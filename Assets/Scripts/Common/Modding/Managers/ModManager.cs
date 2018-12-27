@@ -69,6 +69,16 @@ namespace Modding
 
 		public static void LoadMods()
 		{
+			LoadModsInternal(false).Wait();
+		}
+
+		public static async Task LoadModsAsync()
+		{
+			await LoadModsInternal(true); 
+		}
+
+		protected static async Task LoadModsInternal(bool async)
+		{
 			foreach (string path in SearchPaths)
 			{
 				string[] childPaths = Directory.GetFileSystemEntries(path);
@@ -76,7 +86,7 @@ namespace Modding
 				{
 					foreach (ModLoader loader in Loaders)
 					{
-						ModPackage package = loader.LoadMod(childPath);
+						ModPackage package = async ? await loader.LoadModAsync(childPath) : loader.LoadMod(childPath);
 						if (package != null)
 						{
 							modPackages.Add(package);

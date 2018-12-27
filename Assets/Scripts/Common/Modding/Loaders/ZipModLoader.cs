@@ -17,7 +17,7 @@ namespace Modding.Loaders
 			MetadataFile = metadataFile;
 		}
 
-		public override ModPackage LoadMod(string path)
+		protected override async Task<ModPackage> LoadModInternal(string path, bool async)
 		{
 			FileAttributes attributes = File.GetAttributes(path);
 			if (attributes.HasFlag(FileAttributes.Directory))
@@ -25,9 +25,16 @@ namespace Modding.Loaders
 
 			try
 			{
-				ZipModPackage package = new ZipModPackage(path, MetadataFile);
-				if (package.Metadata != null)
-					return package;
+				ZipModPackage package = new ZipModPackage(path);
+				if (package.Exists(MetadataFile))
+				{
+					string metadataText = async ? await package.ReadTextAsync(MetadataFile) : package.ReadText(MetadataFile);
+					if (metadataText != null)
+					{
+						package.Metadata = ToJSON<ModMetadata>(metadataText);
+						return package;
+					}
+				}
 			}
 			catch (Exception)
 			{
@@ -39,28 +46,14 @@ namespace Modding.Loaders
 
 	public class ZipModPackage : ModPackage
 	{
-		public string MetadataFile { get; protected set; }
 		public FileStream Stream { get; protected set; }
 		public ZipArchive Archive { get; protected set; }
 
-		public ZipModPackage(string path, string metadataFile)
+		public ZipModPackage(string path)
 		{
 			Path = path;
-			MetadataFile = metadataFile;
 			Stream = new FileStream(path, FileMode.Open);
 			Archive = new ZipArchive(Stream, ZipArchiveMode.Read);
-			Metadata = GetMetadata();
-		}
-
-		public virtual ModMetadata GetMetadata()
-		{
-			if (Exists(MetadataFile))
-			{
-				string metadataText = ReadText(MetadataFile);
-				if (metadataText != null)
-					return DecodeObject<ModMetadata>(metadataText);
-			}
-			return null;
 		}
 
 		public override bool Exists(string path)

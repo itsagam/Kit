@@ -23,23 +23,43 @@ public class Test: MonoBehaviour
 
 	async void Start()
 	{
-		ModManager.LoadMods();
+		await LoadMods();
+		await ModdingTest();
+	}
+	
+	protected async Task LoadMods()
+	{
+		await ModManager.LoadModsAsync();
 		foreach (ModPackage mod in ModManager.ModPackages)
 			Debug.Log(mod.Metadata.Name);
+	}
 
-		//ModManager.ResourceLoaded += ModManager_ResourceLoaded;
-		//ModManager.ResourceReused += ModManager_ResourceReused;
-		//ResourceHelper.Modding = false;
-		//obj.GetComponent<MeshRenderer>().material.mainTexture = await ResourceManager.LoadAsync<Texture>(@"Textures/test.jpeg");
-		//Debug.Log(ResourceManager.EncodeObject(ResourceManager.Read<GameData>(ResourceFolder.StreamingAssets, "Data/test.json", true)));
+	protected async Task ModdingTest()
+	{
+		ModManager.ResourceLoaded += ModManager_ResourceLoaded;
+		ModManager.ResourceReused += ModManager_ResourceReused;
+		//ResourceManager.Modding = false;
+		obj.GetComponent<MeshRenderer>().material.mainTexture = await ResourceManager.LoadAsync<Texture>(@"Textures/test.jpeg");
+		Debug.Log(ResourceManager.EncodeObject(ResourceManager.Read<GameData>(ResourceFolder.StreamingAssets, "Data/test.json", true)));
+	}
 
+	protected void ProfileTest()
+	{
+		Debugger.StartProfile("Normal");
+		for (int i = 0; i < 100000; i++)
+			Resources.Load<Texture>("Textures/test");
+		Debugger.EndAndLogProfile();
+	}
+
+	protected void ScriptingTest()
+	{
 		/*
 		foreach(var f in Assembly.GetExecutingAssembly().GetTypes().SelectMany(t => t.GetFields().Where(p => Attribute.IsDefined(p, typeof(VariableAttribute)))))
 		{
-			if (f.IsStatic)
-				Debug.Log(f.GetValue(null));
-			else
-				Debug.Log(f.GetValue(FindObjectOfType(f.DeclaringType)));
+		if (f.IsStatic)
+			Debug.Log(f.GetValue(null));
+		else
+			Debug.Log(f.GetValue(FindObjectOfType(f.DeclaringType)));
 		}
 		*/
 		/*
@@ -57,13 +77,6 @@ public class Test: MonoBehaviour
 			Instantiate<Test>(Resources.Load<Test>("Prefab"));
 			count++;
 		}
-		*/
-
-		/*
-		Debugger.StartProfile("Normal");
-		for (int i = 0; i < 100000; i++)
-			Resources.Load("Textures/test");
-		Debugger.EndAndLogProfile();
 		*/
 	}
 

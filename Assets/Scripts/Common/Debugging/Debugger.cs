@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.Profiling;
+using UniRx;
 
 public class Debugger : MonoBehaviour
 {
@@ -73,10 +74,9 @@ public class Debugger : MonoBehaviour
 
 	public static void LogProfile(string name)
 	{
-		ControlHelper.RunCoroutine(LogTimeLocal());
+		MainThreadDispatcher.StartUpdateMicroCoroutine(LogTimeLocal());
 		IEnumerator LogTimeLocal()
 		{
-			yield return null;
 			yield return null;
 			Debug.Log($"{name}: {GetTime(name)}");
 		}

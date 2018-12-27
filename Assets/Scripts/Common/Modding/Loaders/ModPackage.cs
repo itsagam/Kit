@@ -17,8 +17,8 @@ namespace Modding
 
 	public abstract class ModPackage
 	{
-		public string Path { get; protected set; }
-		public ModMetadata Metadata { get; protected set ; }
+		public string Path { get;  protected set; }
+		public ModMetadata Metadata { get; set ; }
 
 		public abstract bool Exists(string path);
         public abstract void Unload();
@@ -81,15 +81,5 @@ namespace Modding
         {
 			return $"File \"{path}\" not found in mod \"{Metadata.Name}\".";
         }
-
-		protected virtual T DecodeObject<T>(string encoded)
-		{
-			return JsonUtility.FromJson<T>(encoded);
-		}
-
-		protected virtual string EncodeObject(object data)
-		{
-			return JsonUtility.ToJson(data, true);
-		}
 	}
 }

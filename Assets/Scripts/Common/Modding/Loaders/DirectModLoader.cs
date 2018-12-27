@@ -16,7 +16,7 @@ namespace Modding.Loaders
             MetadataFile = metadataFile;
         }
 
-		public override ModPackage LoadMod(string path)
+		protected override async Task<ModPackage> LoadModInternal(string path, bool async)
 		{
 			FileAttributes attributes = File.GetAttributes(path);
 			if (!attributes.HasFlag(FileAttributes.Directory))
@@ -24,11 +24,19 @@ namespace Modding.Loaders
 
 			try
 			{
-				DirectModPackage package = new DirectModPackage(path, MetadataFile);
-				if (package.Metadata != null)
-					return package;
+				DirectModPackage package = new DirectModPackage(path);
+				string metadataPath = package.GetFullPath(MetadataFile);
+				if (package.Exists(metadataPath))
+				{
+					string metadataText = async ? await package.ReadTextAsync(metadataPath) : package.ReadText(metadataPath);
+					if (metadataText != null)
+					{
+						package.Metadata = ToJSON<ModMetadata>(metadataText);
+						return package;
+					}
+				}
 			}
-			catch(Exception)
+			catch (Exception)
 			{
 			}
 
@@ -38,25 +46,9 @@ namespace Modding.Loaders
 
 	public class DirectModPackage: ModPackage
 	{
-		public string MetadataFile { get; protected set; }
-
-		public DirectModPackage(string path, string metadataFile)
+		public DirectModPackage(string path)
 		{
 			Path = path;
-            MetadataFile = metadataFile;
-			Metadata = GetMetadata();
-		}
-
-		public virtual ModMetadata GetMetadata()
-		{
-			string metadataPath = GetFullPath(MetadataFile);
-			if (Exists(metadataPath))
-			{
-				string metadataText = ReadText(metadataPath);
-				if (metadataText != null)
-					return DecodeObject<ModMetadata>(metadataText);
-			}
-			return null;
 		}
 
 		protected override async Task<string> ReadTextInternal(string path, bool async)
