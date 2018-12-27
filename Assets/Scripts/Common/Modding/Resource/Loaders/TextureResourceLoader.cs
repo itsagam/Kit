@@ -3,14 +3,14 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 
-namespace Modding.Parsers
+namespace Modding.Resource.Loaders
 {
-	public class TextureParser : ModParser
+	public class TextureResourceLoader : ResourceLoader
 	{
-		public override ParseType ParseWith => ParseType.Bytes;
+		public override ReadType LoadWith => ReadType.Bytes;
 		public override List<Type> SupportedTypes => new List<Type> { typeof(Texture2D) };
 
-		public override T Parse<T>(string path, byte[] data)
+		public override T Load<T>(string path, byte[] data)
 		{
 			Texture2D texture = null;
 			texture = new Texture2D(0, 0);

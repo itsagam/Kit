@@ -2,8 +2,10 @@
 using System.Collections;
 using System.IO;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using System.Threading.Tasks;
+using Modding.Resource.Readers;
 
 namespace Modding.Loaders
 {
@@ -30,8 +32,8 @@ namespace Modding.Loaders
 				{
 					string metadataText = async ? await package.ReadTextAsync(metadataPath) : package.ReadText(metadataPath);
 					if (metadataText != null)
-					{
-						package.Metadata = ToJSON<ModMetadata>(metadataText);
+					{					
+						package.Metadata = new JSONResourceReader().Read<ModMetadata>(metadataText);
 						return package;
 					}
 				}
@@ -84,19 +86,19 @@ namespace Modding.Loaders
 				return File.ReadAllBytes(matching);
 		}
 
-		public virtual string FindFile(string path)
+		public override IEnumerable<string> FindFiles(string path)
 		{
 			if (Exists(path))
-				return GetFullPath(path);
-
-			if (! System.IO.Path.HasExtension(path))
+				return new string[] { path };
+			
+			if (!System.IO.Path.HasExtension(path))
 			{
 				string fullPath = GetFullPath(path);
 				string directory = System.IO.Path.GetDirectoryName(fullPath);
 				string file = System.IO.Path.GetFileName(fullPath);
 				string[] matching = Directory.GetFiles(directory, $"{file}.*");
 				if (matching.Length > 0)
-					return matching[0];
+					return matching;
 			}
 
 			return null;

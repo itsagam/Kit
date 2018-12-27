@@ -6,15 +6,19 @@ using System.Collections.ObjectModel;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using Modding.Loaders;
+using Modding.Resource;
+using Modding.Resource.Loaders;
+using Modding.Resource.Readers;
 
 namespace Modding
 {
 	public class ResourceInfo
 	{
 		public ModPackage Package;
-		public UnityEngine.Object Reference;
+		public object Reference;
 
-		public ResourceInfo(ModPackage package, UnityEngine.Object reference)
+		public ResourceInfo(ModPackage package, object reference)
 		{
 			Package = package;
 			Reference = reference;
@@ -36,7 +40,8 @@ namespace Modding
 		public static event ResourceUnloadedHandler ResourceUnloaded;
 
         public static List<ModLoader> Loaders = new List<ModLoader>();
-		public static List<ModParser> Parsers = new List<ModParser>();
+		public static List<ResourceLoader> ResourceLoaders = new List<ResourceLoader>();
+		public static List<ResourceReader> ResourceReaders = new List<ResourceReader>();
 		public static List<string> SearchPaths = new List<string>();
 
 		protected static List<ModPackage> modPackages = new List<ModPackage>();
@@ -44,22 +49,28 @@ namespace Modding
 
 		static ModManager()
 		{
-			AddDefaultLoaders();
-			AddDefaultParsers();
+			AddDefaultModLoaders();
+			AddDefaultResourceLoaders();
+			AddDefaultResourceReaders();
 			AddDefaultSearchPaths();
 		}
 
-		private static void AddDefaultLoaders()
+		private static void AddDefaultModLoaders()
         {
-			Loaders.Add(new Loaders.DirectModLoader());
-			Loaders.Add(new Loaders.ZipModLoader());
+			Loaders.Add(new DirectModLoader());
+			Loaders.Add(new ZipModLoader());
 		}
 
-		private static void AddDefaultParsers()
+		private static void AddDefaultResourceLoaders()
 		{
-			Parsers.Add(new Parsers.TextureParser());
-			Parsers.Add(new Parsers.AudioParser());
-			Parsers.Add(new Parsers.TextParser());
+			ResourceLoaders.Add(new TextureResourceLoader());
+			ResourceLoaders.Add(new AudioResourceLoader());
+			ResourceLoaders.Add(new TextResourceLoader());
+		}
+		
+		private static void AddDefaultResourceReaders()
+		{
+			ResourceReaders.Add(new JSONResourceReader());
 		}
 
 		private static void AddDefaultSearchPaths()
@@ -216,6 +227,89 @@ namespace Modding
 			return all;
 		}
 
+		public static T Read<T>(string path)
+		{
+			return ReadInternal<T>(path, false).Result;
+		}
+
+		public static async Task<T> ReadAsync<T>(string path)
+		{
+			return await ReadInternal<T>(path, true);
+		}
+
+		protected static async Task<T> ReadInternal<T>(string path, bool async)
+		{
+			List<ResourceInfo> resourcesInfos = GetResourceInfo(path);
+			if (resourcesInfos != null)
+			{
+				ResourceInfo resourceInfo = resourcesInfos[0];
+				if (ResourceReused != null)
+					ResourceReused(path, resourceInfo);
+				return (T) resourceInfo.Reference;
+			}
+
+			foreach (ModPackage package in ModPackages.Reverse())
+			{
+				T reference = async ? await package.ReadAsync<T>(path) : package.Read<T>(path);
+				if (reference != null)
+				{
+					ResourceInfo resourceInfo = new ResourceInfo(package, reference);
+					if (!resourceInfos.ContainsKey(path))
+						resourceInfos[path] = new List<ResourceInfo>();
+					resourceInfos[path].Add(resourceInfo);
+
+					if (ResourceLoaded != null)
+						ResourceLoaded(path, resourceInfo);
+
+					return reference;
+				}
+			}
+			return default(T);
+		}
+
+		public static List<T> ReadAll<T>(string path)
+		{
+			return ReadAllInternal<T>(path, false).Result;
+		}
+
+		public static async Task<List<T>> ReadAllAsync<T>(string path)
+		{
+			return await ReadAllInternal<T>(path, true);
+		}
+
+		protected static async Task<List<T>> ReadAllInternal<T>(string path, bool async)
+		{
+			List<T> all = new List<T>();
+			List<ResourceInfo> cachedInfos = GetResourceInfo(path);
+			foreach (ModPackage package in ModPackages)
+			{
+				ResourceInfo cachedInfo = cachedInfos?.FirstOrDefault(i => i.Package == package);
+				if (cachedInfo == null)
+				{
+					T reference = async ? await package.ReadAsync<T>(path) : package.Read<T>(path);
+					if (reference != null)
+					{
+						ResourceInfo resourceInfo = new ResourceInfo(package, reference);
+						if (!resourceInfos.ContainsKey(path))
+							resourceInfos[path] = new List<ResourceInfo>();
+						resourceInfos[path].Add(resourceInfo);
+
+						if (ResourceLoaded != null)
+							ResourceLoaded(path, resourceInfo);
+
+						all.Add(reference);
+					}
+				}
+				else
+				{
+					if (ResourceReused != null)
+						ResourceReused(path, cachedInfo);
+					all.Add((T) cachedInfo.Reference);
+				}
+			}
+			return all;
+		}
+
 		public static string ReadText(string path)
 		{
 			return ReadTextInternal(path, false).Result;
@@ -353,7 +447,7 @@ namespace Modding
 				ModUnloaded(package);
 		}
 
-		public static bool Unload(UnityEngine.Object obj)
+		public static bool Unload(object obj)
 		{
 			return Unload(i => i.Reference == obj);
 		}

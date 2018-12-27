@@ -19,15 +19,5 @@ namespace Modding
 		{
 			return await LoadModInternal(path, true);
 		}
-
-		protected virtual T ToJSON<T>(string encoded)
-		{
-			return JsonUtility.FromJson<T>(encoded);
-		}
-
-		protected virtual string FromJSON(object data)
-		{
-			return JsonUtility.ToJson(data, true);
-		}
 	}
 }

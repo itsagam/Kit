@@ -3,14 +3,14 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 
-namespace Modding.Parsers
+namespace Modding.Resource.Loaders
 {
-	public class AudioParser : ModParser
+	public class AudioResourceLoader : ResourceLoader
 	{
-		public override ParseType ParseWith => ParseType.Bytes;
+		public override ReadType LoadWith => ReadType.Bytes;
 		public override List<Type> SupportedTypes => new List<Type> { typeof(AudioClip) };
 
-		public override T Parse<T>(string path, byte[] data)
+		public override T Load<T>(string path, byte[] data)
 		{
 			return WavUtility.ToAudioClip(data, 0, path) as T;
 		}

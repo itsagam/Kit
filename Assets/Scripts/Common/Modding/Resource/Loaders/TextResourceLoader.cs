@@ -3,14 +3,14 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 
-namespace Modding.Parsers
+namespace Modding.Resource.Loaders
 {
-	public class TextParser : ModParser
+	public class TextResourceLoader : ResourceLoader
 	{
-		public override ParseType ParseWith => ParseType.Text;
+		public override ReadType LoadWith => ReadType.Text;
 		public override List<Type> SupportedTypes => new List<Type> { typeof(TextAsset) };
 
-		public override T Parse<T>(string path, string data)
+		public override T Load<T>(string path, string data)
 		{
 			TextAsset asset = new TextAsset(data);
 			asset.name = path;

@@ -25,8 +25,10 @@ public class Test: MonoBehaviour
 	{
 		await LoadMods();
 		await ModdingTest();
+
+		Debug.Log(ResourceManager.EncodeObject(await ResourceManager.ReadAsync<GameData>(ResourceFolder.StreamingAssets, "Data/test", true)));
 	}
-	
+
 	protected async Task LoadMods()
 	{
 		await ModManager.LoadModsAsync();
@@ -40,7 +42,7 @@ public class Test: MonoBehaviour
 		ModManager.ResourceReused += ModManager_ResourceReused;
 		//ResourceManager.Modding = false;
 		obj.GetComponent<MeshRenderer>().material.mainTexture = await ResourceManager.LoadAsync<Texture>(@"Textures/test.jpeg");
-		Debug.Log(ResourceManager.EncodeObject(ResourceManager.Read<GameData>(ResourceFolder.StreamingAssets, "Data/test.json", true)));
+		//Debug.Log(ResourceManager.EncodeObject(ResourceManager.Read<GameData>(ResourceFolder.StreamingAssets, "Data/test.json", true)));
 	}
 
 	protected void ProfileTest()
@@ -82,12 +84,12 @@ public class Test: MonoBehaviour
 
 	private void ModManager_ResourceReused(string path, ResourceInfo info)
 	{
-		Debug.Log($"File {path} resused from {info.Package.Path}");
+		Debug.Log($"File \"{path}\"resused from \"{info.Package.Path}\"");
 	}
 
 	private void ModManager_ResourceLoaded(string path, ResourceInfo info)
 	{
-		Debug.Log($"File {path} loaded from {info.Package.Path}");
+		Debug.Log($"File \"{path}\" loaded from \"{info.Package.Path}\"");
 	}
 
 	void OnDestroy()

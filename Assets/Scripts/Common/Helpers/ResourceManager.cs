@@ -105,7 +105,17 @@ public class ResourceManager
     }
 	
     public static T Read<T>(ResourceFolder folder, string file, bool merge = false)
-    {
+    {	
+		if (Modding)
+		{
+			T modded = ModManager.Read<T>(file);
+			if (modded != null)
+				return modded;
+		}
+		return Read<T>((GetPath(folder, file)));
+
+
+		/*
 		if (merge)
 		{
 			List<string> contents = new List<string>();
@@ -131,6 +141,7 @@ public class ResourceManager
 			}
 			return Read<T>((GetPath(folder, file)));
 		}
+		*/
     }
 
 	public static T Read<T>(string fullPath)
@@ -153,6 +164,15 @@ public class ResourceManager
 
 	public static async Task<T> ReadAsync<T>(ResourceFolder folder, string file, bool merge = false)
 	{
+		if (Modding)
+		{
+			T modded = await ModManager.ReadAsync<T>(file);
+			if (modded != null)
+				return modded;
+		}
+
+		return await ReadAsync<T>(GetPath(folder, file));
+		/*
 		if (merge)
 		{
 			List<string> contents = new List<string>();
@@ -179,6 +199,7 @@ public class ResourceManager
 
 			return await ReadAsync<T>(GetPath(folder, file));
 		}
+		*/
 	}
 
 	public static async Task<string> ReadAsync(ResourceFolder folder, string file)

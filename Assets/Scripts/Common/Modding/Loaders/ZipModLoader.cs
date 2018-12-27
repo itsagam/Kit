@@ -4,7 +4,9 @@ using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
 using System.Threading.Tasks;
+using System.Linq;
 using UnityEngine;
+using Modding.Resource.Readers;
 
 namespace Modding.Loaders
 {
@@ -31,7 +33,7 @@ namespace Modding.Loaders
 					string metadataText = async ? await package.ReadTextAsync(MetadataFile) : package.ReadText(MetadataFile);
 					if (metadataText != null)
 					{
-						package.Metadata = ToJSON<ModMetadata>(metadataText);
+						package.Metadata = new JSONResourceReader().Read<ModMetadata>(metadataText);
 						return package;
 					}
 				}
@@ -63,10 +65,11 @@ namespace Modding.Loaders
 
 		protected override async Task<string> ReadTextInternal(string path, bool async)
 		{
-			ZipArchiveEntry entry = FindFile(path);
-			if (entry == null)
+			string matching = FindFile(path);
+			if (matching == null)
 				throw new FileNotFoundException(GetNotFoundException(path));
 
+			ZipArchiveEntry entry = Archive.GetEntry(matching);
 			Stream stream = entry.Open();
 			TextReader text = new StreamReader(stream);
 			string data = null;
@@ -81,10 +84,11 @@ namespace Modding.Loaders
 
 		protected override async Task<byte[]> ReadBytesInternal(string path, bool async)
 		{
-			ZipArchiveEntry entry = FindFile(path);
-			if (entry == null)
+			string matching = FindFile(path);
+			if (matching == null)
 				throw new FileNotFoundException(GetNotFoundException(path));
-	
+
+			ZipArchiveEntry entry = Archive.GetEntry(matching);
 			Stream stream = entry.Open();
 			byte[] data = new byte[entry.Length];
 			if (async)
@@ -95,30 +99,25 @@ namespace Modding.Loaders
 			return data;
 		}
 
-		public virtual ZipArchiveEntry FindFile(string path)
+		public override IEnumerable<string> FindFiles(string path)
 		{
 			ZipArchiveEntry result = Archive.GetEntry(path);
 			if (result != null)
-				return result;
+				return new string[] { path };
 
 			if (! System.IO.Path.HasExtension(path))
 			{
 				string fileName = System.IO.Path.GetFileName(path);
 				string fileDir = System.IO.Path.GetDirectoryName(path);
-				foreach (ZipArchiveEntry entry in Archive.Entries)
-				{
-					string entryDir = System.IO.Path.GetDirectoryName(entry.FullName);
-					if (string.Compare(fileDir, entryDir, true) == 0)
-					{
-						string entryName = entry.Name;
-						if (entry.Name != "")
-						{
-							string withoutExt = System.IO.Path.GetFileNameWithoutExtension(entryName);
-							if (string.Compare(fileName, withoutExt, true) == 0)
-								return entry;
-						}
-					}
-				}
+				
+				var matching = Archive.Entries
+									.Where(	e => string.Compare(fileDir, System.IO.Path.GetDirectoryName(e.FullName), true) == 0 &&
+											e.Name != null &&
+											string.Compare(fileName, System.IO.Path.GetFileNameWithoutExtension(e.Name), true) == 0)
+									.Select(e => e.FullName);
+
+				if (matching.Any())
+					return matching.ToList<string>();
 			}
 
 			return null;
