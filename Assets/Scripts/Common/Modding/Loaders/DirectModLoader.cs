@@ -57,8 +57,9 @@ namespace Modding.Loaders
 		{
 			string matching = FindFile(path);
 			if (matching == null)
-				throw new FileNotFoundException(GetNotFoundException(path));
+				throw GetNotFoundException(path);
 
+			matching = GetFullPath(matching);
 			if (async)
 				using (StreamReader stream = new StreamReader(matching))
 					return await stream.ReadToEndAsync();
@@ -70,8 +71,9 @@ namespace Modding.Loaders
 		{
 			string matching = FindFile(path);
 			if (matching == null)
-				throw new FileNotFoundException(GetNotFoundException(path));
+				throw GetNotFoundException(path);
 
+			matching = GetFullPath(matching);
 			if (async)
 			{
 				byte[] content;
@@ -88,16 +90,18 @@ namespace Modding.Loaders
 
 		public override IEnumerable<string> FindFiles(string path)
 		{
-			if (Exists(path))
+			string fullPath = GetFullPath(path);
+			if (File.Exists(fullPath))
 				return new string[] { path };
 			
 			if (!System.IO.Path.HasExtension(path))
 			{
-				string fullPath = GetFullPath(path);
-				string directory = System.IO.Path.GetDirectoryName(fullPath);
-				string file = System.IO.Path.GetFileName(fullPath);
-				string[] matching = Directory.GetFiles(directory, $"{file}.*");
-				if (matching.Length > 0)
+				string relativeDir = System.IO.Path.GetDirectoryName(path);
+				string fullDir = System.IO.Path.GetDirectoryName(fullPath);
+				string fullFile = System.IO.Path.GetFileName(fullPath);
+				var matching = Directory.EnumerateFiles(fullDir, $"{fullFile}.*")
+					.Select(p => System.IO.Path.Combine(relativeDir, System.IO.Path.GetFileName(p)));
+				if (matching.Any())
 					return matching;
 			}
 

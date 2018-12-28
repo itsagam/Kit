@@ -45,7 +45,7 @@ namespace Modding
 		public static List<string> SearchPaths = new List<string>();
 
 		protected static List<ModPackage> modPackages = new List<ModPackage>();
-		protected static Dictionary<string, List<ResourceInfo>> resourceInfos = new Dictionary<string, List<ResourceInfo>>();
+		protected static Dictionary<string, List<ResourceInfo>> resourceInfos = new Dictionary<string, List<ResourceInfo>>(StringComparer.OrdinalIgnoreCase);
 
 		static ModManager()
 		{
@@ -243,8 +243,7 @@ namespace Modding
 			if (resourcesInfos != null)
 			{
 				ResourceInfo resourceInfo = resourcesInfos[0];
-				if (ResourceReused != null)
-					ResourceReused(path, resourceInfo);
+				ResourceReused?.Invoke(path, resourceInfo);
 				return (T) resourceInfo.Reference;
 			}
 
@@ -257,14 +256,11 @@ namespace Modding
 					if (!resourceInfos.ContainsKey(path))
 						resourceInfos[path] = new List<ResourceInfo>();
 					resourceInfos[path].Add(resourceInfo);
-
-					if (ResourceLoaded != null)
-						ResourceLoaded(path, resourceInfo);
-
+					ResourceLoaded?.Invoke(path, resourceInfo);
 					return reference;
 				}
 			}
-			return default(T);
+			return default;
 		}
 
 		public static List<T> ReadAll<T>(string path)
@@ -369,12 +365,12 @@ namespace Modding
 			return all;
 		}
 
-		public static byte[] ReadBytes(string path, bool async)
+		public static byte[] ReadBytes(string path)
 		{
 			return ReadBytesInternal(path, false).Result;
 		}
 
-		public static async Task<byte[]> ReadBytesAsync(string path, bool async)
+		public static async Task<byte[]> ReadBytesAsync(string path)
 		{
 			return await ReadBytesInternal(path, true);
 		}

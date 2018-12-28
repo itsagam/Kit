@@ -7,12 +7,14 @@ namespace Modding.Resource.Loaders
 {
 	public class AudioResourceLoader : ResourceLoader
 	{
-		public override ReadType LoadWith => ReadType.Bytes;
+		public override OperateType OperateWith => OperateType.Bytes;
 		public override List<Type> SupportedTypes => new List<Type> { typeof(AudioClip) };
 
-		public override T Load<T>(string path, byte[] data)
+		public override T Load<T>(string path, object data)
 		{
-			return WavUtility.ToAudioClip(data, 0, path) as T;
+			AudioClip clip = WavUtility.ToAudioClip((byte[]) data, 0, path);
+			clip.name = path;
+			return clip as T;
 		}
 	}
 }

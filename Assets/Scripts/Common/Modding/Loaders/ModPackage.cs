@@ -51,7 +51,7 @@ namespace Modding
 				foreach(ResourceLoader loader in ModManager.ResourceLoaders)
 					if (loader.CanLoad(typeof(T)))
 					{
-						if (loader.LoadWith == ReadType.Bytes)
+						if (loader.OperateWith == OperateType.Bytes)
 							return loader.Load<T>(path, await ReadBytesInternal(path, async));
 						else
 							return loader.Load<T>(path, await ReadTextInternal(path, async));
@@ -84,7 +84,7 @@ namespace Modding
 					string fileName = System.IO.Path.GetFileName(matchingFile);
 					foreach (ResourceReader reader in ModManager.ResourceReaders)
 						if (reader.CanRead(fileName))
-							if (reader.ReadWith == ReadType.Bytes)
+							if (reader.OperateWith == OperateType.Bytes)
 								return reader.Read<T>(await ReadBytesInternal(matchingFile, async));
 							else
 								return reader.Read<T>(await ReadTextInternal(matchingFile, async));
@@ -94,7 +94,7 @@ namespace Modding
 			{
 			}
 			
-			return default(T);
+			return default;
 		}
 
 		public virtual string ReadText(string path)
@@ -117,9 +117,9 @@ namespace Modding
 			return await ReadBytesInternal(path, true);
 		}
 
-		protected virtual string GetNotFoundException(string path)
+		protected virtual FileNotFoundException GetNotFoundException(string path)
         {
-			return $"File \"{path}\" not found in mod \"{Metadata.Name}\".";
+			return new FileNotFoundException($"File \"{path}\" not found in mod \"{Metadata.Name}\".");
         }
 	}
 }

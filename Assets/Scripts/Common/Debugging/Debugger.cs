@@ -6,9 +6,12 @@ using System.Linq;
 using UnityEngine;
 using UnityEngine.Profiling;
 using UniRx;
+using System.Text;
 
 public class Debugger : MonoBehaviour
 {
+
+	#region Profiling
 	protected static OrderedDictionary Samples = new OrderedDictionary();
 
 	public static void StartProfile(string name)
@@ -97,4 +100,59 @@ public class Debugger : MonoBehaviour
 			return sample.GetRecorder().elapsedNanoseconds;
 		return -1;
 	}
+	#endregion
+
+	#region Logging
+	public static void Log(string line)
+	{
+		Debug.Log(line);
+	}
+
+	public static void Log(string type, string line)
+	{
+		Log("[" + type + "] " + line);
+	}
+
+	public static void Log(object obj)
+	{
+		Log(EncodeObject(obj));
+	}
+
+	public static void Log(string type, object obj)
+	{
+		Log(type, EncodeObject(obj.ToString()));
+	}
+
+	public static void Log(IEnumerable enumerable)
+	{
+		Log(EnumerableToString(enumerable));
+	}
+
+	public static void Log(string type, IEnumerable enumerable)
+	{
+		Log(type, EnumerableToString(enumerable));
+	}
+
+	protected static string EnumerableToString(IEnumerable enumerable)
+	{
+		IEnumerable<object> items = enumerable.Cast<object>();
+		StringBuilder output = new StringBuilder();
+		if (items.Any())
+		{
+			foreach (object obj in items)
+				output.Append(", " + obj);
+		}
+		return "{" + output + "}";
+	}
+
+	public static string EncodeObject(object data)
+	{
+		return JsonUtility.ToJson(data, true);
+	}
+
+	public static T DecodeObject<T>(string encoded)
+	{
+		return JsonUtility.FromJson<T>(encoded);
+	}
+	#endregion
 }

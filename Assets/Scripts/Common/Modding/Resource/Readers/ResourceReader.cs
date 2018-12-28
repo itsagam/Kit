@@ -10,14 +10,19 @@ namespace Modding.Resource
 	public abstract class ResourceReader
 	{
 		public abstract List<string> SupportedExtensions { get; }
-		public abstract ReadType ReadWith { get; }
+		public abstract OperateType OperateWith { get; }
 
-		public virtual T Read<T>(byte[] data)
+		public virtual T Read<T>(object data)
 		{
 			throw new NotImplementedException();
 		}
 
-		public virtual T Read<T>(string data)
+		public virtual object Write(object obj)
+		{
+			throw new NotImplementedException();
+		}
+
+		public virtual void Merge<T>(T a, T b)
 		{
 			throw new NotImplementedException();
 		}

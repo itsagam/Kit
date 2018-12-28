@@ -67,7 +67,7 @@ namespace Modding.Loaders
 		{
 			string matching = FindFile(path);
 			if (matching == null)
-				throw new FileNotFoundException(GetNotFoundException(path));
+				throw GetNotFoundException(path);
 
 			ZipArchiveEntry entry = Archive.GetEntry(matching);
 			Stream stream = entry.Open();
@@ -86,7 +86,7 @@ namespace Modding.Loaders
 		{
 			string matching = FindFile(path);
 			if (matching == null)
-				throw new FileNotFoundException(GetNotFoundException(path));
+				throw GetNotFoundException(path);
 
 			ZipArchiveEntry entry = Archive.GetEntry(matching);
 			Stream stream = entry.Open();
@@ -111,9 +111,9 @@ namespace Modding.Loaders
 				string fileDir = System.IO.Path.GetDirectoryName(path);
 				
 				var matching = Archive.Entries
-									.Where(	e => string.Compare(fileDir, System.IO.Path.GetDirectoryName(e.FullName), true) == 0 &&
+									.Where(	e => System.IO.Path.GetDirectoryName(e.FullName).Equals(fileDir, StringComparison.OrdinalIgnoreCase) &&
 											e.Name != null &&
-											string.Compare(fileName, System.IO.Path.GetFileNameWithoutExtension(e.Name), true) == 0)
+											System.IO.Path.GetFileNameWithoutExtension(e.Name).Equals(fileName, StringComparison.OrdinalIgnoreCase))
 									.Select(e => e.FullName);
 
 				if (matching.Any())

@@ -6,7 +6,7 @@ using System.Linq;
 
 namespace Modding.Resource
 {
-	public enum ReadType
+	public enum OperateType
 	{
 		Bytes,
 		Text
@@ -14,15 +14,10 @@ namespace Modding.Resource
 
 	public abstract class ResourceLoader
 	{
-		public abstract ReadType LoadWith { get; }
+		public abstract OperateType OperateWith { get; }
 		public abstract List<Type> SupportedTypes { get; }
 
-		public virtual T Load<T>(string path, byte[] data) where T: UnityEngine.Object
-		{
-			throw new NotImplementedException();
-		}
-
-		public virtual T Load<T>(string path, string data) where T : UnityEngine.Object
+		public virtual T Load<T>(string path, object data) where T: UnityEngine.Object
 		{
 			throw new NotImplementedException();
 		}

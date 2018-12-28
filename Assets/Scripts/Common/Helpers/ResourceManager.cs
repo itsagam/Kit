@@ -1,12 +1,14 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using System.IO;
 using UnityEngine;
 using UnityEngine.Networking;
-using Modding;
-using System.Threading.Tasks;
 using UniRx.Async;
+using Modding;
+using Modding.Resource;
+using Modding.Resource.Readers;
 
 public enum ResourceFolder
 {
@@ -24,8 +26,9 @@ public class ResourceManager
 
 	public static bool Modding = true;
 
-	protected static Dictionary<string, UnityEngine.Object> CachedResources = new Dictionary<string, UnityEngine.Object>();
+	protected static Dictionary<string, UnityEngine.Object> CachedResources = new Dictionary<string, UnityEngine.Object>(StringComparer.OrdinalIgnoreCase);
 
+	#region Loading
 	public static T Load<T>(string path) where T : UnityEngine.Object
 	{
 		if (Modding)
@@ -92,19 +95,117 @@ public class ResourceManager
 		CachedResources.Clear();
 		Resources.UnloadUnusedAssets();
 	}
+	#endregion
 
-	public static string Read(ResourceFolder folder, string file)
-    {
+	#region Reading
+	public static string ReadText(ResourceFolder folder, string file)
+	{
 		if (Modding)
 		{
 			string modded = ModManager.ReadText(file);
 			if (modded != null)
 				return modded;
 		}
-        return Read(GetPath(folder, file));
-    }
-	
-    public static T Read<T>(ResourceFolder folder, string file, bool merge = false)
+		return ReadText(GetPath(folder, file));
+	}
+
+	public static async Task<string> ReadTextAsync(ResourceFolder folder, string file)
+	{
+		if (Modding)
+		{
+			string modded = await ModManager.ReadTextAsync(file);
+			if (modded != null)
+				return modded;
+		}
+		return await ReadTextAsync(GetPath(folder, file));
+	}
+
+	public static byte[] ReadBytes(ResourceFolder folder, string file)
+	{
+		if (Modding)
+		{
+			byte[] modded = ModManager.ReadBytes(file);
+			if (modded != null)
+				return modded;
+		}
+		return ReadBytes(GetPath(folder, file));
+	}
+
+	public static async Task<byte[]> ReadBytesAsync(ResourceFolder folder, string file)
+	{
+		if (Modding)
+		{
+			byte[] modded = await ModManager.ReadBytesAsync(file);
+			if (modded != null)
+				return modded;
+		}
+		return await ReadBytesAsync(GetPath(folder, file));
+	}
+
+	public static string ReadText(string fullPath)
+	{
+		return File.ReadAllText(fullPath);
+	}
+
+	public static async Task<string> ReadTextAsync(string fullPath)
+	{
+		return (await LoadAsync(fullPath)).downloadHandler.text;
+	}
+
+	public static byte[] ReadBytes(string fullPath)
+	{
+		return File.ReadAllBytes(fullPath);
+	}
+
+	public static async Task<byte[]> ReadBytesAsync(string fullPath)
+	{
+		return (await LoadAsync(fullPath)).downloadHandler.data;
+	}
+
+	public static async Task<UnityWebRequest> LoadAsync(string filePath)
+	{
+		UnityWebRequest request = UnityWebRequest.Get(LocalToURLPath(filePath));
+		await request.SendWebRequest();
+		return request;
+	}
+
+	public static T Read<T>(string fullPath)
+	{
+		foreach (ResourceReader reader in ModManager.ResourceReaders)
+		{
+			if (reader.CanRead(Path.GetFileName(fullPath)))
+			{
+				T obj = default;
+				if (reader.OperateWith == OperateType.Text)
+					obj = reader.Read<T>(ReadText(fullPath));
+				else
+					obj = reader.Read<T>(ReadBytes(fullPath));
+				if (obj != null)
+					return obj;
+			}
+		}
+		return default;
+	}
+
+	public static async Task<T> ReadAsync<T>(string fullPath)
+	{
+		foreach (ResourceReader reader in ModManager.ResourceReaders)
+		{
+			if (reader.CanRead(Path.GetFileName(fullPath)))
+			{
+				T obj = default;
+				if (reader.OperateWith == OperateType.Text)
+					obj = reader.Read<T>(await ReadTextAsync(fullPath));
+				else
+					obj = reader.Read<T>(await ReadBytesAsync(fullPath));
+				if (obj != null)
+					return obj;
+			}
+		}
+		return default;
+	}
+
+	public static T Read<T>(ResourceFolder folder, string file)
     {	
 		if (Modding)
 		{
@@ -129,7 +230,7 @@ public class ResourceManager
 			if (contents.Count > 0)
 				return GetMerged<T>(contents);
 
-			return default(T);
+			return default;
 		}
 		else
 		{
@@ -144,25 +245,7 @@ public class ResourceManager
 		*/
     }
 
-	public static T Read<T>(string fullPath)
-	{
-		return DecodeObject<T>(Read(fullPath));
-	}
-
-	public static string Read(string fullPath)
-	{
-		return File.ReadAllText(fullPath);
-	}
-
-	protected static T GetMerged<T>(List<string> contents)
-	{
-		T current = DecodeObject<T>(contents[0]);
-		for (int i = 1; i < contents.Count; i++)
-			OverwriteObject(current, contents[i]);
-		return current;
-	}
-
-	public static async Task<T> ReadAsync<T>(ResourceFolder folder, string file, bool merge = false)
+	public static async Task<T> ReadAsync<T>(ResourceFolder folder, string file)
 	{
 		if (Modding)
 		{
@@ -186,7 +269,7 @@ public class ResourceManager
 			if (contents.Count > 0)
 				return GetMerged<T>(contents);
 
-			return default(T);
+			return default;
 		}
 		else
 		{
@@ -202,83 +285,84 @@ public class ResourceManager
 		*/
 	}
 
-	public static async Task<string> ReadAsync(ResourceFolder folder, string file)
+	/*
+	protected static T GetMerged<T>(List<string> contents)
 	{
-		if (Modding)
-		{
-			string modded = await ModManager.ReadTextAsync(file);
-			if (modded != null)
-				return modded;
-		}
-		return await ReadAsync(GetPath(folder, file));
+		T current = DecodeObject<T>(contents[0]);
+		for (int i = 1; i < contents.Count; i++)
+			OverwriteObject(current, contents[i]);
+		return current;
+	}
+	*/
+	#endregion
+
+	#region Saving/Deleting
+	public static void Save(ResourceFolder folder, string file, object contents, ResourceReader reader)
+	{
+		Save(GetPath(folder, file), contents, reader);
 	}
 
-	public static async Task<T> ReadAsync<T>(string fullPath)
+	public static async Task SaveAsync(ResourceFolder folder, string file, object contents, ResourceReader reader)
 	{
-		return DecodeObject<T>(await ReadAsync(fullPath));
+		await SaveAsync(GetPath(folder, file), contents, reader);
 	}
 
-	public static async Task<string> ReadAsync(string fullPath)
+	public static void Save(string fullPath, object contents, ResourceReader reader)
 	{
-		return (await LoadAsync(fullPath)).downloadHandler.text;
-	}
-	
-	public static async Task<UnityWebRequest> LoadAsync(string filePath)
-	{
-		UnityWebRequest request = UnityWebRequest.Get(LocalToURLPath(filePath));
-		await request.SendWebRequest();
-		return request;
+		if (reader.OperateWith == OperateType.Text)
+			SaveText(fullPath, (string)reader.Write(contents));
+		else
+			SaveBytes(fullPath, (byte[])reader.Write(contents));
 	}
 
-	public static void Save(ResourceFolder folder, string file, string contents)
+	public static async Task SaveAsync(string fullPath, object contents, ResourceReader reader)
 	{
-		Save(GetPath(folder, file), contents);
+		if (reader.OperateWith == OperateType.Text)
+			await SaveTextAsync(fullPath, (string)reader.Write(contents));
+		else
+			await SaveBytesAsync(fullPath, (byte[])reader.Write(contents));
 	}
 
-	public static async Task SaveAsync(ResourceFolder folder, string file, string contents)
+	public static void SaveText(ResourceFolder folder, string file, string contents)
 	{
-		await SaveAsync(GetPath(folder, file), contents);
+		SaveText(GetPath(folder, file), contents);
 	}
 
-	public static void Save(ResourceFolder folder, string file, object contents)
+	public static async Task SaveTextAsync(ResourceFolder folder, string file, string contents)
 	{
-		Save(GetPath(folder, file), contents);
+		await SaveTextAsync(GetPath(folder, file), contents);
 	}
 
-	public static async Task SaveAsync(ResourceFolder folder, string file, object contents)
+	public static void SaveBytes(ResourceFolder folder, string file, byte[] bytes)
 	{
-		await SaveAsync(GetPath(folder, file), contents);
+		SaveBytes(GetPath(folder, file), bytes);
 	}
 
-	public static void Save(string fullPath, object contents)
+	public static async Task SaveBytesAsync(ResourceFolder folder, string file, byte[] bytes)
 	{
-		Save(fullPath, EncodeObject(contents));
+		await SaveBytesAsync(GetPath(folder, file), bytes);
 	}
 
-	public static async Task SaveAsync(string fullPath, object contents)
-	{
-		await SaveAsync(fullPath, EncodeObject(contents));
-	}
-
-	public static void Save(string fullPath, string contents)
+	public static void SaveText(string fullPath, string contents)
 	{
 		File.WriteAllText(fullPath, contents);
 	}
 
-	public static async Task SaveAsync(string fullPath, string contents)
+	public static async Task SaveTextAsync(string fullPath, string contents)
 	{
 		using (StreamWriter stream = new StreamWriter(fullPath))
 			await stream.WriteAsync(contents);
 	}
 
-	public static bool Exists(ResourceFolder folder, string file)
+	public static void SaveBytes(string fullPath, byte[] bytes)
 	{
-		return Exists(GetPath(folder, file));
+		File.WriteAllBytes(fullPath, bytes);
 	}
 
-	public static bool Exists(string fullPath)
+	public static async Task SaveBytesAsync(string fullPath, byte[] bytes)
 	{
-		return File.Exists(fullPath);
+		using (FileStream stream = new FileStream(fullPath, FileMode.Create))
+			await stream.WriteAsync(bytes, 0, bytes.Length);
 	}
 
 	public static void Delete(ResourceFolder folder, string file)
@@ -291,6 +375,18 @@ public class ResourceManager
 		File.Delete(fullPath);
 	}
 
+	public static bool Exists(ResourceFolder folder, string file)
+	{
+		return Exists(GetPath(folder, file));
+	}
+
+	public static bool Exists(string fullPath)
+	{
+		return File.Exists(fullPath);
+	}
+	#endregion
+
+	#region Other
 	public static string GetPath(ResourceFolder folder)
 	{
 		return Paths[folder];
@@ -301,25 +397,11 @@ public class ResourceManager
 		return Path.Combine(GetPath(folder), file);
 	}
 
-	public static T DecodeObject<T>(string encoded)
-	{
-		return JsonUtility.FromJson<T>(encoded);
-	}
-
-	public static string EncodeObject(object data)
-	{
-		return JsonUtility.ToJson(data, true);
-	}
-
-	public static void OverwriteObject(object data, string overwrite)
-	{
-		JsonUtility.FromJsonOverwrite(overwrite, data);
-	}
-
 	public static string LocalToURLPath(string path)
 	{
 		if (!path.Contains("file://"))
 			path = "file://" + path;
 		return path;
 	}
+	#endregion
 }

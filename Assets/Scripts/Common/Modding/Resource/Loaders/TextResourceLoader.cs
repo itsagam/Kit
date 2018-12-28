@@ -7,12 +7,12 @@ namespace Modding.Resource.Loaders
 {
 	public class TextResourceLoader : ResourceLoader
 	{
-		public override ReadType LoadWith => ReadType.Text;
+		public override OperateType OperateWith => OperateType.Text;
 		public override List<Type> SupportedTypes => new List<Type> { typeof(TextAsset) };
 
-		public override T Load<T>(string path, string data)
+		public override T Load<T>(string path, object data)
 		{
-			TextAsset asset = new TextAsset(data);
+			TextAsset asset = new TextAsset((string) data);
 			asset.name = path;
 			return asset as T;
 		}

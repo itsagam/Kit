@@ -8,11 +8,21 @@ namespace Modding.Resource.Readers
 	public class JSONResourceReader : ResourceReader 
 	{
 		public override List<string> SupportedExtensions => new List<string> { ".json" };
-		public override ReadType ReadWith => ReadType.Text;
+		public override OperateType OperateWith => OperateType.Text;
 
-		public override T Read<T>(string data)
+		public override T Read<T>(object data)
 		{
-			return FromJSON<T>(data);
+			return FromJSON<T>((string) data);
+		}
+
+		public override object Write(object obj)
+		{
+			return ToJSON(obj);
+		}
+
+		public override void Merge<T>(T data, T overwrite)
+		{
+			OverwriteJSON(data, ToJSON(overwrite));
 		}
 
 		public virtual T FromJSON<T>(string json)
