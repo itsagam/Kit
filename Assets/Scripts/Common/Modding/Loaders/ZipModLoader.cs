@@ -6,7 +6,7 @@ using System.IO.Compression;
 using System.Threading.Tasks;
 using System.Linq;
 using UnityEngine;
-using Modding.Resource.Readers;
+using Modding.Parsers;
 
 namespace Modding.Loaders
 {
@@ -33,7 +33,7 @@ namespace Modding.Loaders
 					string metadataText = async ? await package.ReadTextAsync(MetadataFile) : package.ReadText(MetadataFile);
 					if (metadataText != null)
 					{
-						package.Metadata = new JSONResourceReader().Read<ModMetadata>(metadataText);
+						package.Metadata = new JSONParser().FromJson<ModMetadata>(metadataText);
 						return package;
 					}
 				}

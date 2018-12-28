@@ -3,18 +3,18 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 
-namespace Modding.Resource.Loaders
+namespace Modding.Parsers
 {
-	public class TextResourceLoader : ResourceLoader
+	public class TextParser : ByTypeParser
 	{
 		public override OperateType OperateWith => OperateType.Text;
 		public override List<Type> SupportedTypes => new List<Type> { typeof(TextAsset) };
 
-		public override T Load<T>(string path, object data)
+		public override object Read<T>(object data, string path)
 		{
 			TextAsset asset = new TextAsset((string) data);
 			asset.name = path;
-			return asset as T;
+			return asset;
 		}
 	}
 }

@@ -7,9 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using Modding.Loaders;
-using Modding.Resource;
-using Modding.Resource.Loaders;
-using Modding.Resource.Readers;
+using Modding.Parsers;
 
 namespace Modding
 {
@@ -40,8 +38,7 @@ namespace Modding
 		public static event ResourceUnloadedHandler ResourceUnloaded;
 
         public static List<ModLoader> Loaders = new List<ModLoader>();
-		public static List<ResourceLoader> ResourceLoaders = new List<ResourceLoader>();
-		public static List<ResourceReader> ResourceReaders = new List<ResourceReader>();
+		public static List<ResourceParser> Parsers = new List<ResourceParser>();
 		public static List<string> SearchPaths = new List<string>();
 
 		protected static List<ModPackage> modPackages = new List<ModPackage>();
@@ -49,28 +46,24 @@ namespace Modding
 
 		static ModManager()
 		{
-			AddDefaultModLoaders();
-			AddDefaultResourceLoaders();
-			AddDefaultResourceReaders();
+			AddDefaultLoaders();
+			AddDefaultParsers();
 			AddDefaultSearchPaths();
 		}
 
-		private static void AddDefaultModLoaders()
+		private static void AddDefaultLoaders()
         {
 			Loaders.Add(new DirectModLoader());
 			Loaders.Add(new ZipModLoader());
 		}
 
-		private static void AddDefaultResourceLoaders()
+		private static void AddDefaultParsers()
 		{
-			ResourceLoaders.Add(new TextureResourceLoader());
-			ResourceLoaders.Add(new AudioResourceLoader());
-			ResourceLoaders.Add(new TextResourceLoader());
-		}
-		
-		private static void AddDefaultResourceReaders()
-		{
-			ResourceReaders.Add(new JSONResourceReader());
+			Parsers.Add(new JSONParser());
+
+			Parsers.Add(new TextureParser());
+			Parsers.Add(new AudioParser());
+			Parsers.Add(new TextParser());
 		}
 
 		private static void AddDefaultSearchPaths()
@@ -144,17 +137,17 @@ namespace Modding
 			return null;
 		}
 
-		public static T Load<T>(string path) where T : UnityEngine.Object
+		public static T Load<T>(string path)
 		{
 			return LoadInternal<T>(path, false).Result;
 		}
 
-		public static async Task<T> LoadAsync<T>(string path) where T : UnityEngine.Object
+		public static async Task<T> LoadAsync<T>(string path)
 		{
 			return await LoadInternal<T>(path, true);
 		}
 
-		protected static async Task<T> LoadInternal<T>(string path, bool async) where T : UnityEngine.Object
+		protected static async Task<T> LoadInternal<T>(string path, bool async)
         {
 			List<ResourceInfo> resourcesInfos = GetResourceInfo(path);
 			if (resourcesInfos != null)
@@ -162,7 +155,7 @@ namespace Modding
 				ResourceInfo resourceInfo = resourcesInfos[0];
 				if (ResourceReused != null)
 					ResourceReused(path, resourceInfo);
-				return resourceInfo.Reference as T;
+				return (T) resourceInfo.Reference;
 			}
 
 			foreach (ModPackage package in ModPackages.Reverse())
@@ -181,20 +174,20 @@ namespace Modding
 					return reference;
 				}
 			}
-			return null;
+			return default;
         }
 
-		public static List<T> LoadAll<T>(string path) where T : UnityEngine.Object
+		public static List<T> LoadAll<T>(string path)
 		{
 			return LoadAllInternal<T>(path, false).Result;
 		}
 
-		public static async Task<List<T>> LoadAllAsync<T>(string path) where T : UnityEngine.Object
+		public static async Task<List<T>> LoadAllAsync<T>(string path)
 		{
 			return await LoadAllInternal<T>(path, true);
 		}
 
-		protected static async Task<List<T>> LoadAllInternal<T>(string path, bool async) where T : UnityEngine.Object
+		protected static async Task<List<T>> LoadAllInternal<T>(string path, bool async)
 		{
 			List<T> all = new List<T>();
 			List<ResourceInfo> cachedInfos = GetResourceInfo(path);
@@ -204,85 +197,6 @@ namespace Modding
 				if (cachedInfo == null)
 				{
 					T reference = async ? await package.LoadAsync<T>(path) : package.Load<T>(path);
-					if (reference != null)
-					{
-						ResourceInfo resourceInfo = new ResourceInfo(package, reference);
-						if (!resourceInfos.ContainsKey(path))
-							resourceInfos[path] = new List<ResourceInfo>();
-						resourceInfos[path].Add(resourceInfo);
-
-						if (ResourceLoaded != null)
-							ResourceLoaded(path, resourceInfo);
-
-						all.Add(reference);
-					}
-				}
-				else
-				{
-					if (ResourceReused != null)
-						ResourceReused(path, cachedInfo);
-					all.Add(cachedInfo.Reference as T);
-				}
-			}
-			return all;
-		}
-
-		public static T Read<T>(string path)
-		{
-			return ReadInternal<T>(path, false).Result;
-		}
-
-		public static async Task<T> ReadAsync<T>(string path)
-		{
-			return await ReadInternal<T>(path, true);
-		}
-
-		protected static async Task<T> ReadInternal<T>(string path, bool async)
-		{
-			List<ResourceInfo> resourcesInfos = GetResourceInfo(path);
-			if (resourcesInfos != null)
-			{
-				ResourceInfo resourceInfo = resourcesInfos[0];
-				ResourceReused?.Invoke(path, resourceInfo);
-				return (T) resourceInfo.Reference;
-			}
-
-			foreach (ModPackage package in ModPackages.Reverse())
-			{
-				T reference = async ? await package.ReadAsync<T>(path) : package.Read<T>(path);
-				if (reference != null)
-				{
-					ResourceInfo resourceInfo = new ResourceInfo(package, reference);
-					if (!resourceInfos.ContainsKey(path))
-						resourceInfos[path] = new List<ResourceInfo>();
-					resourceInfos[path].Add(resourceInfo);
-					ResourceLoaded?.Invoke(path, resourceInfo);
-					return reference;
-				}
-			}
-			return default;
-		}
-
-		public static List<T> ReadAll<T>(string path)
-		{
-			return ReadAllInternal<T>(path, false).Result;
-		}
-
-		public static async Task<List<T>> ReadAllAsync<T>(string path)
-		{
-			return await ReadAllInternal<T>(path, true);
-		}
-
-		protected static async Task<List<T>> ReadAllInternal<T>(string path, bool async)
-		{
-			List<T> all = new List<T>();
-			List<ResourceInfo> cachedInfos = GetResourceInfo(path);
-			foreach (ModPackage package in ModPackages)
-			{
-				ResourceInfo cachedInfo = cachedInfos?.FirstOrDefault(i => i.Package == package);
-				if (cachedInfo == null)
-				{
-					T reference = async ? await package.ReadAsync<T>(path) : package.Read<T>(path);
 					if (reference != null)
 					{
 						ResourceInfo resourceInfo = new ResourceInfo(package, reference);

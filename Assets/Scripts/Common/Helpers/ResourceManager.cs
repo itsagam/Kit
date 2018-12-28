@@ -7,8 +7,7 @@ using UnityEngine;
 using UnityEngine.Networking;
 using UniRx.Async;
 using Modding;
-using Modding.Resource;
-using Modding.Resource.Readers;
+using Modding.Parsers;
 
 public enum ResourceFolder
 {
@@ -26,10 +25,10 @@ public class ResourceManager
 
 	public static bool Modding = true;
 
-	protected static Dictionary<string, UnityEngine.Object> CachedResources = new Dictionary<string, UnityEngine.Object>(StringComparer.OrdinalIgnoreCase);
+	protected static Dictionary<string, object> CachedResources = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase);
 
 	#region Loading
-	public static T Load<T>(string path) where T : UnityEngine.Object
+	public static T Load<T>(string path)
 	{
 		if (Modding)
 		{
@@ -41,7 +40,7 @@ public class ResourceManager
 		return LoadCached<T>(Path.ChangeExtension(path, null));
 	} 
 
-	public static async Task<T> LoadAsync<T>(string path) where T : UnityEngine.Object
+	public static async Task<T> LoadAsync<T>(string path)
 	{
 		if (Modding)
 		{
@@ -53,33 +52,33 @@ public class ResourceManager
 		return await LoadCachedAsync<T>(Path.ChangeExtension(path, null));
 	}
 
-	public static T LoadCached<T>(string filePath) where T : UnityEngine.Object
+	public static T LoadCached<T>(string filePath)
 	{
-		UnityEngine.Object obj = null;
-		if (!CachedResources.TryGetValue(filePath, out obj))
+		if (!CachedResources.TryGetValue(filePath, out object obj))
 		{
-			obj = Resources.Load<T>(filePath);
+			obj = Resources.Load(filePath);
 			CachedResources.Add(filePath, obj);
+			return (T) obj;
 		}
-		return obj as T;
+		return default;
 	}
 
-	public static async Task<T> LoadCachedAsync<T>(string filePath) where T : UnityEngine.Object
+	public static async Task<T> LoadCachedAsync<T>(string filePath) 
 	{
-		UnityEngine.Object obj = null;
-		if (!CachedResources.TryGetValue(filePath, out obj))
+		if (!CachedResources.TryGetValue(filePath, out object obj))
 		{
-			obj = await Resources.LoadAsync<T>(filePath);
+			obj = await Resources.LoadAsync(filePath);
 			CachedResources.Add(filePath, obj);
+			return (T) obj;
 		}
-		return obj as T;
+		return default;
 	}
 	
-	public static void Unload(UnityEngine.Object asset)
+	public static void Unload(object asset)
 	{
 		if (!Modding || !ModManager.Unload(asset))
 		{
-			foreach (KeyValuePair<string, UnityEngine.Object> kvp in CachedResources)
+			foreach (KeyValuePair<string, object> kvp in CachedResources)
 				if (kvp.Value == asset)
 				{
 					CachedResources.Remove(kvp.Key);
@@ -87,7 +86,7 @@ public class ResourceManager
 				}
 		}
 
-		Resources.UnloadAsset(asset);
+		Resources.UnloadAsset((UnityEngine.Object) asset);
 	}
 
 	public static void ClearCache()
@@ -171,15 +170,15 @@ public class ResourceManager
 
 	public static T Read<T>(string fullPath)
 	{
-		foreach (ResourceReader reader in ModManager.ResourceReaders)
+		foreach (ResourceParser parser in ModManager.Parsers)
 		{
-			if (reader.CanRead(Path.GetFileName(fullPath)))
+			if (parser.CanRead<T>(fullPath))
 			{
 				T obj = default;
-				if (reader.OperateWith == OperateType.Text)
-					obj = reader.Read<T>(ReadText(fullPath));
+				if (parser.OperateWith == OperateType.Text)
+					obj = (T) parser.Read<T>(ReadText(fullPath));
 				else
-					obj = reader.Read<T>(ReadBytes(fullPath));
+					obj = (T) parser.Read<T>(ReadBytes(fullPath));
 				if (obj != null)
 					return obj;
 			}
@@ -189,15 +188,15 @@ public class ResourceManager
 
 	public static async Task<T> ReadAsync<T>(string fullPath)
 	{
-		foreach (ResourceReader reader in ModManager.ResourceReaders)
+		foreach (ResourceParser parser in ModManager.Parsers)
 		{
-			if (reader.CanRead(Path.GetFileName(fullPath)))
+			if (parser.CanRead<T>(fullPath))
 			{
 				T obj = default;
-				if (reader.OperateWith == OperateType.Text)
-					obj = reader.Read<T>(await ReadTextAsync(fullPath));
+				if (parser.OperateWith == OperateType.Text)
+					obj = (T) parser.Read<T>(await ReadTextAsync(fullPath));
 				else
-					obj = reader.Read<T>(await ReadBytesAsync(fullPath));
+					obj = (T) parser.Read<T>(await ReadBytesAsync(fullPath));
 				if (obj != null)
 					return obj;
 			}
@@ -209,7 +208,7 @@ public class ResourceManager
     {	
 		if (Modding)
 		{
-			T modded = ModManager.Read<T>(file);
+			T modded = ModManager.Load<T>(file);
 			if (modded != null)
 				return modded;
 		}
@@ -249,7 +248,7 @@ public class ResourceManager
 	{
 		if (Modding)
 		{
-			T modded = await ModManager.ReadAsync<T>(file);
+			T modded = await ModManager.LoadAsync<T>(file);
 			if (modded != null)
 				return modded;
 		}
@@ -297,30 +296,30 @@ public class ResourceManager
 	#endregion
 
 	#region Saving/Deleting
-	public static void Save(ResourceFolder folder, string file, object contents, ResourceReader reader)
+	public static void Save(ResourceFolder folder, string file, object contents, ResourceParser parser)
 	{
-		Save(GetPath(folder, file), contents, reader);
+		Save(GetPath(folder, file), contents, parser);
 	}
 
-	public static async Task SaveAsync(ResourceFolder folder, string file, object contents, ResourceReader reader)
+	public static async Task SaveAsync(ResourceFolder folder, string file, object contents, ResourceParser parser)
 	{
-		await SaveAsync(GetPath(folder, file), contents, reader);
+		await SaveAsync(GetPath(folder, file), contents, parser);
 	}
 
-	public static void Save(string fullPath, object contents, ResourceReader reader)
+	public static void Save(string fullPath, object contents, ResourceParser parser)
 	{
-		if (reader.OperateWith == OperateType.Text)
-			SaveText(fullPath, (string)reader.Write(contents));
+		if (parser.OperateWith == OperateType.Text)
+			SaveText(fullPath, (string)parser.Write(contents));
 		else
-			SaveBytes(fullPath, (byte[])reader.Write(contents));
+			SaveBytes(fullPath, (byte[])parser.Write(contents));
 	}
 
-	public static async Task SaveAsync(string fullPath, object contents, ResourceReader reader)
+	public static async Task SaveAsync(string fullPath, object contents, ResourceParser parser)
 	{
-		if (reader.OperateWith == OperateType.Text)
-			await SaveTextAsync(fullPath, (string)reader.Write(contents));
+		if (parser.OperateWith == OperateType.Text)
+			await SaveTextAsync(fullPath, (string)parser.Write(contents));
 		else
-			await SaveBytesAsync(fullPath, (byte[])reader.Write(contents));
+			await SaveBytesAsync(fullPath, (byte[])parser.Write(contents));
 	}
 
 	public static void SaveText(ResourceFolder folder, string file, string contents)

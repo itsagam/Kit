@@ -3,18 +3,17 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 
-namespace Modding.Resource.Loaders
+namespace Modding.Parsers
 {
-	public class AudioResourceLoader : ResourceLoader
+	public class AudioParser : ByTypeParser
 	{
 		public override OperateType OperateWith => OperateType.Bytes;
 		public override List<Type> SupportedTypes => new List<Type> { typeof(AudioClip) };
 
-		public override T Load<T>(string path, object data)
+		public override object Read<T>(object data, string path)
 		{
 			AudioClip clip = WavUtility.ToAudioClip((byte[]) data, 0, path);
-			clip.name = path;
-			return clip as T;
+			return clip;
 		}
 	}
 }

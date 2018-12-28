@@ -5,19 +5,25 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 
-namespace Modding.Resource
+namespace Modding.Parsers
 {
-	public abstract class ResourceReader
+	public enum OperateType
 	{
-		public abstract List<string> SupportedExtensions { get; }
-		public abstract OperateType OperateWith { get; }
+		Bytes,
+		Text
+	}
 
-		public virtual T Read<T>(object data)
+	public abstract class ResourceParser
+	{
+		public abstract OperateType OperateWith { get; }
+		public abstract bool CanRead<T>(string path);
+
+		public virtual object Read<T>(object data, string path = null)
 		{
 			throw new NotImplementedException();
 		}
 
-		public virtual object Write(object obj)
+		public virtual object Write(object obj, string path = null)
 		{
 			throw new NotImplementedException();
 		}
@@ -25,11 +31,6 @@ namespace Modding.Resource
 		public virtual void Merge<T>(T a, T b)
 		{
 			throw new NotImplementedException();
-		}
-
-		public virtual bool CanRead(string fileName)
-		{
-			return SupportedExtensions.Any(e => string.Compare(Path.GetExtension(fileName), e) == 0);
 		}
 	}
 }

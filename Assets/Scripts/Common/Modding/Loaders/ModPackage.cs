@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using Modding.Resource;
+using Modding.Parsers;
 
 namespace Modding
 {
@@ -34,66 +34,33 @@ namespace Modding
 			return FindFiles(path)?.FirstOrDefault();
 		}
 
-		public virtual T Load<T>(string path) where T : UnityEngine.Object
+		public virtual T Load<T>(string path)
 		{
 			return LoadInternal<T>(path, false).Result;
 		}
 
-		public virtual async Task<T> LoadAsync<T>(string path) where T : UnityEngine.Object
+		public virtual async Task<T> LoadAsync<T>(string path)
 		{
 			return await LoadInternal<T>(path, true);
 		}
 
-		protected virtual async Task<T> LoadInternal<T>(string path, bool async) where T : UnityEngine.Object
-		{
-			try
-			{
-				foreach(ResourceLoader loader in ModManager.ResourceLoaders)
-					if (loader.CanLoad(typeof(T)))
-					{
-						if (loader.OperateWith == OperateType.Bytes)
-							return loader.Load<T>(path, await ReadBytesInternal(path, async));
-						else
-							return loader.Load<T>(path, await ReadTextInternal(path, async));
-					}
-			}
-			catch (Exception)
-			{
-			}
-
-			return null;
-		}
-
-		public virtual T Read<T>(string path)
-		{
-			return ReadInternal<T>(path, false).Result;
-		}
-
-		public virtual async Task<T> ReadAsync<T>(string path)
-		{
-			return await ReadInternal<T>(path, true);
-		}
-
-		protected virtual async Task<T> ReadInternal<T>(string path, bool async)
+		protected virtual async Task<T> LoadInternal<T>(string path, bool async)
 		{
 			try
 			{
 				IEnumerable<string> matchingFiles = FindFiles(path);
 				foreach (string matchingFile in matchingFiles)
-				{
-					string fileName = System.IO.Path.GetFileName(matchingFile);
-					foreach (ResourceReader reader in ModManager.ResourceReaders)
-						if (reader.CanRead(fileName))
-							if (reader.OperateWith == OperateType.Bytes)
-								return reader.Read<T>(await ReadBytesInternal(matchingFile, async));
+					foreach (ResourceParser parser in ModManager.Parsers)
+						if (parser.CanRead<T>(matchingFile))
+							if (parser.OperateWith == OperateType.Bytes)
+								return (T)parser.Read<T>(await ReadBytesInternal(matchingFile, async), matchingFile);
 							else
-								return reader.Read<T>(await ReadTextInternal(matchingFile, async));
-				}
+								return (T)parser.Read<T>(await ReadTextInternal(matchingFile, async), matchingFile);
 			}
 			catch (Exception)
 			{
 			}
-			
+
 			return default;
 		}
 
