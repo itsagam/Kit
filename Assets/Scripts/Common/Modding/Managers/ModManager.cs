@@ -37,6 +37,8 @@ namespace Modding
 		public static event ResourceReusedHandler ResourceReused;
 		public static event ResourceUnloadedHandler ResourceUnloaded;
 
+		public const string DefaultSearchFolderName = "Mods";
+
         public static List<ModLoader> Loaders = new List<ModLoader>();
 		public static List<ResourceParser> Parsers = new List<ResourceParser>();
 		public static List<string> SearchPaths = new List<string>();
@@ -68,8 +70,23 @@ namespace Modding
 
 		private static void AddDefaultSearchPaths()
         {
-            SearchPaths.Add(Application.streamingAssetsPath);
-        }
+			switch (Application.platform)
+			{
+				case RuntimePlatform.WindowsEditor:
+				case RuntimePlatform.OSXEditor:
+				case RuntimePlatform.LinuxEditor:
+
+				case RuntimePlatform.WindowsPlayer:
+				case RuntimePlatform.LinuxPlayer:
+					SearchPaths.Add(Path.Combine(Path.GetDirectoryName(Application.dataPath), DefaultSearchFolderName));
+					break;
+
+				case RuntimePlatform.IPhonePlayer:
+				case RuntimePlatform.Android:
+					SearchPaths.Add(Path.Combine(Application.persistentDataPath, DefaultSearchFolderName));
+					break;
+			}
+		}
 
 		public static void LoadMods()
 		{
@@ -85,6 +102,9 @@ namespace Modding
 		{
 			foreach (string path in SearchPaths)
 			{
+				if (!Directory.Exists(path))
+					continue;
+
 				string[] childPaths = Directory.GetFileSystemEntries(path);
 				foreach (string childPath in childPaths)
 				{
@@ -365,15 +385,18 @@ namespace Modding
 		public static bool Unload(Func<ResourceInfo, bool> predicate)
 		{
 			bool found = false;
-			foreach (var kvp in resourceInfos)
+			foreach (var kvp in resourceInfos.Reverse())
 			{
 				foreach (var info in kvp.Value.Where(predicate).Reverse())
 				{
+					UnloadInternal(info.Reference);
 					kvp.Value.Remove(info);
 					if (ResourceUnloaded != null)
 						ResourceUnloaded(kvp.Key, info.Package);
 					found = true;
 				}
+				if (kvp.Value.Count <= 0)
+					resourceInfos.Remove(kvp.Key);
 			}
 			return found;
 		}
@@ -385,6 +408,7 @@ namespace Modding
 			{
 				foreach (ResourceInfo info in infos)
 				{
+					UnloadInternal(info.Reference);
 					if (ResourceUnloaded != null)
 						ResourceUnloaded(path, info.Package);
 				}
@@ -392,6 +416,14 @@ namespace Modding
 				return true;
 			}
 			return false;
+		}
+
+		protected static void UnloadInternal(object resource)
+		{
+			if (resource is UnityEngine.Object)
+			{
+				UnityEngine.Object.Destroy((UnityEngine.Object)resource);
+			}
 		}
 
 		public static ReadOnlyCollection<ModPackage> ModPackages

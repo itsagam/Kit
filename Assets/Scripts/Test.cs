@@ -25,12 +25,9 @@ public class Test: MonoBehaviour
 	async void Start()
 	{
 		await LoadMods();
-		await ModdingTest();
 
-		Debugger.Log(await ResourceManager.LoadAsync<GameData>("Data/test13"));
-
-		//Debugger.Log(await ResourceManager.ReadAsync<GameData>(ResourceFolder.StreamingAssets, "Data/test"));
-		obj.GetComponent<MeshRenderer>().material.mainTexture = await ResourceManager.LoadAsync<Texture>(@"textures/TESt");
+		obj.GetComponent<MeshRenderer>().material.mainTexture = await ResourceManager.LoadAsync<Texture>(ResourceFolder.Resources, @"Textures/Test");
+		//ResourceManager.Unload(obj.GetComponent<MeshRenderer>().material.mainTexture);
 	}
 
 	protected async Task LoadMods()
@@ -38,14 +35,8 @@ public class Test: MonoBehaviour
 		await ModManager.LoadModsAsync();
 		foreach (ModPackage mod in ModManager.ModPackages)
 			Debug.Log(mod.Metadata.Name);
-	}
-
-	protected async Task ModdingTest()
-	{
 		ModManager.ResourceLoaded += ModManager_ResourceLoaded;
 		ModManager.ResourceReused += ModManager_ResourceReused;
-		//ResourceManager.Modding = false;
-		//Debug.Log(ResourceManager.EncodeObject(ResourceManager.Read<GameData>(ResourceFolder.StreamingAssets, "Data/test.json", true)));
 	}
 
 	protected void ProfileTest()

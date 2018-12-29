@@ -46,20 +46,25 @@ namespace Modding
 
 		protected virtual async Task<T> LoadInternal<T>(string path, bool async)
 		{
-			try
-			{
-				IEnumerable<string> matchingFiles = FindFiles(path);
-				foreach (string matchingFile in matchingFiles)
-					foreach (ResourceParser parser in ModManager.Parsers)
+			// If File.json & File.jpg & Load<Texture>("Path/File"), it will load File.json
+
+			IEnumerable<string> matchingFiles = FindFiles(path);
+			if (matchingFiles == null)
+				return default;
+
+			foreach (string matchingFile in matchingFiles)
+				foreach (ResourceParser parser in ModManager.Parsers)
+					try
+					{
 						if (parser.CanRead<T>(matchingFile))
 							if (parser.OperateWith == OperateType.Bytes)
 								return (T)parser.Read<T>(await ReadBytesInternal(matchingFile, async), matchingFile);
 							else
 								return (T)parser.Read<T>(await ReadTextInternal(matchingFile, async), matchingFile);
-			}
-			catch (Exception)
-			{
-			}
+					}
+					catch (Exception)
+					{
+					}
 
 			return default;
 		}
@@ -90,3 +95,4 @@ namespace Modding
         }
 	}
 }
+ 

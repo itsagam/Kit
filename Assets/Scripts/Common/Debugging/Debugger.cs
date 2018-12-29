@@ -139,8 +139,15 @@ public class Debugger : MonoBehaviour
 		StringBuilder output = new StringBuilder();
 		if (items.Any())
 		{
+			bool first = true;
 			foreach (object obj in items)
-				output.Append(", " + obj);
+				if (first)
+				{
+					output.Append(obj);
+					first = false;
+				}
+				else
+					output.Append(", " + obj);
 		}
 		return "{" + output + "}";
 	}

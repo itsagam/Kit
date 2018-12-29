@@ -93,7 +93,7 @@ namespace Modding.Loaders
 			string fullPath = GetFullPath(path);
 			if (File.Exists(fullPath))
 				return new string[] { path };
-			
+
 			if (!System.IO.Path.HasExtension(path))
 			{
 				string relativeDir = System.IO.Path.GetDirectoryName(path);

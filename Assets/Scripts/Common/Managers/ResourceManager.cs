@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.IO;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.Networking;
 using UniRx.Async;
@@ -14,79 +15,153 @@ public enum ResourceFolder
 	Data,
 	StreamingAssets,
 	PersistentData,
+	Resources
 }
 
 public class ResourceManager
 {
 	public static Dictionary<ResourceFolder, string> Paths = new Dictionary<ResourceFolder, string>
-	{	{ ResourceFolder.Data, Application.dataPath },
+	{   { ResourceFolder.Data, Application.dataPath },
 		{ ResourceFolder.StreamingAssets, Application.streamingAssetsPath },
-		{ ResourceFolder.PersistentData, Application.persistentDataPath } };
+		{ ResourceFolder.PersistentData, Application.persistentDataPath },
+		{ ResourceFolder.Resources, Path.Combine(Application.dataPath, "Resources") } };
 
 	public static bool Modding = true;
 
 	protected static Dictionary<string, object> CachedResources = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase);
 
 	#region Loading
-	public static T Load<T>(string path)
+	public static T Load<T>(string fullPath)
 	{
-		if (Modding)
+		foreach (ResourceParser parser in ModManager.Parsers)
 		{
-			T modded = ModManager.Load<T>(path);
-			if (modded != null)
-				return modded;
+			if (parser.CanRead<T>(fullPath))
+			{
+				T obj = default;
+				if (parser.OperateWith == OperateType.Text)
+					obj = (T)parser.Read<T>(ReadText(fullPath));
+				else
+					obj = (T)parser.Read<T>(ReadBytes(fullPath));
+				if (obj != null)
+					return obj;
+			}
 		}
-		
-		return LoadCached<T>(Path.ChangeExtension(path, null));
-	} 
-
-	public static async Task<T> LoadAsync<T>(string path)
-	{
-		if (Modding)
-		{
-			T modded = await ModManager.LoadAsync<T>(path);
-			if (modded != null)
-				return modded;
-		}
-
-		return await LoadCachedAsync<T>(Path.ChangeExtension(path, null));
+		return default;
 	}
 
-	public static T LoadCached<T>(string filePath)
+	public static async Task<T> LoadAsync<T>(string fullPath)
 	{
-		if (!CachedResources.TryGetValue(filePath, out object obj))
+		foreach (ResourceParser parser in ModManager.Parsers)
 		{
-			obj = Resources.Load(filePath);
-			CachedResources.Add(filePath, obj);
+			if (parser.CanRead<T>(fullPath))
+			{
+				T obj = default;
+				if (parser.OperateWith == OperateType.Text)
+					obj = (T)parser.Read<T>(await ReadTextAsync(fullPath));
+				else
+					obj = (T)parser.Read<T>(await ReadBytesAsync(fullPath));
+				if (obj != null)
+					return obj;
+			}
+		}
+		return default;
+	}
+
+	public static T Load<T>(ResourceFolder folder, string file)
+	{
+		if (Modding)
+		{
+			T modded = ModManager.Load<T>(GetModdingPath(folder, file));
+			if (modded != null)
+				return modded;
+		}
+
+		return LoadCached<T>(folder, file);
+	} 
+
+	public static async Task<T> LoadAsync<T>(ResourceFolder folder, string file)
+	{
+		if (Modding)
+		{
+			T modded = await ModManager.LoadAsync<T>(GetModdingPath(folder, file));
+			if (modded != null)
+				return modded;
+		}
+
+		return await LoadCachedAsync<T>(folder, file);
+	}
+
+	protected static T LoadCached<T>(ResourceFolder folder, string file)
+	{
+		if (!CachedResources.TryGetValue(file, out object obj))
+		{
+			if (folder == ResourceFolder.Resources)
+				obj = Resources.Load(Path.ChangeExtension(file, null));
+			else
+				obj = Load<T>(GetPath(folder, file));
+
+			CachedResources.Add(file, obj);
 			return (T) obj;
 		}
 		return default;
 	}
 
-	public static async Task<T> LoadCachedAsync<T>(string filePath) 
+	protected static async Task<T> LoadCachedAsync<T>(ResourceFolder folder, string file) 
 	{
-		if (!CachedResources.TryGetValue(filePath, out object obj))
+		if (!CachedResources.TryGetValue(file, out object obj))
 		{
-			obj = await Resources.LoadAsync(filePath);
-			CachedResources.Add(filePath, obj);
+			if (folder == ResourceFolder.Resources)
+				obj = await Resources.LoadAsync(Path.ChangeExtension(file, null));
+			else
+				obj = await LoadAsync<T>(GetPath(folder, file));
+
+			CachedResources.Add(file, obj);
 			return (T) obj;
 		}
 		return default;
 	}
 	
-	public static void Unload(object asset)
+	public static void Unload(object resource)
 	{
-		if (!Modding || !ModManager.Unload(asset))
+		if (!Modding || !ModManager.Unload(resource))
 		{
 			foreach (KeyValuePair<string, object> kvp in CachedResources)
-				if (kvp.Value == asset)
+				if (kvp.Value == resource)
 				{
 					CachedResources.Remove(kvp.Key);
 					break;
 				}
-		}
 
-		Resources.UnloadAsset((UnityEngine.Object) asset);
+			UnloadInternal(resource);
+		}
+	}
+
+	public static void Unload(string path)
+	{
+		if (!Modding || !ModManager.Unload(path))
+		{
+			if (CachedResources.TryGetValue(path, out object resource))
+			{
+				CachedResources.Remove(path);
+				UnloadInternal(resource);
+			}		
+		}
+	}
+
+	protected static void UnloadInternal(object resource)
+	{
+		if (resource is UnityEngine.Object)
+		{
+			try
+			{
+				UnityEngine.Object unityObject = (UnityEngine.Object)resource;
+				Resources.UnloadAsset(unityObject);
+				UnityEngine.Object.Destroy(unityObject);
+			}
+			catch (Exception)
+			{
+			}
+		}
 	}
 
 	public static void ClearCache()
@@ -101,7 +176,7 @@ public class ResourceManager
 	{
 		if (Modding)
 		{
-			string modded = ModManager.ReadText(file);
+			string modded = ModManager.ReadText(GetModdingPath(folder, file));
 			if (modded != null)
 				return modded;
 		}
@@ -112,7 +187,7 @@ public class ResourceManager
 	{
 		if (Modding)
 		{
-			string modded = await ModManager.ReadTextAsync(file);
+			string modded = await ModManager.ReadTextAsync(GetModdingPath(folder, file));
 			if (modded != null)
 				return modded;
 		}
@@ -123,7 +198,7 @@ public class ResourceManager
 	{
 		if (Modding)
 		{
-			byte[] modded = ModManager.ReadBytes(file);
+			byte[] modded = ModManager.ReadBytes(GetModdingPath(folder, file));
 			if (modded != null)
 				return modded;
 		}
@@ -134,7 +209,7 @@ public class ResourceManager
 	{
 		if (Modding)
 		{
-			byte[] modded = await ModManager.ReadBytesAsync(file);
+			byte[] modded = await ModManager.ReadBytesAsync(GetModdingPath(folder, file));
 			if (modded != null)
 				return modded;
 		}
@@ -148,7 +223,7 @@ public class ResourceManager
 
 	public static async Task<string> ReadTextAsync(string fullPath)
 	{
-		return (await LoadAsync(fullPath)).downloadHandler.text;
+		return (await WebAsync(fullPath)).downloadHandler.text;
 	}
 
 	public static byte[] ReadBytes(string fullPath)
@@ -158,52 +233,17 @@ public class ResourceManager
 
 	public static async Task<byte[]> ReadBytesAsync(string fullPath)
 	{
-		return (await LoadAsync(fullPath)).downloadHandler.data;
+		return (await WebAsync(fullPath)).downloadHandler.data;
 	}
 
-	public static async Task<UnityWebRequest> LoadAsync(string filePath)
+	public static async Task<UnityWebRequest> WebAsync(string filePath)
 	{
 		UnityWebRequest request = UnityWebRequest.Get(LocalToURLPath(filePath));
 		await request.SendWebRequest();
 		return request;
 	}
 
-	public static T Read<T>(string fullPath)
-	{
-		foreach (ResourceParser parser in ModManager.Parsers)
-		{
-			if (parser.CanRead<T>(fullPath))
-			{
-				T obj = default;
-				if (parser.OperateWith == OperateType.Text)
-					obj = (T) parser.Read<T>(ReadText(fullPath));
-				else
-					obj = (T) parser.Read<T>(ReadBytes(fullPath));
-				if (obj != null)
-					return obj;
-			}
-		}
-		return default;
-	}
-
-	public static async Task<T> ReadAsync<T>(string fullPath)
-	{
-		foreach (ResourceParser parser in ModManager.Parsers)
-		{
-			if (parser.CanRead<T>(fullPath))
-			{
-				T obj = default;
-				if (parser.OperateWith == OperateType.Text)
-					obj = (T) parser.Read<T>(await ReadTextAsync(fullPath));
-				else
-					obj = (T) parser.Read<T>(await ReadBytesAsync(fullPath));
-				if (obj != null)
-					return obj;
-			}
-		}
-		return default;
-	}
-
+	/*
 	public static T Read<T>(ResourceFolder folder, string file)
     {	
 		if (Modding)
@@ -215,7 +255,6 @@ public class ResourceManager
 		return Read<T>((GetPath(folder, file)));
 
 
-		/*
 		if (merge)
 		{
 			List<string> contents = new List<string>();
@@ -241,7 +280,6 @@ public class ResourceManager
 			}
 			return Read<T>((GetPath(folder, file)));
 		}
-		*/
     }
 
 	public static async Task<T> ReadAsync<T>(ResourceFolder folder, string file)
@@ -254,7 +292,6 @@ public class ResourceManager
 		}
 
 		return await ReadAsync<T>(GetPath(folder, file));
-		/*
 		if (merge)
 		{
 			List<string> contents = new List<string>();
@@ -281,10 +318,8 @@ public class ResourceManager
 
 			return await ReadAsync<T>(GetPath(folder, file));
 		}
-		*/
 	}
 
-	/*
 	protected static T GetMerged<T>(List<string> contents)
 	{
 		T current = DecodeObject<T>(contents[0]);
@@ -394,6 +429,11 @@ public class ResourceManager
 	public static string GetPath(ResourceFolder folder, string file)
 	{
 		return Path.Combine(GetPath(folder), file);
+	}
+
+	public static string GetModdingPath(ResourceFolder folder, string file)
+	{
+		return Path.Combine(folder.ToString(), file);
 	}
 
 	public static string LocalToURLPath(string path)
