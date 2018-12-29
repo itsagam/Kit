@@ -33,15 +33,15 @@ public class ResourceManager
 	#region Loading
 	public static T Load<T>(string fullPath)
 	{
-		foreach (ResourceParser parser in ModManager.Parsers)
+		foreach (var (parser, certainty) in RankParsers<T>(fullPath))
 		{
-			if (parser.CanRead<T>(fullPath))
+			if (parser.CanRead<T>(fullPath) >= 1.0f)
 			{
 				T obj = default;
 				if (parser.OperateWith == OperateType.Text)
-					obj = (T)parser.Read<T>(ReadText(fullPath));
+					obj = (T)parser.Read<T>(ReadText(fullPath), fullPath);
 				else
-					obj = (T)parser.Read<T>(ReadBytes(fullPath));
+					obj = (T)parser.Read<T>(ReadBytes(fullPath), fullPath);
 				if (obj != null)
 					return obj;
 			}
@@ -51,20 +51,24 @@ public class ResourceManager
 
 	public static async Task<T> LoadAsync<T>(string fullPath)
 	{
-		foreach (ResourceParser parser in ModManager.Parsers)
+		foreach (var (parser, certainty) in RankParsers<T>(fullPath))
 		{
-			if (parser.CanRead<T>(fullPath))
-			{
-				T obj = default;
-				if (parser.OperateWith == OperateType.Text)
-					obj = (T)parser.Read<T>(await ReadTextAsync(fullPath));
-				else
-					obj = (T)parser.Read<T>(await ReadBytesAsync(fullPath));
-				if (obj != null)
-					return obj;
-			}
+			T obj = default;
+			if (parser.OperateWith == OperateType.Text)
+				obj = (T)parser.Read<T>(await ReadTextAsync(fullPath), fullPath);
+			else
+				obj = (T)parser.Read<T>(await ReadBytesAsync(fullPath), fullPath);
+			if (obj != null)
+				return obj;
 		}
 		return default;
+	}
+
+	protected static IEnumerable<(ResourceParser, float)> RankParsers<T>(string fullPath)
+	{
+		return ModManager.Parsers.Select(parser => (parser, certainty: parser.CanRead<T>(fullPath)))
+			.Where(d => d.certainty > 0)
+			.OrderByDescending(d => d.certainty);
 	}
 
 	public static T Load<T>(ResourceFolder folder, string file)

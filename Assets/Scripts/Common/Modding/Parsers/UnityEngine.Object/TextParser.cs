@@ -5,10 +5,11 @@ using System.Collections.Generic;
 
 namespace Modding.Parsers
 {
-	public class TextParser : ByTypeParser
+	public class TextParser : ResourceParser
 	{
-		public override OperateType OperateWith => OperateType.Text;
 		public override List<Type> SupportedTypes => new List<Type> { typeof(TextAsset) };
+		public override List<string> SupportedExtensions => new List<string> { ".txt" };
+		public override OperateType OperateWith => OperateType.Text;
 
 		public override object Read<T>(object data, string path)
 		{

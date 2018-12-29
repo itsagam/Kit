@@ -26,7 +26,9 @@ public class Test: MonoBehaviour
 	{
 		await LoadMods();
 
-		obj.GetComponent<MeshRenderer>().material.mainTexture = await ResourceManager.LoadAsync<Texture>(ResourceFolder.Resources, @"Textures/Test");
+		Debugger.Log(await ResourceManager.LoadAsync<GameData>(ResourceFolder.Resources, "Data/Test"), true);
+
+		//obj.GetComponent<MeshRenderer>().material.mainTexture = await ResourceManager.LoadAsync<Texture>(ResourceFolder.Resources, @"Textures/Test");
 		//ResourceManager.Unload(obj.GetComponent<MeshRenderer>().material.mainTexture);
 	}
 

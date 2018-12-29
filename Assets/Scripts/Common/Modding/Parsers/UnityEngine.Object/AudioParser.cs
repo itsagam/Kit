@@ -5,10 +5,11 @@ using System.Collections.Generic;
 
 namespace Modding.Parsers
 {
-	public class AudioParser : ByTypeParser
+	public class AudioParser : ResourceParser
 	{
-		public override OperateType OperateWith => OperateType.Bytes;
 		public override List<Type> SupportedTypes => new List<Type> { typeof(AudioClip) };
+		public override List<string> SupportedExtensions => new List<string> { ".wav" };
+		public override OperateType OperateWith => OperateType.Bytes;
 
 		public override object Read<T>(object data, string path)
 		{

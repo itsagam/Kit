@@ -5,8 +5,9 @@ using System.Collections.Generic;
 
 namespace Modding.Parsers
 {
-	public class JSONParser : ByNameParser
+	public class JSONParser : ResourceParser
 	{
+		public override List<Type> SupportedTypes => new List<Type> { };
 		public override List<string> SupportedExtensions => new List<string> { ".json" };
 		public override OperateType OperateWith => OperateType.Text;
 

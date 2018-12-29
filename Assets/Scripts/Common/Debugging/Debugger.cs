@@ -81,7 +81,7 @@ public class Debugger : MonoBehaviour
 		IEnumerator LogTimeLocal()
 		{
 			yield return null;
-			Debug.Log($"{name}: {GetTime(name)}");
+			Debugger.Log($"{name}: {GetTime(name)}");
 		}
 	}
 
@@ -113,14 +113,20 @@ public class Debugger : MonoBehaviour
 		Log("[" + type + "] " + line);
 	}
 
-	public static void Log(object obj)
+	public static void Log(object obj, bool serialize = false)
 	{
-		Log(EncodeObject(obj));
+		if (serialize)
+			Log(SerializeObject(obj));
+		else
+			Log(obj.ToString());
 	}
 
-	public static void Log(string type, object obj)
+	public static void Log(string type, object obj, bool serialize = false)
 	{
-		Log(type, EncodeObject(obj.ToString()));
+		if (serialize)
+			Log(type, SerializeObject(obj));
+		else
+			Log(type, obj.ToString());
 	}
 
 	public static void Log(IEnumerable enumerable)
@@ -152,12 +158,12 @@ public class Debugger : MonoBehaviour
 		return "{" + output + "}";
 	}
 
-	public static string EncodeObject(object data)
+	public static string SerializeObject(object data)
 	{
 		return JsonUtility.ToJson(data, true);
 	}
 
-	public static T DecodeObject<T>(string encoded)
+	public static T DeserializeObject<T>(string encoded)
 	{
 		return JsonUtility.FromJson<T>(encoded);
 	}

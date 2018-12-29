@@ -5,10 +5,11 @@ using System.Collections.Generic;
 
 namespace Modding.Parsers
 {
-	public class TextureParser : ByTypeParser
+	public class TextureParser : ResourceParser
 	{
-		public override OperateType OperateWith => OperateType.Bytes;
 		public override List<Type> SupportedTypes => new List<Type> { typeof(Texture2D) };
+		public override List<string> SupportedExtensions => new List<string> { ".jpg", ".jpeg", ".png" };
+		public override OperateType OperateWith => OperateType.Bytes;
 
 		public override object Read<T>(object data, string path)
 		{

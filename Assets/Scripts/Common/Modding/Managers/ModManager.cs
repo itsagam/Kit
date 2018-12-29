@@ -114,8 +114,7 @@ namespace Modding
 						if (package != null)
 						{
 							modPackages.Add(package);
-							if (ModLoaded != null)
-								ModLoaded(package);
+							ModLoaded?.Invoke(package);
 							break;
 						}
 					}
@@ -173,8 +172,7 @@ namespace Modding
 			if (resourcesInfos != null)
 			{
 				ResourceInfo resourceInfo = resourcesInfos[0];
-				if (ResourceReused != null)
-					ResourceReused(path, resourceInfo);
+				ResourceReused?.Invoke(path, resourceInfo);
 				return (T) resourceInfo.Reference;
 			}
 
@@ -187,10 +185,7 @@ namespace Modding
 					if (!resourceInfos.ContainsKey(path))
 						resourceInfos[path] = new List<ResourceInfo>();
 					resourceInfos[path].Add(resourceInfo);
-
-					if (ResourceLoaded != null)
-						ResourceLoaded(path, resourceInfo);
-
+					ResourceLoaded?.Invoke(path, resourceInfo);
 					return reference;
 				}
 			}
@@ -223,17 +218,13 @@ namespace Modding
 						if (!resourceInfos.ContainsKey(path))
 							resourceInfos[path] = new List<ResourceInfo>();
 						resourceInfos[path].Add(resourceInfo);
-
-						if (ResourceLoaded != null)
-							ResourceLoaded(path, resourceInfo);
-
+						ResourceLoaded?.Invoke(path, resourceInfo);
 						all.Add(reference);
 					}
 				}
 				else
 				{
-					if (ResourceReused != null)
-						ResourceReused(path, cachedInfo);
+					ResourceReused?.Invoke(path, cachedInfo);
 					all.Add((T) cachedInfo.Reference);
 				}
 			}
@@ -373,8 +364,7 @@ namespace Modding
 			Unload(i => i.Package == package);
 			package.Unload();
 			modPackages.Remove(package);
-			if (ModUnloaded != null)
-				ModUnloaded(package);
+			ModUnloaded?.Invoke(package);
 		}
 
 		public static bool Unload(object obj)
@@ -391,8 +381,7 @@ namespace Modding
 				{
 					UnloadInternal(info.Reference);
 					kvp.Value.Remove(info);
-					if (ResourceUnloaded != null)
-						ResourceUnloaded(kvp.Key, info.Package);
+					ResourceUnloaded?.Invoke(kvp.Key, info.Package);
 					found = true;
 				}
 				if (kvp.Value.Count <= 0)
@@ -409,8 +398,7 @@ namespace Modding
 				foreach (ResourceInfo info in infos)
 				{
 					UnloadInternal(info.Reference);
-					if (ResourceUnloaded != null)
-						ResourceUnloaded(path, info.Package);
+					ResourceUnloaded?.Invoke(path, info.Package);
 				}
 				resourceInfos.Remove(path);
 				return true;

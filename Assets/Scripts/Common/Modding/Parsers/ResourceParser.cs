@@ -15,8 +15,22 @@ namespace Modding.Parsers
 
 	public abstract class ResourceParser
 	{
+		public abstract List<Type> SupportedTypes { get; }
+		public abstract List<string> SupportedExtensions { get; }
 		public abstract OperateType OperateWith { get; }
-		public abstract bool CanRead<T>(string path);
+
+		public virtual float CanRead<T>(string path)
+		{
+			float certainty = 0;
+
+			if (SupportedTypes.Any(t => typeof(T).IsAssignableFrom(t)))
+				certainty += 0.5f;
+
+			if (SupportedExtensions.Any(e => string.Compare(Path.GetExtension(path), e) == 0))
+				certainty += 0.5f;
+
+			return certainty;
+		}
 
 		public virtual object Read<T>(object data, string path = null)
 		{
