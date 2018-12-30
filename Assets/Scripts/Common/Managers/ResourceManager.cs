@@ -31,37 +31,43 @@ public class ResourceManager
 	protected static Dictionary<string, object> CachedResources = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase);
 
 	#region Loading
-	public static T Load<T>(string fullPath)
+	public static T Load<T>(string fullPath) where T : class
+	{
+		if (!File.Exists(fullPath))
+			return null;
+
+		foreach (var (parser, certainty) in RankParsers<T>(fullPath))
+		{
+			if (parser.CanRead<T>(fullPath) >= 1.0f)
+			{
+				if (parser.OperateWith == OperateType.Text)
+					return (T)parser.Read<T>(ReadText(fullPath), fullPath);
+				else
+					return (T)parser.Read<T>(ReadBytes(fullPath), fullPath);
+			}
+		}
+		return null;
+	}
+
+	public static async Task<T> LoadAsync<T>(string fullPath) where T : class
 	{
 		foreach (var (parser, certainty) in RankParsers<T>(fullPath))
 		{
 			if (parser.CanRead<T>(fullPath) >= 1.0f)
 			{
-				T obj = default;
 				if (parser.OperateWith == OperateType.Text)
-					obj = (T)parser.Read<T>(ReadText(fullPath), fullPath);
+				{
+					string text = await ReadTextAsync(fullPath);
+					return text != null ? (T) parser.Read<T>(text, fullPath) : null;
+				}
 				else
-					obj = (T)parser.Read<T>(ReadBytes(fullPath), fullPath);
-				if (obj != null)
-					return obj;
+				{
+					byte[] bytes = await ReadBytesAsync(fullPath);
+					return bytes != null ? (T) parser.Read<T>(bytes, fullPath) : null;
+				}
 			}
 		}
-		return default;
-	}
-
-	public static async Task<T> LoadAsync<T>(string fullPath)
-	{
-		foreach (var (parser, certainty) in RankParsers<T>(fullPath))
-		{
-			T obj = default;
-			if (parser.OperateWith == OperateType.Text)
-				obj = (T)parser.Read<T>(await ReadTextAsync(fullPath), fullPath);
-			else
-				obj = (T)parser.Read<T>(await ReadBytesAsync(fullPath), fullPath);
-			if (obj != null)
-				return obj;
-		}
-		return default;
+		return null;
 	}
 
 	protected static IEnumerable<(ResourceParser, float)> RankParsers<T>(string fullPath)
@@ -71,7 +77,7 @@ public class ResourceManager
 			.OrderByDescending(d => d.certainty);
 	}
 
-	public static T Load<T>(ResourceFolder folder, string file)
+	public static T Load<T>(ResourceFolder folder, string file) where T : class
 	{
 		if (Modding)
 		{
@@ -83,7 +89,7 @@ public class ResourceManager
 		return LoadCached<T>(folder, file);
 	} 
 
-	public static async Task<T> LoadAsync<T>(ResourceFolder folder, string file)
+	public static async Task<T> LoadAsync<T>(ResourceFolder folder, string file) where T : class
 	{
 		if (Modding)
 		{
@@ -95,7 +101,7 @@ public class ResourceManager
 		return await LoadCachedAsync<T>(folder, file);
 	}
 
-	protected static T LoadCached<T>(ResourceFolder folder, string file)
+	protected static T LoadCached<T>(ResourceFolder folder, string file) where T : class
 	{
 		if (!CachedResources.TryGetValue(file, out object obj))
 		{
@@ -104,13 +110,16 @@ public class ResourceManager
 			else
 				obj = Load<T>(GetPath(folder, file));
 
-			CachedResources.Add(file, obj);
-			return (T) obj;
+			if (obj != null)
+			{
+				CachedResources.Add(file, obj);
+				return (T) obj;
+			}
 		}
-		return default;
+		return null;
 	}
 
-	protected static async Task<T> LoadCachedAsync<T>(ResourceFolder folder, string file) 
+	protected static async Task<T> LoadCachedAsync<T>(ResourceFolder folder, string file) where T : class
 	{
 		if (!CachedResources.TryGetValue(file, out object obj))
 		{
@@ -119,10 +128,13 @@ public class ResourceManager
 			else
 				obj = await LoadAsync<T>(GetPath(folder, file));
 
-			CachedResources.Add(file, obj);
-			return (T) obj;
+			if (obj != null)
+			{
+				CachedResources.Add(file, obj);
+				return (T) obj;
+			}
 		}
-		return default;
+		return null;
 	}
 	
 	public static void Unload(object resource)
@@ -159,8 +171,12 @@ public class ResourceManager
 			try
 			{
 				UnityEngine.Object unityObject = (UnityEngine.Object)resource;
-				Resources.UnloadAsset(unityObject);
-				UnityEngine.Object.Destroy(unityObject);
+
+				// GetInstanceID() seems to return positive values for loaded assets and negative for created ones
+				if (unityObject.GetInstanceID() > 0)
+					Resources.UnloadAsset(unityObject);
+				else
+					UnityEngine.Object.Destroy(unityObject);
 			}
 			catch (Exception)
 			{
@@ -222,22 +238,44 @@ public class ResourceManager
 
 	public static string ReadText(string fullPath)
 	{
-		return File.ReadAllText(fullPath);
+		try
+		{
+			return File.ReadAllText(fullPath);
+		}
+		catch (Exception)
+		{
+			return null;
+		}
 	}
 
 	public static async Task<string> ReadTextAsync(string fullPath)
 	{
-		return (await WebAsync(fullPath)).downloadHandler.text;
+		UnityWebRequest request = await WebAsync(fullPath);
+		if (request.isHttpError || request.isNetworkError)
+			return null;
+		else
+			return request.downloadHandler.text;
 	}
 
 	public static byte[] ReadBytes(string fullPath)
 	{
-		return File.ReadAllBytes(fullPath);
+		try
+		{
+			return File.ReadAllBytes(fullPath);
+		}
+		catch (Exception)
+		{
+			return null;
+		}
 	}
 
 	public static async Task<byte[]> ReadBytesAsync(string fullPath)
 	{
-		return (await WebAsync(fullPath)).downloadHandler.data;
+		UnityWebRequest request = await WebAsync(fullPath);
+		if (request.isHttpError || request.isNetworkError)
+			return null;
+		else
+			return request.downloadHandler.data;
 	}
 
 	public static async Task<UnityWebRequest> WebAsync(string filePath)
@@ -247,18 +285,10 @@ public class ResourceManager
 		return request;
 	}
 
+	// TODO: Data merging with ResourceParser
 	/*
 	public static T Read<T>(ResourceFolder folder, string file)
     {	
-		if (Modding)
-		{
-			T modded = ModManager.Load<T>(file);
-			if (modded != null)
-				return modded;
-		}
-		return Read<T>((GetPath(folder, file)));
-
-
 		if (merge)
 		{
 			List<string> contents = new List<string>();
@@ -288,14 +318,6 @@ public class ResourceManager
 
 	public static async Task<T> ReadAsync<T>(ResourceFolder folder, string file)
 	{
-		if (Modding)
-		{
-			T modded = await ModManager.LoadAsync<T>(file);
-			if (modded != null)
-				return modded;
-		}
-
-		return await ReadAsync<T>(GetPath(folder, file));
 		if (merge)
 		{
 			List<string> contents = new List<string>();
@@ -335,82 +357,122 @@ public class ResourceManager
 	#endregion
 
 	#region Saving/Deleting
-	public static void Save(ResourceFolder folder, string file, object contents, ResourceParser parser)
+	public static bool Save(ResourceFolder folder, string file, object contents, ResourceParser parser)
 	{
-		Save(GetPath(folder, file), contents, parser);
+		return Save(GetPath(folder, file), contents, parser);
 	}
 
-	public static async Task SaveAsync(ResourceFolder folder, string file, object contents, ResourceParser parser)
+	public static async Task<bool> SaveAsync(ResourceFolder folder, string file, object contents, ResourceParser parser)
 	{
-		await SaveAsync(GetPath(folder, file), contents, parser);
+		return await SaveAsync(GetPath(folder, file), contents, parser);
 	}
 
-	public static void Save(string fullPath, object contents, ResourceParser parser)
+	public static bool Save(string fullPath, object contents, ResourceParser parser)
 	{
 		if (parser.OperateWith == OperateType.Text)
-			SaveText(fullPath, (string)parser.Write(contents));
+			return SaveText(fullPath, (string)parser.Write(contents));
 		else
-			SaveBytes(fullPath, (byte[])parser.Write(contents));
+			return SaveBytes(fullPath, (byte[])parser.Write(contents));
 	}
 
-	public static async Task SaveAsync(string fullPath, object contents, ResourceParser parser)
+	public static async Task<bool> SaveAsync(string fullPath, object contents, ResourceParser parser)
 	{
 		if (parser.OperateWith == OperateType.Text)
-			await SaveTextAsync(fullPath, (string)parser.Write(contents));
+			return await SaveTextAsync(fullPath, (string)parser.Write(contents));
 		else
-			await SaveBytesAsync(fullPath, (byte[])parser.Write(contents));
+			return await SaveBytesAsync(fullPath, (byte[])parser.Write(contents));
 	}
 
-	public static void SaveText(ResourceFolder folder, string file, string contents)
+	public static bool SaveText(ResourceFolder folder, string file, string contents)
 	{
-		SaveText(GetPath(folder, file), contents);
+		return SaveText(GetPath(folder, file), contents);
 	}
 
-	public static async Task SaveTextAsync(ResourceFolder folder, string file, string contents)
+	public static async Task<bool> SaveTextAsync(ResourceFolder folder, string file, string contents)
 	{
-		await SaveTextAsync(GetPath(folder, file), contents);
+		return await SaveTextAsync(GetPath(folder, file), contents);
 	}
 
-	public static void SaveBytes(ResourceFolder folder, string file, byte[] bytes)
+	public static bool SaveBytes(ResourceFolder folder, string file, byte[] bytes)
 	{
-		SaveBytes(GetPath(folder, file), bytes);
+		return SaveBytes(GetPath(folder, file), bytes);
 	}
 
-	public static async Task SaveBytesAsync(ResourceFolder folder, string file, byte[] bytes)
+	public static async Task<bool> SaveBytesAsync(ResourceFolder folder, string file, byte[] bytes)
 	{
-		await SaveBytesAsync(GetPath(folder, file), bytes);
+		return await SaveBytesAsync(GetPath(folder, file), bytes);
 	}
 
-	public static void SaveText(string fullPath, string contents)
+	public static bool SaveText(string fullPath, string contents)
 	{
-		File.WriteAllText(fullPath, contents);
+		try
+		{
+			File.WriteAllText(fullPath, contents);
+			return true;
+		}
+		catch (Exception)
+		{
+			return false;
+		}
 	}
 
-	public static async Task SaveTextAsync(string fullPath, string contents)
+	public static async Task<bool> SaveTextAsync(string fullPath, string contents)
 	{
-		using (StreamWriter stream = new StreamWriter(fullPath))
-			await stream.WriteAsync(contents);
+		try
+		{
+			using (StreamWriter stream = new StreamWriter(fullPath))
+				await stream.WriteAsync(contents);
+			return true;
+		}
+		catch (Exception)
+		{
+			return false;
+		}
 	}
 
-	public static void SaveBytes(string fullPath, byte[] bytes)
+	public static bool SaveBytes(string fullPath, byte[] bytes)
 	{
-		File.WriteAllBytes(fullPath, bytes);
+		try
+		{
+			File.WriteAllBytes(fullPath, bytes);
+			return true;
+		}
+		catch (Exception)
+		{
+			return false;
+		}
 	}
 
-	public static async Task SaveBytesAsync(string fullPath, byte[] bytes)
+	public static async Task<bool> SaveBytesAsync(string fullPath, byte[] bytes)
 	{
-		using (FileStream stream = new FileStream(fullPath, FileMode.Create))
-			await stream.WriteAsync(bytes, 0, bytes.Length);
+		try
+		{
+			using (FileStream stream = new FileStream(fullPath, FileMode.Create))
+				await stream.WriteAsync(bytes, 0, bytes.Length);
+			return true;
+		}
+		catch (Exception)
+		{
+			return false;
+		}
 	}
 
-	public static void Delete(ResourceFolder folder, string file)
+	public static bool Delete(ResourceFolder folder, string file)
 	{
-		Delete(GetPath(folder, file));
+		return Delete(GetPath(folder, file));
 	}
 
-	public static void Delete(string fullPath)
+	public static bool Delete(string fullPath)
 	{
-		File.Delete(fullPath);
+		try
+		{
+			File.Delete(fullPath);
+			return true;
+		}
+		catch (Exception)
+		{
+			return false;
+		}
 	}
 
 	public static bool Exists(ResourceFolder folder, string file)

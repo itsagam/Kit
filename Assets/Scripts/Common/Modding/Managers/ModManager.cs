@@ -57,6 +57,7 @@ namespace Modding
         {
 			Loaders.Add(new DirectModLoader());
 			Loaders.Add(new ZipModLoader());
+			// TODO: Loaders.Add(new AssetBundleModLoader());
 		}
 
 		private static void AddDefaultParsers()
@@ -156,18 +157,18 @@ namespace Modding
 			return null;
 		}
 
-		public static T Load<T>(string path)
+		public static T Load<T>(string path) where T : class
 		{
 			return LoadInternal<T>(path, false).Result;
 		}
 
-		public static async Task<T> LoadAsync<T>(string path)
+		public static async Task<T> LoadAsync<T>(string path) where T : class
 		{
 			return await LoadInternal<T>(path, true);
 		}
 
-		protected static async Task<T> LoadInternal<T>(string path, bool async)
-        {
+		protected static async Task<T> LoadInternal<T>(string path, bool async) where T : class
+		{
 			List<ResourceInfo> resourcesInfos = GetResourceInfo(path);
 			if (resourcesInfos != null)
 			{
@@ -175,7 +176,7 @@ namespace Modding
 				ResourceReused?.Invoke(path, resourceInfo);
 				return (T) resourceInfo.Reference;
 			}
-
+			
 			foreach (ModPackage package in ModPackages.Reverse())
 			{
 				T reference = async ? await package.LoadAsync<T>(path) : package.Load<T>(path);
@@ -189,20 +190,21 @@ namespace Modding
 					return reference;
 				}
 			}
-			return default;
+			
+			return null;
         }
 
-		public static List<T> LoadAll<T>(string path)
+		public static List<T> LoadAll<T>(string path) where T : class
 		{
 			return LoadAllInternal<T>(path, false).Result;
 		}
 
-		public static async Task<List<T>> LoadAllAsync<T>(string path)
+		public static async Task<List<T>> LoadAllAsync<T>(string path) where T : class
 		{
 			return await LoadAllInternal<T>(path, true);
 		}
 
-		protected static async Task<List<T>> LoadAllInternal<T>(string path, bool async)
+		protected static async Task<List<T>> LoadAllInternal<T>(string path, bool async) where T : class
 		{
 			List<T> all = new List<T>();
 			List<ResourceInfo> cachedInfos = GetResourceInfo(path);

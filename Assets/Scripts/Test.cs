@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using System.IO;
 using UnityEngine;
 using Modding;
+using UnityEngine.UI;
 
 public class GameData
 {
@@ -21,15 +22,19 @@ public class GameData
 public class Test: MonoBehaviour
 {
 	public GameObject obj;
+	public Text text;
 
 	async void Start()
 	{
 		await LoadMods();
 
-		Debugger.Log(await ResourceManager.LoadAsync<GameData>(ResourceFolder.Resources, "Data/Test"), true);
+		//Debugger.Log(await ResourceManager.LoadAsync<GameData>(ResourceFolder.Resources, "Data/Test"), true);
 
-		//obj.GetComponent<MeshRenderer>().material.mainTexture = await ResourceManager.LoadAsync<Texture>(ResourceFolder.Resources, @"Textures/Test");
-		//ResourceManager.Unload(obj.GetComponent<MeshRenderer>().material.mainTexture);
+		Texture tex = await ResourceManager.LoadAsync<Texture>(ResourceFolder.StreamingAssets, @"Textures/Test1");
+		obj.GetComponent<MeshRenderer>().material.mainTexture = tex;
+
+		//AudioClip clip = await ResourceManager.LoadAsync<AudioClip>(ResourceFolder.Resources, @"Sounds/Test");
+		//GetComponent<AudioSource>().clip = clip;
 	}
 
 	protected async Task LoadMods()
@@ -90,6 +95,6 @@ public class Test: MonoBehaviour
 
 	void OnDestroy()
 	{
-		ModManager.UnloadMods();
+		//ModManager.UnloadMods();
 	}
 }

@@ -96,13 +96,16 @@ namespace Modding.Loaders
 
 			if (!System.IO.Path.HasExtension(path))
 			{
-				string relativeDir = System.IO.Path.GetDirectoryName(path);
 				string fullDir = System.IO.Path.GetDirectoryName(fullPath);
-				string fullFile = System.IO.Path.GetFileName(fullPath);
-				var matching = Directory.EnumerateFiles(fullDir, $"{fullFile}.*")
-					.Select(p => System.IO.Path.Combine(relativeDir, System.IO.Path.GetFileName(p)));
-				if (matching.Any())
-					return matching;
+				if (Directory.Exists(fullDir))
+				{
+					string fullFile = System.IO.Path.GetFileName(fullPath);
+					string relativeDir = System.IO.Path.GetDirectoryName(path);
+					var matching = Directory.EnumerateFiles(fullDir, $"{fullFile}.*")
+						.Select(p => System.IO.Path.Combine(relativeDir, System.IO.Path.GetFileName(p)));
+					if (matching.Any())
+						return matching;
+				}
 			}
 
 			return null;

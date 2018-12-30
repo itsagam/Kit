@@ -34,21 +34,21 @@ namespace Modding
 			return FindFiles(path)?.FirstOrDefault();
 		}
 
-		public virtual T Load<T>(string path)
+		public virtual T Load<T>(string path) where T : class
 		{
 			return LoadInternal<T>(path, false).Result;
 		}
 
-		public virtual async Task<T> LoadAsync<T>(string path)
+		public virtual async Task<T> LoadAsync<T>(string path) where T : class
 		{
 			return await LoadInternal<T>(path, true);
 		}
 
-		protected virtual async Task<T> LoadInternal<T>(string path, bool async)
+		protected virtual async Task<T> LoadInternal<T>(string path, bool async) where T : class
 		{
 			IEnumerable<string> matchingFiles = FindFiles(path);
 			if (matchingFiles == null)
-				return default;
+				return null;
 			
 			var certainties = matchingFiles
 								.SelectMany(file => ModManager.Parsers.Select(parser => (file, parser, certainty: parser.CanRead<T>(file))))
@@ -58,7 +58,7 @@ namespace Modding
 			foreach (var (file, parser, certainty) in certainties)
 			{
 				try
-				{
+				{					
 					if (parser.OperateWith == OperateType.Bytes)
 						return (T)parser.Read<T>(await ReadBytesInternal(file, async), file);
 					else
@@ -69,7 +69,7 @@ namespace Modding
 				}
 			}
 
-			return default;
+			return null;
 		}
 
 		public virtual string ReadText(string path)
