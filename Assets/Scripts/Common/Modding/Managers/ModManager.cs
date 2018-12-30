@@ -11,14 +11,16 @@ using Modding.Parsers;
 
 namespace Modding
 {
-	public class ResourceInfo
+	public struct ResourceInfo
 	{
 		public ModPackage Package;
+		public ResourceParser Parser;
 		public object Reference;
-
-		public ResourceInfo(ModPackage package, object reference)
+		
+		public ResourceInfo(ModPackage package, ResourceParser parser, object reference)
 		{
 			Package = package;
+			Parser = parser;
 			Reference = reference;
 		}
 	}
@@ -157,6 +159,11 @@ namespace Modding
 			return null;
 		}
 
+		public static ResourceInfo? GetResourceInfo(object resource)
+		{
+			return resourceInfos.SelectMany(r => r.Value).FirstOrDefault(r => r.Reference == resource);
+		}
+
 		public static T Load<T>(string path) where T : class
 		{
 			return LoadInternal<T>(path, false).Result;
@@ -169,23 +176,26 @@ namespace Modding
 
 		protected static async Task<T> LoadInternal<T>(string path, bool async) where T : class
 		{
-			List<ResourceInfo> resourcesInfos = GetResourceInfo(path);
-			if (resourcesInfos != null)
+			List<ResourceInfo> loadedResources = GetResourceInfo(path);
+			if (loadedResources != null)
 			{
-				ResourceInfo resourceInfo = resourcesInfos[0];
-				ResourceReused?.Invoke(path, resourceInfo);
-				return (T) resourceInfo.Reference;
+				ResourceInfo loadedResource = loadedResources[0];
+				ResourceReused?.Invoke(path, loadedResource);
+				return (T) loadedResource.Reference;
 			}
 			
 			foreach (ModPackage package in ModPackages.Reverse())
 			{
-				T reference = async ? await package.LoadAsync<T>(path) : package.Load<T>(path);
+				var (reference, parser) = async ? await package.LoadAsync<T>(path) : package.Load<T>(path);
 				if (reference != null)
 				{
-					ResourceInfo resourceInfo = new ResourceInfo(package, reference);
-					if (!resourceInfos.ContainsKey(path))
-						resourceInfos[path] = new List<ResourceInfo>();
-					resourceInfos[path].Add(resourceInfo);
+					if (! resourceInfos.TryGetValue(path, out loadedResources))
+					{
+						loadedResources = new List<ResourceInfo>();
+						resourceInfos[path] = loadedResources;
+					}
+					ResourceInfo resourceInfo = new ResourceInfo(package, parser, reference);
+					loadedResources.Add(resourceInfo);
 					ResourceLoaded?.Invoke(path, resourceInfo);
 					return reference;
 				}
@@ -207,29 +217,33 @@ namespace Modding
 		protected static async Task<List<T>> LoadAllInternal<T>(string path, bool async) where T : class
 		{
 			List<T> all = new List<T>();
-			List<ResourceInfo> cachedInfos = GetResourceInfo(path);
+			List<ResourceInfo> loadedResources = GetResourceInfo(path);
+			if (loadedResources == null)
+			{
+				loadedResources = new List<ResourceInfo>();
+				resourceInfos[path] = loadedResources;
+			}
 			foreach (ModPackage package in ModPackages)
 			{
-				ResourceInfo cachedInfo = cachedInfos?.FirstOrDefault(i => i.Package == package);
-				if (cachedInfo == null)
+				ResourceInfo loadedResource = loadedResources.Find(r => r.Package == package);
+				if (loadedResource.Reference == null)
 				{
-					T reference = async ? await package.LoadAsync<T>(path) : package.Load<T>(path);
+					var (reference, parser) = async ? await package.LoadAsync<T>(path) : package.Load<T>(path);
 					if (reference != null)
 					{
-						ResourceInfo resourceInfo = new ResourceInfo(package, reference);
-						if (!resourceInfos.ContainsKey(path))
-							resourceInfos[path] = new List<ResourceInfo>();
-						resourceInfos[path].Add(resourceInfo);
+						ResourceInfo resourceInfo = new ResourceInfo(package, parser, reference);
+						loadedResources.Add(resourceInfo);
 						ResourceLoaded?.Invoke(path, resourceInfo);
 						all.Add(reference);
 					}
 				}
 				else
 				{
-					ResourceReused?.Invoke(path, cachedInfo);
-					all.Add((T) cachedInfo.Reference);
+					ResourceReused?.Invoke(path, loadedResource);
+					all.Add((T) loadedResource.Reference);
 				}
 			}
+
 			return all;
 		}
 

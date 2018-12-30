@@ -115,45 +115,45 @@ public class Debugger : MonoBehaviour
 
 	public static void Log(object obj, bool serialize = false)
 	{
-		if (serialize)
-			Log(SerializeObject(obj));
-		else
-			Log(obj.ToString());
+		Log(serialize ? SerializeObject(obj) : obj.ToString());
 	}
 
 	public static void Log(string type, object obj, bool serialize = false)
 	{
-		if (serialize)
-			Log(type, SerializeObject(obj));
-		else
-			Log(type, obj.ToString());
+		Log(type, serialize ? SerializeObject(obj) : obj.ToString());
 	}
 
-	public static void Log(IEnumerable enumerable)
+	public static void Log(IEnumerable enumerable, bool serialize = false)
 	{
-		Log(EnumerableToString(enumerable));
+		Log(EnumerableToString(enumerable, serialize));
 	}
 
-	public static void Log(string type, IEnumerable enumerable)
+	public static void Log(string type, IEnumerable enumerable, bool serialize = false)
 	{
-		Log(type, EnumerableToString(enumerable));
+		Log(type, EnumerableToString(enumerable, serialize));
 	}
 
-	protected static string EnumerableToString(IEnumerable enumerable)
+	protected static string EnumerableToString(IEnumerable enumerable, bool serialize = false)
 	{
+		if (enumerable == null)
+			return "Null";
+
 		IEnumerable<object> items = enumerable.Cast<object>();
 		StringBuilder output = new StringBuilder();
 		if (items.Any())
 		{
 			bool first = true;
-			foreach (object obj in items)
+			foreach (object item in items)
+			{
+				string itemString = item is IEnumerable itemEnum ? EnumerableToString(itemEnum) : (serialize ? SerializeObject(item) : item.ToString());
 				if (first)
 				{
-					output.Append(obj);
+					output.Append(itemString);
 					first = false;
 				}
 				else
-					output.Append(", " + obj);
+					output.Append(", " + itemString);
+			}
 		}
 		return "{" + output + "}";
 	}

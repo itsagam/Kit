@@ -30,11 +30,13 @@ public class Test: MonoBehaviour
 
 		//Debugger.Log(await ResourceManager.LoadAsync<GameData>(ResourceFolder.Resources, "Data/Test"), true);
 
-		Texture tex = await ResourceManager.LoadAsync<Texture>(ResourceFolder.StreamingAssets, @"Textures/Test1");
+		Texture tex = await ResourceManager.LoadAsync<Texture>(ResourceFolder.Resources, @"Textures/Test");
 		obj.GetComponent<MeshRenderer>().material.mainTexture = tex;
 
 		//AudioClip clip = await ResourceManager.LoadAsync<AudioClip>(ResourceFolder.Resources, @"Sounds/Test");
 		//GetComponent<AudioSource>().clip = clip;
+
+		//Debugger.Log(ResourceManager.GetLoadedModFileInfo(ResourceFolder.Resources, @"Textures/Test")[0].Parser);
 	}
 
 	protected async Task LoadMods()

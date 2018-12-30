@@ -487,6 +487,11 @@ public class ResourceManager
 	#endregion
 
 	#region Other
+	public static List<ResourceInfo> GetModdedResourceInfo(ResourceFolder folder, string file)
+	{
+		return ModManager.GetResourceInfo(GetModdingPath(folder, file));
+	}
+
 	public static string GetPath(ResourceFolder folder)
 	{
 		return Paths[folder];
@@ -497,9 +502,14 @@ public class ResourceManager
 		return Path.Combine(GetPath(folder), file);
 	}
 
+	public static string GetModdingPath(ResourceFolder folder)
+	{
+		return folder.ToString();
+	}
+
 	public static string GetModdingPath(ResourceFolder folder, string file)
 	{
-		return Path.Combine(folder.ToString(), file);
+		return Path.Combine(GetModdingPath(folder), file);
 	}
 
 	public static string LocalToURLPath(string path)
