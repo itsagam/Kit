@@ -54,15 +54,24 @@ namespace Modding
 								.SelectMany(file => ModManager.Parsers.Select(parser => (file, parser, certainty: parser.CanRead<T>(file))))
 								.Where(d => d.certainty > 0)
 								.OrderByDescending(d => d.certainty);
-
+			string text = null;
+			byte[] bytes = null;
 			foreach (var (file, parser, certainty) in certainties)
 			{
 				try
-				{					
+				{
 					if (parser.OperateWith == OperateType.Bytes)
-						return ((T)parser.Read<T>(await ReadBytesInternal(file, async), file), parser);
+					{
+						if (bytes == null)
+							bytes = await ReadBytesInternal(file, async);
+						return ((T) parser.Read<T>(bytes, file), parser);
+					}
 					else
-						return ((T)parser.Read<T>(await ReadTextInternal(file, async), file), parser);
+					{
+						if (text == null)
+							text = await ReadTextInternal(file, async);
+						return ((T) parser.Read<T>(text, file), parser);
+					}
 				}
 				catch (Exception)
 				{

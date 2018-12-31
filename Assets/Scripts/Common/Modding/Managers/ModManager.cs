@@ -216,14 +216,15 @@ namespace Modding
 
 		protected static async Task<List<T>> LoadAllInternal<T>(string path, bool async) where T : class
 		{
-			List<T> all = new List<T>();
 			List<ResourceInfo> loadedResources = GetResourceInfo(path);
 			if (loadedResources == null)
 			{
 				loadedResources = new List<ResourceInfo>();
 				resourceInfos[path] = loadedResources;
 			}
-			foreach (ModPackage package in ModPackages)
+
+			List<T> all = new List<T>();
+			foreach (ModPackage package in ModPackages.Reverse())
 			{
 				ResourceInfo loadedResource = loadedResources.Find(r => r.Package == package);
 				if (loadedResource.Reference == null)
@@ -243,7 +244,6 @@ namespace Modding
 					all.Add((T) loadedResource.Reference);
 				}
 			}
-
 			return all;
 		}
 

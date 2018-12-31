@@ -115,12 +115,12 @@ public class Debugger : MonoBehaviour
 
 	public static void Log(object obj, bool serialize = false)
 	{
-		Log(serialize ? SerializeObject(obj) : obj.ToString());
+		Log(ObjectToString(obj, serialize));
 	}
 
 	public static void Log(string type, object obj, bool serialize = false)
 	{
-		Log(type, serialize ? SerializeObject(obj) : obj.ToString());
+		Log(type, ObjectToString(obj, serialize));
 	}
 
 	public static void Log(IEnumerable enumerable, bool serialize = false)
@@ -133,7 +133,12 @@ public class Debugger : MonoBehaviour
 		Log(type, EnumerableToString(enumerable, serialize));
 	}
 
-	protected static string EnumerableToString(IEnumerable enumerable, bool serialize = false)
+	protected static string ObjectToString(object obj, bool serialize)
+	{
+		return serialize ? SerializeObject(obj) : obj?.ToString();
+	}
+
+	protected static string EnumerableToString(IEnumerable enumerable, bool serialize)
 	{
 		if (enumerable == null)
 			return "Null";
@@ -145,7 +150,7 @@ public class Debugger : MonoBehaviour
 			bool first = true;
 			foreach (object item in items)
 			{
-				string itemString = item is IEnumerable itemEnum ? EnumerableToString(itemEnum) : (serialize ? SerializeObject(item) : item.ToString());
+				string itemString = item is IEnumerable itemEnum ? EnumerableToString(itemEnum, serialize) : ObjectToString(item, serialize);
 				if (first)
 				{
 					output.Append(itemString);

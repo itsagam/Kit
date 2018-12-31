@@ -28,10 +28,10 @@ public class Test: MonoBehaviour
 	{
 		await LoadMods();
 
-		//Debugger.Log(await ResourceManager.LoadAsync<GameData>(ResourceFolder.Resources, "Data/Test"), true);
+		Debugger.Log("Full", await ResourceManager.LoadAsync<GameData>(ResourceFolder.StreamingAssets, "Data/Test.json", true), true);
 
-		Texture tex = await ResourceManager.LoadAsync<Texture>(ResourceFolder.Resources, @"Textures/Test");
-		obj.GetComponent<MeshRenderer>().material.mainTexture = tex;
+		//Texture tex = await ResourceManager.LoadAsync<Texture>(ResourceFolder.Resources, @"Textures/Test");
+		//obj.GetComponent<MeshRenderer>().material.mainTexture = tex;
 
 		//AudioClip clip = await ResourceManager.LoadAsync<AudioClip>(ResourceFolder.Resources, @"Sounds/Test");
 		//GetComponent<AudioSource>().clip = clip;

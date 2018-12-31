@@ -1,7 +1,7 @@
-﻿using UnityEngine;
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using UnityEngine;
 
 namespace Modding.Parsers
 {
@@ -21,9 +21,9 @@ namespace Modding.Parsers
 			return ToJson(obj);
 		}
 
-		public override void Merge<T>(T data, T overwrite)
+		public override void Merge<T>(T current, object overwrite)
 		{
-			OverwriteJson(data, ToJson(overwrite));
+			OverwriteJson(current, (string) overwrite);
 		}
 
 		public virtual T FromJson<T>(string json)
