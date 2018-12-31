@@ -383,9 +383,9 @@ namespace Modding
 			ModUnloaded?.Invoke(package);
 		}
 
-		public static bool Unload(object obj)
+		public static bool Unload(object reference)
 		{
-			return Unload(i => i.Reference == obj);
+			return Unload(i => i.Reference == reference);
 		}
 
 		public static bool Unload(Func<ResourceInfo, bool> predicate)
@@ -428,6 +428,11 @@ namespace Modding
 			{
 				UnityEngine.Object.Destroy((UnityEngine.Object)resource);
 			}
+		}
+
+		public static void ClearCache()
+		{
+			resourceInfos.Clear();
 		}
 
 		public static ReadOnlyCollection<ModPackage> ModPackages

@@ -28,38 +28,141 @@ public class ResourceManager
 
 	public static bool Modding = true;
 
-	protected static Dictionary<string, object> CachedResources = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase);
+	protected static Dictionary<string, object> resources = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase);
 
 	#region Loading
-	public static (T reference, ResourceParser parser) Load<T>(string fullPath) where T : class
+	public static T Load<T>(ResourceFolder folder, string file, bool merge = false) where T : class
 	{
-		string text = null;
-		byte[] bytes = null;
-		foreach (var (parser, certainty) in RankParsers<T>(fullPath))
+		return LoadInternal<T>(folder, file, merge, false).Result;
+	}
+
+	public static async Task<T> LoadAsync<T>(ResourceFolder folder, string file, bool merge = false) where T : class
+	{
+		return await LoadInternal<T>(folder, file, merge, true);
+	}
+
+	// TODO: Handle partial (without file extension) filenames when folder = StreamingAssets, PersistentData...
+	protected static async Task<T> LoadInternal<T>(ResourceFolder folder, string file, bool merge, bool async) where T : class
+	{
+		if (Modding)
+		{
+			if (!merge)
+			{
+				string moddingPath = GetModdingPath(folder, file);
+				T modded = async ? await ModManager.LoadAsync<T>(moddingPath) : ModManager.Load<T>(moddingPath);
+				if (modded != null)
+					return modded;
+			}
+			else
+				return async ? await LoadMergedAsync<T>(folder, file) : LoadMerged<T>(folder, file);
+		}
+
+		return async ? await LoadUnmoddedAsync<T>(folder, file) : LoadUnmodded<T>(folder, file);
+	}
+
+	public static T LoadUnmodded<T>(ResourceFolder folder, string file) where T : class
+	{
+		return LoadUnmoddedInternal<T>(folder, file, false).Result;
+	}
+
+	public static async Task<T> LoadUnmoddedAsync<T>(ResourceFolder folder, string file) where T : class
+	{
+		return await LoadUnmoddedInternal<T>(folder, file, true);
+	}
+
+	protected static async Task<T> LoadUnmoddedInternal<T>(ResourceFolder folder, string file, bool async) where T : class
+	{
+		object reference = null;
+		if (!resources.TryGetValue(file, out reference))
+		{
+			if (folder == ResourceFolder.Resources)
+			{
+				string fileNoExt = Path.ChangeExtension(file, null);
+				reference = async ? await Resources.LoadAsync(fileNoExt) : Resources.Load(fileNoExt);
+			}
+			else
+			{
+				string fullPath = GetFullPath(folder, file);
+				reference = async ? (await LoadAsync<T>(fullPath)).reference : Load<T>(fullPath).reference;
+			}
+
+			if (reference != null)
+				resources.Add(file, reference);
+		}
+		return (T) reference;
+	}
+
+	protected static T LoadMerged<T>(ResourceFolder folder, string file) where T : class
+	{
+		return LoadMergedInternal<T>(folder, file, false).Result;
+	}
+
+	protected static async Task<T> LoadMergedAsync<T>(ResourceFolder folder, string file) where T : class
+	{
+		return await LoadMergedInternal<T>(folder, file, true);
+	}
+
+	protected static async Task<T> LoadMergedInternal<T>(ResourceFolder folder, string file, bool async) where T : class
+	{
+		object reference = null;
+		if (resources.TryGetValue(file, out reference))
+			return (T) reference;
+
+		ResourceParser parser = null;
+		string fullPath = GetFullPath(folder, file);
+		if (folder == ResourceFolder.Resources)
+		{
+			string fileNoExt = Path.ChangeExtension(file, null);
+			reference = async ? await Resources.LoadAsync(fileNoExt) : Resources.Load(fileNoExt);
+			if (reference == null)
+				return null;
+			parser = RankParsers<T>(fullPath).FirstOrDefault().parser;
+		}
+		else
+		{
+			(reference, parser) = async ? await LoadAsync<T>(fullPath) : Load<T>(fullPath);
+			if (reference == null)
+				return null;
+		}
+
+		T merged = (T) reference;
+		if (parser != null)
 		{
 			try
 			{
+				string moddingPath = GetModdingPath(folder, file);
 				if (parser.OperateWith == OperateType.Text)
 				{
-					if (text == null)
-						text = ReadText(fullPath);
-					return text != null ? ((T) parser.Read<T>(text, fullPath), parser) : (null, null);
+					List<string> textList = async ? await ModManager.ReadTextAllAsync(moddingPath) : ModManager.ReadTextAll(moddingPath);
+					foreach (string text in textList)
+						parser.Merge(merged, text);
 				}
 				else
 				{
-					if (bytes == null)
-						bytes = ReadBytes(fullPath);
-					return bytes != null ? ((T) parser.Read<T>(bytes, fullPath), parser) : (null, null);
+					List<byte[]> bytesList = async ? await ModManager.ReadBytesAllAsync(moddingPath) : ModManager.ReadBytesAll(moddingPath);
+					foreach (byte[] bytes in bytesList)
+						parser.Merge(merged, bytes);
 				}
 			}
 			catch (Exception)
 			{
 			}
 		}
-		return (null, null);
+		resources[file] = merged;
+		return merged;
+	}
+
+	public static (T reference, ResourceParser parser) Load<T>(string fullPath) where T : class
+	{
+		return LoadInternal<T>(fullPath, false).Result;
 	}
 
 	public static async Task<(T reference, ResourceParser parser)> LoadAsync<T>(string fullPath) where T : class
+	{
+		return await LoadInternal<T>(fullPath, true);
+	}
+
+	protected static async Task<(T reference, ResourceParser parser)> LoadInternal<T>(string fullPath, bool async) where T : class
 	{
 		string text = null;
 		byte[] bytes = null;
@@ -70,13 +173,13 @@ public class ResourceManager
 				if (parser.OperateWith == OperateType.Text)
 				{
 					if (text == null)
-						text = await ReadTextAsync(fullPath);
+						text = async ? await ReadTextAsync(fullPath) : ReadText(fullPath);
 					return text != null ? ((T) parser.Read<T>(text, fullPath), parser) : (null, null);
 				}
 				else
 				{
 					if (bytes == null)
-						bytes = await ReadBytesAsync(fullPath);
+						bytes = async ? await ReadBytesAsync(fullPath) : ReadBytes(fullPath);
 					return bytes != null ? ((T) parser.Read<T>(bytes, fullPath), parser) : (null, null);
 				}
 			}
@@ -94,146 +197,24 @@ public class ResourceManager
 			.OrderByDescending(d => d.certainty);
 	}
 
-	public static T Load<T>(ResourceFolder folder, string file) where T : class
+	public static bool Unload(object resource)
 	{
-		if (Modding)
-		{
-			T modded = ModManager.Load<T>(GetModdingPath(folder, file));
-			if (modded != null)
-				return modded;
-		}
+		if (Modding && ModManager.Unload(resource))
+			return true;
 
-		return LoadUnmodded<T>(folder, file);
-	} 
-
-	public static async Task<T> LoadAsync<T>(ResourceFolder folder, string file, bool merge = false) where T : class
-	{
-		if (Modding)
-		{
-			if (!merge)
+		bool found = false;
+		foreach (var kvp in resources.Reverse())
+			if (kvp.Value == resource)
 			{
-				T modded = await ModManager.LoadAsync<T>(GetModdingPath(folder, file));
-				if (modded != null)
-					return modded;
+				resources.Remove(kvp.Key);
+				found = true;
+				break;
 			}
-			else
-				return await LoadMergedAsync<T>(folder, file);
-		}
 
-		return await LoadUnmoddedAsync<T>(folder, file);
-	}
-
-	protected static async Task<T> LoadMergedAsync<T>(ResourceFolder folder, string file) where T : class
-	{
-		if (CachedResources.TryGetValue(file, out object obj))
-			return (T) obj;
-
-		object reference = null;
-		ResourceParser parser = null;
-		string fullPath = GetFullPath(folder, file);
-		if (folder == ResourceFolder.Resources)
-		{
-			reference = await Resources.LoadAsync(Path.ChangeExtension(file, null));
-			if (reference == null)
-				return null;
-			parser = RankParsers<T>(fullPath).FirstOrDefault().parser;
-		}
-		else
-		{
-			(reference, parser) = await LoadAsync<T>(fullPath);
-			if (reference == null)
-				return null;
-		}
-
-		T merged = (T) reference;
-		if (parser != null)
+		if (resource is UnityEngine.Object unityObject)
 		{
 			try
 			{
-				string moddingPath = GetModdingPath(folder, file);
-				if (parser.OperateWith == OperateType.Text)
-					foreach (string text in await ModManager.ReadTextAllAsync(moddingPath))
-						parser.Merge(merged, text);
-				else
-					foreach (byte[] bytes in await ModManager.ReadBytesAllAsync(moddingPath))
-						parser.Merge(merged, bytes);
-			}
-			catch (Exception)
-			{
-			}
-		}
-		CachedResources[file] = merged;
-		return merged;
-	}
-
-	// TODO: Handle partial (without no file extension) filenames when folder = StreamingAssets, PersistentData...
-	protected static T LoadUnmodded<T>(ResourceFolder folder, string file) where T : class
-	{
-		object obj = null;
-		if (!CachedResources.TryGetValue(file, out obj))
-		{
-			if (folder == ResourceFolder.Resources)
-				obj = Resources.Load(Path.ChangeExtension(file, null));
-			else
-				obj = Load<T>(GetFullPath(folder, file));
-
-			if (obj != null)
-				CachedResources[file] = obj;
-		}
-		return (T) obj;
-	}
-
-	protected static async Task<T> LoadUnmoddedAsync<T>(ResourceFolder folder, string file) where T : class
-	{
-		object obj = null;
-		if (!CachedResources.TryGetValue(file, out obj))
-		{
-			if (folder == ResourceFolder.Resources)
-				obj = await Resources.LoadAsync(Path.ChangeExtension(file, null));
-			else
-				obj = (await LoadAsync<T>(GetFullPath(folder, file))).reference;
-
-			if (obj != null)
-				CachedResources.Add(file, obj);
-		}
-		return (T) obj;
-	}
-	
-	public static void Unload(object resource)
-	{
-		if (!Modding || !ModManager.Unload(resource))
-		{
-			foreach (KeyValuePair<string, object> kvp in CachedResources)
-				if (kvp.Value == resource)
-				{
-					CachedResources.Remove(kvp.Key);
-					break;
-				}
-
-			UnloadInternal(resource);
-		}
-	}
-
-	public static void Unload(string path)
-	{
-		if (!Modding || !ModManager.Unload(path))
-		{
-			if (CachedResources.TryGetValue(path, out object resource))
-			{
-				CachedResources.Remove(path);
-				UnloadInternal(resource);
-			}		
-		}
-	}
-
-	protected static void UnloadInternal(object resource)
-	{
-		if (resource is UnityEngine.Object)
-		{
-			try
-			{
-				UnityEngine.Object unityObject = (UnityEngine.Object)resource;
-
 				// GetInstanceID() seems to return positive values for loaded assets and negative for created ones
 				if (unityObject.GetInstanceID() > 0)
 					Resources.UnloadAsset(unityObject);
@@ -244,13 +225,40 @@ public class ResourceManager
 			{
 			}
 		}
+		return found;
+	}
+
+	public static bool Unload(ResourceFolder folder, string file)
+	{
+		string moddingPath = GetModdingPath(folder, file);
+		if (Modding && ModManager.UnloadAll(moddingPath))
+			return true;
+		
+		if (resources.TryGetValue(file, out object resource))
+		{
+			resources.Remove(file);
+			if (resource is UnityEngine.Object unityObject)
+			{
+				if (folder == ResourceFolder.Resources)
+					Resources.UnloadAsset(unityObject);
+				else
+					UnityEngine.Object.Destroy(unityObject);
+			}
+			return true;
+		}
+		return false;
+	}
+
+	public static void UnloadUnused()
+	{
+		Resources.UnloadUnusedAssets();
 	}
 
 	public static void ClearCache()
 	{
-		CachedResources.Clear();
-		Resources.UnloadUnusedAssets();
+		resources.Clear();
 	}
+
 	#endregion
 
 	#region Reading

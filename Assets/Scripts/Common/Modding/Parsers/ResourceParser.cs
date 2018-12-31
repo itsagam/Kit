@@ -34,7 +34,7 @@ namespace Modding.Parsers
 			return certainty;
 		}
 
-		public virtual object Write(object obj, string path = null)
+		public virtual object Write(object data, string path = null)
 		{
 			throw new NotImplementedException();
 		}

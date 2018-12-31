@@ -16,9 +16,9 @@ namespace Modding.Parsers
 			return FromJson<T>((string) data);
 		}
 
-		public override object Write(object obj, string path = null)
+		public override object Write(object data, string path = null)
 		{
-			return ToJson(obj);
+			return ToJson(data);
 		}
 
 		public override void Merge<T>(T current, object overwrite)

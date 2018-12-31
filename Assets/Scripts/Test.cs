@@ -28,15 +28,14 @@ public class Test: MonoBehaviour
 	{
 		await LoadMods();
 
-		Debugger.Log("Full", await ResourceManager.LoadAsync<GameData>(ResourceFolder.StreamingAssets, "Data/Test.json", true), true);
-
+		//Debugger.Log("Full", await ResourceManager.LoadAsync<GameData>(ResourceFolder.StreamingAssets, "Data/Test.json", true), true);
+	
 		//Texture tex = await ResourceManager.LoadAsync<Texture>(ResourceFolder.Resources, @"Textures/Test");
 		//obj.GetComponent<MeshRenderer>().material.mainTexture = tex;
 
 		//AudioClip clip = await ResourceManager.LoadAsync<AudioClip>(ResourceFolder.Resources, @"Sounds/Test");
 		//GetComponent<AudioSource>().clip = clip;
-
-		//Debugger.Log(ResourceManager.GetLoadedModFileInfo(ResourceFolder.Resources, @"Textures/Test")[0].Parser);
+		//GetComponent<AudioSource>().Play();
 	}
 
 	protected async Task LoadMods()
