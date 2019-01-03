@@ -21,7 +21,7 @@ namespace Modding.Parsers
 			return ToJson(data);
 		}
 
-		public override void Merge<T>(T current, object overwrite)
+		public override void Merge<T>(object current, object overwrite)
 		{
 			OverwriteJson(current, (string) overwrite);
 		}

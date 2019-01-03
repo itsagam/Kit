@@ -9,6 +9,7 @@ using System.IO;
 using UnityEngine;
 using Modding;
 using UnityEngine.UI;
+using UniRx;
 
 public class GameData
 {
@@ -26,16 +27,11 @@ public class Test: MonoBehaviour
 
 	async void Start()
 	{
-		await LoadMods();
+		Console.Initialize();
+		//await LoadMods();
+		//await ModdingTest();
 
-		//Debugger.Log("Full", await ResourceManager.LoadAsync<GameData>(ResourceFolder.StreamingAssets, "Data/Test.json", true), true);
-	
-		//Texture tex = await ResourceManager.LoadAsync<Texture>(ResourceFolder.Resources, @"Textures/Test");
-		//obj.GetComponent<MeshRenderer>().material.mainTexture = tex;
-
-		//AudioClip clip = await ResourceManager.LoadAsync<AudioClip>(ResourceFolder.Resources, @"Sounds/Test");
-		//GetComponent<AudioSource>().clip = clip;
-		//GetComponent<AudioSource>().Play();
+		await StartCoroutine(ConsoleTest());
 	}
 
 	protected async Task LoadMods()
@@ -47,6 +43,18 @@ public class Test: MonoBehaviour
 		ModManager.ResourceReused += ModManager_ResourceReused;
 	}
 
+	protected async Task ModdingTest()
+	{
+		Debugger.Log(await ResourceManager.LoadAsync<GameData>(ResourceFolder.StreamingAssets, "Data/Test.json", true), true);
+
+		Texture tex = await ResourceManager.LoadAsync<Texture>(ResourceFolder.Resources, @"Textures/Test");
+		obj.GetComponent<MeshRenderer>().material.mainTexture = tex;
+
+		AudioClip clip = await ResourceManager.LoadAsync<AudioClip>(ResourceFolder.Resources, @"Sounds/Test");
+		GetComponent<AudioSource>().clip = clip;
+		//GetComponent<AudioSource>().Play();
+	}
+
 	protected void ProfileTest()
 	{
 		Debugger.StartProfile("Normal");
@@ -55,33 +63,13 @@ public class Test: MonoBehaviour
 		Debugger.EndAndLogProfile();
 	}
 
-	protected void ScriptingTest()
+	IEnumerator ConsoleTest()
 	{
-		/*
-		foreach(var f in Assembly.GetExecutingAssembly().GetTypes().SelectMany(t => t.GetFields().Where(p => Attribute.IsDefined(p, typeof(VariableAttribute)))))
+		for (int i = 0; i < 30; i++)
 		{
-		if (f.IsStatic)
-			Debug.Log(f.GetValue(null));
-		else
-			Debug.Log(f.GetValue(FindObjectOfType(f.DeclaringType)));
+			Debug.Log("Log " + i);
+			yield return new WaitForSeconds(0.1f);
 		}
-		*/
-		/*
-		foreach (var obj in Resources.FindObjectsOfTypeAll<Test>())
-			obj.Value2 = 20;
-
-		foreach (var obj in Resources.FindObjectsOfTypeAll<Test>())
-			Debug.Log(obj.Value2);
-		*/
-		/*
-		Debug.Log(Resources.Load<Test>("Prefab").Value2);
-		
-		if (count <= 0)
-		{
-			Instantiate<Test>(Resources.Load<Test>("Prefab"));
-			count++;
-		}
-		*/
 	}
 
 	private void ModManager_ResourceReused(string path, ResourceInfo info)

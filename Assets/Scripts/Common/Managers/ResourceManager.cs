@@ -41,7 +41,6 @@ public class ResourceManager
 		return await LoadInternal<T>(folder, file, merge, true);
 	}
 
-	// TODO: Handle partial (without file extension) filenames when folder = StreamingAssets, PersistentData...
 	protected static async Task<T> LoadInternal<T>(ResourceFolder folder, string file, bool merge, bool async) where T : class
 	{
 		if (Modding)
@@ -135,13 +134,13 @@ public class ResourceManager
 				{
 					List<string> textList = async ? await ModManager.ReadTextAllAsync(moddingPath) : ModManager.ReadTextAll(moddingPath);
 					foreach (string text in textList)
-						parser.Merge(merged, text);
+						parser.Merge<T>(merged, text);
 				}
 				else
 				{
 					List<byte[]> bytesList = async ? await ModManager.ReadBytesAllAsync(moddingPath) : ModManager.ReadBytesAll(moddingPath);
 					foreach (byte[] bytes in bytesList)
-						parser.Merge(merged, bytes);
+						parser.Merge<T>(merged, bytes);
 				}
 			}
 			catch (Exception)

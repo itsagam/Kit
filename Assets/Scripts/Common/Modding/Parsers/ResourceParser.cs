@@ -39,7 +39,7 @@ namespace Modding.Parsers
 			throw new NotImplementedException();
 		}
 
-		public virtual void Merge<T>(T current, object overwrite)
+		public virtual void Merge<T>(object current, object overwrite)
 		{
 			throw new NotImplementedException();
 		}
