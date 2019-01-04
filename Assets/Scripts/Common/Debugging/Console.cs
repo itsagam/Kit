@@ -14,13 +14,15 @@ public class Console : MonoBehaviour
 	public const int Length = 5000;
 	public const double GestureTime = 250;
 	public const float GestureDistance = 0.05f;
-	protected static Console Instance = null;
+	public const float TransitionTime = 0.3f;
+	public const string LogPrefix = "[Log] ";
 
 	public Canvas Canvas;
-	public Animator Animator;
-	public ScrollRect Scroll;
-	public Text Text;
+	public ScrollRect LogScroll;
+	public Text LogText;
+	public InputField CommandInput;
 
+	protected static Console Instance = null;
 	protected StringBuilder log = new StringBuilder(Length + 1);
 
 	public static void Initialize()
@@ -34,9 +36,12 @@ public class Console : MonoBehaviour
 	{
 		Application.logMessageReceived += OnLog;
 		DontDestroyOnLoad(gameObject);
-		IsVisible = false;
-		Text.text = "";
+		Canvas.gameObject.SetActive(false);
+		LogScroll.transform.localScale = new Vector3(1, 0, 1);
 		RegisterGesture();
+
+		LogText.text = "";
+		CommandInput.text = "";
 	}
 
 	protected void RegisterGesture()
@@ -60,7 +65,7 @@ public class Console : MonoBehaviour
 	
 	protected void OnLog(string message, string stackTrace, LogType type)
 	{
-		LogLine(message);
+		LogLine(LogPrefix + message);
 		ScrollToBottom();
 	}
 
@@ -70,17 +75,22 @@ public class Console : MonoBehaviour
 		if (postLength > Length)
 			log.Remove(0, postLength - Length);
 		log.AppendLine(line);
-		Text.text = log.ToString();
+		LogText.text = log.ToString();
 	}
 
 	public void ScrollToBottom()
 	{
-		Scroll.verticalNormalizedPosition = 0;
+		LogScroll.verticalNormalizedPosition = 0;
 	}
 
 	public void ScrollToTop()
 	{
-		Scroll.verticalNormalizedPosition = 1;
+		LogScroll.verticalNormalizedPosition = 1;
+	}
+
+	public void Execute(string command)
+	{
+
 	}
 
 	public bool IsVisible
@@ -94,11 +104,18 @@ public class Console : MonoBehaviour
 			if (value)
 			{
 				Canvas.gameObject.SetActive(true);
-				Scroll.transform.DOScaleY(1.0f, 0.4f).SetEase(Ease.InCubic);
+				LogScroll.transform.DOScaleY(1.0f, TransitionTime).SetEase(Ease.InSine);
+				CommandInput.ActivateInputField();
+				CommandInput.Select();
+				Observable.NextFrame(FrameCountType.Update).Subscribe(u =>
+			   {;
+				   CommandInput.MoveTextEnd(true);
+			   });
+			
 			}
 			else
 			{
-				Scroll.transform.DOScaleY(0.0f, 0.4f).SetEase(Ease.OutCubic).OnComplete(() =>
+				LogScroll.transform.DOScaleY(0.0f, TransitionTime).SetEase(Ease.OutSine).OnComplete(() =>
 				{
 					Canvas.gameObject.SetActive(false);
 				});

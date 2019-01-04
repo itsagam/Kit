@@ -31,7 +31,7 @@ public class Test: MonoBehaviour
 		//await LoadMods();
 		//await ModdingTest();
 
-		await StartCoroutine(ConsoleTest());
+		await ConsoleTest();
 	}
 
 	protected async Task LoadMods()
@@ -63,12 +63,12 @@ public class Test: MonoBehaviour
 		Debugger.EndAndLogProfile();
 	}
 
-	IEnumerator ConsoleTest()
+	async Task ConsoleTest()
 	{
 		for (int i = 0; i < 30; i++)
 		{
 			Debug.Log("Log " + i);
-			yield return new WaitForSeconds(0.1f);
+			await Observable.Timer(TimeSpan.FromSeconds(0.1f));
 		}
 	}
 
