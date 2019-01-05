@@ -81,7 +81,7 @@ public class Debugger : MonoBehaviour
 		IEnumerator LogTimeLocal()
 		{
 			yield return null;
-			Debugger.Log($"{name}: {GetTime(name)}");
+			Debugger.Log(name + ": " + GetTime(name));
 		}
 	}
 

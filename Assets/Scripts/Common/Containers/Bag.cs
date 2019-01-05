@@ -1,0 +1,158 @@
+﻿using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
+using UnityEngine;
+
+[Serializable]
+public class Bag<T> : Dictionary<T, int>, IEnumerable
+{
+    public event Action<T, int> OnChanged;
+
+	public Dictionary<T, int> Max;
+
+    public new int this [T unit]
+    {
+        get
+        {
+			if (TryGetValue(unit, out int stored))
+				return stored;
+			return 0;
+        }
+        set
+        {
+			int final = (Max != null && Max.TryGetValue(unit, out int max)) ? Mathf.Min(value, max) : value;
+			if (final > 0)
+				base[unit] = final;
+			else
+                Remove(unit);
+			OnChanged?.Invoke(unit, final);
+		}
+    }
+
+    public bool Contains(Bunch<T> bunch)
+    {
+        return Contains(bunch.Unit, bunch.Amount);
+    }
+
+    public bool Contains(KeyValuePair<T, int> kvp)
+    {
+        return Contains(kvp.Key, kvp.Value);
+    }
+
+    public bool Contains(T type, int amount)
+    {
+        return this[type] >= amount;
+    }
+
+    public bool Contains(Bag<T> bag)
+    {
+        return bag.All(f => Contains(f));
+    }
+
+    public void Store(KeyValuePair<T, int> kvp)
+    {
+        Store(kvp.Key, kvp.Value);
+    }
+
+    public void Store(Bunch<T> bunch)
+    {
+        Store(bunch.Unit, bunch.Amount);
+    }
+
+    public void Store(T type, int amount)
+    {
+        this[type] += amount;
+    }
+
+    public void Store(Bag<T> bag)
+    {
+        foreach (KeyValuePair<T, int> field in bag)
+            Store(field);
+    }
+
+    public bool Consume(T type, int amount)
+    {
+        if (Contains(type, amount))
+        {
+            this[type] -= amount;
+            return true;
+        }
+        return false;
+    }
+
+    public bool Consume(KeyValuePair<T, int> kvp)
+    {
+        return Consume(kvp.Key, kvp.Value);
+    }
+
+    public bool Consume(Bunch<T> bunch)
+    {
+        return Consume(bunch.Unit, bunch.Amount);
+    }
+
+    public bool Consume(Bag<T> bag)
+    {
+        if (Contains(bag))
+        {
+            foreach (KeyValuePair<T, int> field in bag)
+                this[field.Key] -= field.Value;
+            return true;
+        }
+        return false;
+    }
+
+    public static Bag<T> operator +(Bag<T> bagTo, Bag<T> bagFrom)
+    {
+        bagTo.Store(bagFrom);
+        return bagTo;
+    }
+
+    public static Bag<T> operator +(Bag<T> bag, Bunch<T> bunch)
+    {
+        bag.Store(bunch);
+        return bag;
+    }
+
+    public static Bag<T> operator +(Bag<T> bag, KeyValuePair<T, int> kvp)
+    {
+        bag.Store(kvp);
+        return bag;
+    }
+
+    public static Bag<T> operator -(Bag<T> bagTo, Bag<T> bagFrom)
+    {
+        bagTo.Consume(bagFrom);
+        return bagTo;
+    }
+
+    public static Bag<T> operator -(Bag<T> bag, Bunch<T> bunch)
+    {
+        bag.Consume(bunch);
+        return bag;
+    }
+
+    public static Bag<T> operator -(Bag<T> bag, KeyValuePair<T, int> kvp)
+    {
+        bag.Consume(kvp);
+        return bag;
+    }
+
+    public IEnumerable<Bunch<T>> AsList()
+    {
+        return this.Select(kvp => new Bunch<T>(kvp));
+    }
+
+    public List<Bunch<T>> ToList()
+    {
+        return AsList().ToList();
+    }
+
+    public override string ToString()
+    {
+        string ret = "";
+        foreach (var item in this)
+            ret += item.ToString() + "\n";
+        return ret;
+    }
+}

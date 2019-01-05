@@ -26,12 +26,12 @@ namespace Modding.Parsers
 			OverwriteJson(current, (string) overwrite);
 		}
 
-		public virtual T FromJson<T>(string json)
+		public static T FromJson<T>(string json)
 		{
 			return JsonUtility.FromJson<T>(json);
 		}
 
-		public virtual string ToJson(object data)
+		public static string ToJson(object data)
 		{
 			return JsonUtility.ToJson(data, true);
 		}

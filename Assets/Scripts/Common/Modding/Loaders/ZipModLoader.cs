@@ -33,7 +33,7 @@ namespace Modding.Loaders
 					string metadataText = async ? await package.ReadTextAsync(MetadataFile) : package.ReadText(MetadataFile);
 					if (metadataText != null)
 					{
-						package.Metadata = new JSONParser().FromJson<ModMetadata>(metadataText);
+						package.Metadata = JSONParser.FromJson<ModMetadata>(metadataText);
 						return package;
 					}
 				}

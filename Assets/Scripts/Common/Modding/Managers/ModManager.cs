@@ -27,17 +27,11 @@ namespace Modding
 
 	public class ModManager
 	{
-		public delegate void ModLoadedHandler(ModPackage modPackage);
-		public delegate void ModUnloadedHandler(ModPackage modPackage);
-		public delegate void ResourceLoadedHandler(string path, ResourceInfo info);
-		public delegate void ResourceReusedHandler(string path, ResourceInfo info);
-		public delegate void ResourceUnloadedHandler(string path, ModPackage package);
-
-		public static event ModLoadedHandler ModLoaded;
-		public static event ModUnloadedHandler ModUnloaded;
-		public static event ResourceLoadedHandler ResourceLoaded;
-		public static event ResourceReusedHandler ResourceReused;
-		public static event ResourceUnloadedHandler ResourceUnloaded;
+		public static event Action<ModPackage> ModLoaded;
+		public static event Action<ModPackage> ModUnloaded;
+		public static event Action<string, ResourceInfo> ResourceLoaded;
+		public static event Action<string, ResourceInfo> ResourceReused;
+		public static event Action<string, ModPackage> ResourceUnloaded;
 
 		public const string DefaultSearchFolderName = "Mods";
 

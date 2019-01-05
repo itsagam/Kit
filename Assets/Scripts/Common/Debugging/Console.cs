@@ -8,6 +8,15 @@ using UnityEngine.UI;
 using DG.Tweening;
 using UniRx;
 
+// TODO: Set static variables
+// TODO: Call static functions
+// TODO: Set MonoBehavior variables
+// TODO: Call MonoBehavior functions
+// TODO: Command history
+// TODO: Autocomplete objects
+// TODO: Autocomplete functions/variables
+// TODO: Autocomplete parameters
+
 public class Console : MonoBehaviour
 {
 	public const string PrefabPath = "Console/Console";
@@ -24,12 +33,16 @@ public class Console : MonoBehaviour
 
 	protected static Console Instance = null;
 	protected StringBuilder log = new StringBuilder(Length + 1);
-
+	
+	[RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
 	public static void Initialize()
 	{
-		Console prefab = Resources.Load<Console>(PrefabPath);
-		Instance = Instantiate<Console>(prefab);
-		Instance.name = prefab.name;
+		if (Debug.isDebugBuild && Instance == null)
+		{
+			Console prefab = Resources.Load<Console>(PrefabPath);
+			Instance = Instantiate(prefab);
+			Instance.name = prefab.name;
+		}
 	}
 
 	protected void Awake()
@@ -55,12 +68,10 @@ public class Console : MonoBehaviour
 			.Buffer(clickStream.Throttle(TimeSpan.FromMilliseconds(GestureTime)))
 			.Where(b => b.Count >= 2)
 			.Where(b => b.All(v => Math.Abs(v.x - b.Average(w => w.x)) + Math.Abs(v.y - b.Average(w => w.y)) < GestureDistance))
-			.Subscribe(b => OnDoubleClick());
-	}
-
-	protected void OnDoubleClick()
-	{
-		IsVisible = !IsVisible;
+			.Subscribe(b =>
+			{
+				IsVisible = !IsVisible;
+			});
 	}
 	
 	protected void OnLog(string message, string stackTrace, LogType type)
@@ -93,6 +104,11 @@ public class Console : MonoBehaviour
 
 	}
 
+	protected void OnDestroy()
+	{
+		Application.logMessageReceived -= OnLog;
+	}
+
 	public bool IsVisible
 	{
 		get
@@ -107,11 +123,9 @@ public class Console : MonoBehaviour
 				LogScroll.transform.DOScaleY(1.0f, TransitionTime).SetEase(Ease.InSine);
 				CommandInput.ActivateInputField();
 				CommandInput.Select();
-				Observable.NextFrame(FrameCountType.Update).Subscribe(u =>
-			   {;
-				   CommandInput.MoveTextEnd(true);
-			   });
-			
+				Observable.NextFrame().Subscribe(u => {
+					CommandInput.MoveTextEnd(true);
+				});
 			}
 			else
 			{

@@ -57,8 +57,7 @@ public class WavUtility
 
 		int headerOffset = 16 + 4 + subchunk1 + 4;
 		int subchunk2 = BitConverter.ToInt32(fileBytes, headerOffset);
-		//Debug.LogFormat ("riff={0} wave={1} subchunk1={2} format={3} channels={4} sampleRate={5} byteRate={6} blockAlign={7} bitDepth={8} headerOffset={9} subchunk2={10} filesize={11}", riff, wave, subchunk1, formatCode, channels, sampleRate, byteRate, blockAlign, bitDepth, headerOffset, subchunk2, fileBytes.Length);
-
+		
 		float[] data;
 		switch (bitDepth)
 		{
@@ -230,7 +229,6 @@ public class WavUtility
 			filepath = string.Format("{0}/{1}/{2}.{3}", Application.persistentDataPath, dirname, DateTime.UtcNow.ToString("yyMMdd-HHmmss-fff"), "wav");
 			Directory.CreateDirectory(Path.GetDirectoryName(filepath));
 			File.WriteAllBytes(filepath, bytes);
-			//Debug.Log ("Auto-saved .wav file: " + filepath);
 		}
 		else
 		{
@@ -356,7 +354,6 @@ public class WavUtility
 	{
 		int count = bytes.Length;
 		stream.Write(bytes, 0, count);
-		//Debug.LogFormat ("WAV:{0} wrote {1} bytes.", tag, count);
 		return count;
 	}
 

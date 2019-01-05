@@ -25,13 +25,19 @@ public class Test: MonoBehaviour
 	public GameObject obj;
 	public Text text;
 
-	async void Start()
+	void Start()
 	{
-		Console.Initialize();
 		//await LoadMods();
 		//await ModdingTest();
+		Debug.unityLogger.logEnabled = false;
+		Debug.Log(TestA());
+		//await ConsoleTest();
+	}
 
-		await ConsoleTest();
+	protected int TestA()
+	{
+		Camera.main.backgroundColor = Color.black;
+		return 1;
 	}
 
 	protected async Task LoadMods()
