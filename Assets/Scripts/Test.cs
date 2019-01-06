@@ -23,21 +23,13 @@ public class GameData
 public class Test: MonoBehaviour
 {
 	public GameObject obj;
-	public Text text;
 
 	void Start()
 	{
 		//await LoadMods();
 		//await ModdingTest();
-		Debug.unityLogger.logEnabled = false;
-		Debug.Log(TestA());
-		//await ConsoleTest();
-	}
 
-	protected int TestA()
-	{
-		Camera.main.backgroundColor = Color.black;
-		return 1;
+		//await ConsoleTest();
 	}
 
 	protected async Task LoadMods()

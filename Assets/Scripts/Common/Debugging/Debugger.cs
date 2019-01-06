@@ -10,7 +10,6 @@ using System.Text;
 
 public class Debugger : MonoBehaviour
 {
-
 	#region Profiling
 	protected static OrderedDictionary Samples = new OrderedDictionary();
 

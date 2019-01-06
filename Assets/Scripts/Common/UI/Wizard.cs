@@ -14,13 +14,12 @@ public class Wizard : Popup
 	public string PreviousShowAnimation = "PreviousShow";
 	public string PreviousHideAnimation = "PreviousHide";
 
-	public int Index { get; protected set; }
+	public int Index { get; protected set; } = -1;
 	public event Action<int, Popup, int, Popup> OnChange;
 
 	protected override void Awake()
 	{
 		base.Awake();
-		Index = -1;
 		Observable.NextFrame().Subscribe(u =>
 			{
 				if (Default != null)

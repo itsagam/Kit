@@ -26,7 +26,7 @@ public class ShowButtonEditor : Editor
 			}
 			else if (property.name == "ID")
 			{
-				if (mode == ShowHideButton.ShowHideType.ID)
+				if (mode == ShowHideButton.ShowHideType.Name)
 					EditorGUILayout.PropertyField(property);
 			}
 			else

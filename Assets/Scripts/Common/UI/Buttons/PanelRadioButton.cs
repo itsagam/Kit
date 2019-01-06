@@ -11,8 +11,7 @@ public class PanelRadioButton : RadioButton
 	protected override void Awake()
 	{
 		base.Awake();
-		if (Panel != null)
-			Panel.gameObject.SetActive(false);
+		Panel?.gameObject.SetActive(false);
 	}
 
 	public override void Select()

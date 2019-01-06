@@ -15,55 +15,65 @@ public class ShowHideButton : MonoBehaviour, IPointerClickHandler
 	public enum ShowHideType
 	{
 		Popup,
-		ID
+		Name
 	}
 
 	public ShowHideMode Mode;
 	public ShowHideType Type;
 	public Popup Popup;
-	public string ID;
+	public string Name;
 
 	public void OnPointerClick (PointerEventData eventData)
 	{
-		if (Type == ShowHideType.Popup)
+		switch (Type)
 		{
-			if (Popup != null)
-			{
-				if (Mode == ShowHideMode.Show)
-					Popup.Show();
-				else if (Mode == ShowHideMode.Hide)
-					Popup.Hide();
-				else
+			case ShowHideType.Popup:
+				if (Popup != null)
 				{
-					if (Popup.IsShown())
-						Popup.Hide();
-					else
-						Popup.Show();
+					switch (Mode)
+					{
+						case ShowHideMode.Show:
+							Popup.Show();
+							break;
+
+						case ShowHideMode.Hide:
+							Popup.Hide();
+							break;
+
+						case ShowHideMode.Toggle:
+							if (Popup.IsShown())
+								Popup.Hide();
+							else
+								Popup.Show();
+							break;
+					}
 				}
-			}
-		}
-		else
-		{
-			if (!ID.IsNullOrEmpty())
-			{
-				if (Mode == ShowHideMode.Show)
+				break;
+
+			case ShowHideType.Name:
+				if (!Name.IsNullOrEmpty())
 				{
-					if (! Popup.IsShown(ID))
-						Popup.Show(ID);
+					switch (Mode)
+					{
+						case ShowHideMode.Show:
+							if (!Popup.IsShown(Name))
+								Popup.Show(Name);
+							break;
+
+						case ShowHideMode.Hide:
+							if (Popup.IsShown(Name))
+								Popup.Hide(Name);
+							break;
+
+						case ShowHideMode.Toggle:
+							if (Popup.IsShown(Name))
+								Popup.Hide(Name);
+							else
+								Popup.Show(Name);
+							break;
+					}
 				}
-				else if (Mode == ShowHideMode.Hide)
-				{
-					if (Popup.IsShown(ID))					
-						Popup.Hide(ID);
-				}
-				else
-				{
-					if (Popup.IsShown(ID))
-						Popup.Hide(ID);
-					else
-						Popup.Show(ID);
-				}
-			}
+				break;
 		}
 	}
 }

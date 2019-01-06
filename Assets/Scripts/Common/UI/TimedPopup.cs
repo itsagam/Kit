@@ -7,6 +7,7 @@ public class TimedPopup : Popup
 {
 	public float Time = 3.0f;
 
+	// TODO: Use UniRx
 	public override void Reshow(object data, Action onShown)
 	{
 		base.Reshow(data, onShown);

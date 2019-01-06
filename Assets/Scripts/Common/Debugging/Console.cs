@@ -19,6 +19,7 @@ using UniRx;
 
 public class Console : MonoBehaviour
 {
+	public const bool Enabled = false;
 	public const string PrefabPath = "Console/Console";
 	public const int Length = 5000;
 	public const double GestureTime = 250;
@@ -37,7 +38,7 @@ public class Console : MonoBehaviour
 	[RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
 	public static void Initialize()
 	{
-		if (Debug.isDebugBuild && Instance == null)
+		if (Enabled && Instance == null)
 		{
 			Console prefab = Resources.Load<Console>(PrefabPath);
 			Instance = Instantiate(prefab);
