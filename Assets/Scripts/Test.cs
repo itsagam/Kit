@@ -24,12 +24,13 @@ public class Test: MonoBehaviour
 {
 	public GameObject obj;
 
-	void Start()
+	async void Start()
 	{
 		//await LoadMods();
 		//await ModdingTest();
 
 		//await ConsoleTest();
+
 	}
 
 	protected async Task LoadMods()

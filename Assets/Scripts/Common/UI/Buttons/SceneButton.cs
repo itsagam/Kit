@@ -10,6 +10,7 @@ public class SceneButton : MonoBehaviour, IPointerClickHandler
 	public string Scene;
 	public FadeMode FadeMode = FadeMode.FadeOutIn;
 	public Color FadeColor = Color.black;
+	public float FadeTime = 1.0f;
 	public UnityEvent OnProgress;
 	public UnityEvent OnComplete;
 
@@ -19,12 +20,13 @@ public class SceneButton : MonoBehaviour, IPointerClickHandler
 			return;
 
 		enabled = false;
-		SceneHelper.LoadScene(Scene, FadeMode, FadeColor,
-			() => {
-				OnComplete.Invoke();
-			},
-			(float progress) => {
+		SceneManager.LoadScene(Scene).SetFadeMode(FadeMode).SetFadeColor(FadeColor).SetFadeTime(FadeTime)
+			.OnProgress((float progress) => {
 				OnProgress.Invoke();
-			});
+			})
+			.OnComplete(() => {
+				OnComplete.Invoke();
+			})
+			.Execute();
 	}
 }

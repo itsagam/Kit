@@ -27,16 +27,16 @@ public class AudioHelper : MonoBehaviour
 
     protected void OnEnable()
     {
-		SceneHelper.OnSceneChanging += OnSceneChanging;
-		SceneHelper.OnFadingOut += OnFadingOut;
-		SceneHelper.OnFadingIn += OnFadingIn;
+		SceneManager.OnSceneChanging += OnSceneChanging;
+		SceneManager.OnFadingOut += OnFadingOut;
+		SceneManager.OnFadingIn += OnFadingIn;
     }
 
     protected void OnDisable()
     {
-		SceneHelper.OnSceneChanging -= OnSceneChanging;
-		SceneHelper.OnFadingOut -= OnFadingOut;
-		SceneHelper.OnFadingIn -= OnFadingIn;
+		SceneManager.OnSceneChanging -= OnSceneChanging;
+		SceneManager.OnFadingOut -= OnFadingOut;
+		SceneManager.OnFadingIn -= OnFadingIn;
     }
 
     protected void OnSceneChanging(string scene)

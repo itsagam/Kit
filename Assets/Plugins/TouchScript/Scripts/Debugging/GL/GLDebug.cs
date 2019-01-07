@@ -3,13 +3,14 @@
  * Based on http://pastebin.com/69QP1s45
  */
 
- #if TOUCHSCRIPT_DEBUG
+#if TOUCHSCRIPT_DEBUG
 
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Rendering;
-#if UNITY_EDITOR 
+using UnityEditor.Build.Reporting;
+#if UNITY_EDITOR
 using UnityEditor;
 using UnityEditor.Build;
 #endif
@@ -628,14 +629,14 @@ namespace TouchScript.Debugging.GL
     }
 
 #if UNITY_EDITOR
-    internal class BuildProcessor : IPreprocessBuild, IPostprocessBuild
-    {
+    internal class BuildProcessor : IPreprocessBuildWithReport, IPostprocessBuildWithReport
+	{
         public int callbackOrder
         {
             get { return 0; }
         }
 
-        public void OnPreprocessBuild(BuildTarget target, string path)
+        public void OnPreprocessBuild(BuildReport report)
         {
             // Add hidden shaders to the build.
             var objs = Resources.FindObjectsOfTypeAll<GraphicsSettings>();
@@ -648,7 +649,7 @@ namespace TouchScript.Debugging.GL
             graphicsSettings.ApplyModifiedProperties();
         }
 
-        public void OnPostprocessBuild(BuildTarget target, string path)
+        public void OnPostprocessBuild(BuildReport report)
         {
             // Reverd GraphicsSettings.
             var objs = Resources.FindObjectsOfTypeAll<GraphicsSettings>();
@@ -664,7 +665,7 @@ namespace TouchScript.Debugging.GL
             prop.InsertArrayElementAtIndex(index);
             prop.GetArrayElementAtIndex(index).objectReferenceValue = Shader.Find(shaderName);
         }
-    }
+	}
 #endif
 }
 
