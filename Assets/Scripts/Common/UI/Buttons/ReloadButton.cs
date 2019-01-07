@@ -22,7 +22,6 @@ public class ReloadButton : MonoBehaviour, IPointerClickHandler
 			})
 			.OnComplete(() => {
 				OnComplete.Invoke();
-			})
-			.Execute();
+			});
 	}
 }

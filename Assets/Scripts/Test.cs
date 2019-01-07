@@ -30,7 +30,6 @@ public class Test: MonoBehaviour
 		//await ModdingTest();
 
 		//await ConsoleTest();
-
 	}
 
 	protected async Task LoadMods()

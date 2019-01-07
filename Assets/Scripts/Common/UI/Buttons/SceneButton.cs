@@ -21,12 +21,13 @@ public class SceneButton : MonoBehaviour, IPointerClickHandler
 
 		enabled = false;
 		SceneManager.LoadScene(Scene).SetFadeMode(FadeMode).SetFadeColor(FadeColor).SetFadeTime(FadeTime)
-			.OnProgress((float progress) => {
+			.OnProgress((float progress) =>
+			{
 				OnProgress.Invoke();
 			})
-			.OnComplete(() => {
+			.OnComplete(() =>
+			{
 				OnComplete.Invoke();
-			})
-			.Execute();
+			});
 	}
 }

@@ -15,7 +15,7 @@ public class QuitButton : MonoBehaviour, IPointerClickHandler
 	public void OnPointerClick (PointerEventData eventData)
 	{
 		if (Fade)
-			SceneManager.FadeOut().SetColor(FadeColor).SetTime(FadeTime).OnComplete(Quit).Execute();
+			SceneManager.FadeOut().SetColor(FadeColor).SetTime(FadeTime).OnComplete(Quit);
 		else
 			Quit();
 	}

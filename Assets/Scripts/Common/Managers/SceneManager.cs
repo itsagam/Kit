@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Threading.Tasks;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
@@ -21,50 +20,59 @@ public enum FadeMode
 public class SceneManager
 {
 	public static event Action<string> OnSceneChanging;
+	public static event Action<string> OnSceneChanged;
 	public static event Action OnFadingIn;
 	public static event Action OnFadedIn;
 	public static event Action OnFadingOut;
 	public static event Action OnFadedOut;
-	public static event Action<float, float> OnFading;
-	public static event Action<float, float> OnFaded;
+	public static event Action<float> OnFading;
+	public static event Action<float> OnFaded;
+
+	public static float DefaultFadeTime = 1.0f;
+	public static Color DefaultFadeColor = Color.black;
 
 	protected static Image fadeImage;
 
 	public class FadeBuilder
 	{
-		public float To;
-		public float From;
-		public Color Color = Color.black;
-		public float Time = 1.0f;
-		
+		protected Tweener tween;
 		protected event Action onComplete;
 
 		public FadeBuilder(float to)
 		{
-			To = to;
+			OnFading?.Invoke(to);
+			FadeImage.gameObject.SetActive(true);
+			FadeImage.DOKill();
+			FadeImage.color = DefaultFadeColor.SetAlpha(FadeImage.color.a);
+			tween = FadeImage.DOFade(1 - to, DefaultFadeTime).OnComplete(() => {
+				if (FadeImage.color.a <= 0)
+					FadeImage.gameObject.SetActive(false);
+				onComplete?.Invoke();
+				OnFaded?.Invoke(to);
+			});
 		}
 
 		public FadeBuilder SetFrom(float from)
 		{
-			From = from;
+			tween.ChangeStartValue(FadeImage.color.SetAlpha(1 - from));
 			return this;
 		}
 
 		public FadeBuilder SetTo(float to)
 		{
-			To = to;
+			tween.ChangeEndValue(FadeImage.color.SetAlpha(1 - to));
 			return this;
 		}
 
 		public FadeBuilder SetColor(Color color)
 		{
-			Color = color;
+			FadeImage.color = color.SetAlpha(FadeImage.color.a);
 			return this;
 		}
 
 		public FadeBuilder SetTime(float time)
 		{
-			Time = time;
+			tween.timeScale = tween.Duration(false) / time;
 			return this;
 		}
 
@@ -73,27 +81,12 @@ public class SceneManager
 			this.onComplete += onComplete;
 			return this;
 		}
-
-		public void Execute()
-		{
-			OnFading?.Invoke(To, From);
-
-			FadeImage.enabled = true;
-			FadeImage.color = Color.SetAlpha(1 - From);
-			FadeImage.DOKill();
-			FadeImage.DOFade(1 - To, Time).OnComplete(() => {
-				if (To >= 1)
-					FadeImage.enabled = false;
-				onComplete?.Invoke();
-				OnFaded?.Invoke(To, From);
-			});
-		}
 	}
 
 	public class LoadBuilder
 	{
 		public string Name;
-		public bool Additive = false;
+		public bool Additive;
 		public FadeMode FadeMode = FadeMode.FadeOutIn;
 		public Color FadeColor = Color.black;
 		public float FadeTime = 1.0f;
@@ -104,6 +97,9 @@ public class SceneManager
 		public LoadBuilder(string name)
 		{
 			Name = name;
+			Observable.NextFrame().Subscribe(t => {
+				Execute();
+			});
 		}
 
 		public LoadBuilder SetAdditive(bool additive = true)
@@ -142,9 +138,11 @@ public class SceneManager
 			return this;
 		}
 
-		public void Execute()
+		protected void Execute()
 		{
-			OnSceneChanging?.Invoke(Name);
+			if (!Additive)
+				OnSceneChanging?.Invoke(Name);
+
 			switch (FadeMode)
 			{
 				case FadeMode.None:
@@ -157,23 +155,22 @@ public class SceneManager
 						FadeOut().SetColor(FadeColor).SetTime(FadeTime).OnComplete(() =>
 						{
 							LoadSceneInternal(Name, Additive, onProgress, onComplete);
-						}).Execute();
+						});
 						break;
 					}
 				case FadeMode.FadeIn:
 					{
 						LoadSceneInternal(Name, Additive, onProgress, () => {
-							FadeIn().SetColor(FadeColor).SetTime(FadeTime).Execute();
+							FadeIn().SetColor(FadeColor).SetTime(FadeTime);
 							onComplete?.Invoke();
 						});
 						break;
 					}
 				case FadeMode.FadeOutIn:
 					{
-						FadeOut().SetColor(FadeColor).SetTime(FadeTime).OnComplete(() =>
-						{
-							LoadScene(Name).SetFadeMode(FadeMode.FadeIn).SetFadeColor(FadeColor).SetFadeTime(FadeTime).OnProgress(onProgress).OnComplete(onComplete).Execute();
-						}).Execute();
+						FadeOut().SetColor(FadeColor).SetTime(FadeTime).OnComplete(() => {
+							LoadScene(Name).SetFadeMode(FadeMode.FadeIn).SetFadeColor(FadeColor).SetFadeTime(FadeTime).OnProgress(onProgress).OnComplete(onComplete);
+						});
 						break;
 					}
 			}
@@ -192,17 +189,22 @@ public class SceneManager
 
 	protected static void LoadSceneInternal(string name, bool additive, Action<float> onProgress, Action onComplete)
 	{
-		var task = LoadSceneProgress(UnityEngine.SceneManagement.SceneManager.LoadSceneAsync(name, additive ? LoadSceneMode.Additive : LoadSceneMode.Single), onProgress, onComplete);
+		AsyncOperation load = UnityEngine.SceneManagement.SceneManager.LoadSceneAsync(name, additive ? LoadSceneMode.Additive : LoadSceneMode.Single);
+		Observable.FromMicroCoroutine(f => LoadSceneProgress(load, onProgress, () => {
+			onComplete?.Invoke();
+			if (!additive)
+				OnSceneChanged?.Invoke(name);
+		})).Subscribe();
 	}
 
-	protected static async Task LoadSceneProgress(AsyncOperation load, Action<float> onProgress, Action onComplete)
+	protected static IEnumerator LoadSceneProgress(AsyncOperation load, Action<float> onProgress, Action onComplete)
     {
 		while (!load.isDone)
         {
 			onProgress?.Invoke(load.progress);
-			await Observable.NextFrame();
+			yield return null;
         }
-		onComplete?.Invoke();
+		onComplete?.Invoke();		
 	}
 
 	public static FadeBuilder Fade(float to)

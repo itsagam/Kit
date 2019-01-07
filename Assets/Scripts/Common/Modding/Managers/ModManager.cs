@@ -72,7 +72,6 @@ namespace Modding
 				case RuntimePlatform.WindowsEditor:
 				case RuntimePlatform.OSXEditor:
 				case RuntimePlatform.LinuxEditor:
-
 				case RuntimePlatform.WindowsPlayer:
 				case RuntimePlatform.LinuxPlayer:
 					SearchPaths.Add(Path.Combine(Path.GetDirectoryName(Application.dataPath), DefaultSearchFolderName));

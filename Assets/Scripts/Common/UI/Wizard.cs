@@ -20,8 +20,7 @@ public class Wizard : Popup
 	protected override void Awake()
 	{
 		base.Awake();
-		Observable.NextFrame().Subscribe(u =>
-			{
+		Observable.NextFrame().Subscribe(t => {
 				if (Default != null)
 					GoTo(Default);
 			});
