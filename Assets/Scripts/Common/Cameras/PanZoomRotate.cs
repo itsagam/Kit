@@ -7,8 +7,8 @@ using TouchScript;
 using TouchScript.Pointers;
 using TouchScript.Gestures;
 
-//TODO: Make Forward-independant
-//TODO: Clamp is causing weird problems (variable "extra" keeps increasing camera position in ortho mode, function makes camera go mad in perpective mode)
+//TODO: Simplify Forward code (one possible way to do it is cache Forward sign and multiply it with target zoom instead of forward.Abs())
+//TODO: Check and clean Rotation
 [RequireComponent(typeof(Camera))]
 [RequireComponent(typeof(MetaGesture))]
 public class PanZoomRotate : MonoBehaviour
@@ -29,6 +29,7 @@ public class PanZoomRotate : MonoBehaviour
 	protected MetaGesture gesture;
 
 	protected Bounds bounds;
+	protected Vector3 forward;
 	protected Vector3 targetPosition;
 	protected Quaternion targetRotation;
 	protected float targetZoom;
@@ -39,7 +40,8 @@ public class PanZoomRotate : MonoBehaviour
 		transformCached = GetComponent<Transform>();
 		cameraCached = GetComponent<Camera>();
 		gesture = GetComponent<MetaGesture>();
-	
+		forward = transformCached.forward;
+		
 		if (PanBounds != null)
 			bounds = PanBounds.GetBounds();
 	}
@@ -62,8 +64,8 @@ public class PanZoomRotate : MonoBehaviour
 		if (cameraCached.orthographic)
 			targetZoom = cameraCached.orthographicSize;
 		else
-			// Get the transformCached.forward component of position (Dot product multiples each component of two vectors and return the sum)
-			targetZoom = Vector3.Dot(targetPosition, transformCached.forward);
+			// Get the forward component of position (Dot product multiples each component of two vectors and return the sum)
+			targetZoom = Vector3.Dot(targetPosition, forward.Abs());
 		Clamp();
 	}
 	#endregion
@@ -104,12 +106,12 @@ public class PanZoomRotate : MonoBehaviour
 		float deltaMagnitude = (position1 - position2).magnitude;
 		float deltaMagnitudeDifference = previousDeltaMagnitude - deltaMagnitude;
 
-		int sign = 1;
+		float sign = 1;
 		float multiplier = 1;
 		if (!cameraCached.orthographic)
 		{
-			// In perpective mode, increasing transformCached.forward zoomes in, in ortho increasing orthographicSize zoomes out 
-			sign = -1;
+			// In perpective mode, increasing forward zoomes in, in ortho increasing orthographicSize zoomes out 
+			sign = Mathf.Sign(Vector3.Dot(Vector3.one, forward)) * -1;
 			// Zoom speed is twice as fast in perspective mode
 			multiplier = 0.5f;
 		}
@@ -130,7 +132,7 @@ public class PanZoomRotate : MonoBehaviour
 		float angle = MathHelper.AngleBetween(position1, position2);
 		float previousAngle = MathHelper.AngleBetween(previousPosition1, previousPosition2);
 		float deltaAngle = Mathf.DeltaAngle(angle, previousAngle);
-		targetRotation = Quaternion.AngleAxis(deltaAngle * RotateSpeed, transformCached.forward) * targetRotation;
+		targetRotation = Quaternion.AngleAxis(deltaAngle * RotateSpeed, forward) * targetRotation;
 	}
 	#endregion
 
@@ -141,7 +143,7 @@ public class PanZoomRotate : MonoBehaviour
 		if (PanBounds != null)
 		{
 			float distance = Mathf.Abs(targetZoom);
-			//float angle = Vector3.Dot(Vector3.one, Vector3.Project(targetRotation.eulerAngles, transformCached.forward));
+			//float angle = Vector3.Dot(Vector3.one, Vector3.Project(targetRotation.eulerAngles, forward));
 			Vector2 frustum = new Vector2();
 			frustum.y = distance;
 			if (!cameraCached.orthographic)
@@ -151,10 +153,18 @@ public class PanZoomRotate : MonoBehaviour
 			//frustum *= 1 - (0.5f * Mathf.Sin(angle % 91 * 2 * Mathf.Deg2Rad));
 			frustum.x = Mathf.Abs(frustum.x);
 			frustum.y = Mathf.Abs(frustum.y);
-	
-			targetPosition.x = Mathf.Clamp(targetPosition.x, bounds.min.x + frustum.x, bounds.max.x - frustum.x);
-			targetPosition.y = Mathf.Clamp(targetPosition.y, bounds.min.y + frustum.y, bounds.max.y - frustum.y);
-			//targetPosition.z = Mathf.Clamp(targetPosition.z, bounds.min.z + frustum.y, bounds.max.z - frustum.y);
+
+			Vector3 clamped;
+			clamped.x = Mathf.Clamp(targetPosition.x, bounds.min.x + frustum.x, bounds.max.x - frustum.x);
+			clamped.y = Mathf.Clamp(targetPosition.y, bounds.min.y + frustum.y, bounds.max.y - frustum.y);
+			clamped.z = Mathf.Clamp(targetPosition.z, bounds.min.z + frustum.y, bounds.max.z - frustum.y);
+			// ProjectOnPlane excludes given normal (in our case forward), so we discard the forward component from clamped vector
+			Vector3 withoutForward = Vector3.ProjectOnPlane(clamped, forward);
+			// Project keeps just the given normal (in our case forward), so we separate the forward component from original vector
+			Vector3 justForward = Vector3.Project(targetPosition, forward);
+
+			// We combine clamped vector without forward and use the original forward
+			targetPosition = withoutForward + justForward;
 		}
 	}
 
@@ -164,8 +174,8 @@ public class PanZoomRotate : MonoBehaviour
 		if (cameraCached.orthographic)
 			cameraCached.orthographicSize = Mathf.Lerp(cameraCached.orthographicSize, targetZoom, fraction);
 		else
-			// ProjectOnPlane excludes given normal (in our case transformCached.forward), then we set it to target zoom by adding it
-			targetPosition = Vector3.ProjectOnPlane(targetPosition, transformCached.forward) + transformCached.forward * targetZoom;
+			// ProjectOnPlane excludes forward, then we set it to target zoom by adding it
+			targetPosition = Vector3.ProjectOnPlane(targetPosition, forward) + forward.Abs() * targetZoom;
 
 		transformCached.position = Vector3.Lerp(transformCached.position, targetPosition, fraction);
 		transformCached.rotation = Quaternion.Slerp(transformCached.rotation, targetRotation, fraction);
