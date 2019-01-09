@@ -76,9 +76,7 @@ public class Debugger : MonoBehaviour
 
 	public static void LogProfile(string name)
 	{
-		Observable.NextFrame().Subscribe(t => {
-			Debugger.Log(name + ": " + GetTime(name));
-		});
+		Observable.NextFrame().Subscribe(t => Debugger.Log(name + ": " + GetTime(name)));
 	}
 
 	public static string GetTime(string name)

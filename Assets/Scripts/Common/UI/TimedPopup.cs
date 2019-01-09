@@ -2,27 +2,32 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UniRx;
 
 public class TimedPopup : Popup
 {
 	public float Time = 3.0f;
 
-	// TODO: Use UniRx
+	protected IDisposable observable;
+
 	public override void Reshow(object data, Action onShown)
 	{
 		base.Reshow(data, onShown);
-		CancelInvoke("HidePopup");
-		Invoke("HidePopup", Time);
+		QueueHide();
 	}
 
 	protected override void OnShown()
 	{
 		base.OnShown();
-		Invoke("HidePopup", Time);
+		QueueHide();
 	}
 
-	private void HidePopup()
+	protected void QueueHide()
 	{
-		Hide();
+		observable?.Dispose();
+		observable = Observable.Timer(TimeSpan.FromSeconds(Time)).Subscribe(t => {
+			observable = null;
+			Hide();
+		});
 	}
 }

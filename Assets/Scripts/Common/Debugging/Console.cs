@@ -124,9 +124,7 @@ public class Console : MonoBehaviour
 				LogScroll.transform.DOScaleY(1.0f, TransitionTime).SetEase(Ease.InSine);
 				CommandInput.ActivateInputField();
 				CommandInput.Select();
-				Observable.NextFrame().Subscribe(t => {
-					CommandInput.MoveTextEnd(true);
-				});
+				Observable.NextFrame().Subscribe(t => CommandInput.MoveTextEnd(true));
 			}
 			else
 			{

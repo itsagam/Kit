@@ -40,16 +40,7 @@ public class SceneManager
 
 		public FadeBuilder(float to)
 		{
-			OnFading?.Invoke(to);
-			FadeImage.gameObject.SetActive(true);
-			FadeImage.DOKill();
-			FadeImage.color = DefaultFadeColor.SetAlpha(FadeImage.color.a);
-			tween = FadeImage.DOFade(1 - to, DefaultFadeTime).OnComplete(() => {
-				if (FadeImage.color.a <= 0)
-					FadeImage.gameObject.SetActive(false);
-				onComplete?.Invoke();
-				OnFaded?.Invoke(to);
-			});
+			Execute(to);
 		}
 
 		public FadeBuilder SetFrom(float from)
@@ -81,6 +72,20 @@ public class SceneManager
 			this.onComplete += onComplete;
 			return this;
 		}
+
+		protected void Execute(float to)
+		{
+			OnFading?.Invoke(to);
+			FadeImage.gameObject.SetActive(true);
+			FadeImage.DOKill();
+			FadeImage.color = DefaultFadeColor.SetAlpha(FadeImage.color.a);
+			tween = FadeImage.DOFade(1 - to, DefaultFadeTime).OnComplete(() => {
+				if (FadeImage.color.a <= 0)
+					FadeImage.gameObject.SetActive(false);
+				onComplete?.Invoke();
+				OnFaded?.Invoke(to);
+			});
+		}
 	}
 
 	public class LoadBuilder
@@ -97,9 +102,7 @@ public class SceneManager
 		public LoadBuilder(string name)
 		{
 			Name = name;
-			Observable.NextFrame().Subscribe(t => {
-				Execute();
-			});
+			Observable.NextFrame().Subscribe(t => Execute());
 		}
 
 		public LoadBuilder SetAdditive(bool additive = true)

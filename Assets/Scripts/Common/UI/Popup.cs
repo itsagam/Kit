@@ -116,9 +116,7 @@ public class Popup : MonoBehaviour
                 animator.Play(animationHash);
                 animator.Update(0);
 				animated = true;
-				Observable.Timer(TimeSpan.FromSeconds(animator.GetCurrentAnimatorStateInfo(0).length)).Subscribe(l => {
-					OnShown(onShown);
-				});
+				Observable.Timer(TimeSpan.FromSeconds(animator.GetCurrentAnimatorStateInfo(0).length)).Subscribe(l => OnShown(onShown));
             }
         }
 		Play(ShowSound);
@@ -152,9 +150,7 @@ public class Popup : MonoBehaviour
                 animator.Play(animationHash);
                 animator.Update(0);
                 animated = true;
-				Observable.Timer(TimeSpan.FromSeconds(animator.GetCurrentAnimatorStateInfo(0).length)).Subscribe(l => {
-					OnHidden(onHidden, mode);
-				});
+				Observable.Timer(TimeSpan.FromSeconds(animator.GetCurrentAnimatorStateInfo(0).length)).Subscribe(l => OnHidden(onHidden, mode));
             }
         }
 		Play(HideSound);
