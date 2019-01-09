@@ -184,6 +184,11 @@ public static class Vector3Extensions
 		return vector.x > vector.z ? vector.x : vector.z;
 	}
 
+	public static Vector3 Abs(this Vector3 vector)
+	{
+		return new Vector3(Mathf.Abs(vector.x), Mathf.Abs(vector.y), Mathf.Abs(vector.z));
+	}
+
 	public static Quaternion ToQuaternion(this Vector3 vector)
 	{
 		return Quaternion.Euler(vector);

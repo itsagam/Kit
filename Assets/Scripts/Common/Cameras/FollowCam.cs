@@ -10,11 +10,11 @@ public class FollowCam : MonoBehaviour
 	public float Distance = 10.0f;
 	public float Speed = 10.0f;
 
-	protected Camera cam;
+	protected Camera cameraCached;
 
 	protected void Awake()
 	{
-		cam = GetComponent<Camera>();
+		cameraCached = GetComponent<Camera>();
 	}
 
 	public void Follow()
