@@ -7,7 +7,7 @@ using TouchScript;
 using TouchScript.Pointers;
 using TouchScript.Gestures;
 
-//TODO: Frustum doesn't work at different targetZoom in perpective mode
+//TODO: Pinch Zoom position goes awry at extreme positions in perpective mode
 //TODO: Check and make Rotation work
 [RequireComponent(typeof(Camera))]
 [RequireComponent(typeof(MetaGesture))]
@@ -17,6 +17,7 @@ public class PanZoomRotate : MonoBehaviour
 	public bool Zoom = true;
 	public bool Rotate = true;
 	public float PanSpeed = 5.0f;
+	public float PanZoomFactor = 1.5f;
 	public Transform PanBounds;
 	public float ZoomSpeed = 0.025f;
 	public float ZoomMin = 1;
@@ -102,11 +103,20 @@ public class PanZoomRotate : MonoBehaviour
 	{
 		Vector3 delta = previousPosition - position;
 
-		// Adding 1 so that panning is possible when fully zoomed out (zoom level = 0), the new range is 1...2
-		float zoomLevel = 1 + GetZoomLevel();
-	
-		// Multiplying by zoomLevel so that panning is faster at higher zoom levels
-		targetPosition += transformCached.TransformDirection(delta * zoomLevel * PanSpeed);
+		float zoomFactor = 1;
+		// Compute only if PanZoomFactor is provided/valid
+		if (PanZoomFactor > 1)
+		{
+			// Map targetZoom from ZoomMin...ZoomMax to 1...PanZoomFactor
+			// If in orthographic mode or if forward is negative, higher targetZoom means lower zoom, so we invert the output range
+			if (cameraCached.orthographic || forwardSign < 0)
+				zoomFactor = MathHelper.Map(targetZoom, ZoomMin, ZoomMax, PanZoomFactor, 1);
+			else
+				zoomFactor = MathHelper.Map(targetZoom, ZoomMin, ZoomMax, 1, PanZoomFactor);
+		}
+
+		// Multiplying by zoomFactor so that panning is faster at higher zoom levels
+		targetPosition += transformCached.TransformDirection(delta * zoomFactor * PanSpeed);
 	}
 
 	protected void PinchZoom(Vector2 position1, Vector2 position2, Vector2 previousPosition1, Vector2 previousPosition2)
@@ -117,15 +127,10 @@ public class PanZoomRotate : MonoBehaviour
 		float deltaMagnitudeDifference = previousDeltaMagnitude - deltaMagnitude;
 
 		float sign = 1;
-		float multiplier = 1;
 		if (!cameraCached.orthographic)
-		{
 			// In ortho increasing orthographicSize always zoomes out, in perpective mode it depends on forward
 			// If forward is positive increasing forward component zoomes in, if it's negative increasing forward component zoomes out 
 			sign = -forwardSign;
-			// Zoom speed is twice as fast in perspective mode
-			multiplier = 0.5f;
-		}
 
 		float newTargetZoom = targetZoom + (deltaMagnitudeDifference * ZoomSpeed) * sign;
 
@@ -133,9 +138,9 @@ public class PanZoomRotate : MonoBehaviour
 		if (!MathHelper.IsInRange(newTargetZoom, ZoomMin, ZoomMax))
 			return;
 
-		targetPosition += transformCached.TransformDirection((previousPosition1 + previousPosition2 - viewSize) * targetZoom / viewSize.y) * sign * multiplier;
+		targetPosition += transformCached.TransformDirection((previousPosition1 + previousPosition2 - viewSize) * targetZoom / viewSize.y) * sign;
 		targetZoom = newTargetZoom;
-		targetPosition -= transformCached.TransformDirection((position1 + position2 - viewSize) * targetZoom / viewSize.y) * sign * multiplier;
+		targetPosition -= transformCached.TransformDirection((position1 + position2 - viewSize) * targetZoom / viewSize.y) * sign;
 	}
 
 	protected void TwistRotate(Vector2 position1, Vector2 position2, Vector2 previousPosition1, Vector2 previousPosition2)
@@ -144,18 +149,6 @@ public class PanZoomRotate : MonoBehaviour
 		float previousAngle = MathHelper.AngleBetween(previousPosition1, previousPosition2);
 		float deltaAngle = Mathf.DeltaAngle(angle, previousAngle);
 		targetRotation = Quaternion.AngleAxis(deltaAngle * RotateSpeed, forward) * targetRotation;
-	}
-
-	protected float GetZoomLevel()
-	{
-		// InverseLerp normalizes a value, so here we get targetZoom normalized to 0...1
-		float zoomLevel = Mathf.InverseLerp(ZoomMin, ZoomMax, targetZoom);
-
-		// If in orthographic mode or if forward is negative, higher targetZoom means lower zoom, so we invert the result
-		if (cameraCached.orthographic || forwardSign < 0)
-			zoomLevel = 1 - zoomLevel;
-
-		return zoomLevel;
 	}
 	#endregion
 
@@ -168,12 +161,16 @@ public class PanZoomRotate : MonoBehaviour
 			float viewDistance = targetZoom;
 			if (!cameraCached.orthographic)
 			{
-				// viewDistance is higher at lower zoom, so we invert
-				float zoomLevel = 1 - GetZoomLevel();
 				// Scale range ZoomMin...ZoomMax (which can be negative) to a maximum viewable area
 				float viewMax = Mathf.Abs(ZoomMax - ZoomMin);
-				// Current viewable area = zoom level * maximum viewable area
-				viewDistance = zoomLevel * viewMax;
+
+				// Map targetZoom from ZoomMin...ZoomMax to 0...maximum viewable area
+				// If forward is negative, higher targetZoom means lower zoom, so we invert the output range
+				if (forwardSign < 0)
+					viewDistance = MathHelper.Map(targetZoom, ZoomMin, ZoomMax, 0, viewMax);
+				else
+					viewDistance = MathHelper.Map(targetZoom, ZoomMin, ZoomMax, viewMax, 0);
+
 				// Some padding is required
 				viewDistance += 1.0f;
 				// Take fieldOfView into acount
