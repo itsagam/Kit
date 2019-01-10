@@ -106,14 +106,7 @@ public class PanZoomRotate : MonoBehaviour
 		float zoomFactor = 1;
 		// Compute only if PanZoomFactor is provided/valid
 		if (PanZoomFactor > 1)
-		{
-			// Map targetZoom from ZoomMin...ZoomMax to 1...PanZoomFactor
-			// If in orthographic mode or if forward is negative, higher targetZoom means lower zoom, so we invert the output range
-			if (cameraCached.orthographic || forwardSign < 0)
-				zoomFactor = MathHelper.Map(targetZoom, ZoomMin, ZoomMax, PanZoomFactor, 1);
-			else
-				zoomFactor = MathHelper.Map(targetZoom, ZoomMin, ZoomMax, 1, PanZoomFactor);
-		}
+			zoomFactor = GetZoomMapped(1, PanZoomFactor);
 
 		// Multiplying by zoomFactor so that panning is faster at higher zoom levels
 		targetPosition += transformCached.TransformDirection(delta * zoomFactor * PanSpeed);
@@ -132,15 +125,20 @@ public class PanZoomRotate : MonoBehaviour
 			// If forward is positive increasing forward component zoomes in, if it's negative increasing forward component zoomes out 
 			sign = -forwardSign;
 
-		float newTargetZoom = targetZoom + (deltaMagnitudeDifference * ZoomSpeed) * sign;
+		float delta = deltaMagnitudeDifference * ZoomSpeed * sign;
+		float newTargetZoom = targetZoom + delta;
 
 		// If new zoom level is out of bounds, continuing to zoom pans the camera – this prevents that
 		if (!MathHelper.IsInRange(newTargetZoom, ZoomMin, ZoomMax))
 			return;
 
-		targetPosition += transformCached.TransformDirection((previousPosition1 + previousPosition2 - viewSize) * targetZoom / viewSize.y) * sign;
+		float viewDistance = GetViewDistance();
+
+		targetPosition += transformCached.TransformDirection((previousPosition1 + previousPosition2 - viewSize) * viewDistance / viewSize.y) * sign;
+		viewDistance += delta;
+		targetPosition -= transformCached.TransformDirection((position1 + position2 - viewSize) * viewDistance / viewSize.y) * sign;
+
 		targetZoom = newTargetZoom;
-		targetPosition -= transformCached.TransformDirection((position1 + position2 - viewSize) * targetZoom / viewSize.y) * sign;
 	}
 
 	protected void TwistRotate(Vector2 position1, Vector2 position2, Vector2 previousPosition1, Vector2 previousPosition2)
@@ -150,6 +148,36 @@ public class PanZoomRotate : MonoBehaviour
 		float deltaAngle = Mathf.DeltaAngle(angle, previousAngle);
 		targetRotation = Quaternion.AngleAxis(deltaAngle * RotateSpeed, forward) * targetRotation;
 	}
+
+	protected float GetViewDistance()
+	{
+		if (cameraCached.orthographic)
+		{
+			return targetZoom;
+		}
+		else
+		{
+			// Scale range ZoomMin...ZoomMax (which can be negative) to a maximum viewable area
+			float viewMax = Mathf.Abs(ZoomMax - ZoomMin);
+			// More area is viewable at lower zooms so min/max are inverted
+			float viewDistance = GetZoomMapped(viewMax, 0);
+			// Some padding is required
+			//viewDistance += 0.37f;
+			viewDistance += 1;
+			// Take fieldOfView into acount
+			viewDistance *= Mathf.Tan(cameraCached.fieldOfView * 0.5f * Mathf.Deg2Rad);
+			return viewDistance;
+		}
+	}
+
+	protected float GetZoomMapped(float min, float max)
+	{
+		// If in orthographic mode or if forward is negative, higher targetZoom means lower zoom, so we invert the output range
+		if (cameraCached.orthographic || forwardSign < 0)
+			return MathHelper.Map(targetZoom, ZoomMin, ZoomMax, max, min);
+		else
+			return MathHelper.Map(targetZoom, ZoomMin, ZoomMax, min, max);
+	}
 	#endregion
 
 	#region Update
@@ -158,30 +186,13 @@ public class PanZoomRotate : MonoBehaviour
 		targetZoom = Mathf.Clamp(targetZoom, ZoomMin, ZoomMax);	
 		if (PanBounds != null)
 		{
-			float viewDistance = targetZoom;
-			if (!cameraCached.orthographic)
-			{
-				// Scale range ZoomMin...ZoomMax (which can be negative) to a maximum viewable area
-				float viewMax = Mathf.Abs(ZoomMax - ZoomMin);
-
-				// Map targetZoom from ZoomMin...ZoomMax to 0...maximum viewable area
-				// If forward is negative, higher targetZoom means lower zoom, so we invert the output range
-				if (forwardSign < 0)
-					viewDistance = MathHelper.Map(targetZoom, ZoomMin, ZoomMax, 0, viewMax);
-				else
-					viewDistance = MathHelper.Map(targetZoom, ZoomMin, ZoomMax, viewMax, 0);
-
-				// Some padding is required
-				viewDistance += 1.0f;
-				// Take fieldOfView into acount
-				viewDistance *= Mathf.Tan(cameraCached.fieldOfView * 0.5f * Mathf.Deg2Rad);
-			}
+			float viewDistance = GetViewDistance();
 
 			Vector2 frustum = new Vector2(viewDistance * cameraCached.aspect, viewDistance);
 			//float angle = Vector3.Dot(Vector3.one, Vector3.Project(targetRotation.eulerAngles, forward));
 			//frustum = MathHelper.Rotate(frustum, angle);
 			//frustum *= 1 - (0.5f * Mathf.Sin(angle % 91 * 2 * Mathf.Deg2Rad));
-			frustum = frustum.Abs();
+			//frustum = frustum.Abs();
 
 			Vector3 clamped;
 			clamped.x = Mathf.Clamp(targetPosition.x, bounds.min.x + frustum.x, bounds.max.x - frustum.x);
