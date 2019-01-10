@@ -7,7 +7,8 @@ using TouchScript;
 using TouchScript.Pointers;
 using TouchScript.Gestures;
 
-//TODO: Pinch Zoom position goes awry at extreme positions in perpective mode
+//TODO: Pinch Zoom is lazy at corners in perpective mode
+//TODOL Figure out padding
 //TODO: Check and make Rotation work
 [RequireComponent(typeof(Camera))]
 [RequireComponent(typeof(MetaGesture))]
@@ -162,8 +163,8 @@ public class PanZoomRotate : MonoBehaviour
 			// More area is viewable at lower zooms so min/max are inverted
 			float viewDistance = GetZoomMapped(viewMax, 0);
 			// Some padding is required
-			//viewDistance += 0.37f;
-			viewDistance += 1;
+			viewDistance += 0.4f;
+			//viewDistance += 1;
 			// Take fieldOfView into acount
 			viewDistance *= Mathf.Tan(cameraCached.fieldOfView * 0.5f * Mathf.Deg2Rad);
 			return viewDistance;
@@ -187,7 +188,6 @@ public class PanZoomRotate : MonoBehaviour
 		if (PanBounds != null)
 		{
 			float viewDistance = GetViewDistance();
-
 			Vector2 frustum = new Vector2(viewDistance * cameraCached.aspect, viewDistance);
 			//float angle = Vector3.Dot(Vector3.one, Vector3.Project(targetRotation.eulerAngles, forward));
 			//frustum = MathHelper.Rotate(frustum, angle);
