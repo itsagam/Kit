@@ -167,6 +167,7 @@ MonoBehaviour:
   PanSpeed: 5
   PanBounds: {fileID: 1184614731}
   ZoomSpeed: 0.025
+  ZoomPanFactor: 1.5
   ZoomMin: 0.5
   ZoomMax: 4.5
   RotateSpeed: 0.5
@@ -189,6 +190,7 @@ MonoBehaviour:
   PanSpeed: 5
   PanBounds: {fileID: 1184614731}
   ZoomSpeed: 0.025
+  ZoomPanFactor: 1.5
   ZoomMin: -4
   ZoomMax: 4
   RotateSpeed: 0.5
@@ -226,7 +228,7 @@ Camera:
   near clip plane: 0.3
   far clip plane: 1000
   field of view: 60
-  orthographic: 0
+  orthographic: 1
   orthographic size: 4.5
   m_Depth: -1
   m_CullingMask:
@@ -251,7 +253,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 407319249}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: -4}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
@@ -359,7 +361,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1184614727}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 4}
+  m_LocalPosition: {x: 0, y: 0, z: 6}
   m_LocalScale: {x: 16, y: -9, z: 0.25}
   m_Children: []
   m_Father: {fileID: 0}

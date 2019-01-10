@@ -40,7 +40,12 @@ public class MathHelper
         return (number >= min && number <= max);
     }
 
-    public static Vector3 RotateAround(Vector3 point, Vector3 pivot, Vector3 angle)
+	public static float Map(float value, float inMin, float inMax, float outMin, float outMax)
+	{
+		return (value - inMin) * (outMax - outMin) / (inMax - inMin) + outMin;
+	}
+
+	public static Vector3 RotateAround(Vector3 point, Vector3 pivot, Vector3 angle)
     {
         return RotateAround(point, pivot, Quaternion.Euler(angle));
     }

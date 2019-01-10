@@ -7,7 +7,7 @@ using TouchScript;
 using TouchScript.Pointers;
 using TouchScript.Gestures;
 
-//TODO: Frustum doesn't work when camera position nears 0
+//TODO: Frustum doesn't work at different targetZoom in perpective mode
 //TODO: Check and make Rotation work
 [RequireComponent(typeof(Camera))]
 [RequireComponent(typeof(MetaGesture))]
@@ -34,7 +34,8 @@ public class PanZoomRotate : MonoBehaviour
 	protected Bounds bounds;
 	protected Vector3 forward;
 	protected Vector3 forwardAbs;
-	
+	protected int forwardSign;
+
 	#region Initialization
 	protected void Awake()
 	{
@@ -44,6 +45,7 @@ public class PanZoomRotate : MonoBehaviour
 
 		forward = transformCached.forward;
 		forwardAbs = forward.Abs();
+		forwardSign = (int) Mathf.Sign(Vector3.Dot(Vector3.one, forward));
 
 		if (PanBounds != null)
 			bounds = PanBounds.GetBounds();
@@ -100,11 +102,9 @@ public class PanZoomRotate : MonoBehaviour
 	{
 		Vector3 delta = previousPosition - position;
 
-		// InverseLerp normalizes a value, so here we get targetZoom normalized to 0...1
-		float zoomLevel = Mathf.InverseLerp(ZoomMin, ZoomMax, targetZoom);
-		// Adding 1 so that panning is possible when fully zoomed out (zoomLevel = 0), the new range is 1...2
-		zoomLevel += 1;
-
+		// Adding 1 so that panning is possible when fully zoomed out (zoom level = 0), the new range is 1...2
+		float zoomLevel = 1 + GetZoomLevel();
+	
 		// Multiplying by zoomLevel so that panning is faster at higher zoom levels
 		targetPosition += transformCached.TransformDirection(delta * zoomLevel * PanSpeed);
 	}
@@ -122,7 +122,7 @@ public class PanZoomRotate : MonoBehaviour
 		{
 			// In ortho increasing orthographicSize always zoomes out, in perpective mode it depends on forward
 			// If forward is positive increasing forward component zoomes in, if it's negative increasing forward component zoomes out 
-			sign = -Mathf.Sign(Vector3.Dot(Vector3.one, forward));
+			sign = -forwardSign;
 			// Zoom speed is twice as fast in perspective mode
 			multiplier = 0.5f;
 		}
@@ -145,6 +145,18 @@ public class PanZoomRotate : MonoBehaviour
 		float deltaAngle = Mathf.DeltaAngle(angle, previousAngle);
 		targetRotation = Quaternion.AngleAxis(deltaAngle * RotateSpeed, forward) * targetRotation;
 	}
+
+	protected float GetZoomLevel()
+	{
+		// InverseLerp normalizes a value, so here we get targetZoom normalized to 0...1
+		float zoomLevel = Mathf.InverseLerp(ZoomMin, ZoomMax, targetZoom);
+
+		// If in orthographic mode or if forward is negative, higher targetZoom means lower zoom, so we invert the result
+		if (cameraCached.orthographic || forwardSign < 0)
+			zoomLevel = 1 - zoomLevel;
+
+		return zoomLevel;
+	}
 	#endregion
 
 	#region Update
@@ -153,26 +165,26 @@ public class PanZoomRotate : MonoBehaviour
 		targetZoom = Mathf.Clamp(targetZoom, ZoomMin, ZoomMax);	
 		if (PanBounds != null)
 		{
-			float viewDistance;
-			if (cameraCached.orthographic)
+			float viewDistance = targetZoom;
+			if (!cameraCached.orthographic)
 			{
-				viewDistance = targetZoom;
-			}
-			else
-			{
-				float zoomLevel = 1 - Mathf.InverseLerp(ZoomMin, ZoomMax, targetZoom);
-				viewDistance = zoomLevel * Mathf.Abs(ZoomMax - ZoomMin);
+				// viewDistance is higher at lower zoom, so we invert
+				float zoomLevel = 1 - GetZoomLevel();
+				// Scale range ZoomMin...ZoomMax (which can be negative) to a maximum viewable area
+				float viewMax = Mathf.Abs(ZoomMax - ZoomMin);
+				// Current viewable area = zoom level * maximum viewable area
+				viewDistance = zoomLevel * viewMax;
+				// Some padding is required
+				viewDistance += 1.0f;
+				// Take fieldOfView into acount
 				viewDistance *= Mathf.Tan(cameraCached.fieldOfView * 0.5f * Mathf.Deg2Rad);
 			}
 
+			Vector2 frustum = new Vector2(viewDistance * cameraCached.aspect, viewDistance);
 			//float angle = Vector3.Dot(Vector3.one, Vector3.Project(targetRotation.eulerAngles, forward));
-			Vector2 frustum = new Vector2();
-			frustum.y = viewDistance;
-			frustum.x = frustum.y * cameraCached.aspect;
 			//frustum = MathHelper.Rotate(frustum, angle);
 			//frustum *= 1 - (0.5f * Mathf.Sin(angle % 91 * 2 * Mathf.Deg2Rad));
-			frustum.x = Mathf.Abs(frustum.x);
-			frustum.y = Mathf.Abs(frustum.y);
+			frustum = frustum.Abs();
 
 			Vector3 clamped;
 			clamped.x = Mathf.Clamp(targetPosition.x, bounds.min.x + frustum.x, bounds.max.x - frustum.x);
