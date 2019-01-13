@@ -40,6 +40,30 @@ public class MathHelper
         return (number >= min && number <= max);
     }
 
+	public static float Clamp(float value, float from, float to)
+	{
+		float min = from;
+		float max = to;
+		if (max < min)
+		{
+			min = to;
+			max = from;
+		}
+		return Mathf.Clamp(value, min, max);
+	}
+
+	public static int Clamp(int value, int from, int to)
+	{
+		int min = from;
+		int max = to;
+		if (max < min)
+		{
+			min = to;
+			max = from;
+		}
+		return Mathf.Clamp(value, min, max);
+	}
+
 	public static float Map(float value, float inMin, float inMax, float outMin, float outMax)
 	{
 		return (value - inMin) * (outMax - outMin) / (inMax - inMin) + outMin;
@@ -72,15 +96,15 @@ public class MathHelper
         return Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
     }
 
-    public static Vector2 Rotate(Vector2 point, float angle)
-    {
-        float rad = angle * Mathf.Deg2Rad;
-        float cos = Mathf.Cos(rad);
-        float sin = Mathf.Sin(rad);
-        return new Vector2(point.x * cos - point.y * sin, point.x * sin + point.y * cos);
-    }
+	public static Vector2 Rotate(Vector2 point, float angle)
+	{
+		float rad = angle * Mathf.Deg2Rad;
+		float cos = Mathf.Cos(rad);
+		float sin = Mathf.Sin(rad);
+		return new Vector2(point.x * cos - point.y * sin, point.x * sin + point.y * cos);
+	}
 
-    public static float ClampDeltaAngle(float delta)
+	public static float ClampDeltaAngle(float delta)
     {
         if (delta > 180)
             delta = 360 - delta;
@@ -98,8 +122,8 @@ public class MathHelper
         return angle;
     }
 
-    public static float ClampAngle(float angle, float min, float max)
+    public static float ClampAngle(float angle, float from, float to)
     {
-        return Mathf.Clamp(ClampAngle(angle), min, max);
+        return Clamp(ClampAngle(angle), from, to);
     }
 }

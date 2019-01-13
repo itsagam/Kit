@@ -184,6 +184,14 @@ public static class Vector3Extensions
 		return vector.x > vector.z ? vector.x : vector.z;
 	}
 
+	public static Vector3 Clamp(this Vector3 vector, Vector3 min, Vector3 max)
+	{
+		return new Vector3(
+			MathHelper.Clamp(vector.x, min.x, max.x),
+			MathHelper.Clamp(vector.y, min.y, max.y),
+			MathHelper.Clamp(vector.z, min.z, max.z));
+	}
+
 	public static Vector3 Abs(this Vector3 vector)
 	{
 		return new Vector3(Mathf.Abs(vector.x), Mathf.Abs(vector.y), Mathf.Abs(vector.z));
