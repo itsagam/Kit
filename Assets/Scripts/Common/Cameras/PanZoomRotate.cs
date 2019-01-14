@@ -110,13 +110,11 @@ public class PanZoomRotate : MonoBehaviour
 	{
 		Vector3 delta = previousPosition - position;
 
-		float zoomFactor = 1;
 		// Compute only if PanZoomFactor is provided/valid
-		if (PanZoomFactor > 1)
-			zoomFactor = GetZoomMapped(1, PanZoomFactor);
+		float zoomFactor = PanZoomFactor > 1 ? GetZoomMapped(1, PanZoomFactor) : 1;
 
 		// Multiplying by zoomFactor so that panning is faster at higher zoom levels
-		targetPosition += transformCached.TransformDirection(delta * zoomFactor * PanSpeed);
+		targetPosition += transformCached.TransformDirection(delta * PanSpeed * zoomFactor);
 	}
 
 	protected void PinchZoom(Vector2 position1, Vector2 position2, Vector2 previousPosition1, Vector2 previousPosition2)
@@ -219,22 +217,16 @@ public class PanZoomRotate : MonoBehaviour
 		if (bounds.extents != Vector3.zero)
 		{
 			float frustumHeight = GetFrustumHeight();
-			Vector3 frustum = new Vector3(frustumHeight * cameraCached.aspect, frustumHeight, frustumHeight);
-
+			Vector2 frustum = new Vector3(frustumHeight * cameraCached.aspect, frustumHeight);
+			
 			float angle = GetForwardComponent(targetRotation.eulerAngles);
-			frustum = targetRotation * frustum;
-			//frustum = MathHelper.Rotate(frustum, angle);
-			// Plot a function that returns 0 at 0 degrees, 1 at 45 degrees, and 0 again at 90 degrees
-			// Higher values reset the cycle (by having modulo taken with 90)
-			//float rotation = Mathf.Sin((angle % 90) * 2 * Mathf.Deg2Rad);
-			// Percentage of area to extend when frustum is angled
-			//float extension = 0.3f;
-			//frustum *= 1 - extension * rotation;
-			// Rotating can result in negative values, invalidating the frustum
-			frustum = frustum.Abs();
+			// Plot a function that returns 0 at 0 degrees, 1 at 90 degrees, and 0 again at 180 degrees (higher values reset the cycle)
+			float angleAmount = Mathf.Abs(Mathf.Sin(angle * Mathf.Deg2Rad));
+			// Swap width and height of the frustum depending on angle (using this instead of "targetRotation * frustum" because that doesn't work on width/height)
+			frustum = new Vector2(Mathf.Lerp(frustum.x, frustum.y, angleAmount), Mathf.Lerp(frustum.y, frustum.x, angleAmount));
 			
 			// Clamp camera position to its bounds, equal to view bounds shrunk by frustum size
-			Vector3 clamped = targetPosition.Clamp(bounds.min + frustum, bounds.max - frustum);
+			Vector3 clamped = targetPosition.Clamp(bounds.min + frustum.ToVector3(), bounds.max - frustum.ToVector3());
 
 			// Set the clamped vector, but use the original forward component
 			targetPosition = SetForwardComponent(clamped, GetForwardComponentVector(targetPosition));
