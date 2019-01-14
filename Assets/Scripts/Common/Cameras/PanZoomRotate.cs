@@ -7,8 +7,6 @@ using TouchScript;
 using TouchScript.Pointers;
 using TouchScript.Gestures;
 
-//TODO: Pinch Zoom is lazy at corners in perpective mode
-//TODO: Proper rotation clamping
 [RequireComponent(typeof(Camera))]
 [RequireComponent(typeof(MetaGesture))]
 public class PanZoomRotate : MonoBehaviour
@@ -16,7 +14,7 @@ public class PanZoomRotate : MonoBehaviour
 	public bool Pan = true;
 	public bool Zoom = true;
 	public bool Rotate = false;
-	[Tooltip("Area/bounds to focus on; can be a transform, a renderer or a collider.")]
+	[Tooltip("Area/bounds to focus on – it can be a transform, a renderer or a collider; will be origin if not provided.")]
 	public Component View;
 	public float PanSpeed = 5.0f;
 	[Tooltip("Order of magnitude zoom level affects panning speed; has to be greater than 1 to be applicable.")]
@@ -33,14 +31,17 @@ public class PanZoomRotate : MonoBehaviour
 	protected Camera cameraCached;
 	protected Transform transformCached;
 	protected MetaGesture gesture;
+	protected Bounds bounds;
+
+	protected Vector3 forward;
+	protected Vector3 forwardAbs;
+	protected int forwardSign;
+	protected Quaternion cameraRotation;
+	protected Quaternion cameraRotationInv;
 
 	protected Vector3 targetPosition;
 	protected Quaternion targetRotation;
 	protected float targetZoom;
-	protected Bounds bounds;
-	protected Vector3 forward;
-	protected Vector3 forwardAbs;
-	protected int forwardSign;
 
 	#region Initialization
 	protected void Awake()
@@ -49,16 +50,18 @@ public class PanZoomRotate : MonoBehaviour
 		cameraCached = GetComponent<Camera>();
 		gesture = GetComponent<MetaGesture>();
 
-		forward = transformCached.forward;
-		forwardAbs = forward.Abs();
-		forwardSign = (int) Mathf.Sign(Vector3.Dot(Vector3.one, forward));
-
 		if (View is Transform t)
 			bounds = t.GetBounds();
 		else if (View is Renderer r)
 			bounds = r.bounds;
 		else if (View is Collider c)
 			bounds = c.bounds;
+
+		forward = transformCached.forward;
+		forwardAbs = forward.Abs();
+		forwardSign = (int) Mathf.Sign(Vector3.Dot(Vector3.one, forward));
+		cameraRotation = SetForwardComponent(transformCached.rotation.eulerAngles, 0).ToQuaternion();
+		cameraRotationInv = Quaternion.Inverse(cameraRotation);
 	}
 
 	protected void OnEnable()
@@ -124,13 +127,18 @@ public class PanZoomRotate : MonoBehaviour
 		float deltaMagnitude = (position1 - position2).magnitude;
 		float deltaMagnitudeDifference = previousDeltaMagnitude - deltaMagnitude;
 
-		float sign = 1;
+		float direction = 1;
+		float magnitude = 1;
 		if (!cameraCached.orthographic)
-			// In ortho increasing orthographicSize always zoomes out, in perpective mode it depends on forward
+		{
+			// In ortho increasing orthographicSize always zoomes out, in perspective mode it depends on forward
 			// If forward is positive increasing forward component zoomes in, if it's negative increasing forward component zoomes out 
-			sign = -forwardSign;
+			direction = -forwardSign;
+			// Zoom effect is twice as faster by default in perspective mode
+			magnitude = 0.5f;
+		}
 
-		float delta = deltaMagnitudeDifference * ZoomSpeed * sign;
+		float delta = deltaMagnitudeDifference * ZoomSpeed * direction;
 
 		float newTargetZoom = targetZoom + delta;
 		// If new zoom level is out of bounds, continuing to zoom pans the camera – this prevents that
@@ -140,8 +148,8 @@ public class PanZoomRotate : MonoBehaviour
 
 		float frustumHeight = GetFrustumHeight();
 		targetPosition = targetPosition
-			+ transformCached.TransformDirection((previousPosition1 + previousPosition2 - viewSize) * frustumHeight / viewSize.y) * sign
-			- transformCached.TransformDirection((position1 + position2 - viewSize) * (frustumHeight + delta) / viewSize.y) * sign;
+			+ transformCached.TransformDirection((previousPosition1 + previousPosition2 - viewSize) * frustumHeight / viewSize.y) * direction * magnitude
+			- transformCached.TransformDirection((position1 + position2 - viewSize) * (frustumHeight + delta) / viewSize.y) * direction * magnitude;
 	}
 
 	protected void TwistRotate(Vector2 position1, Vector2 position2, Vector2 previousPosition1, Vector2 previousPosition2)
@@ -217,17 +225,23 @@ public class PanZoomRotate : MonoBehaviour
 		if (bounds.extents != Vector3.zero)
 		{
 			float frustumHeight = GetFrustumHeight();
-			Vector2 frustum = new Vector3(frustumHeight * cameraCached.aspect, frustumHeight);
-			
-			float angle = GetForwardComponent(targetRotation.eulerAngles);
+			Vector2 frustum = new Vector2(frustumHeight * cameraCached.aspect, frustumHeight);
+
+			// Calculate applied rotation by multiplying target rotation with inverse camera space
+			Quaternion rotation = targetRotation * cameraRotationInv;
+			float angle = GetForwardComponent(rotation.eulerAngles);
 			// Plot a function that returns 0 at 0 degrees, 1 at 90 degrees, and 0 again at 180 degrees (higher values reset the cycle)
 			float angleAmount = Mathf.Abs(Mathf.Sin(angle * Mathf.Deg2Rad));
-			// Swap width and height of the frustum depending on angle (using this instead of "targetRotation * frustum" because that doesn't work on width/height)
+			// Swap width and height of the frustum depending on angle (have to use this, not "targetRotation * frustum" because that doesn't work on width/height)
 			frustum = new Vector2(Mathf.Lerp(frustum.x, frustum.y, angleAmount), Mathf.Lerp(frustum.y, frustum.x, angleAmount));
 			
+			// Convert frustum from 2d space to 3d space using camera space
+			Vector3 frustum3d = cameraRotation * frustum;
+			// Rotation can result in negative values, invalidating the frustum
+			frustum3d = frustum3d.Abs();
+		
 			// Clamp camera position to its bounds, equal to view bounds shrunk by frustum size
-			Vector3 clamped = targetPosition.Clamp(bounds.min + frustum.ToVector3(), bounds.max - frustum.ToVector3());
-
+			Vector3 clamped = targetPosition.Clamp(bounds.min + frustum3d, bounds.max - frustum3d);	
 			// Set the clamped vector, but use the original forward component
 			targetPosition = SetForwardComponent(clamped, GetForwardComponentVector(targetPosition));
 		}
