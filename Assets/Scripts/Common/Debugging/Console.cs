@@ -11,11 +11,10 @@ using UnityEngine.UI;
 using DG.Tweening;
 using UniRx;
 
-// TODO: Set static variables
-// TODO: Call static functions
 // TODO: Set MonoBehavior variables
 // TODO: Call MonoBehavior functions
 // TODO: Command history
+// TODO: Command validation
 // TODO: Autocomplete objects
 // TODO: Autocomplete functions/variables
 // TODO: Autocomplete parameters
@@ -28,7 +27,7 @@ public class Console : MonoBehaviour
 	public const double GestureTime = 250;
 	public const float GestureDistance = 0.05f;
 	public const float TransitionTime = 0.3f;
-	public const string LogPrefix = "[Log] ";
+	public const string LogColor = "#00DDFF";
 	public const string CommandPrefix = "> ";
 
 	public Canvas Canvas;
@@ -88,8 +87,7 @@ public class Console : MonoBehaviour
 	
 	protected void OnLog(string message, string stackTrace, LogType type)
 	{
-		Log(LogPrefix + message);
-		ScrollToBottom();
+		Log($"<color={LogColor}>{message}</color>");
 	}
 
 	protected void SetupUI()
@@ -162,6 +160,11 @@ public class Console : MonoBehaviour
 		}
 	}
 
+	public void Log(object obj)
+	{
+		Log(Debugger.ObjectOrEnumerableToString(obj, true));
+	}
+
 	public void Log(string line)
 	{
 		int postLength = log.Length + line.Length;
@@ -169,11 +172,7 @@ public class Console : MonoBehaviour
 			log.Remove(0, postLength - Length);
 		log.AppendLine(line);
 		LogText.text = log.ToString();
-	}
-
-	public void Log(object obj)
-	{
-		Log(Debugger.ObjectOrEnumerableToString(obj, true));
+		Observable.NextFrame().Subscribe(t => ScrollToBottom());
 	}
 
 	public void ScrollToBottom()
@@ -213,7 +212,7 @@ public class Console : MonoBehaviour
 		string rhs = sides.Length == 2 ? sides[1] : null;
 
 		string memberPath;
-		string[] arguments;
+		string[] argStrings;
 		int openIndex = lhs.IndexOf('(');
 		if (openIndex >= 0)
 		{
@@ -223,36 +222,44 @@ public class Console : MonoBehaviour
 				Log("Closing parenthesis not found.");
 				return;
 			}
-			string args = lhs.Slice(openIndex + 1, closeIndex);
-			memberPath = lhs.Substring(0, openIndex);
-			arguments = args.SplitAndTrim(',');
+			memberPath = lhs.Substring(0, openIndex).Trim();
+			string argsString = lhs.Slice(openIndex + 1, closeIndex).Trim();
+			if (argsString.IsNullOrEmpty())
+				argStrings = new string[0];
+			else
+				argStrings = argsString.SplitAndTrim(',');
 		}
 		else
 		{
 			memberPath = lhs;
-			arguments = null;
+			argStrings = null;
 		}
 
-		if (arguments != null && rhs != null)
+		if (argStrings != null && rhs != null)
 		{
 			Log("You cannot try to call a method and set a value at the same time.");
 			return;
 		}
 
-		string typeName; 
+		string typeName;
 		string memberName;
-		int lastDotIndex = lhs.LastIndexOf('.');
+		int lastDotIndex = memberPath.LastIndexOf('.');
 		if (lastDotIndex >= 0)
 		{
-			typeName = lhs.Substring(0, lastDotIndex);
-			memberName = lhs.Substring(lastDotIndex + 1);
+			typeName = memberPath.Substring(0, lastDotIndex).Trim();
+			memberName = memberPath.Substring(lastDotIndex + 1).Trim();
 		}
 		else
 		{
-			typeName = lhs;
+			typeName = memberPath;
 			memberName = null;
 		}
 
+		Execute(typeName, memberName, rhs, argStrings);
+	}
+
+	protected void Execute(string typeName, string memberName, string valueString, string[] argStrings)
+	{
 		Assembly assembly = Assembly.GetExecutingAssembly();
 		Type type = assembly.GetType(typeName, false, true);
 		if (type == null)
@@ -261,11 +268,10 @@ public class Console : MonoBehaviour
 			return;
 		}
 
-		BindingFlags baseFlags = BindingFlags.Public | BindingFlags.Static;
 		// No member specified, list all accessible members and return
 		if (memberName == null)
 		{
-			MemberInfo[] allMembers = type.GetMembers(baseFlags);
+			MemberInfo[] allMembers = type.GetMembers(BindingFlags.Public | BindingFlags.Static);
 			if (allMembers.Length > 0)
 			{
 				foreach (MemberInfo member in allMembers)
@@ -276,8 +282,18 @@ public class Console : MonoBehaviour
 			return;
 		}
 
-		MemberTypes types = arguments == null ? MemberTypes.Field | MemberTypes.Property : MemberTypes.Method;
-		MemberInfo[]  members = type.GetMember(memberName, types, baseFlags);
+		MemberTypes types = default;
+		if (valueString != null)
+			types = MemberTypes.Field | MemberTypes.Property;
+		else if (argStrings != null)
+			types = MemberTypes.Method;
+		else
+		{
+			types = MemberTypes.Field | MemberTypes.Property | MemberTypes.Method;
+			argStrings = new string[0];
+		}
+		
+		MemberInfo[] members = type.GetMember(memberName, types, BindingFlags.Public | BindingFlags.Static | BindingFlags.IgnoreCase);
 		if (members.Length == 0)
 		{
 			Log($"Member \"{memberName}\" was not found in the class.");
@@ -288,43 +304,104 @@ public class Console : MonoBehaviour
 			switch (member.MemberType)
 			{
 				case MemberTypes.Field:
+					try
 					{
-						FieldInfo field = type.GetField(memberName);
-						if (rhs != null)
+						FieldInfo field = (FieldInfo) member;
+						if (valueString != null)
 						{
-							TypeConverter converter = TypeDescriptor.GetConverter(field.FieldType);
-							object value = converter.ConvertFromString(rhs);
+							object value = TypeDescriptor.GetConverter(field.FieldType).ConvertFromString(valueString);
 							field.SetValue(null, value);
 						}
 						Log(field.GetValue(null));
 					}
+					catch (Exception e)
+					{
+						Log(e.Message);
+					}
 					return;
 
 				case MemberTypes.Property:
+					try
 					{
-						PropertyInfo property = type.GetProperty(memberName);
-						if (rhs != null)
+						PropertyInfo property = (PropertyInfo) member;
+						if (valueString != null)
 						{
-							TypeConverter converter = TypeDescriptor.GetConverter(property.PropertyType);
-							object value = converter.ConvertFromString(rhs);
+							object value = TypeDescriptor.GetConverter(property.PropertyType).ConvertFromString(valueString);
 							property.SetValue(null, value);
 						}
-						Log(property.GetValue(null));					
+						Log(property.GetValue(null));
+					}
+					catch (Exception e)
+					{
+						Log(e.Message);
 					}
 					return;
 
 				case MemberTypes.Method:
+					try
 					{
-						MethodInfo method = type.GetMethod(memberName);
-
+						MethodInfo method = (MethodInfo) member;
+						ParameterInfo[] parameters = method.GetParameters();
+						if (parameters.Length == argStrings.Length)
+						{
+							object[] arguments = new object[parameters.Length];
+							for (int i = 0; i < parameters.Length; i++)
+								arguments[i] = TypeDescriptor.GetConverter(parameters[i].ParameterType).ConvertFromString(argStrings[i]);							
+							object result = method.Invoke(null, arguments);
+							if (method.ReturnType != typeof(void))
+								Log(result.ToString());
+							return;
+						}
+					}
+					catch (Exception)
+					{
 					}
 					break;
 			}
+		Log("No member matching given parameters was found.");
 	}
 
 	protected string MemberToString(MemberInfo member)
 	{
-		return member.ReflectedType.FullName + "." + member.Name;
+		string output = $"{member.ReflectedType.FullName}.{member.Name}";
+		switch (member.MemberType)
+		{
+			case MemberTypes.Field:
+				{
+					FieldInfo field = (FieldInfo) member;
+					output += $" = {field.FieldType}";
+					if (field.IsLiteral)
+						output += " (Read-only)";
+				}
+				break;
+
+			case MemberTypes.Property:
+				{
+					PropertyInfo property = (PropertyInfo) member;
+					output += $" = {property.PropertyType}";
+					if (!property.CanWrite)
+						output += " (Read-only)";
+				}
+				break;
+
+			case MemberTypes.Method:
+				{
+					MethodInfo method = (MethodInfo) member;
+					ParameterInfo[] parameters = method.GetParameters();
+					output += "(";
+					bool first = true;
+					foreach (ParameterInfo parameterInfo in parameters)
+					{
+						if (!first)
+							output += ", ";
+						output += parameterInfo.ParameterType.Name;
+						first = false;
+					}
+					output += ")";
+				}
+				break;
+		}
+		return output;
 	}
 
 	protected void OnDestroy()

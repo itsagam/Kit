@@ -22,16 +22,33 @@ public class GameData
 
 public class Test2: Test
 {
-	public static string String = "Default";
+
 }
 
 public class Test: MonoBehaviour
 {
+	public static string String = "Default";
 	public static int Integer = 1;
 	public static float Float = 1.5f;
 	public static void Call()
 	{
 		print("Called");
+	}
+	public static void Call(int value)
+	{
+		print("Called I " + value);
+	}
+	public static void Call(string value)
+	{
+		print("Called S " + value);
+	}
+
+	public static int PropertyInt
+	{
+		get
+		{
+			return 1;
+		}
 	}
 
 	public GameObject obj;

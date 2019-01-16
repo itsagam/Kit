@@ -129,7 +129,7 @@ public class Debugger : MonoBehaviour
 
 	public static string ObjectOrEnumerableToString(object obj, bool serialize)
 	{
-		if (obj is IEnumerable e)
+		if (obj is IEnumerable e && !(e is string))
 			return EnumerableToString(e, serialize);
 		else
 			return ObjectToString(obj, serialize);
@@ -137,7 +137,13 @@ public class Debugger : MonoBehaviour
 
 	public static string ObjectToString(object obj, bool serialize)
 	{
-		return serialize ? SerializeObject(obj) : obj?.ToString();
+		if (obj == null)
+			return "Null";
+		
+		if (obj.GetType().IsValueType || (obj is string))
+			return obj.ToString();
+		else
+			return serialize ? SerializeObject(obj) : obj.ToString();
 	}
 
 	public static string EnumerableToString(IEnumerable enumerable, bool serialize)
@@ -163,13 +169,7 @@ public class Debugger : MonoBehaviour
 
 	public static string SerializeObject(object obj)
 	{
-		if (obj == null)
-			return "Null";
-
-		if (obj.GetType().IsValueType)
-			return obj.ToString();
-		else
-			return JsonUtility.ToJson(obj, true);
+		return JsonUtility.ToJson(obj, true);
 	}
 	#endregion
 }
