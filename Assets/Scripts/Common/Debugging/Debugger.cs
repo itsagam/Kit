@@ -127,44 +127,49 @@ public class Debugger : MonoBehaviour
 		Log(type, EnumerableToString(enumerable, serialize));
 	}
 
-	protected static string ObjectToString(object obj, bool serialize)
+	public static string ObjectOrEnumerableToString(object obj, bool serialize)
+	{
+		if (obj is IEnumerable e)
+			return EnumerableToString(e, serialize);
+		else
+			return ObjectToString(obj, serialize);
+	}
+
+	public static string ObjectToString(object obj, bool serialize)
 	{
 		return serialize ? SerializeObject(obj) : obj?.ToString();
 	}
 
-	protected static string EnumerableToString(IEnumerable enumerable, bool serialize)
+	public static string EnumerableToString(IEnumerable enumerable, bool serialize)
 	{
 		if (enumerable == null)
 			return "Null";
 
-		IEnumerable<object> items = enumerable.Cast<object>();
 		StringBuilder output = new StringBuilder();
-		if (items.Any())
+		bool first = true;
+		foreach (object item in enumerable)
 		{
-			bool first = true;
-			foreach (object item in items)
+			string itemString = ObjectOrEnumerableToString(item, serialize);
+			if (first)
 			{
-				string itemString = item is IEnumerable itemEnum ? EnumerableToString(itemEnum, serialize) : ObjectToString(item, serialize);
-				if (first)
-				{
-					output.Append(itemString);
-					first = false;
-				}
-				else
-					output.Append(", " + itemString);
+				output.Append(itemString);
+				first = false;
 			}
+			else
+				output.Append(", " + itemString);
 		}
 		return "{" + output + "}";
 	}
 
-	public static string SerializeObject(object data)
+	public static string SerializeObject(object obj)
 	{
-		return JsonUtility.ToJson(data, true);
-	}
+		if (obj == null)
+			return "Null";
 
-	public static T DeserializeObject<T>(string encoded)
-	{
-		return JsonUtility.FromJson<T>(encoded);
+		if (obj.GetType().IsValueType)
+			return obj.ToString();
+		else
+			return JsonUtility.ToJson(obj, true);
 	}
 	#endregion
 }

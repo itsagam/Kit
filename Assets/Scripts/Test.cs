@@ -20,8 +20,20 @@ public class GameData
 	public double Value;
 }
 
+public class Test2: Test
+{
+	public static string String = "Default";
+}
+
 public class Test: MonoBehaviour
 {
+	public static int Integer = 1;
+	public static float Float = 1.5f;
+	public static void Call()
+	{
+		print("Called");
+	}
+
 	public GameObject obj;
 
 	async void Start()

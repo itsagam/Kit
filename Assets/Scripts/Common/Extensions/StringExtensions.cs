@@ -5,6 +5,16 @@ using UnityEngine;
 
 public static class StringExtensions
 {
+	public static string Slice(this string str, int startIndex, int endIndex)
+	{
+		return str.Substring(startIndex, endIndex - startIndex);
+	}
+
+	public static string[] SplitAndTrim(this string str, params char[] separators)
+	{
+		return Array.ConvertAll(str.Split(separators), p => p.Trim());
+	}
+
 	public static bool IsNullOrEmpty(this string str)
 	{
 		return string.IsNullOrEmpty(str);
