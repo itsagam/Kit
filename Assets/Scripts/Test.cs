@@ -10,6 +10,7 @@ using UnityEngine;
 using Modding;
 using UnityEngine.UI;
 using UniRx;
+using XLua;
 
 public class GameData
 {
@@ -25,6 +26,7 @@ public class Test2: Test
 
 }
 
+[Hotfix]
 public class Test: MonoBehaviour
 {
 	public static string String = "Default";
@@ -53,12 +55,13 @@ public class Test: MonoBehaviour
 
 	public GameObject obj;
 
-	async void Start()
+	void Start()
 	{
 		//await LoadMods();
 		//await ModdingTest();
 
 		//await ConsoleTest();
+		InjectTest();
 	}
 
 	protected async Task LoadMods()
@@ -97,6 +100,24 @@ public class Test: MonoBehaviour
 			Debug.Log("Log " + i);
 			await Observable.Timer(TimeSpan.FromSeconds(0.1f));
 		}
+	}
+
+	void InjectTest()
+	{
+		LuaEnv luaenv = new LuaEnv();
+		luaenv.DoString(@"
+				local util = require 'xlua.util'
+				util.hotfix_ex(CS.Test, 'Hello', function(self)
+					self:Hello()
+                    print('Hello from Lua')
+                end)
+            ");
+		Hello();
+	}
+
+	public void Hello()
+	{
+		print("Hello from C#");
 	}
 
 	private void ModManager_ResourceReused(string path, ResourceInfo info)

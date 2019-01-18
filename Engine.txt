@@ -1,7 +1,12 @@
 Engine
 ----------------------------------------
-	Scriptable
-	Moddable
+	Scriptable/Moddable
+		Variables
+			- Console
+			- Configs
+			- Mods
+		How to invoke modded methods automatically from C#?
+		How to set default values of MonoBehaviours?
 	Reactive
 
 Library

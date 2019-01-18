@@ -14,7 +14,6 @@ namespace Modding
         public string Name;
         public string Author;
         public string Version;
-        public object Other;
     }
 
 	public abstract class ModPackage

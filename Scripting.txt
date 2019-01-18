@@ -1,0 +1,50 @@
+Combine uREPL UI, ILRuntime's C# and toLua method injection 
+
+C#
+--------------------------------------------------------------------------------
+uREPL:
+Highly featured packed, with in-game inspectors
+Full autocompletion for commands
+Really well-written code
+Uses Mono.CSharp.Evaluator, which does not seem to work on iOS
+
+CSharp-Interpreter-for-Unity-3D:
+Uses System.CodeDom.Compiler/Microsoft.CSharp for code compilation
+Does not seem to work on iOS
+
+csharp-eval-unity3d:
+Evaluates basic C# expressions
+Custom interpreter
+Works on iOS
+
+ILRuntime:
+Is a C# compiled library interpreter
+Code has to be compiled before use
+High-level functionality is very barebones, although well-written
+Does not support injection of any kind
+Works on iOS
+
+Lua
+--------------------------------------------------------------------------------
+xLua:
+Have to invoke C# methods in Lua using "CS."
+Lots of high-level functionalities
+Hotfix functionality does voodoo (https://github.com/Tencent/xLua/blob/master/Assets/XLua/Doc/Hotfix_EN.md) to allow to change C# methods (create a property somewhere marked with [Hotfix] attribute that returns all modifiable classes)
+To enable hotfix funtionality you have to inject project .dll after every recompile with xLua->Hotfix in Editor
+Both static-binding via code generation and reflection supported
+A bit more consistent and cleaner than xLua
+Maintained by Tencent
+
+ToLua:
+Run Unity in Administrator mode for the first time. It tries to copy Unity.Cecil.dll from Unity folder to its project directory, whose references its missing.
+Delete InjectionBridgeEditorInfo.xml
+Good performance (https://blog.csdn.net/u011467512/article/details/72716376)
+Supports method replacing/pre-inject/post-inject (https://zhuanlan.zhihu.com/p/35124260) by doing some voodoo
+To enable it you have to inject project .dll after every recompile with Lua->Inject All
+Uses static-binding
+
+SLua:
+Lean and high-performance
+Not much high-level functionality
+Does not support injection
+Uses static-binding
