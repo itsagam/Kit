@@ -61,7 +61,7 @@ public class Test: MonoBehaviour
 		//await ModdingTest();
 
 		//await ConsoleTest();
-		InjectTest();
+		//InjectTest();
 	}
 
 	protected async Task LoadMods()

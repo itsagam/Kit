@@ -67,6 +67,7 @@ namespace Modding
 
 		private static void AddDefaultSearchPaths()
         {
+			// TODO: Adding "Patches" and patching system
 			switch (Application.platform)
 			{
 				case RuntimePlatform.WindowsEditor:
@@ -106,6 +107,7 @@ namespace Modding
 				{
 					foreach (ModLoader loader in Loaders)
 					{
+						// TODO: Load and execute mod scripts
 						ModPackage package = async ? await loader.LoadModAsync(childPath) : loader.LoadMod(childPath);
 						if (package != null)
 						{

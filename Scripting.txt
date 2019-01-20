@@ -1,4 +1,4 @@
-Combine uREPL UI, ILRuntime's C# and toLua method injection 
+Combine uREPL UI, ILRuntime's C# and toLua/xLua method injection 
 
 C#
 --------------------------------------------------------------------------------

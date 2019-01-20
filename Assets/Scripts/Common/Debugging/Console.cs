@@ -10,14 +10,21 @@ using UnityEngine.EventSystems;
 using UnityEngine.UI;
 using DG.Tweening;
 using UniRx;
+using XLua;
 
+// TODO: Provide a way to list all members
+// TODO: Provide multiple-line support
+// TODO: Hook print function to Console
+// TODO: Find a way to remove "CS."
+
+// TODO: Logging over limit messes up HTML tags
 // TODO: Set MonoBehavior variables
 // TODO: Call MonoBehavior functions
-// TODO: Command history
-// TODO: Command validation
+// TODO: Make public methods static
 // TODO: Autocomplete objects
 // TODO: Autocomplete functions/variables
 // TODO: Autocomplete parameters
+// TODO: Use swipe-down gesture
 
 public class Console : MonoBehaviour
 {
@@ -33,10 +40,9 @@ public class Console : MonoBehaviour
 	public Canvas Canvas;
 	public ScrollRect LogScroll;
 	public Text LogText;
-	public InputField CommandInput;
+	public ConsoleInputField CommandInput;
 
 	protected static Console instance = null;
-	protected StringBuilder log = new StringBuilder(Length + 1);
 
 	#region Initialization
 	[RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
@@ -53,19 +59,12 @@ public class Console : MonoBehaviour
 	protected void Awake()
 	{
 		RegisterLogging();
+		RegisterInput();
 		RegisterGesture();
-		SetupUI();
+		InitializeLua();
+		InitializeUI();
+		InitializeHistory();
 		DontDestroyOnLoad(gameObject);
-	}
-
-	public void RegisterLogging()
-	{
-		Application.logMessageReceived += OnLog;
-	}
-
-	public void UnregisterLogging()
-	{
-		Application.logMessageReceived -= OnLog;
 	}
 
 	protected void RegisterGesture()
@@ -79,63 +78,38 @@ public class Console : MonoBehaviour
 			.Buffer(clickStream.Throttle(TimeSpan.FromMilliseconds(GestureTime)))
 			.Where(b => b.Count >= 2)
 			.Where(b => b.All(v => Math.Abs(v.x - b.Average(w => w.x)) + Math.Abs(v.y - b.Average(w => w.y)) < GestureDistance))
-			.Subscribe(b =>
-			{
-				IsVisible = !IsVisible;
-			});
-	}
-	
-	protected void OnLog(string message, string stackTrace, LogType type)
-	{
-		Log($"<color={LogColor}>{message}</color>");
+			.Subscribe(b => Toggle())
+			.AddTo(this);
 	}
 
-	protected void SetupUI()
+	protected void RegisterInput()
+	{
+		CommandInput.AddKeyHandler(KeyCode.Return, Submit);
+		CommandInput.AddKeyHandler(KeyCode.UpArrow, SelectPreviousCommand);
+		CommandInput.AddKeyHandler(KeyCode.DownArrow, SelectNextCommand);
+	}
+
+	protected void InitializeUI()
 	{
 		Canvas.gameObject.SetActive(false);
 		LogScroll.transform.localScale = new Vector3(1, 0, 1);
 		LogText.text = "";
 		CommandInput.text = "";
-		CommandInput.onValidateInput += OnValidateInput;
-	}
-
-	protected char OnValidateInput(string text, int charIndex, char addedChar)
-	{
-		if (addedChar == '\n')
-		{
-			OnSubmit();
-			return '\0';
-		}
-		else
-			return addedChar;
-	}
-
-	protected void OnSubmit()
-	{
-		string command = CommandInput.text;
-		if (command != "")
-		{
-			Log(CommandPrefix + command);
-			Execute(command);
-			ClearCommand();
-		}
 	}
 	#endregion
 
-	#region Public methods
+	#region Console
 	public void Show()
 	{
 		Canvas.gameObject.SetActive(true);
 		LogScroll.transform.DOScaleY(1.0f, TransitionTime).SetEase(Ease.InSine);
 		CommandInput.ActivateInputField();
 		CommandInput.Select();
-		//Observable.NextFrame().Subscribe(t => CommandInput.MoveTextEnd(true));
 	}
 
 	public void Hide()
 	{
-		LogScroll.transform.DOScaleY(0.0f, TransitionTime).SetEase(Ease.OutSine).OnComplete(() =>
-		{
+		LogScroll.transform.DOScaleY(0.0f, TransitionTime).SetEase(Ease.OutSine).OnComplete(() => {
 			Canvas.gameObject.SetActive(false);
 		});
 	}
@@ -159,6 +133,25 @@ public class Console : MonoBehaviour
 				Hide();
 		}
 	}
+	#endregion
+
+	#region Log
+	protected StringBuilder log = new StringBuilder(Length + 1);
+
+	public void RegisterLogging()
+	{
+		Application.logMessageReceived += OnLog;
+	}
+
+	public void UnregisterLogging()
+	{
+		Application.logMessageReceived -= OnLog;
+	}
+
+	protected void OnLog(string message, string stackTrace, LogType type)
+	{
+		Log($"<color={LogColor}>{message}</color>");
+	}
 
 	public void Log(object obj)
 	{
@@ -169,7 +162,9 @@ public class Console : MonoBehaviour
 	{
 		int postLength = log.Length + line.Length;
 		if (postLength > Length)
+		{
 			log.Remove(0, postLength - Length);
+		}
 		log.AppendLine(line);
 		LogText.text = log.ToString();
 		Observable.NextFrame().Subscribe(t => ScrollToBottom());
@@ -190,6 +185,20 @@ public class Console : MonoBehaviour
 		log.Clear();
 		LogText.text = "";
 	}
+	#endregion
+
+	#region Command
+	protected void Submit()
+	{
+		string command = CommandInput.text;
+		if (command != "")
+		{
+			Log(CommandPrefix + command);
+			AddToHistory(command);
+			Execute(command);
+			ClearCommand();
+		}
+	}
 
 	public void ClearCommand()
 	{
@@ -199,9 +208,42 @@ public class Console : MonoBehaviour
 	}
 	#endregion
 
+	#region Execution
+	protected LuaEnv lua;
+
+	protected void InitializeLua()
+	{
+		lua = new LuaEnv();
+		string luaLibrary = ResourceManager.ReadText(ResourceFolder.StreamingAssets, "Lua/LuaLibrary.lua");
+		lua.DoString(luaLibrary);
+	}
+
 	public void Execute(string command)
 	{
+		try
+		{
+			// Try to execute as an expression first
+			ExecuteLocal("return " + command);
+		}
+		catch (LuaException)
+		{
+			try
+			{
+				ExecuteLocal(command);
+			}
+			catch (LuaException ex)
+			{
+				Log(ex.Message);
+			}
+		}
 
+		void ExecuteLocal(string commandActual)
+		{
+			object[] results = lua.DoString(commandActual);
+			if (results != null)
+				foreach (object result in results)
+					Log(result != null ? result.ToString() : "nil");
+		}
 	}
 
 	/*
@@ -411,9 +453,61 @@ protected string MemberToString(MemberInfo member)
 	return output;
 }
 */
+	#endregion
+
+	#region History
+	protected List<string> history;
+	protected int currentCommandIndex;
+
+	protected void InitializeHistory()
+	{
+		history = new List<string>();
+		currentCommandIndex = 0;
+	}
+
+	public void AddToHistory(string command)
+	{
+		history.Add(command);
+		currentCommandIndex = history.Count;
+	}
+
+	public void SelectPreviousCommand()
+	{
+		SelectCommand(currentCommandIndex - 1);
+	}
+
+	public void SelectNextCommand()
+	{
+		SelectCommand(currentCommandIndex + 1);
+	}
+
+	public void SelectCommand(int index)
+	{	
+		if (index > history.Count - 1)
+		{
+			CommandInput.text = "";
+			currentCommandIndex = history.Count;
+		}
+		else if (index < 0)
+		{
+		}
+		else
+		{
+			CommandInput.text = history[index];
+			currentCommandIndex = index;
+		}
+		CommandInput.MoveTextEnd(false);
+	}
+
+	public void ClearHistory()
+	{
+		history.Clear();
+	}
+	#endregion
 
 	protected void OnDestroy()
 	{
+		lua.Dispose();
 		UnregisterLogging();
 	}
 }

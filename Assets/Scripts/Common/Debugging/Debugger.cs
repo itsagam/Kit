@@ -10,6 +10,8 @@ using System.Text;
 
 public class Debugger : MonoBehaviour
 {
+	public const string NullString = "Null";
+
 	#region Profiling
 	protected static OrderedDictionary Samples = new OrderedDictionary();
 
@@ -138,7 +140,7 @@ public class Debugger : MonoBehaviour
 	public static string ObjectToString(object obj, bool serialize)
 	{
 		if (obj == null)
-			return "Null";
+			return NullString;
 		
 		if (obj.GetType().IsValueType || (obj is string))
 			return obj.ToString();
@@ -149,7 +151,7 @@ public class Debugger : MonoBehaviour
 	public static string EnumerableToString(IEnumerable enumerable, bool serialize)
 	{
 		if (enumerable == null)
-			return "Null";
+			return NullString;
 
 		StringBuilder output = new StringBuilder();
 		bool first = true;

@@ -81,7 +81,7 @@ public class ResourceManager
 			}
 			else
 			{
-				string fullPath = GetFullPath(folder, file);
+				string fullPath = GetPath(folder, file);
 				reference = async ? (await LoadAsync<T>(fullPath)).reference : Load<T>(fullPath).reference;
 			}
 
@@ -108,7 +108,7 @@ public class ResourceManager
 			return (T) reference;
 
 		ResourceParser parser = null;
-		string fullPath = GetFullPath(folder, file);
+		string fullPath = GetPath(folder, file);
 		if (folder == ResourceFolder.Resources)
 		{
 			string fileNoExt = Path.ChangeExtension(file, null);
@@ -269,7 +269,7 @@ public class ResourceManager
 			if (modded != null)
 				return modded;
 		}
-		return ReadText(GetFullPath(folder, file));
+		return ReadText(GetPath(folder, file));
 	}
 
 	public static async Task<string> ReadTextAsync(ResourceFolder folder, string file)
@@ -280,7 +280,7 @@ public class ResourceManager
 			if (modded != null)
 				return modded;
 		}
-		return await ReadTextAsync(GetFullPath(folder, file));
+		return await ReadTextAsync(GetPath(folder, file));
 	}
 
 	public static byte[] ReadBytes(ResourceFolder folder, string file)
@@ -291,7 +291,7 @@ public class ResourceManager
 			if (modded != null)
 				return modded;
 		}
-		return ReadBytes(GetFullPath(folder, file));
+		return ReadBytes(GetPath(folder, file));
 	}
 
 	public static async Task<byte[]> ReadBytesAsync(ResourceFolder folder, string file)
@@ -302,7 +302,7 @@ public class ResourceManager
 			if (modded != null)
 				return modded;
 		}
-		return await ReadBytesAsync(GetFullPath(folder, file));
+		return await ReadBytesAsync(GetPath(folder, file));
 	}
 
 	public static string ReadText(string fullPath)
@@ -358,12 +358,12 @@ public class ResourceManager
 	#region Saving/Deleting
 	public static bool Save(ResourceFolder folder, string file, object contents, ResourceParser parser)
 	{
-		return Save(GetFullPath(folder, file), contents, parser);
+		return Save(GetPath(folder, file), contents, parser);
 	}
 
 	public static async Task<bool> SaveAsync(ResourceFolder folder, string file, object contents, ResourceParser parser)
 	{
-		return await SaveAsync(GetFullPath(folder, file), contents, parser);
+		return await SaveAsync(GetPath(folder, file), contents, parser);
 	}
 
 	public static bool Save(string fullPath, object contents, ResourceParser parser)
@@ -384,22 +384,22 @@ public class ResourceManager
 
 	public static bool SaveText(ResourceFolder folder, string file, string contents)
 	{
-		return SaveText(GetFullPath(folder, file), contents);
+		return SaveText(GetPath(folder, file), contents);
 	}
 
 	public static async Task<bool> SaveTextAsync(ResourceFolder folder, string file, string contents)
 	{
-		return await SaveTextAsync(GetFullPath(folder, file), contents);
+		return await SaveTextAsync(GetPath(folder, file), contents);
 	}
 
 	public static bool SaveBytes(ResourceFolder folder, string file, byte[] bytes)
 	{
-		return SaveBytes(GetFullPath(folder, file), bytes);
+		return SaveBytes(GetPath(folder, file), bytes);
 	}
 
 	public static async Task<bool> SaveBytesAsync(ResourceFolder folder, string file, byte[] bytes)
 	{
-		return await SaveBytesAsync(GetFullPath(folder, file), bytes);
+		return await SaveBytesAsync(GetPath(folder, file), bytes);
 	}
 
 	public static bool SaveText(string fullPath, string contents)
@@ -458,7 +458,7 @@ public class ResourceManager
 
 	public static bool Delete(ResourceFolder folder, string file)
 	{
-		return Delete(GetFullPath(folder, file));
+		return Delete(GetPath(folder, file));
 	}
 
 	public static bool Delete(string fullPath)
@@ -476,7 +476,7 @@ public class ResourceManager
 
 	public static bool Exists(ResourceFolder folder, string file)
 	{
-		return Exists(GetFullPath(folder, file));
+		return Exists(GetPath(folder, file));
 	}
 
 	public static bool Exists(string fullPath)
@@ -491,14 +491,14 @@ public class ResourceManager
 		return ModManager.GetResourceInfo(GetModdingPath(folder, file));
 	}
 
-	public static string GetFullPath(ResourceFolder folder)
+	public static string GetPath(ResourceFolder folder)
 	{
 		return Paths[folder];
 	}
 
-	public static string GetFullPath(ResourceFolder folder, string file)
+	public static string GetPath(ResourceFolder folder, string file)
 	{
-		return Path.Combine(GetFullPath(folder), file);
+		return Path.Combine(GetPath(folder), file);
 	}
 
 	public static string GetModdingPath(ResourceFolder folder)
