@@ -13,18 +13,16 @@ using UniRx;
 using XLua;
 
 // TODO: Provide a way to list all members
-// TODO: Provide multiple-line support
 // TODO: Hook print function to Console
 // TODO: Find a way to remove "CS."
 
-// TODO: Logging over limit messes up HTML tags
-// TODO: Set MonoBehavior variables
-// TODO: Call MonoBehavior functions
 // TODO: Make public methods static
+
+// TODO: Use swipe-down gesture
+// TODO: Provide multiple-line support
 // TODO: Autocomplete objects
 // TODO: Autocomplete functions/variables
 // TODO: Autocomplete parameters
-// TODO: Use swipe-down gesture
 
 public class Console : MonoBehaviour
 {
@@ -36,6 +34,7 @@ public class Console : MonoBehaviour
 	public const float TransitionTime = 0.3f;
 	public const string LogColor = "#00DDFF";
 	public const string CommandPrefix = "> ";
+	public const string NullString = "nil";
 
 	public Canvas Canvas;
 	public ScrollRect LogScroll;
@@ -136,7 +135,7 @@ public class Console : MonoBehaviour
 	#endregion
 
 	#region Log
-	protected StringBuilder log = new StringBuilder(Length + 1);
+	protected StringBuilder log = new StringBuilder(Length);
 
 	public void RegisterLogging()
 	{
@@ -155,15 +154,17 @@ public class Console : MonoBehaviour
 
 	public void Log(object obj)
 	{
-		Log(Debugger.ObjectOrEnumerableToString(obj, true));
+		Log(Debugger.ObjectOrEnumerableToString(obj, false));
 	}
 
 	public void Log(string line)
 	{
-		int postLength = log.Length + line.Length;
-		if (postLength > Length)
+		int newLength = log.Length + line.Length;
+		if (newLength > Length)
 		{
-			log.Remove(0, postLength - Length);
+			int removeLength = newLength - Length;
+			removeLength = log.IndexOf('\n', removeLength) + 1;
+			log.Remove(0, removeLength);
 		}
 		log.AppendLine(line);
 		LogText.text = log.ToString();
@@ -209,13 +210,13 @@ public class Console : MonoBehaviour
 	#endregion
 
 	#region Execution
-	protected LuaEnv lua;
+	protected LuaEnv luaEnv;
 
 	protected void InitializeLua()
 	{
-		lua = new LuaEnv();
+		luaEnv = new LuaEnv();
 		string luaLibrary = ResourceManager.ReadText(ResourceFolder.StreamingAssets, "Lua/LuaLibrary.lua");
-		lua.DoString(luaLibrary);
+		luaEnv.DoString(luaLibrary);
 	}
 
 	public void Execute(string command)
@@ -239,14 +240,12 @@ public class Console : MonoBehaviour
 
 		void ExecuteLocal(string commandActual)
 		{
-			object[] results = lua.DoString(commandActual);
-			if (results != null)
-				foreach (object result in results)
-					Log(result != null ? result.ToString() : "nil");
+			object[] results = luaEnv.DoString(commandActual);
+			results?.ForEach(r => Log(r != null ? r.ToString() : NullString));
 		}
 	}
 
-	/*
+/*
 public void Execute(string command)
 {
 	string[] sides = command.SplitAndTrim('=');
@@ -322,10 +321,7 @@ protected void Execute(string typeName, string memberName, string valueString, s
 	{
 		MemberInfo[] allMembers = type.GetMembers(BindingFlags.Public | BindingFlags.Static);
 		if (allMembers.Length > 0)
-		{
-			foreach (MemberInfo member in allMembers)
-				Log(MemberToString(member));
-		}
+			allMembers.ForEach(m => Log(MemberToString(m)));
 		else
 			Log($"Class \"{typeName}\" has no accessible members.");
 		return;
@@ -505,9 +501,11 @@ protected string MemberToString(MemberInfo member)
 	}
 	#endregion
 
+	#region Destruction
 	protected void OnDestroy()
 	{
-		lua.Dispose();
+		luaEnv.Dispose();
 		UnregisterLogging();
 	}
+	#endregion
 }

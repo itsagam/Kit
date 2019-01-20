@@ -55,13 +55,13 @@ public class Test: MonoBehaviour
 
 	public GameObject obj;
 
-	void Start()
+	async void Start()
 	{
 		//await LoadMods();
 		//await ModdingTest();
-
-		//await ConsoleTest();
 		//InjectTest();
+
+		await ConsoleTest();
 	}
 
 	protected async Task LoadMods()
@@ -96,10 +96,7 @@ public class Test: MonoBehaviour
 	async Task ConsoleTest()
 	{
 		for (int i = 0; i < 30; i++)
-		{
-			Debug.Log("Log " + i);
 			await Observable.Timer(TimeSpan.FromSeconds(0.1f));
-		}
 	}
 
 	void InjectTest()
@@ -114,10 +111,10 @@ public class Test: MonoBehaviour
             ");
 		Hello();
 	}
-
+	
 	public void Hello()
 	{
-		print("Hello from C#");
+		Debug.Log("Hello from C#");
 	}
 
 	private void ModManager_ResourceReused(string path, ResourceInfo info)

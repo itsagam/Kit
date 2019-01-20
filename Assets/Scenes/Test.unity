@@ -122,7 +122,6 @@ GameObject:
   m_Component:
   - component: {fileID: 225321744}
   - component: {fileID: 225321743}
-  - component: {fileID: 225321742}
   - component: {fileID: 225321741}
   - component: {fileID: 225321746}
   - component: {fileID: 225321745}
@@ -135,14 +134,6 @@ GameObject:
   m_IsActive: 1
 --- !u!81 &225321741
 AudioListener:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 225321740}
-  m_Enabled: 1
---- !u!92 &225321742
-Behaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -218,7 +209,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   obj: {fileID: 953567217}
-  text: {fileID: 0}
 --- !u!82 &225321746
 AudioSource:
   m_ObjectHideFlags: 0
