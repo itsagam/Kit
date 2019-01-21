@@ -21,9 +21,10 @@ public class GameData
 	public double Value;
 }
 
-public class Test2: Test
+public class Test2
 {
-
+	public const string Const = "Const";
+	public static string Static = "Static";
 }
 
 [Hotfix]
@@ -54,6 +55,7 @@ public class Test: MonoBehaviour
 	}
 
 	public GameObject obj;
+	public string InsString = Test2.Static;
 
 	async void Start()
 	{

@@ -9,6 +9,7 @@ using UnityEngine;
 using Modding.Loaders;
 using Modding.Parsers;
 
+// TODO: Call Dispose in Destroy, Tick in Update whereever LuaEnv is used
 namespace Modding
 {
 	public struct ResourceInfo
@@ -142,6 +143,7 @@ namespace Modding
 
 		public static void SaveModOrder()
 		{
+			//TODO: Use its own player prefs catagory
 			for (int i = 0; i < modPackages.Count; i++)
 				PlayerPrefs.SetInt(modPackages[i].Metadata.Name, i);
 		}

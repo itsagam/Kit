@@ -31,6 +31,7 @@ public class ResourceManager
 	protected static Dictionary<string, object> resources = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase);
 
 	#region Loading
+	// TODO: Provide moddable Boolean
 	public static T Load<T>(ResourceFolder folder, string file, bool merge = false) where T : class
 	{
 		return LoadInternal<T>(folder, file, merge, false).Result;

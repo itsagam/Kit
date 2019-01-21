@@ -6,7 +6,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
 
-public class ConsoleInputField : InputField
+public class CustomInputField : InputField
 {
 	protected List<(KeyCode key, EventModifiers modifiers, Action action)> KeyHandlers = new List<(KeyCode, EventModifiers, Action)>();
 
