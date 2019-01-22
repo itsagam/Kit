@@ -7,7 +7,6 @@ using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 using DG.Tweening;
 using UniRx;
-using UniRx.Async;
 
 public enum FadeMode
 {
@@ -93,8 +92,8 @@ public class SceneManager
 		public string Name;
 		public bool Additive;
 		public FadeMode FadeMode = FadeMode.FadeOutIn;
-		public Color FadeColor = Color.black;
-		public float FadeTime = 1.0f;
+		public Color FadeColor = DefaultFadeColor;
+		public float FadeTime = DefaultFadeTime;
 
 		protected event Action<float> onProgress;
 		protected event Action onComplete;

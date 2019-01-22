@@ -97,6 +97,7 @@ public class Console : MonoBehaviour
 			.AddTo(this);
 		*/
 
+		CommandInput.AddKeyHandler(KeyCode.Return, NewLine, EventModifiers.Shift);
 		CommandInput.AddKeyHandler(KeyCode.Return, Submit);
 		CommandInput.AddKeyHandler(KeyCode.UpArrow, SelectPreviousCommand);
 		CommandInput.AddKeyHandler(KeyCode.DownArrow, SelectNextCommand);
@@ -109,10 +110,17 @@ public class Console : MonoBehaviour
 		CommandInput.onValidateInput += OnValidateInput;
 	}
 
+	protected void NewLine()
+	{
+		//CommandInput.caretPosition;
+	}
+
 	protected char OnValidateInput(string text, int charIndex, char addedChar)
 	{
 		if (addedChar == '`')
 			return '\0';
+		//else if (addedChar == '\n')
+		//	return '\0';
 		else
 			return addedChar;
 	}
@@ -239,7 +247,7 @@ public class Console : MonoBehaviour
 	protected void InitializeLua()
 	{
 		luaEnv = new LuaEnv();
-		string luaLibrary = ResourceManager.ReadText(ResourceFolder.StreamingAssets, "Lua/LuaLibrary.lua");
+		string luaLibrary = ResourceManager.ReadText(ResourceFolder.StreamingAssets, "Lua/LuaLibrary.lua", false);
 		luaEnv.DoString(luaLibrary);
 	}
 

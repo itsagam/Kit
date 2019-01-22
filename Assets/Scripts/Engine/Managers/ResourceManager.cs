@@ -26,32 +26,34 @@ public class ResourceManager
 		{ ResourceFolder.PersistentData, Application.persistentDataPath },
 		{ ResourceFolder.Resources, Path.Combine(Application.dataPath, "Resources") } };
 
+	// Global variable to enable/disable modding
 	public static bool Modding = true;
+	// Default mode for modding in individual calls
+	public const bool DefaultModding = true;
 
 	protected static Dictionary<string, object> resources = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase);
 
 	#region Loading
-	// TODO: Provide moddable Boolean
-	public static T Load<T>(ResourceFolder folder, string file, bool merge = false) where T : class
+	public static T Load<T>(ResourceFolder folder, string file, bool modded = DefaultModding, bool merge = false) where T : class
 	{
-		return LoadInternal<T>(folder, file, merge, false).Result;
+		return LoadInternal<T>(folder, file, modded, merge, false).Result;
 	}
 
-	public static async Task<T> LoadAsync<T>(ResourceFolder folder, string file, bool merge = false) where T : class
+	public static async Task<T> LoadAsync<T>(ResourceFolder folder, string file, bool modded = DefaultModding, bool merge = false) where T : class
 	{
-		return await LoadInternal<T>(folder, file, merge, true);
+		return await LoadInternal<T>(folder, file, modded, merge, true);
 	}
 
-	protected static async Task<T> LoadInternal<T>(ResourceFolder folder, string file, bool merge, bool async) where T : class
+	protected static async Task<T> LoadInternal<T>(ResourceFolder folder, string file, bool modded, bool merge, bool async) where T : class
 	{
-		if (Modding)
+		if (Modding && modded)
 		{
 			if (!merge)
 			{
 				string moddingPath = GetModdingPath(folder, file);
-				T modded = async ? await ModManager.LoadAsync<T>(moddingPath) : ModManager.Load<T>(moddingPath);
-				if (modded != null)
-					return modded;
+				T moddedFile = async ? await ModManager.LoadAsync<T>(moddingPath) : ModManager.Load<T>(moddingPath);
+				if (moddedFile != null)
+					return moddedFile;
 			}
 			else
 				return async ? await LoadMergedAsync<T>(folder, file) : LoadMerged<T>(folder, file);
@@ -92,12 +94,12 @@ public class ResourceManager
 		return (T) reference;
 	}
 
-	protected static T LoadMerged<T>(ResourceFolder folder, string file) where T : class
+	public static T LoadMerged<T>(ResourceFolder folder, string file) where T : class
 	{
 		return LoadMergedInternal<T>(folder, file, false).Result;
 	}
 
-	protected static async Task<T> LoadMergedAsync<T>(ResourceFolder folder, string file) where T : class
+	public static async Task<T> LoadMergedAsync<T>(ResourceFolder folder, string file) where T : class
 	{
 		return await LoadMergedInternal<T>(folder, file, true);
 	}
@@ -199,7 +201,7 @@ public class ResourceManager
 
 	public static bool Unload(object resource)
 	{
-		if (Modding && ModManager.Unload(resource))
+		if (DefaultModding && ModManager.Unload(resource))
 			return true;
 
 		bool found = false;
@@ -231,7 +233,7 @@ public class ResourceManager
 	public static bool Unload(ResourceFolder folder, string file)
 	{
 		string moddingPath = GetModdingPath(folder, file);
-		if (Modding && ModManager.UnloadAll(moddingPath))
+		if (DefaultModding && ModManager.UnloadAll(moddingPath))
 			return true;
 		
 		if (resources.TryGetValue(file, out object resource))
@@ -262,46 +264,46 @@ public class ResourceManager
 	#endregion
 
 	#region Reading
-	public static string ReadText(ResourceFolder folder, string file)
+	public static string ReadText(ResourceFolder folder, string file, bool modded = DefaultModding)
 	{
-		if (Modding)
+		if (Modding && modded)
 		{
-			string modded = ModManager.ReadText(GetModdingPath(folder, file));
-			if (modded != null)
-				return modded;
+			string moddedFile = ModManager.ReadText(GetModdingPath(folder, file));
+			if (moddedFile != null)
+				return moddedFile;
 		}
 		return ReadText(GetPath(folder, file));
 	}
 
-	public static async Task<string> ReadTextAsync(ResourceFolder folder, string file)
+	public static async Task<string> ReadTextAsync(ResourceFolder folder, string file, bool modded = DefaultModding)
 	{
-		if (Modding)
+		if (Modding && modded)
 		{
-			string modded = await ModManager.ReadTextAsync(GetModdingPath(folder, file));
-			if (modded != null)
-				return modded;
+			string moddedFile = await ModManager.ReadTextAsync(GetModdingPath(folder, file));
+			if (moddedFile != null)
+				return moddedFile;
 		}
 		return await ReadTextAsync(GetPath(folder, file));
 	}
 
-	public static byte[] ReadBytes(ResourceFolder folder, string file)
+	public static byte[] ReadBytes(ResourceFolder folder, string file, bool modded = DefaultModding)
 	{
-		if (Modding)
+		if (Modding && modded)
 		{
-			byte[] modded = ModManager.ReadBytes(GetModdingPath(folder, file));
-			if (modded != null)
-				return modded;
+			byte[] moddedFile = ModManager.ReadBytes(GetModdingPath(folder, file));
+			if (moddedFile != null)
+				return moddedFile;
 		}
 		return ReadBytes(GetPath(folder, file));
 	}
 
-	public static async Task<byte[]> ReadBytesAsync(ResourceFolder folder, string file)
+	public static async Task<byte[]> ReadBytesAsync(ResourceFolder folder, string file, bool modded = DefaultModding)
 	{
-		if (Modding)
+		if (Modding && modded)
 		{
-			byte[] modded = await ModManager.ReadBytesAsync(GetModdingPath(folder, file));
-			if (modded != null)
-				return modded;
+			byte[] moddedFile = await ModManager.ReadBytesAsync(GetModdingPath(folder, file));
+			if (moddedFile != null)
+				return moddedFile;
 		}
 		return await ReadBytesAsync(GetPath(folder, file));
 	}

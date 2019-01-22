@@ -59,11 +59,10 @@ public class Test: MonoBehaviour
 
 	async void Start()
 	{
-		//await LoadMods();
 		//await ModdingTest();
 		//InjectTest();
 
-		await ConsoleTest();
+		//await ConsoleTest();
 	}
 
 	protected async Task LoadMods()
@@ -77,6 +76,7 @@ public class Test: MonoBehaviour
 
 	protected async Task ModdingTest()
 	{
+		await LoadMods();
 		Debugger.Log(await ResourceManager.LoadAsync<GameData>(ResourceFolder.StreamingAssets, "Data/Test.json", true), true);
 
 		Texture tex = await ResourceManager.LoadAsync<Texture>(ResourceFolder.Resources, @"Textures/Test");
@@ -85,6 +85,21 @@ public class Test: MonoBehaviour
 		AudioClip clip = await ResourceManager.LoadAsync<AudioClip>(ResourceFolder.Resources, @"Sounds/Test");
 		GetComponent<AudioSource>().clip = clip;
 		//GetComponent<AudioSource>().Play();
+	}
+
+	private void ModManager_ResourceReused(string path, ResourceInfo info)
+	{
+		Debug.Log($"File \"{path}\" resused from \"{info.Package.Path}\"");
+	}
+
+	private void ModManager_ResourceLoaded(string path, ResourceInfo info)
+	{
+		Debug.Log($"File \"{path}\" loaded from \"{info.Package.Path}\"");
+	}
+
+	void OnDestroy()
+	{
+		ModManager.UnloadMods();
 	}
 
 	protected void ProfileTest()
@@ -117,20 +132,5 @@ public class Test: MonoBehaviour
 	public void Hello()
 	{
 		Debug.Log("Hello from C#");
-	}
-
-	private void ModManager_ResourceReused(string path, ResourceInfo info)
-	{
-		Debug.Log($"File \"{path}\" resused from \"{info.Package.Path}\"");
-	}
-
-	private void ModManager_ResourceLoaded(string path, ResourceInfo info)
-	{
-		Debug.Log($"File \"{path}\" loaded from \"{info.Package.Path}\"");
-	}
-
-	void OnDestroy()
-	{
-		//ModManager.UnloadMods();
 	}
 }
