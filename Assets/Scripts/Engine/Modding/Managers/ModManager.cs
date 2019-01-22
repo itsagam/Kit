@@ -9,18 +9,17 @@ using UnityEngine;
 using Modding.Loaders;
 using Modding.Parsers;
 
-// TODO: Call Dispose in Destroy, Tick in Update whereever LuaEnv is used
 namespace Modding
 {
 	public struct ResourceInfo
 	{
-		public ModPackage Package;
+		public Mod Mod;
 		public ResourceParser Parser;
 		public object Reference;
 		
-		public ResourceInfo(ModPackage package, ResourceParser parser, object reference)
+		public ResourceInfo(Mod mod, ResourceParser parser, object reference)
 		{
-			Package = package;
+			Mod = mod;
 			Parser = parser;
 			Reference = reference;
 		}
@@ -28,11 +27,11 @@ namespace Modding
 
 	public class ModManager
 	{
-		public static event Action<ModPackage> ModLoaded;
-		public static event Action<ModPackage> ModUnloaded;
+		public static event Action<Mod> ModLoaded;
+		public static event Action<Mod> ModUnloaded;
 		public static event Action<string, ResourceInfo> ResourceLoaded;
 		public static event Action<string, ResourceInfo> ResourceReused;
-		public static event Action<string, ModPackage> ResourceUnloaded;
+		public static event Action<string, Mod> ResourceUnloaded;
 
 		public const string DefaultSearchFolderName = "Mods";
 
@@ -40,7 +39,7 @@ namespace Modding
 		public static List<ResourceParser> Parsers = new List<ResourceParser>();
 		public static List<string> SearchPaths = new List<string>();
 
-		protected static List<ModPackage> modPackages = new List<ModPackage>();
+		protected static List<Mod> mods = new List<Mod>();
 		protected static Dictionary<string, List<ResourceInfo>> resourceInfos = new Dictionary<string, List<ResourceInfo>>(StringComparer.OrdinalIgnoreCase);
 
 		static ModManager()
@@ -108,44 +107,47 @@ namespace Modding
 				{
 					foreach (ModLoader loader in Loaders)
 					{
-						// TODO: Load and execute mod scripts
-						ModPackage package = async ? await loader.LoadModAsync(childPath) : loader.LoadMod(childPath);
-						if (package != null)
+						Mod mod = async ? await loader.LoadModAsync(childPath) : loader.LoadMod(childPath);
+						if (mod != null)
 						{
-							modPackages.Add(package);
-							ModLoaded?.Invoke(package);
+							if (async)
+								await mod.ExecuteScriptsAsync();
+							else
+								mod.ExecuteScripts();
+							mods.Add(mod);
+							ModLoaded?.Invoke(mod);
 							break;
 						}
 					}
 				}
 			}
 
-			for (int i = modPackages.Count-1; i>=0; i--)
+			for (int i = mods.Count-1; i>=0; i--)
 			{
-				string key = modPackages[i].Metadata.Name;
+				string key = mods[i].Metadata.Name;
 				if (PlayerPrefs.HasKey(key))
-					MoveModOrder(modPackages[i], PlayerPrefs.GetInt(key));
+					MoveModOrder(mods[i], PlayerPrefs.GetInt(key));
 			}
 
 			SaveModOrder();
 		}
 	
-		public static int GetModOrder(ModPackage modPackage)
+		public static int GetModOrder(Mod mod)
 		{
-			return modPackages.FindIndex(p => p == modPackage);
+			return mods.FindIndex(p => p == mod);
 		}
 
-		public static void MoveModOrder(ModPackage modPackage, int index)
+		public static void MoveModOrder(Mod mod, int index)
 		{
-			modPackages.Remove(modPackage);
-			modPackages.Insert(index, modPackage);
+			mods.Remove(mod);
+			mods.Insert(index, mod);
 		}
 
 		public static void SaveModOrder()
 		{
 			//TODO: Use its own player prefs catagory
-			for (int i = 0; i < modPackages.Count; i++)
-				PlayerPrefs.SetInt(modPackages[i].Metadata.Name, i);
+			for (int i = 0; i < mods.Count; i++)
+				PlayerPrefs.SetInt(mods[i].Metadata.Name, i);
 		}
 
 		public static List<ResourceInfo> GetResourceInfo(string path)
@@ -181,9 +183,9 @@ namespace Modding
 				return (T) loadedResource.Reference;
 			}
 			
-			foreach (ModPackage package in ModPackages.Reverse())
+			foreach (Mod mod in Mods.Reverse())
 			{
-				var (reference, parser) = async ? await package.LoadAsync<T>(path) : package.Load<T>(path);
+				var (reference, parser) = async ? await mod.LoadAsync<T>(path) : mod.Load<T>(path);
 				if (reference != null)
 				{
 					if (! resourceInfos.TryGetValue(path, out loadedResources))
@@ -191,7 +193,7 @@ namespace Modding
 						loadedResources = new List<ResourceInfo>();
 						resourceInfos[path] = loadedResources;
 					}
-					ResourceInfo resourceInfo = new ResourceInfo(package, parser, reference);
+					ResourceInfo resourceInfo = new ResourceInfo(mod, parser, reference);
 					loadedResources.Add(resourceInfo);
 					ResourceLoaded?.Invoke(path, resourceInfo);
 					return reference;
@@ -221,15 +223,15 @@ namespace Modding
 			}
 
 			List<T> all = new List<T>();
-			foreach (ModPackage package in ModPackages.Reverse())
+			foreach (Mod mod in Mods.Reverse())
 			{
-				ResourceInfo loadedResource = loadedResources.Find(r => r.Package == package);
+				ResourceInfo loadedResource = loadedResources.Find(r => r.Mod == mod);
 				if (loadedResource.Reference == null)
 				{
-					var (reference, parser) = async ? await package.LoadAsync<T>(path) : package.Load<T>(path);
+					var (reference, parser) = async ? await mod.LoadAsync<T>(path) : mod.Load<T>(path);
 					if (reference != null)
 					{
-						ResourceInfo resourceInfo = new ResourceInfo(package, parser, reference);
+						ResourceInfo resourceInfo = new ResourceInfo(mod, parser, reference);
 						loadedResources.Add(resourceInfo);
 						ResourceLoaded?.Invoke(path, resourceInfo);
 						all.Add(reference);
@@ -256,14 +258,14 @@ namespace Modding
 
 		protected static async Task<string> ReadTextInternal(string path, bool async)
 		{
-			foreach (ModPackage package in ModPackages.Reverse())
+			foreach (Mod mod in Mods.Reverse())
 			{
 				try
 				{
 					if (async)
-						return await package.ReadTextAsync(path);
+						return await mod.ReadTextAsync(path);
 					else
-						return package.ReadText(path);
+						return mod.ReadText(path);
 				}
 				catch (FileNotFoundException)
 				{
@@ -286,14 +288,14 @@ namespace Modding
 		{
 			List<string> all = new List<string>();
 
-			foreach (ModPackage package in ModPackages)
+			foreach (Mod mod in Mods)
 			{
 				try
 				{
 					if (async)
-						all.Add(await package.ReadTextAsync(path));
+						all.Add(await mod.ReadTextAsync(path));
 					else
-						all.Add(package.ReadText(path));
+						all.Add(mod.ReadText(path));
 				}
 				catch (FileNotFoundException)
 				{
@@ -315,14 +317,14 @@ namespace Modding
 
 		protected static async Task<byte[]> ReadBytesInternal(string path, bool async)
 		{
-			foreach (ModPackage package in ModPackages.Reverse())
+			foreach (Mod mod in Mods.Reverse())
 			{
 				try
 				{
 					if (async)
-						return await package.ReadBytesAsync(path);
+						return await mod.ReadBytesAsync(path);
 					else
-						return package.ReadBytes(path);
+						return mod.ReadBytes(path);
 				}
 				catch (FileNotFoundException)
 				{
@@ -344,14 +346,14 @@ namespace Modding
 		protected static async Task<List<byte[]>> ReadBytesAllInternal(string path, bool async)
 		{
 			List<byte[]> all = new List<byte[]>();
-			foreach (ModPackage package in ModPackages)
+			foreach (Mod mod in Mods)
 			{
 				try
 				{
 					if (async)
-						all.Add(await package.ReadBytesAsync(path));
+						all.Add(await mod.ReadBytesAsync(path));
 					else
-						all.Add(package.ReadBytes(path));
+						all.Add(mod.ReadBytes(path));
 				}
 				catch (FileNotFoundException)
 				{
@@ -368,16 +370,16 @@ namespace Modding
 
         public static void UnloadMods()
 		{
-			for (int i = modPackages.Count - 1; i >= 0; i--)
-				UnloadMod(modPackages[i]);
+			for (int i = mods.Count - 1; i >= 0; i--)
+				UnloadMod(mods[i]);
 		}
 
-		public static void UnloadMod(ModPackage package)
+		public static void UnloadMod(Mod mod)
 		{
-			Unload(i => i.Package == package);
-			package.Unload();
-			modPackages.Remove(package);
-			ModUnloaded?.Invoke(package);
+			Unload(i => i.Mod == mod);
+			mod.Unload();
+			mods.Remove(mod);
+			ModUnloaded?.Invoke(mod);
 		}
 
 		public static bool Unload(object reference)
@@ -394,7 +396,7 @@ namespace Modding
 				{
 					UnloadInternal(info.Reference);
 					kvp.Value.Remove(info);
-					ResourceUnloaded?.Invoke(kvp.Key, info.Package);
+					ResourceUnloaded?.Invoke(kvp.Key, info.Mod);
 					found = true;
 				}
 				if (kvp.Value.Count <= 0)
@@ -411,7 +413,7 @@ namespace Modding
 				foreach (ResourceInfo info in infos)
 				{
 					UnloadInternal(info.Reference);
-					ResourceUnloaded?.Invoke(path, info.Package);
+					ResourceUnloaded?.Invoke(path, info.Mod);
 				}
 				resourceInfos.Remove(path);
 				return true;
@@ -432,11 +434,11 @@ namespace Modding
 			resourceInfos.Clear();
 		}
 
-		public static ReadOnlyCollection<ModPackage> ModPackages
+		public static ReadOnlyCollection<Mod> Mods
 		{
 			get
 			{
-				return modPackages.AsReadOnly();
+				return mods.AsReadOnly();
 			}
 		}
 	}

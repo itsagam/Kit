@@ -192,11 +192,11 @@ public class SceneManager
 	protected static void LoadSceneInternal(string name, bool additive, Action<float> onProgress, Action onComplete)
 	{
 		AsyncOperation load = UnityEngine.SceneManagement.SceneManager.LoadSceneAsync(name, additive ? LoadSceneMode.Additive : LoadSceneMode.Single);
-		Observable.FromMicroCoroutine(f => LoadSceneProgress(load, onProgress, () => {
+		MainThreadDispatcher.StartUpdateMicroCoroutine(LoadSceneProgress(load, onProgress, () => {
 			onComplete?.Invoke();
 			if (!additive)
 				OnSceneChanged?.Invoke(name);
-		})).Subscribe();
+		}));
 	}
 
 	protected static IEnumerator LoadSceneProgress(AsyncOperation load, Action<float> onProgress, Action onComplete)

@@ -51,7 +51,7 @@ public class Console : MonoBehaviour
 	{
 		RegisterLogging();
 		RegisterInput();
-		InitializeLua();
+		InitializeScripting();
 		InitializeUI();
 		InitializeHistory();
 		DontDestroyOnLoad(gameObject);
@@ -242,18 +242,18 @@ public class Console : MonoBehaviour
 	#endregion
 
 	#region Execution
-	protected LuaEnv luaEnv;
+	protected LuaEnv scriptEnv;
 
-	protected void InitializeLua()
+	protected void InitializeScripting()
 	{
-		luaEnv = new LuaEnv();
 		string luaLibrary = ResourceManager.ReadText(ResourceFolder.StreamingAssets, "Lua/LuaLibrary.lua", false);
-		luaEnv.DoString(luaLibrary);
+		scriptEnv = new LuaEnv();
+		scriptEnv.DoString(luaLibrary);
 	}
 
 	protected void Update()
 	{
-		luaEnv.Tick();
+		scriptEnv.Tick();
 	}
 
 	public void Execute(string command)
@@ -277,7 +277,7 @@ public class Console : MonoBehaviour
 
 		void ExecuteLocal(string commandActual)
 		{
-			object[] results = luaEnv.DoString(commandActual);
+			object[] results = scriptEnv.DoString(commandActual);
 			results?.ForEach(r => Log(r != null ? r.ToString() : NullString));
 		}
 	}
@@ -336,7 +336,7 @@ public class Console : MonoBehaviour
 	#region Destruction
 	protected void OnDestroy()
 	{
-		luaEnv.Dispose();
+		scriptEnv.Dispose();
 		UnregisterLogging();
 	}
 	#endregion

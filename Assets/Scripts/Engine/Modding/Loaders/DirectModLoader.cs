@@ -18,7 +18,7 @@ namespace Modding.Loaders
             MetadataFile = metadataFile;
         }
 
-		protected override async Task<ModPackage> LoadModInternal(string path, bool async)
+		protected override async Task<Mod> LoadModInternal(string path, bool async)
 		{
 			FileAttributes attributes = File.GetAttributes(path);
 			if (!attributes.HasFlag(FileAttributes.Directory))
@@ -26,15 +26,14 @@ namespace Modding.Loaders
 
 			try
 			{
-				DirectModPackage package = new DirectModPackage(path);
-				string metadataPath = package.GetFullPath(MetadataFile);
-				if (package.Exists(metadataPath))
+				DirectMod mod = new DirectMod(path);
+				if (mod.Exists(MetadataFile))
 				{
-					string metadataText = async ? await package.ReadTextAsync(metadataPath) : package.ReadText(metadataPath);
+					string metadataText = async ? await mod.ReadTextAsync(MetadataFile) : mod.ReadText(MetadataFile);
 					if (metadataText != null)
 					{					
-						package.Metadata = JSONParser.FromJson<ModMetadata>(metadataText);
-						return package;
+						mod.Metadata = JSONParser.FromJson<ModMetadata>(metadataText);
+						return mod;
 					}
 				}
 			}
@@ -46,9 +45,9 @@ namespace Modding.Loaders
 		}
 	}
 
-	public class DirectModPackage: ModPackage
+	public class DirectMod: Mod
 	{
-		public DirectModPackage(string path)
+		public DirectMod(string path)
 		{
 			Path = path;
 		}
@@ -119,10 +118,6 @@ namespace Modding.Loaders
 		public virtual string GetFullPath(string subPath)
 		{
 			return System.IO.Path.Combine(Path, subPath);
-		}
-
-		public override void Unload()
-		{
 		}
 	}
 }

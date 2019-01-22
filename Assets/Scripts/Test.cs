@@ -59,7 +59,7 @@ public class Test: MonoBehaviour
 
 	async void Start()
 	{
-		//await ModdingTest();
+		await ModdingTest();
 		//InjectTest();
 
 		//await ConsoleTest();
@@ -68,7 +68,7 @@ public class Test: MonoBehaviour
 	protected async Task LoadMods()
 	{
 		await ModManager.LoadModsAsync();
-		foreach (ModPackage mod in ModManager.ModPackages)
+		foreach (Mod mod in ModManager.Mods)
 			Debug.Log(mod.Metadata.Name);
 		ModManager.ResourceLoaded += ModManager_ResourceLoaded;
 		ModManager.ResourceReused += ModManager_ResourceReused;
@@ -89,12 +89,12 @@ public class Test: MonoBehaviour
 
 	private void ModManager_ResourceReused(string path, ResourceInfo info)
 	{
-		Debug.Log($"File \"{path}\" resused from \"{info.Package.Path}\"");
+		Debug.Log($"File \"{path}\" resused from \"{info.Mod.Path}\"");
 	}
 
 	private void ModManager_ResourceLoaded(string path, ResourceInfo info)
 	{
-		Debug.Log($"File \"{path}\" loaded from \"{info.Package.Path}\"");
+		Debug.Log($"File \"{path}\" loaded from \"{info.Mod.Path}\"");
 	}
 
 	void OnDestroy()

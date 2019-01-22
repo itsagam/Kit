@@ -1,3 +1,8 @@
 {
-	"Name": "Mod1"
+	"Name": "Mod1",
+	"Scripts": 
+	[
+		"Script1.lua",
+		"Script2.lua"
+	]
 }

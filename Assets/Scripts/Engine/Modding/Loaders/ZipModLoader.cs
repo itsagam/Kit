@@ -19,7 +19,7 @@ namespace Modding.Loaders
 			MetadataFile = metadataFile;
 		}
 
-		protected override async Task<ModPackage> LoadModInternal(string path, bool async)
+		protected override async Task<Mod> LoadModInternal(string path, bool async)
 		{
 			FileAttributes attributes = File.GetAttributes(path);
 			if (attributes.HasFlag(FileAttributes.Directory))
@@ -27,14 +27,14 @@ namespace Modding.Loaders
 
 			try
 			{
-				ZipModPackage package = new ZipModPackage(path);
-				if (package.Exists(MetadataFile))
+				ZipMod mod = new ZipMod(path);
+				if (mod.Exists(MetadataFile))
 				{
-					string metadataText = async ? await package.ReadTextAsync(MetadataFile) : package.ReadText(MetadataFile);
+					string metadataText = async ? await mod.ReadTextAsync(MetadataFile) : mod.ReadText(MetadataFile);
 					if (metadataText != null)
 					{
-						package.Metadata = JSONParser.FromJson<ModMetadata>(metadataText);
-						return package;
+						mod.Metadata = JSONParser.FromJson<ModMetadata>(metadataText);
+						return mod;
 					}
 				}
 			}
@@ -46,12 +46,12 @@ namespace Modding.Loaders
 		}
 	}
 
-	public class ZipModPackage : ModPackage
+	public class ZipMod : Mod
 	{
 		public FileStream Stream { get; protected set; }
 		public ZipArchive Archive { get; protected set; }
 
-		public ZipModPackage(string path)
+		public ZipMod(string path)
 		{
 			Path = path;
 			Stream = new FileStream(path, FileMode.Open);
@@ -125,6 +125,7 @@ namespace Modding.Loaders
 
 		public override void Unload()
 		{
+			base.Unload();
 			Archive.Dispose();
 			Stream.Dispose();
 		}

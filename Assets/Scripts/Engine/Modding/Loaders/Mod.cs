@@ -6,6 +6,8 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using Modding.Parsers;
+using UniRx;
+using XLua;
 
 namespace Modding
 {
@@ -14,19 +16,54 @@ namespace Modding
         public string Name;
         public string Author;
         public string Version;
+		public List<string> Scripts;
     }
 
-	public abstract class ModPackage
+	public abstract class Mod
 	{
 		public string Path { get;  protected set; }
 		public ModMetadata Metadata { get; set ; }
-
-		public abstract bool Exists(string path);
-        public abstract void Unload();
-
+	
 		public abstract IEnumerable<string> FindFiles(string path);
+		public abstract bool Exists(string path);
 		protected abstract Task<string> ReadTextInternal(string path, bool async);
 		protected abstract Task<byte[]> ReadBytesInternal(string path, bool async);
+
+		protected LuaEnv scriptEnv;
+		protected IDisposable scriptUpdate;
+
+		public void ExecuteScripts()
+		{
+			var task = ExecuteScriptsInternal(false);
+		}
+
+		public async Task ExecuteScriptsAsync()
+		{
+			await ExecuteScriptsInternal(true);
+		}
+
+		protected async Task ExecuteScriptsInternal(bool async)
+		{
+			if (Metadata?.Scripts == null)
+				return;
+
+			var validScripts = Metadata.Scripts.Where(s => !s.IsNullOrEmpty() && Exists(s));
+			if (!validScripts.Any())
+				return;
+
+			// TODO: Share common scripting library & environment
+			string luaLibrary = ResourceManager.ReadText(ResourceFolder.StreamingAssets, "Lua/LuaLibrary.lua", false);
+			scriptEnv = new LuaEnv();
+			scriptEnv.DoString(luaLibrary);
+
+			foreach (string scriptFile in validScripts)
+			{
+				string script = async ? await ReadTextAsync(scriptFile) : ReadText(scriptFile);
+				scriptEnv.DoString(script);
+			}
+
+			scriptUpdate = Observable.EveryUpdate().Subscribe(f => scriptEnv.Tick());
+		}
 
 		public virtual string FindFile(string path)
 		{
@@ -104,6 +141,12 @@ namespace Modding
         {
 			return new FileNotFoundException($"File \"{path}\" not found in mod \"{Metadata.Name}\".");
         }
+
+		public virtual void Unload()
+		{
+			scriptUpdate?.Dispose();
+			scriptEnv?.Dispose();
+		}
 	}
 }
  

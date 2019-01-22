@@ -8,14 +8,15 @@ namespace Modding
 {
     public abstract class ModLoader
 	{
-		protected abstract Task<ModPackage> LoadModInternal(string path, bool async);
+		protected abstract Task<Mod> LoadModInternal(string path, bool async);
 
-		public virtual ModPackage LoadMod(string path)
+		// TODO: Cleanup and merge the loader code
+		public virtual Mod LoadMod(string path)
 		{
 			return LoadModInternal(path, false).Result;
 		}
 
-		public virtual async Task<ModPackage> LoadModAsync(string path)
+		public virtual async Task<Mod> LoadModAsync(string path)
 		{
 			return await LoadModInternal(path, true);
 		}
