@@ -21,9 +21,10 @@ namespace Modding
 
 	public abstract class Mod
 	{
+		public const string MetadataFile = "Metadata.json";
 		public string Path { get;  protected set; }
-		public ModMetadata Metadata { get; set ; }
-	
+		public ModMetadata Metadata { get; protected set; }
+		
 		public abstract IEnumerable<string> FindFiles(string path);
 		public abstract bool Exists(string path);
 		protected abstract Task<string> ReadTextInternal(string path, bool async);
@@ -32,17 +33,41 @@ namespace Modding
 		protected LuaEnv scriptEnv;
 		protected IDisposable scriptUpdate;
 
-		public void ExecuteScripts()
+		public virtual bool LoadMetadata()
+		{
+			return LoadMetadataInternal(false).Result;
+		}
+
+		public virtual async Task<bool> LoadMetadataAsync()
+		{
+			return await LoadMetadataInternal(true);
+		}
+
+		protected virtual async Task<bool> LoadMetadataInternal(bool async)
+		{
+			if (Exists(MetadataFile))
+			{
+				string metadataText = async ? await ReadTextAsync(MetadataFile) : ReadText(MetadataFile);
+				if (metadataText != null)
+				{
+					Metadata = JSONParser.FromJson<ModMetadata>(metadataText);
+					return true;
+				}
+			}
+			return false;
+		}
+
+		public virtual void ExecuteScripts()
 		{
 			var task = ExecuteScriptsInternal(false);
 		}
 
-		public async Task ExecuteScriptsAsync()
+		public virtual async Task ExecuteScriptsAsync()
 		{
 			await ExecuteScriptsInternal(true);
 		}
 
-		protected async Task ExecuteScriptsInternal(bool async)
+		protected virtual async Task ExecuteScriptsInternal(bool async)
 		{
 			if (Metadata?.Scripts == null)
 				return;

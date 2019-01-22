@@ -27,15 +27,8 @@ namespace Modding.Loaders
 			try
 			{
 				DirectMod mod = new DirectMod(path);
-				if (mod.Exists(MetadataFile))
-				{
-					string metadataText = async ? await mod.ReadTextAsync(MetadataFile) : mod.ReadText(MetadataFile);
-					if (metadataText != null)
-					{					
-						mod.Metadata = JSONParser.FromJson<ModMetadata>(metadataText);
-						return mod;
-					}
-				}
+				if (async ? await mod.LoadMetadataAsync() : mod.LoadMetadata())
+					return mod;
 			}
 			catch (Exception)
 			{

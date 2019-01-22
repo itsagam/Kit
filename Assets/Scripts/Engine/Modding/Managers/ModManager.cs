@@ -33,7 +33,7 @@ namespace Modding
 		public static event Action<string, ResourceInfo> ResourceReused;
 		public static event Action<string, Mod> ResourceUnloaded;
 
-		public const string DefaultSearchFolderName = "Mods";
+		public const string DefaultModFolderName = "Mods";
 
         public static List<ModLoader> Loaders = new List<ModLoader>();
 		public static List<ResourceParser> Parsers = new List<ResourceParser>();
@@ -49,14 +49,14 @@ namespace Modding
 			AddDefaultSearchPaths();
 		}
 
-		private static void AddDefaultLoaders()
+		protected static void AddDefaultLoaders()
         {
 			Loaders.Add(new DirectModLoader());
 			Loaders.Add(new ZipModLoader());
 			// TODO: Loaders.Add(new AssetBundleModLoader());
 		}
 
-		private static void AddDefaultParsers()
+		protected static void AddDefaultParsers()
 		{
 			Parsers.Add(new JSONParser());
 
@@ -65,9 +65,15 @@ namespace Modding
 			Parsers.Add(new TextParser());
 		}
 
-		private static void AddDefaultSearchPaths()
+		protected static void AddDefaultSearchPaths()
         {
 			// TODO: Adding "Patches" and patching system
+			string writeableFolder = GetWriteableFolder();
+			SearchPaths.Add(Path.Combine(writeableFolder, DefaultModFolderName));
+		}
+
+		protected static string GetWriteableFolder()
+		{
 			switch (Application.platform)
 			{
 				case RuntimePlatform.WindowsEditor:
@@ -75,14 +81,13 @@ namespace Modding
 				case RuntimePlatform.LinuxEditor:
 				case RuntimePlatform.WindowsPlayer:
 				case RuntimePlatform.LinuxPlayer:
-					SearchPaths.Add(Path.Combine(Path.GetDirectoryName(Application.dataPath), DefaultSearchFolderName));
-					break;
-
+					return Path.GetDirectoryName(Application.dataPath);
+		
 				case RuntimePlatform.IPhonePlayer:
 				case RuntimePlatform.Android:
-					SearchPaths.Add(Path.Combine(Application.persistentDataPath, DefaultSearchFolderName));
-					break;
+					return Application.persistentDataPath;
 			}
+			return null;
 		}
 
 		public static void LoadMods()
@@ -110,26 +115,31 @@ namespace Modding
 						Mod mod = async ? await loader.LoadModAsync(childPath) : loader.LoadMod(childPath);
 						if (mod != null)
 						{
-							if (async)
-								await mod.ExecuteScriptsAsync();
-							else
-								mod.ExecuteScripts();
-							mods.Add(mod);
-							ModLoaded?.Invoke(mod);
+							mods.Add(mod);						
 							break;
 						}
 					}
 				}
 			}
 
-			for (int i = mods.Count-1; i>=0; i--)
-			{
-				string key = mods[i].Metadata.Name;
-				if (PlayerPrefs.HasKey(key))
-					MoveModOrder(mods[i], PlayerPrefs.GetInt(key));
-			}
-
+			LoadModOrder();
 			SaveModOrder();
+
+			foreach (Mod mod in mods)
+			{
+				if (async)
+					await mod.ExecuteScriptsAsync();
+				else
+					mod.ExecuteScripts();
+
+				ModLoaded?.Invoke(mod);
+			}
+		}
+
+		public static void LoadModOrder()
+		{
+			// Reversing the list makes sure new mods (whose entries we do not have and will all return -1) are ordered in reverse
+			mods = mods.AsEnumerable().Reverse().OrderBy(m => PlayerPrefs.GetInt($"Mods/{m.Metadata.Name}.Order", -1)).ToList();
 		}
 	
 		public static int GetModOrder(Mod mod)
@@ -137,17 +147,40 @@ namespace Modding
 			return mods.FindIndex(p => p == mod);
 		}
 
+		public static void MoveModFirst(Mod mod)
+		{
+			MoveModOrder(mod, 0);
+		}
+
+		public static void MoveModLast(Mod mod)
+		{
+			MoveModOrder(mod, mods.Count-1);
+		}
+
+		public static void MoveModUp(Mod mod)
+		{
+			MoveModOrder(mod, GetModOrder(mod) - 1);
+		}
+
+		public static void MoveModDown(Mod mod)
+		{
+			MoveModOrder(mod, GetModOrder(mod) + 1);
+		}
+
 		public static void MoveModOrder(Mod mod, int index)
 		{
+			if (index < 0 || index >= mods.Count)
+				return;
+
 			mods.Remove(mod);
 			mods.Insert(index, mod);
+			SaveModOrder();
 		}
 
 		public static void SaveModOrder()
 		{
-			//TODO: Use its own player prefs catagory
 			for (int i = 0; i < mods.Count; i++)
-				PlayerPrefs.SetInt(mods[i].Metadata.Name, i);
+				PlayerPrefs.SetInt($"Mods/{mods[i].Metadata.Name}.Order", i);
 		}
 
 		public static List<ResourceInfo> GetResourceInfo(string path)
@@ -183,7 +216,7 @@ namespace Modding
 				return (T) loadedResource.Reference;
 			}
 			
-			foreach (Mod mod in Mods.Reverse())
+			foreach (Mod mod in mods)
 			{
 				var (reference, parser) = async ? await mod.LoadAsync<T>(path) : mod.Load<T>(path);
 				if (reference != null)
@@ -223,7 +256,7 @@ namespace Modding
 			}
 
 			List<T> all = new List<T>();
-			foreach (Mod mod in Mods.Reverse())
+			foreach (Mod mod in mods)
 			{
 				ResourceInfo loadedResource = loadedResources.Find(r => r.Mod == mod);
 				if (loadedResource.Reference == null)
@@ -258,7 +291,7 @@ namespace Modding
 
 		protected static async Task<string> ReadTextInternal(string path, bool async)
 		{
-			foreach (Mod mod in Mods.Reverse())
+			foreach (Mod mod in mods)
 			{
 				try
 				{
@@ -287,8 +320,7 @@ namespace Modding
 		protected static async Task<List<string>> ReadTextAllInternal(string path, bool async)
 		{
 			List<string> all = new List<string>();
-
-			foreach (Mod mod in Mods)
+			foreach (Mod mod in mods)
 			{
 				try
 				{
@@ -317,7 +349,7 @@ namespace Modding
 
 		protected static async Task<byte[]> ReadBytesInternal(string path, bool async)
 		{
-			foreach (Mod mod in Mods.Reverse())
+			foreach (Mod mod in mods)
 			{
 				try
 				{
@@ -346,7 +378,7 @@ namespace Modding
 		protected static async Task<List<byte[]>> ReadBytesAllInternal(string path, bool async)
 		{
 			List<byte[]> all = new List<byte[]>();
-			foreach (Mod mod in Mods)
+			foreach (Mod mod in mods)
 			{
 				try
 				{
@@ -376,7 +408,7 @@ namespace Modding
 
 		public static void UnloadMod(Mod mod)
 		{
-			Unload(i => i.Mod == mod);
+			Unload(o => o.Mod == mod);
 			mod.Unload();
 			mods.Remove(mod);
 			ModUnloaded?.Invoke(mod);
@@ -384,7 +416,7 @@ namespace Modding
 
 		public static bool Unload(object reference)
 		{
-			return Unload(i => i.Reference == reference);
+			return Unload(o => o.Reference == reference);
 		}
 
 		public static bool Unload(Func<ResourceInfo, bool> predicate)
