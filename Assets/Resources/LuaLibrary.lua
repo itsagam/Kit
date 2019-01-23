@@ -1,2 +1,0 @@
-UE = CS.UnityEngine
-

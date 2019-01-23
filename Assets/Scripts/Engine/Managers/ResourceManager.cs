@@ -31,6 +31,7 @@ public class ResourceManager
 	// Default mode for modding in individual calls
 	public const bool DefaultModding = true;
 
+	// TODO: StringComparer.OrdinalIgnoreCase is slowing down caching
 	protected static Dictionary<string, object> resources = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase);
 
 	#region Loading
@@ -72,6 +73,7 @@ public class ResourceManager
 		return await LoadUnmoddedInternal<T>(folder, file, true);
 	}
 
+	// TODO: Tasks are slowing down sync methods (along with StringComparer.OrdinalIgnoreCase) -- use UniTask from UniRx?
 	protected static async Task<T> LoadUnmoddedInternal<T>(ResourceFolder folder, string file, bool async) where T : class
 	{
 		object reference = null;
@@ -201,7 +203,7 @@ public class ResourceManager
 
 	public static bool Unload(object resource)
 	{
-		if (DefaultModding && ModManager.Unload(resource))
+		if (Modding && ModManager.Unload(resource))
 			return true;
 
 		bool found = false;
@@ -233,7 +235,7 @@ public class ResourceManager
 	public static bool Unload(ResourceFolder folder, string file)
 	{
 		string moddingPath = GetModdingPath(folder, file);
-		if (DefaultModding && ModManager.UnloadAll(moddingPath))
+		if (Modding && ModManager.UnloadAll(moddingPath))
 			return true;
 		
 		if (resources.TryGetValue(file, out object resource))

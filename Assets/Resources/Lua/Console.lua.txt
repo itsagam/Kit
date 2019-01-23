@@ -1,0 +1,50 @@
+function print(line)
+	CS.Console.Log(line)
+end
+CS.UnityEngine.Debug.Log = print
+
+function clear()
+	CS.Console.ClearLog()
+end
+cls = clear
+
+function go(path, comp)
+	if type(path) == "string" then
+		if comp == nil then
+			return UE.GameObject.Find(path)
+		else
+			return UE.GameObject.Find(path):GetComponent(typeof(comp))
+		end
+	else
+		return UE.GameObject.FindObjectOfType(typeof(path))
+	end
+end
+
+function gos(tag)
+	if type(tag) == "string" then
+		return UE.GameObject.FindGameObjectsWithTag(tag)
+	else
+		return UE.GameObject.FindObjectsOfType(typeof(tag))
+	end
+end
+
+function create(name, ...)
+	go = UE.GameObject(name)
+	for k, v in pairs({...}) do
+		go:AddComponent(typeof(v))
+	end
+	return go
+end
+
+function instantiate(path)
+	prefab = UE.Resources.Load(path)
+	if prefab ~= nil then
+		return UE.GameObject.Instantiate(prefab);
+	else
+		return nil
+	end
+end
+
+function destroy(path, comp)
+	UE.GameObject.Destroy(go(path, comp))
+end

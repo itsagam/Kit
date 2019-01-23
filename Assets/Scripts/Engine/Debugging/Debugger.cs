@@ -10,8 +10,9 @@ using System.Text;
 
 public class Debugger : MonoBehaviour
 {
+	public const int LogProfileDelay = 1;
 	public const string NullString = "Null";
-
+	
 	#region Profiling
 	protected static OrderedDictionary Samples = new OrderedDictionary();
 
@@ -60,25 +61,26 @@ public class Debugger : MonoBehaviour
 		GetProfile(name)?.End();
 	}
 
-	public static void EndAndLogProfile()
+	public static void EndAndLogProfile(int delayFrames = LogProfileDelay)
 	{
 		CustomSampler sample = GetLastProfile();
 		if (sample != null)
 		{
 			sample.End();
-			LogProfile(sample.name);
+			LogProfile(sample.name, delayFrames);
 		}
 	}
 
-	public static void EndAndLogProfile(string name)
+	public static void EndAndLogProfile(string name, int delayFrames = LogProfileDelay)
 	{
 		EndProfile(name);
-		LogProfile(name);
+		LogProfile(name, delayFrames);
 	}
 
-	public static void LogProfile(string name)
+	public static void LogProfile(string name, int delayFrames = LogProfileDelay)
 	{
-		Observable.NextFrame().Subscribe(t => Debugger.Log(name + ": " + GetTime(name)));
+		Log(name + ": " + GetTime(name));
+		Observable.TimerFrame(delayFrames).Subscribe(t => Log(name + ": " + GetTime(name)));
 	}
 
 	public static string GetTime(string name)
@@ -86,7 +88,7 @@ public class Debugger : MonoBehaviour
 		long time = GetTimeRaw(name);
 		if (time < 0)
 			return null;
-		return Math.Round(time / 1000000000f, 3) + "s";
+		return Math.Round(time / 1000000f, 5) + "ms";
 	}
 
 	public static long GetTimeRaw(string name)

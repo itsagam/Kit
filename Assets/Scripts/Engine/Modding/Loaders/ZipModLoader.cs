@@ -110,7 +110,7 @@ namespace Modding.Loaders
 									.Select(e => e.FullName);
 
 				if (matching.Any())
-					return matching.ToList<string>();
+					return matching.ToList();
 			}
 
 			return null;

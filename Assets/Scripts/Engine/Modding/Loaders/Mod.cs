@@ -22,6 +22,7 @@ namespace Modding
 	public abstract class Mod
 	{
 		public const string MetadataFile = "Metadata.json";
+
 		public string Path { get;  protected set; }
 		public ModMetadata Metadata { get; protected set; }
 		
@@ -76,15 +77,13 @@ namespace Modding
 			if (!validScripts.Any())
 				return;
 
-			// TODO: Share common scripting library & environment
-			string luaLibrary = ResourceManager.ReadText(ResourceFolder.StreamingAssets, "Lua/LuaLibrary.lua", false);
 			scriptEnv = new LuaEnv();
-			scriptEnv.DoString(luaLibrary);
+			scriptEnv.DoString("require 'Lua/General'");
 
 			foreach (string scriptFile in validScripts)
 			{
-				string script = async ? await ReadTextAsync(scriptFile) : ReadText(scriptFile);
-				scriptEnv.DoString(script);
+				var script = async ? await ReadBytesAsync(scriptFile) : ReadBytes(scriptFile);
+				scriptEnv.DoString(script, scriptFile);
 			}
 
 			scriptUpdate = Observable.EveryUpdate().Subscribe(f => scriptEnv.Tick());

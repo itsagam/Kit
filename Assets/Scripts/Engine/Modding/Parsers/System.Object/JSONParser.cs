@@ -36,7 +36,7 @@ namespace Modding.Parsers
 			return JsonUtility.ToJson(data, true);
 		}
 
-		public virtual void OverwriteJson(object data, string overwrite)
+		public static void OverwriteJson(object data, string overwrite)
 		{
 			JsonUtility.FromJsonOverwrite(overwrite, data);
 		}

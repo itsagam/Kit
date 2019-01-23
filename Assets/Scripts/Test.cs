@@ -21,12 +21,6 @@ public class GameData
 	public double Value;
 }
 
-public class Test2
-{
-	public const string Const = "Const";
-	public static string Static = "Static";
-}
-
 [Hotfix]
 public class Test: MonoBehaviour
 {
@@ -55,15 +49,15 @@ public class Test: MonoBehaviour
 	}
 
 	public GameObject obj;
-	public string InsString = Test2.Static;
 
-	async void Start()
+#pragma warning disable CS1998
+	async void  Start()
 	{
-		await ModdingTest();
+		//await ModdingTest();
 		//InjectTest();
-
 		//await ConsoleTest();
 	}
+#pragma warning restore CS1998
 
 	protected async Task LoadMods()
 	{
