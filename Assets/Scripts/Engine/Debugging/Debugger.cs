@@ -131,18 +131,18 @@ public class Debugger : MonoBehaviour
 		Log(type, EnumerableToString(enumerable, serialize));
 	}
 
-	public static string ObjectOrEnumerableToString(object obj, bool serialize)
+	public static string ObjectOrEnumerableToString(object obj, bool serialize, string nullString = NullString)
 	{
 		if (obj is IEnumerable e && !(e is string))
-			return EnumerableToString(e, serialize);
+			return EnumerableToString(e, serialize, nullString);
 		else
-			return ObjectToString(obj, serialize);
+			return ObjectToString(obj, serialize, nullString);
 	}
 
-	public static string ObjectToString(object obj, bool serialize)
+	public static string ObjectToString(object obj, bool serialize, string nullString = NullString)
 	{
 		if (obj == null)
-			return NullString;
+			return nullString;
 		
 		if (obj.GetType().IsValueType || (obj is string))
 			return obj.ToString();
@@ -150,25 +150,25 @@ public class Debugger : MonoBehaviour
 			return serialize ? SerializeObject(obj) : obj.ToString();
 	}
 
-	public static string EnumerableToString(IEnumerable enumerable, bool serialize)
+	public static string EnumerableToString(IEnumerable enumerable, bool serialize, string nullString = NullString)
 	{
 		if (enumerable == null)
-			return NullString;
+			return nullString;
 
 		StringBuilder output = new StringBuilder();
+		output.Append("{");
 		bool first = true;
 		foreach (object item in enumerable)
 		{
-			string itemString = ObjectOrEnumerableToString(item, serialize);
+			string itemString = ObjectOrEnumerableToString(item, serialize, nullString);
 			if (first)
-			{
-				output.Append(itemString);
 				first = false;
-			}
 			else
-				output.Append(", " + itemString);
+				output.Append(", ");
+			output.Append(itemString);
 		}
-		return "{" + output + "}";
+		output.Append("}");	
+		return output.ToString();
 	}
 
 	public static string SerializeObject(object obj)

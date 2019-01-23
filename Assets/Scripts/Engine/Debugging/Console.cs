@@ -12,11 +12,8 @@ using TouchScript.Gestures;
 using UniRx;
 using XLua;
 
-// TODO: Provide a way to list all members
 // TODO: Provide hotfix helper functions
 // TODO: Provide a way to handle files
-// TODO: Find a way to remove "CS."
-
 // TODO: Provide multiple-line support
 
 public class Console : MonoBehaviour
@@ -188,7 +185,7 @@ public class Console : MonoBehaviour
 
 	public static void Log(object obj)
 	{
-		Log(Debugger.ObjectOrEnumerableToString(obj, false));
+		Log(ObjectOrEnumerableToString(obj));
 	}
 
 	public static void Log(string line)
@@ -205,6 +202,85 @@ public class Console : MonoBehaviour
 		log.AppendLine(line);
 		instance.LogText.text = log.ToString();
 		Observable.NextFrame().Subscribe(t => ScrollToBottom());
+	}
+
+	public static string ObjectOrEnumerableToString(object obj)
+	{
+		if (obj is LuaTable table)
+		{
+			bool first = true;
+			StringBuilder output = new StringBuilder();
+			output.Append("{");
+			table.ForEach<object, object>((key, value) => {
+				string keyString = ObjectOrEnumerableToString(key);
+				string valueString = ObjectOrEnumerableToString(value);
+				if (first)
+					first = false;
+				else
+					output.Append(", ");
+				output.Append(keyString);
+				output.Append(" = ");
+				output.Append(valueString);
+			});
+			output.Append("}");
+			return output.ToString();
+		}
+		else
+			return Debugger.ObjectOrEnumerableToString(obj, false, NullString);
+	}
+
+	public static void List(Type type)
+	{
+		MemberInfo[] members = type.GetMembers(BindingFlags.Public | BindingFlags.DeclaredOnly | BindingFlags.Static | BindingFlags.Instance);
+		Log($"{type.FullName} : {type.BaseType.FullName}");
+		members.ForEach(member => Log(MemberToString(type, member)));
+	}
+
+	protected static string MemberToString(Type type, MemberInfo member)
+	{
+		string output = $"{type.FullName}.{member.Name}";
+		switch (member.MemberType)
+		{
+			case MemberTypes.Field:
+				{
+					FieldInfo field = (FieldInfo) member;
+					output += $" = {field.FieldType}";
+					if (field.IsLiteral)
+						output += " (Read-only)";
+					if (field.IsStatic)
+						output += " [Static]";
+				}
+				break;
+
+			case MemberTypes.Property:
+				{
+					PropertyInfo property = (PropertyInfo) member;
+					output += $" = {property.PropertyType}";
+					if (!property.CanWrite)
+						output += " (Read-only)";
+				}
+				break;
+
+			case MemberTypes.Method:
+				{
+					MethodInfo method = (MethodInfo) member;
+					ParameterInfo[] parameters = method.GetParameters();
+					output += "(";
+					bool first = true;
+					foreach (ParameterInfo parameterInfo in parameters)
+					{
+						if (!first)
+							output += ", ";
+						output += parameterInfo.ParameterType.Name;
+						first = false;
+					}
+					output += ")";
+					if (method.IsStatic)
+						output += " [Static]";
+				}
+				break;
+		}
+		return output;
 	}
 
 	public static void ScrollToBottom()
@@ -282,7 +358,7 @@ public class Console : MonoBehaviour
 		void ExecuteLocal(string commandActual)
 		{
 			object[] results = instance.scriptEnv.DoString(commandActual);
-			results?.ForEach(r => Log(r != null ? r.ToString() : NullString));
+			results?.ForEach(result => Log(result));
 		}
 	}
 	#endregion
