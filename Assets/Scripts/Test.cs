@@ -55,7 +55,7 @@ public class Test: MonoBehaviour
 #pragma warning disable CS1998
 	async void  Start()
 	{
-		//await ModdingTest();
+		await ModdingTest();
 		//InjectTest();
 		//await ConsoleTest();
 
@@ -83,7 +83,8 @@ public class Test: MonoBehaviour
 		//ResourceManager.ResourceLoaded += ResourceLoaded;
 		//ResourceManager.ResourceReused += ResourceReused;
 
-		/*
+		ResourceManager.Load<Texture>(ResourceFolder.Resources, "Textures/test", true);
+
 		Debugger.StartProfile("Resources.Load");
 		for (int i = 0; i <= 100000; i++)
 			Resources.Load<Texture>("Textures/test");
@@ -93,7 +94,6 @@ public class Test: MonoBehaviour
 		for (int i = 0; i <= 100000; i++)
 			ResourceManager.Load<Texture>(ResourceFolder.Resources, "Textures/test", true);
 		Debugger.EndAndLogProfile();
-		*/
 	}
 #pragma warning restore CS1998
 
@@ -136,8 +136,8 @@ public class Test: MonoBehaviour
 		await ModManager.LoadModsAsync();
 		foreach (Mod mod in ModManager.Mods)
 			Debug.Log(mod.Metadata.Name);
-		ModManager.ResourceLoaded += ModManager_ResourceLoaded;
-		ModManager.ResourceReused += ModManager_ResourceReused;
+		//ModManager.ResourceLoaded += ModManager_ResourceLoaded;
+		//ModManager.ResourceReused += ModManager_ResourceReused;
 	}
 
 	protected async UniTask ModdingTest()

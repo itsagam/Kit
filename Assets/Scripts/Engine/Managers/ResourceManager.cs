@@ -21,10 +21,10 @@ public enum ResourceFolder
 public class ResourceManager
 {
 	public static Dictionary<ResourceFolder, string> Paths = new Dictionary<ResourceFolder, string>
-	{   { ResourceFolder.Data, Application.dataPath },
-		{ ResourceFolder.StreamingAssets, Application.streamingAssetsPath },
-		{ ResourceFolder.PersistentData, Application.persistentDataPath },
-		{ ResourceFolder.Resources, Path.Combine(Application.dataPath, "Resources") } };
+	{   { ResourceFolder.Data, Path.Combine(Application.dataPath, "/") },
+		{ ResourceFolder.StreamingAssets,  Path.Combine(Application.streamingAssetsPath, "/") },
+		{ ResourceFolder.PersistentData, Path.Combine(Application.persistentDataPath, "/") },
+		{ ResourceFolder.Resources, Path.Combine(Application.dataPath, "Resources/")} };
 
 	// Global variable to enable/disable modding
 	public static bool Modding = true;
@@ -40,7 +40,7 @@ public class ResourceManager
 	static ResourceManager()
 	{
 		foreach (var kvp in Paths)
-			folderToString[kvp.Key] = kvp.Key.ToString();
+			folderToString[kvp.Key] = kvp.Key.ToString() + "/";
 	}
 
 	#region Loading
@@ -609,7 +609,7 @@ public class ResourceManager
 
 	public static string GetPath(ResourceFolder folder, string file)
 	{
-		return GetPath(folder) + "/" + file;
+		return GetPath(folder) + file;
 	}
 
 	public static string GetModdingPath(ResourceFolder folder)
@@ -619,7 +619,7 @@ public class ResourceManager
 
 	public static string GetModdingPath(ResourceFolder folder, string file)
 	{
-		return GetModdingPath(folder) + "/" + file;
+		return GetModdingPath(folder) + file;
 	}
 
 	public static string LocalToURLPath(string path)

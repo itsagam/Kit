@@ -11,4 +11,9 @@ public static class EnumerableExtensions
 		foreach (T obj in enumerable)
 			action(obj);
 	}
+
+	public static IEnumerable<T> Yield<T>(this T item)
+	{
+		yield return item;
+	}
 }

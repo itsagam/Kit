@@ -81,12 +81,9 @@ namespace Modding.Loaders
 				throw GetNotFoundException(path);
 
 			ZipArchiveEntry entry = Archive.GetEntry(matching);
-			Stream stream = entry.Open();
-			TextReader text = new StreamReader(stream);
-			string data = text.ReadToEnd();
-			text.Dispose();
-			stream.Dispose();
-			return data;
+			using (Stream stream = entry.Open())
+			using (TextReader text = new StreamReader(stream))
+				return text.ReadToEnd();
 		}
 
 		public override async UniTask<string> ReadTextAsync(string path)
@@ -96,12 +93,9 @@ namespace Modding.Loaders
 				throw GetNotFoundException(path);
 
 			ZipArchiveEntry entry = Archive.GetEntry(matching);
-			Stream stream = entry.Open();
-			TextReader text = new StreamReader(stream);
-			string data = await text.ReadToEndAsync();
-			text.Dispose();
-			stream.Dispose();
-			return data;
+			using (Stream stream = entry.Open())
+			using (TextReader text = new StreamReader(stream))
+				return await text.ReadToEndAsync();
 		}
 
 		public override byte[] ReadBytes(string path)
@@ -111,11 +105,12 @@ namespace Modding.Loaders
 				throw GetNotFoundException(path);
 
 			ZipArchiveEntry entry = Archive.GetEntry(matching);
-			Stream stream = entry.Open();
-			byte[] data = new byte[entry.Length];
-			stream.Read(data, 0, (int) entry.Length);
-			stream.Dispose();
-			return data;
+			using (Stream stream = entry.Open())
+			{
+				byte[] data = new byte[entry.Length];
+				stream.Read(data, 0, (int) entry.Length);
+				return data;
+			}
 		}
 
 		public override async UniTask<byte[]> ReadBytesAsync(string path)
@@ -125,18 +120,19 @@ namespace Modding.Loaders
 				throw GetNotFoundException(path);
 
 			ZipArchiveEntry entry = Archive.GetEntry(matching);
-			Stream stream = entry.Open();
-			byte[] data = new byte[entry.Length];
-			await stream.ReadAsync(data, 0, (int)entry.Length);
-			stream.Dispose();
-			return data;
+			using (Stream stream = entry.Open())
+			{
+				byte[] data = new byte[entry.Length];
+				await stream.ReadAsync(data, 0, (int) entry.Length);
+				return data;
+			}
 		}
 
 		public override IEnumerable<string> FindFiles(string path)
 		{
 			ZipArchiveEntry result = Archive.GetEntry(path);
 			if (result != null)
-				return new string[] { path };
+				return path.Yield();
 
 			if (! System.IO.Path.HasExtension(path))
 			{

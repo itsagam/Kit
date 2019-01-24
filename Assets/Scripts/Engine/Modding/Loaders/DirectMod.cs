@@ -60,7 +60,7 @@ namespace Modding.Loaders
 	{
 		public DirectMod(string path)
 		{
-			Path = path;
+			Path = path + "/";
 		}
 
 		public override string ReadText(string path)
@@ -114,7 +114,7 @@ namespace Modding.Loaders
 		{
 			string fullPath = GetFullPath(path);
 			if (File.Exists(fullPath))
-				return new string[] { path };
+				return path.Yield();
 
 			if (!System.IO.Path.HasExtension(path))
 			{
@@ -141,7 +141,7 @@ namespace Modding.Loaders
 		//TODO: Path.Combine is slowing down the thing
 		public virtual string GetFullPath(string subPath)
 		{
-			return System.IO.Path.Combine(Path, subPath);
+			return Path + subPath;
 		}
 	}
 }
