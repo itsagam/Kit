@@ -1,1 +1,1 @@
-print("Hello from Mod1 script 1")
+dofile('Scripts/Extra.lua')

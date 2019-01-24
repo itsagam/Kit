@@ -10,6 +10,7 @@ using UnityEngine;
 using Modding;
 using UnityEngine.UI;
 using UniRx;
+using UniRx.Async;
 using XLua;
 
 public class GameData
@@ -55,11 +56,74 @@ public class Test: MonoBehaviour
 #pragma warning disable CS1998
 	async void  Start()
 	{
-		//await ModdingTest();
+		/*
+		Debugger.StartProfile("async");
+		for (int i = 0; i <= 1000; i++)
+			await GetNumAsync(1000);
+		Debugger.EndAndLogProfile();
+		*/
+
+		/*
+		Debugger.StartProfile("void");
+		for (int i = 0; i <= 1000; i++)
+			GetNum(1000);
+		Debugger.EndAndLogProfile();
+		*/
+
+		/*
+		Debugger.StartProfile("UniTask");
+		for (int i = 0; i <= 1000; i++)
+			await GetNumUniTask(1000);
+		Debugger.EndAndLogProfile();
+		*/
+		
+		/*
+		Debugger.StartProfile("Resources.Load");
+		for (int i = 0; i <= 10000; i++)
+			Resources.Load<Texture>("Textures/test");
+		Debugger.EndAndLogProfile();
+		*/
+
+		/*
+		Debugger.StartProfile("ResourceManager.Load");
+		for (int i = 0; i <= 10000; i++)
+			ResourceManager.Load<Texture>(ResourceFolder.Resources, "Textures/test", false);
+		Debugger.EndAndLogProfile();
+		*/
+
+		await ModdingTest();
 		//InjectTest();
 		//await ConsoleTest();
 	}
 #pragma warning restore CS1998
+
+	protected void Func()
+	{
+
+	}
+	public async Task<int> GetNumAsync(int i)
+	{
+		if (i > 0)
+			return i + await GetNumAsync(i - 1);
+		else
+			return 0;
+	}
+
+	public async UniTask<int> GetNumUniTask(int i)
+	{
+		if (i > 0)
+			return i + await GetNumUniTask(i - 1);
+		else
+			return 0;
+	}
+
+	public int GetNum(int i)
+	{
+		if (i > 0)
+			return i + GetNum(i - 1);
+		else
+			return 0 ;
+	}
 
 	protected async Task LoadMods()
 	{

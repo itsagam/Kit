@@ -10,7 +10,6 @@ using System.Text;
 
 public class Debugger : MonoBehaviour
 {
-	public const int LogProfileDelay = 1;
 	public const string NullString = "Null";
 	
 	#region Profiling
@@ -61,42 +60,47 @@ public class Debugger : MonoBehaviour
 		GetProfile(name)?.End();
 	}
 
-	public static void EndAndLogProfile(int delayFrames = LogProfileDelay)
+	public static void EndAndLogProfile()
 	{
 		CustomSampler sample = GetLastProfile();
 		if (sample != null)
 		{
 			sample.End();
-			LogProfile(sample.name, delayFrames);
+			LogProfile(sample.name);
 		}
 	}
 
-	public static void EndAndLogProfile(string name, int delayFrames = LogProfileDelay)
+	public static void EndAndLogProfile(string name)
 	{
 		EndProfile(name);
-		LogProfile(name, delayFrames);
+		LogProfile(name);
 	}
 
-	public static void LogProfile(string name, int delayFrames = LogProfileDelay)
+	public static void LogProfile(string name)
 	{
-		Log(name + ": " + GetTime(name));
-		Observable.TimerFrame(delayFrames).Subscribe(t => Log(name + ": " + GetTime(name)));
+		// Recorder values are valid only for one frame, and in which frame they register Begin/End seems random
+		// This checks for registered recorder blocks for 100 frames after a call to this function
+		IDisposable observer = null;
+		int count = 0;	
+		observer = Observable.EveryUpdate().Subscribe(l => {
+			Recorder recorder = GetProfile(name)?.GetRecorder();
+			if (recorder != null && recorder.sampleBlockCount > 0)
+			{
+				Log(name + ": " + ConvertTime(recorder.elapsedNanoseconds));
+				observer.Dispose();
+			}
+			else if (count++ >= 100)
+			{
+				observer.Dispose();
+			}
+		});
 	}
 
-	public static string GetTime(string name)
+	public static string ConvertTime(long time)
 	{
-		long time = GetTimeRaw(name);
 		if (time < 0)
 			return null;
 		return Math.Round(time / 1000000f, 5) + "ms";
-	}
-
-	public static long GetTimeRaw(string name)
-	{
-		CustomSampler sample = GetProfile(name);
-		if (sample != null)
-			return sample.GetRecorder().elapsedNanoseconds;
-		return -1;
 	}
 	#endregion
 

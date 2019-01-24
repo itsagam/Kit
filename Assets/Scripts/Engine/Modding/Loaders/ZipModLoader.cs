@@ -31,7 +31,7 @@ namespace Modding.Loaders
 				if (async ? await mod.LoadMetadataAsync() : mod.LoadMetadata())
 					return mod;
 			}
-			catch (Exception)
+			catch
 			{
 			}
 

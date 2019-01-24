@@ -36,19 +36,23 @@ namespace Modding
 
 		public virtual bool LoadMetadata()
 		{
-			return LoadMetadataInternal(false).Result;
+			if (Exists(MetadataFile))
+			{
+				string metadataText = ReadText(MetadataFile);
+				if (metadataText != null)
+				{
+					Metadata = JSONParser.FromJson<ModMetadata>(metadataText);
+					return true;
+				}
+			}
+			return false;
 		}
 
 		public virtual async Task<bool> LoadMetadataAsync()
 		{
-			return await LoadMetadataInternal(true);
-		}
-
-		protected virtual async Task<bool> LoadMetadataInternal(bool async)
-		{
 			if (Exists(MetadataFile))
 			{
-				string metadataText = async ? await ReadTextAsync(MetadataFile) : ReadText(MetadataFile);
+				string metadataText = await ReadTextAsync(MetadataFile);
 				if (metadataText != null)
 				{
 					Metadata = JSONParser.FromJson<ModMetadata>(metadataText);
@@ -60,7 +64,7 @@ namespace Modding
 
 		public virtual void ExecuteScripts()
 		{
-			var task = ExecuteScriptsInternal(false);
+			ExecuteScriptsInternal(false).Wait();
 		}
 
 		public virtual async Task ExecuteScriptsAsync()
@@ -78,12 +82,20 @@ namespace Modding
 				return;
 
 			scriptEnv = new LuaEnv();
+			scriptEnv.Global.Set("self", this);
 			scriptEnv.DoString("require 'Lua/General'");
-
+			scriptEnv.DoString("require 'Lua/Modding'");
 			foreach (string scriptFile in validScripts)
 			{
-				var script = async ? await ReadBytesAsync(scriptFile) : ReadBytes(scriptFile);
-				scriptEnv.DoString(script, scriptFile);
+				try
+				{
+					var script = async ? await ReadBytesAsync(scriptFile) : ReadBytes(scriptFile);
+					scriptEnv.DoString(script, scriptFile);
+				}
+				catch (Exception e)
+				{
+					Debug.LogException(e);
+				}
 			}
 
 			scriptUpdate = Observable.EveryUpdate().Subscribe(f => scriptEnv.Tick());
@@ -133,7 +145,7 @@ namespace Modding
 						return ((T) parser.Read<T>(text, file), parser);
 					}
 				}
-				catch (Exception)
+				catch
 				{
 				}
 			}

@@ -25,7 +25,7 @@ namespace HTTP
 
 		public void Send(Request request)
 		{
-			var task = SendAsync(request);
+			SendAsync(request).Wait();
 		}
 
 		public async Task SendAsync(Request request)

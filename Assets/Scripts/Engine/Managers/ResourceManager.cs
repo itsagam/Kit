@@ -31,50 +31,46 @@ public class ResourceManager
 	// Default mode for modding in individual calls
 	public const bool DefaultModding = true;
 
-	// TODO: StringComparer.OrdinalIgnoreCase is slowing down caching
-	protected static Dictionary<string, object> resources = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase);
+	protected static Dictionary<string, object> resources = new Dictionary<string, object>();
 
 	#region Loading
 	public static T Load<T>(ResourceFolder folder, string file, bool modded = DefaultModding, bool merge = false) where T : class
-	{
-		return LoadInternal<T>(folder, file, modded, merge, false).Result;
-	}
-
-	public static async Task<T> LoadAsync<T>(ResourceFolder folder, string file, bool modded = DefaultModding, bool merge = false) where T : class
-	{
-		return await LoadInternal<T>(folder, file, modded, merge, true);
-	}
-
-	protected static async Task<T> LoadInternal<T>(ResourceFolder folder, string file, bool modded, bool merge, bool async) where T : class
 	{
 		if (Modding && modded)
 		{
 			if (!merge)
 			{
 				string moddingPath = GetModdingPath(folder, file);
-				T moddedFile = async ? await ModManager.LoadAsync<T>(moddingPath) : ModManager.Load<T>(moddingPath);
+				T moddedFile = ModManager.Load<T>(moddingPath);
 				if (moddedFile != null)
 					return moddedFile;
 			}
 			else
-				return async ? await LoadMergedAsync<T>(folder, file) : LoadMerged<T>(folder, file);
+				return LoadMerged<T>(folder, file);
 		}
 
-		return async ? await LoadUnmoddedAsync<T>(folder, file) : LoadUnmodded<T>(folder, file);
+		return LoadUnmodded<T>(folder, file);
+	}
+
+	public static async UniTask<T> LoadAsync<T>(ResourceFolder folder, string file, bool modded = DefaultModding, bool merge = false) where T : class
+	{
+		if (Modding && modded)
+		{
+			if (!merge)
+			{
+				string moddingPath = GetModdingPath(folder, file);
+				T moddedFile = await ModManager.LoadAsync<T>(moddingPath);
+				if (moddedFile != null)
+					return moddedFile;
+			}
+			else
+				return await LoadMergedAsync<T>(folder, file);
+		}
+
+		return await LoadUnmoddedAsync<T>(folder, file);
 	}
 
 	public static T LoadUnmodded<T>(ResourceFolder folder, string file) where T : class
-	{
-		return LoadUnmoddedInternal<T>(folder, file, false).Result;
-	}
-
-	public static async Task<T> LoadUnmoddedAsync<T>(ResourceFolder folder, string file) where T : class
-	{
-		return await LoadUnmoddedInternal<T>(folder, file, true);
-	}
-
-	// TODO: Tasks are slowing down sync methods (along with StringComparer.OrdinalIgnoreCase) -- use UniTask from UniRx?
-	protected static async Task<T> LoadUnmoddedInternal<T>(ResourceFolder folder, string file, bool async) where T : class
 	{
 		object reference = null;
 		if (!resources.TryGetValue(file, out reference))
@@ -82,12 +78,35 @@ public class ResourceManager
 			if (folder == ResourceFolder.Resources)
 			{
 				string fileNoExt = Path.ChangeExtension(file, null);
-				reference = async ? await Resources.LoadAsync(fileNoExt) : Resources.Load(fileNoExt);
+				reference = Resources.Load(fileNoExt);
 			}
 			else
 			{
 				string fullPath = GetPath(folder, file);
-				reference = async ? (await LoadAsync<T>(fullPath)).reference : Load<T>(fullPath).reference;
+				reference = Load<T>(fullPath).reference;
+			}
+
+			if (reference != null)
+				resources.Add(file, reference);
+		}
+		return (T) reference;
+	}
+
+	// TODO: Tasks are slowing down sync methods (along with StringComparer.OrdinalIgnoreCase) -- use UniTask from UniRx?
+	public static async UniTask<T> LoadUnmoddedAsync<T>(ResourceFolder folder, string file) where T : class
+	{
+		object reference = null;
+		if (!resources.TryGetValue(file, out reference))
+		{
+			if (folder == ResourceFolder.Resources)
+			{
+				string fileNoExt = Path.ChangeExtension(file, null);
+				reference = await Resources.LoadAsync(fileNoExt);
+			}
+			else
+			{
+				string fullPath = GetPath(folder, file);
+				reference = (await LoadAsync<T>(fullPath)).reference;
 			}
 
 			if (reference != null)
@@ -98,16 +117,6 @@ public class ResourceManager
 
 	public static T LoadMerged<T>(ResourceFolder folder, string file) where T : class
 	{
-		return LoadMergedInternal<T>(folder, file, false).Result;
-	}
-
-	public static async Task<T> LoadMergedAsync<T>(ResourceFolder folder, string file) where T : class
-	{
-		return await LoadMergedInternal<T>(folder, file, true);
-	}
-
-	protected static async Task<T> LoadMergedInternal<T>(ResourceFolder folder, string file, bool async) where T : class
-	{
 		object reference = null;
 		if (resources.TryGetValue(file, out reference))
 			return (T) reference;
@@ -117,14 +126,14 @@ public class ResourceManager
 		if (folder == ResourceFolder.Resources)
 		{
 			string fileNoExt = Path.ChangeExtension(file, null);
-			reference = async ? await Resources.LoadAsync(fileNoExt) : Resources.Load(fileNoExt);
+			reference = Resources.Load(fileNoExt);
 			if (reference == null)
 				return null;
 			parser = RankParsers<T>(fullPath).FirstOrDefault().parser;
 		}
 		else
 		{
-			(reference, parser) = async ? await LoadAsync<T>(fullPath) : Load<T>(fullPath);
+			(reference, parser) = Load<T>(fullPath);
 			if (reference == null)
 				return null;
 		}
@@ -137,19 +146,71 @@ public class ResourceManager
 				string moddingPath = GetModdingPath(folder, file);
 				if (parser.OperateWith == OperateType.Text)
 				{
-					List<string> textList = async ? await ModManager.ReadTextAllAsync(moddingPath) : ModManager.ReadTextAll(moddingPath);
+					List<string> textList = ModManager.ReadTextAll(moddingPath);
 					foreach (string text in textList)
 						parser.Merge<T>(merged, text);
 				}
 				else
 				{
-					List<byte[]> bytesList = async ? await ModManager.ReadBytesAllAsync(moddingPath) : ModManager.ReadBytesAll(moddingPath);
+					List<byte[]> bytesList = ModManager.ReadBytesAll(moddingPath);
 					foreach (byte[] bytes in bytesList)
 						parser.Merge<T>(merged, bytes);
 				}
 			}
-			catch (Exception)
+			catch (Exception e)
 			{
+				Debug.LogException(e);
+			}
+		}
+		resources[file] = merged;
+		return merged;
+	}
+
+	public static async UniTask<T> LoadMergedAsync<T>(ResourceFolder folder, string file) where T : class
+	{
+		object reference = null;
+		if (resources.TryGetValue(file, out reference))
+			return (T) reference;
+
+		ResourceParser parser = null;
+		string fullPath = GetPath(folder, file);
+		if (folder == ResourceFolder.Resources)
+		{
+			string fileNoExt = Path.ChangeExtension(file, null);
+			reference = await Resources.LoadAsync(fileNoExt);
+			if (reference == null)
+				return null;
+			parser = RankParsers<T>(fullPath).FirstOrDefault().parser;
+		}
+		else
+		{
+			(reference, parser) = await LoadAsync<T>(fullPath);
+			if (reference == null)
+				return null;
+		}
+
+		T merged = (T) reference;
+		if (parser != null)
+		{
+			try
+			{
+				string moddingPath = GetModdingPath(folder, file);
+				if (parser.OperateWith == OperateType.Text)
+				{
+					List<string> textList = await ModManager.ReadTextAllAsync(moddingPath);
+					foreach (string text in textList)
+						parser.Merge<T>(merged, text);
+				}
+				else
+				{
+					List<byte[]> bytesList = await ModManager.ReadBytesAllAsync(moddingPath);
+					foreach (byte[] bytes in bytesList)
+						parser.Merge<T>(merged, bytes);
+				}
+			}
+			catch (Exception e)
+			{
+				Debug.LogException(e);
 			}
 		}
 		resources[file] = merged;
@@ -157,16 +218,6 @@ public class ResourceManager
 	}
 
 	public static (T reference, ResourceParser parser) Load<T>(string fullPath) where T : class
-	{
-		return LoadInternal<T>(fullPath, false).Result;
-	}
-
-	public static async Task<(T reference, ResourceParser parser)> LoadAsync<T>(string fullPath) where T : class
-	{
-		return await LoadInternal<T>(fullPath, true);
-	}
-
-	protected static async Task<(T reference, ResourceParser parser)> LoadInternal<T>(string fullPath, bool async) where T : class
 	{
 		string text = null;
 		byte[] bytes = null;
@@ -177,21 +228,49 @@ public class ResourceManager
 				if (parser.OperateWith == OperateType.Text)
 				{
 					if (text == null)
-						text = async ? await ReadTextAsync(fullPath) : ReadText(fullPath);
-					return text != null ? ((T) parser.Read<T>(text, fullPath), parser) : (null, null);
+						text = ReadText(fullPath);
+					return text != null ? ((T) parser.Read<T>(text, fullPath), parser) : default;
 				}
 				else
 				{
 					if (bytes == null)
-						bytes = async ? await ReadBytesAsync(fullPath) : ReadBytes(fullPath);
-					return bytes != null ? ((T) parser.Read<T>(bytes, fullPath), parser) : (null, null);
+						bytes = ReadBytes(fullPath);
+					return bytes != null ? ((T) parser.Read<T>(bytes, fullPath), parser) : default;
 				}
 			}
 			catch (Exception)
 			{
 			}
 		}
-		return (null, null);
+		return default;
+	}
+
+	public static async UniTask<(T reference, ResourceParser parser)> LoadAsync<T>(string fullPath) where T : class
+	{
+		string text = null;
+		byte[] bytes = null;
+		foreach (var (parser, certainty) in RankParsers<T>(fullPath))
+		{
+			try
+			{
+				if (parser.OperateWith == OperateType.Text)
+				{
+					if (text == null)
+						text = await ReadTextAsync(fullPath);
+					return text != null ? ((T) parser.Read<T>(text, fullPath), parser) : default;
+				}
+				else
+				{
+					if (bytes == null)
+						bytes = await ReadBytesAsync(fullPath);
+					return bytes != null ? ((T) parser.Read<T>(bytes, fullPath), parser) : default;
+				}
+			}
+			catch (Exception)
+			{
+			}
+		}
+		return default;
 	}
 
 	protected static IEnumerable<(ResourceParser parser, float certainty)> RankParsers<T>(string fullPath)
@@ -277,7 +356,7 @@ public class ResourceManager
 		return ReadText(GetPath(folder, file));
 	}
 
-	public static async Task<string> ReadTextAsync(ResourceFolder folder, string file, bool modded = DefaultModding)
+	public static async UniTask<string> ReadTextAsync(ResourceFolder folder, string file, bool modded = DefaultModding)
 	{
 		if (Modding && modded)
 		{
@@ -299,7 +378,7 @@ public class ResourceManager
 		return ReadBytes(GetPath(folder, file));
 	}
 
-	public static async Task<byte[]> ReadBytesAsync(ResourceFolder folder, string file, bool modded = DefaultModding)
+	public static async UniTask<byte[]> ReadBytesAsync(ResourceFolder folder, string file, bool modded = DefaultModding)
 	{
 		if (Modding && modded)
 		{
@@ -310,19 +389,21 @@ public class ResourceManager
 		return await ReadBytesAsync(GetPath(folder, file));
 	}
 
+	// TODO: Log exceptions wherever adequate
 	public static string ReadText(string fullPath)
 	{
 		try
 		{
 			return File.ReadAllText(fullPath);
 		}
-		catch (Exception)
+		catch (Exception e)
 		{
+			Debug.LogException(e);
 			return null;
 		}
 	}
 
-	public static async Task<string> ReadTextAsync(string fullPath)
+	public static async UniTask<string> ReadTextAsync(string fullPath)
 	{
 		UnityWebRequest request = await WebAsync(fullPath);
 		if (request.isHttpError || request.isNetworkError)
@@ -337,13 +418,14 @@ public class ResourceManager
 		{
 			return File.ReadAllBytes(fullPath);
 		}
-		catch (Exception)
+		catch (Exception e)
 		{
+			Debug.LogException(e);
 			return null;
 		}
 	}
 
-	public static async Task<byte[]> ReadBytesAsync(string fullPath)
+	public static async UniTask<byte[]> ReadBytesAsync(string fullPath)
 	{
 		UnityWebRequest request = await WebAsync(fullPath);
 		if (request.isHttpError || request.isNetworkError)
@@ -352,7 +434,7 @@ public class ResourceManager
 			return request.downloadHandler.data;
 	}
 
-	public static async Task<UnityWebRequest> WebAsync(string filePath)
+	public static async UniTask<UnityWebRequest> WebAsync(string filePath)
 	{
 		UnityWebRequest request = UnityWebRequest.Get(LocalToURLPath(filePath));
 		await request.SendWebRequest();
@@ -366,7 +448,7 @@ public class ResourceManager
 		return Save(GetPath(folder, file), contents, parser);
 	}
 
-	public static async Task<bool> SaveAsync(ResourceFolder folder, string file, object contents, ResourceParser parser)
+	public static async UniTask<bool> SaveAsync(ResourceFolder folder, string file, object contents, ResourceParser parser)
 	{
 		return await SaveAsync(GetPath(folder, file), contents, parser);
 	}
@@ -379,7 +461,7 @@ public class ResourceManager
 			return SaveBytes(fullPath, (byte[])parser.Write(contents));
 	}
 
-	public static async Task<bool> SaveAsync(string fullPath, object contents, ResourceParser parser)
+	public static async UniTask<bool> SaveAsync(string fullPath, object contents, ResourceParser parser)
 	{
 		if (parser.OperateWith == OperateType.Text)
 			return await SaveTextAsync(fullPath, (string)parser.Write(contents));
@@ -392,7 +474,7 @@ public class ResourceManager
 		return SaveText(GetPath(folder, file), contents);
 	}
 
-	public static async Task<bool> SaveTextAsync(ResourceFolder folder, string file, string contents)
+	public static async UniTask<bool> SaveTextAsync(ResourceFolder folder, string file, string contents)
 	{
 		return await SaveTextAsync(GetPath(folder, file), contents);
 	}
@@ -402,7 +484,7 @@ public class ResourceManager
 		return SaveBytes(GetPath(folder, file), bytes);
 	}
 
-	public static async Task<bool> SaveBytesAsync(ResourceFolder folder, string file, byte[] bytes)
+	public static async UniTask<bool> SaveBytesAsync(ResourceFolder folder, string file, byte[] bytes)
 	{
 		return await SaveBytesAsync(GetPath(folder, file), bytes);
 	}
@@ -414,13 +496,14 @@ public class ResourceManager
 			File.WriteAllText(fullPath, contents);
 			return true;
 		}
-		catch (Exception)
+		catch (Exception e)
 		{
+			Debug.LogException(e);
 			return false;
 		}
 	}
 
-	public static async Task<bool> SaveTextAsync(string fullPath, string contents)
+	public static async UniTask<bool> SaveTextAsync(string fullPath, string contents)
 	{
 		try
 		{
@@ -428,8 +511,9 @@ public class ResourceManager
 				await stream.WriteAsync(contents);
 			return true;
 		}
-		catch (Exception)
+		catch (Exception e)
 		{
+			Debug.LogException(e);
 			return false;
 		}
 	}
@@ -441,13 +525,14 @@ public class ResourceManager
 			File.WriteAllBytes(fullPath, bytes);
 			return true;
 		}
-		catch (Exception)
+		catch (Exception e)
 		{
+			Debug.LogException(e);
 			return false;
 		}
 	}
 
-	public static async Task<bool> SaveBytesAsync(string fullPath, byte[] bytes)
+	public static async UniTask<bool> SaveBytesAsync(string fullPath, byte[] bytes)
 	{
 		try
 		{
@@ -455,8 +540,9 @@ public class ResourceManager
 				await stream.WriteAsync(bytes, 0, bytes.Length);
 			return true;
 		}
-		catch (Exception)
+		catch (Exception e)
 		{
+			Debug.LogException(e);
 			return false;
 		}
 	}
@@ -473,8 +559,9 @@ public class ResourceManager
 			File.Delete(fullPath);
 			return true;
 		}
-		catch (Exception)
+		catch (Exception e)
 		{
+			Debug.LogException(e);
 			return false;
 		}
 	}

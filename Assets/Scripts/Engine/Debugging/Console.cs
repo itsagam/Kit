@@ -13,7 +13,6 @@ using UniRx;
 using XLua;
 
 // TODO: Provide hotfix helper functions
-// TODO: Provide a way to handle files
 // TODO: Provide multiple-line support
 
 public class Console : MonoBehaviour
@@ -24,6 +23,7 @@ public class Console : MonoBehaviour
 	public const string LogColor = "#00DDFF"; //#DDDDDDD
 	public const string CommandPrefix = "> ";
 	public const string NullString = "nil";
+	public static int Depth = 2;
 
 	public Animator Animator;
 	public ScrollRect LogScroll;
@@ -131,6 +131,7 @@ public class Console : MonoBehaviour
 		instance.Animator.Play("Show");
 		instance.CommandInput.ActivateInputField();
 		instance.CommandInput.Select();
+		Observable.NextFrame().Subscribe(t => ScrollToBottom());
 	}
 
 	public static void Hide()
@@ -206,14 +207,19 @@ public class Console : MonoBehaviour
 
 	public static string ObjectOrEnumerableToString(object obj)
 	{
+		return ObjectOrEnumerableToString(obj, Depth, new List<object> { obj });
+	}
+
+	protected static string ObjectOrEnumerableToString(object obj, int depth, List<object> traversed)
+	{
 		if (obj is LuaTable table)
 		{
 			bool first = true;
 			StringBuilder output = new StringBuilder();
 			output.Append("{");
 			table.ForEach<object, object>((key, value) => {
-				string keyString = ObjectOrEnumerableToString(key);
-				string valueString = ObjectOrEnumerableToString(value);
+				string keyString = CheckForCycles(key, depth, traversed);
+				string valueString = CheckForCycles(value, depth, traversed);
 				if (first)
 					first = false;
 				else
@@ -227,6 +233,27 @@ public class Console : MonoBehaviour
 		}
 		else
 			return Debugger.ObjectOrEnumerableToString(obj, false, NullString);
+	}
+
+	protected static string CheckForCycles(object obj, int depth, List<object> traversed)
+	{
+		if (obj is LuaTable)
+		{
+			if (traversed.Contains(obj))
+				return "*";
+			else
+			{
+				if (depth > 1)
+				{
+					traversed.Add(obj);
+					return ObjectOrEnumerableToString(obj, depth - 1, traversed);
+				}
+				else
+					return "...";
+			}
+	
+		}
+		return ObjectOrEnumerableToString(obj, depth, traversed);
 	}
 
 	public static void List(Type type)
@@ -326,7 +353,7 @@ public class Console : MonoBehaviour
 
 	protected void InitializeScripting()
 	{
-		scriptEnv = new LuaEnv();
+		scriptEnv = new LuaEnv();	
 		scriptEnv.DoString("require 'Lua/General'");
 		scriptEnv.DoString("require 'Lua/Console'");
 	}

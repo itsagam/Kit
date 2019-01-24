@@ -1,0 +1,15 @@
+function readtext(file)
+	return self:ReadText(file)
+end
+
+function readbytes(file)
+	return self:ReadBytes(file)
+end
+
+function loadfile(file)
+	return load(readbytes(file))
+end
+
+function dofile(file)
+	return assert(loadfile(file))()
+end

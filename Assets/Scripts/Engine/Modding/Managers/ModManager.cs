@@ -1,11 +1,10 @@
 ﻿using System;
 using System.IO;
-using System.Collections;
-using System.Threading.Tasks;
 using System.Collections.ObjectModel;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UniRx.Async;
 using Modding.Loaders;
 using Modding.Parsers;
 
@@ -40,7 +39,7 @@ namespace Modding
 		public static List<string> SearchPaths = new List<string>();
 
 		protected static List<Mod> mods = new List<Mod>();
-		protected static Dictionary<string, List<ResourceInfo>> resourceInfos = new Dictionary<string, List<ResourceInfo>>(StringComparer.OrdinalIgnoreCase);
+		protected static Dictionary<string, List<ResourceInfo>> resourceInfos = new Dictionary<string, List<ResourceInfo>>();
 
 		static ModManager()
 		{
@@ -53,7 +52,7 @@ namespace Modding
         {
 			Loaders.Add(new DirectModLoader());
 			Loaders.Add(new ZipModLoader());
-			// TODO: Loaders.Add(new AssetBundleModLoader());
+			// UNDONE: Loaders.Add(new AssetBundleModLoader());
 		}
 
 		protected static void AddDefaultParsers()
@@ -92,16 +91,6 @@ namespace Modding
 
 		public static void LoadMods()
 		{
-			LoadModsInternal(false).Wait();
-		}
-
-		public static async Task LoadModsAsync()
-		{
-			await LoadModsInternal(true); 
-		}
-
-		protected static async Task LoadModsInternal(bool async)
-		{
 			foreach (string path in SearchPaths)
 			{
 				if (!Directory.Exists(path))
@@ -112,10 +101,10 @@ namespace Modding
 				{
 					foreach (ModLoader loader in Loaders)
 					{
-						Mod mod = async ? await loader.LoadModAsync(childPath) : loader.LoadMod(childPath);
+						Mod mod = loader.LoadMod(childPath);
 						if (mod != null)
 						{
-							mods.Add(mod);						
+							mods.Add(mod);
 							break;
 						}
 					}
@@ -127,11 +116,39 @@ namespace Modding
 
 			foreach (Mod mod in mods)
 			{
-				if (async)
-					await mod.ExecuteScriptsAsync();
-				else
-					mod.ExecuteScripts();
+				mod.ExecuteScripts();
+				ModLoaded?.Invoke(mod);
+			}
+		}
 
+		public static async UniTask LoadModsAsync()
+		{
+			foreach (string path in SearchPaths)
+			{
+				if (!Directory.Exists(path))
+					continue;
+
+				string[] childPaths = Directory.GetFileSystemEntries(path);
+				foreach (string childPath in childPaths)
+				{
+					foreach (ModLoader loader in Loaders)
+					{
+						Mod mod = await loader.LoadModAsync(childPath);
+						if (mod != null)
+						{
+							mods.Add(mod);
+							break;
+						}
+					}
+				}
+			}
+
+			LoadModOrder();
+			SaveModOrder();
+
+			foreach (Mod mod in mods)
+			{
+				await mod.ExecuteScriptsAsync();
 				ModLoaded?.Invoke(mod);
 			}
 		}
@@ -183,30 +200,7 @@ namespace Modding
 				PlayerPrefs.SetInt($"Mods/{mods[i].Metadata.Name}.Order", i);
 		}
 
-		public static List<ResourceInfo> GetResourceInfo(string path)
-		{
-			if (resourceInfos.TryGetValue(path, out List<ResourceInfo> resourceInfo))
-				if (resourceInfo.Count > 0)
-					return resourceInfo;
-			return null;
-		}
-
-		public static ResourceInfo? GetResourceInfo(object resource)
-		{
-			return resourceInfos.SelectMany(r => r.Value).FirstOrDefault(r => r.Reference == resource);
-		}
-
 		public static T Load<T>(string path) where T : class
-		{
-			return LoadInternal<T>(path, false).Result;
-		}
-
-		public static async Task<T> LoadAsync<T>(string path) where T : class
-		{
-			return await LoadInternal<T>(path, true);
-		}
-
-		protected static async Task<T> LoadInternal<T>(string path, bool async) where T : class
 		{
 			List<ResourceInfo> loadedResources = GetResourceInfo(path);
 			if (loadedResources != null)
@@ -215,13 +209,13 @@ namespace Modding
 				ResourceReused?.Invoke(path, loadedResource);
 				return (T) loadedResource.Reference;
 			}
-			
+
 			foreach (Mod mod in mods)
 			{
-				var (reference, parser) = async ? await mod.LoadAsync<T>(path) : mod.Load<T>(path);
+				var (reference, parser) = mod.Load<T>(path);
 				if (reference != null)
 				{
-					if (! resourceInfos.TryGetValue(path, out loadedResources))
+					if (!resourceInfos.TryGetValue(path, out loadedResources))
 					{
 						loadedResources = new List<ResourceInfo>();
 						resourceInfos[path] = loadedResources;
@@ -232,21 +226,39 @@ namespace Modding
 					return reference;
 				}
 			}
-			
 			return null;
-        }
+		}
+
+		public static async UniTask<T> LoadAsync<T>(string path) where T : class
+		{
+			List<ResourceInfo> loadedResources = GetResourceInfo(path);
+			if (loadedResources != null)
+			{
+				ResourceInfo loadedResource = loadedResources[0];
+				ResourceReused?.Invoke(path, loadedResource);
+				return (T) loadedResource.Reference;
+			}
+
+			foreach (Mod mod in mods)
+			{
+				var (reference, parser) = await mod.LoadAsync<T>(path);
+				if (reference != null)
+				{
+					if (!resourceInfos.TryGetValue(path, out loadedResources))
+					{
+						loadedResources = new List<ResourceInfo>();
+						resourceInfos[path] = loadedResources;
+					}
+					ResourceInfo resourceInfo = new ResourceInfo(mod, parser, reference);
+					loadedResources.Add(resourceInfo);
+					ResourceLoaded?.Invoke(path, resourceInfo);
+					return reference;
+				}
+			}
+			return null;
+		}
 
 		public static List<T> LoadAll<T>(string path) where T : class
-		{
-			return LoadAllInternal<T>(path, false).Result;
-		}
-
-		public static async Task<List<T>> LoadAllAsync<T>(string path) where T : class
-		{
-			return await LoadAllInternal<T>(path, true);
-		}
-
-		protected static async Task<List<T>> LoadAllInternal<T>(string path, bool async) where T : class
 		{
 			List<ResourceInfo> loadedResources = GetResourceInfo(path);
 			if (loadedResources == null)
@@ -254,14 +266,13 @@ namespace Modding
 				loadedResources = new List<ResourceInfo>();
 				resourceInfos[path] = loadedResources;
 			}
-
 			List<T> all = new List<T>();
 			foreach (Mod mod in mods)
 			{
 				ResourceInfo loadedResource = loadedResources.Find(r => r.Mod == mod);
 				if (loadedResource.Reference == null)
 				{
-					var (reference, parser) = async ? await mod.LoadAsync<T>(path) : mod.Load<T>(path);
+					var (reference, parser) =  mod.Load<T>(path);
 					if (reference != null)
 					{
 						ResourceInfo resourceInfo = new ResourceInfo(mod, parser, reference);
@@ -279,28 +290,75 @@ namespace Modding
 			return all;
 		}
 
+		public static async UniTask<List<T>> LoadAllAsync<T>(string path) where T : class
+		{
+			List<ResourceInfo> loadedResources = GetResourceInfo(path);
+			if (loadedResources == null)
+			{
+				loadedResources = new List<ResourceInfo>();
+				resourceInfos[path] = loadedResources;
+			}
+			List<T> all = new List<T>();
+			foreach (Mod mod in mods)
+			{
+				ResourceInfo loadedResource = loadedResources.Find(r => r.Mod == mod);
+				if (loadedResource.Reference == null)
+				{
+					var (reference, parser) = await mod.LoadAsync<T>(path);
+					if (reference != null)
+					{
+						ResourceInfo resourceInfo = new ResourceInfo(mod, parser, reference);
+						loadedResources.Add(resourceInfo);
+						ResourceLoaded?.Invoke(path, resourceInfo);
+						all.Add(reference);
+					}
+				}
+				else
+				{
+					ResourceReused?.Invoke(path, loadedResource);
+					all.Add((T) loadedResource.Reference);
+				}
+			}
+			return all;
+		}
+
+		public static List<ResourceInfo> GetResourceInfo(string path)
+		{
+			if (resourceInfos.TryGetValue(path, out List<ResourceInfo> resourceInfo))
+				if (resourceInfo.Count > 0)
+					return resourceInfo;
+			return null;
+		}
+
+		public static ResourceInfo? GetResourceInfo(object resource)
+		{
+			return resourceInfos.SelectMany(r => r.Value).FirstOrDefault(r => r.Reference == resource);
+		}
+
 		public static string ReadText(string path)
-		{
-			return ReadTextInternal(path, false).Result;
-		}
-
-		public static async Task<string> ReadTextAsync(string path)
-		{
-			return await ReadTextInternal(path, true);
-		}
-
-		protected static async Task<string> ReadTextInternal(string path, bool async)
 		{
 			foreach (Mod mod in mods)
 			{
 				try
 				{
-					if (async)
-						return await mod.ReadTextAsync(path);
-					else
-						return mod.ReadText(path);
+					return mod.ReadText(path);
 				}
-				catch (FileNotFoundException)
+				catch
+				{
+				}
+			}
+			return null;
+		}
+
+		public static async UniTask<string> ReadTextAsync(string path)
+		{
+			foreach (Mod mod in mods)
+			{
+				try
+				{
+					return await mod.ReadTextAsync(path);
+				}
+				catch
 				{
 				}
 			}
@@ -309,56 +367,62 @@ namespace Modding
 
 		public static List<string> ReadTextAll(string path)
 		{
-			return ReadTextAllInternal(path, false).Result;
+			List<string> all = new List<string>();
+			foreach (Mod mod in mods)
+			{
+				try
+				{
+					all.Add(mod.ReadText(path));
+				}
+				catch
+				{
+				}
+			}
+
+			return all;
 		}
 
-		public static async Task<List<string>> ReadTextAllAsync(string path)
-		{
-			return await ReadTextAllInternal(path, true);
-		}
-
-		protected static async Task<List<string>> ReadTextAllInternal(string path, bool async)
+		public static async UniTask<List<string>> ReadTextAllAsync(string path)
 		{
 			List<string> all = new List<string>();
 			foreach (Mod mod in mods)
 			{
 				try
 				{
-					if (async)
-						all.Add(await mod.ReadTextAsync(path));
-					else
-						all.Add(mod.ReadText(path));
+					all.Add(await mod.ReadTextAsync(path));
 				}
-				catch (FileNotFoundException)
+				catch
 				{
 				}
 			}
-			
+
 			return all;
 		}
 
 		public static byte[] ReadBytes(string path)
 		{
-			return ReadBytesInternal(path, false).Result;
+			foreach (Mod mod in mods)
+			{
+				try
+				{
+					return mod.ReadBytes(path);
+				}
+				catch
+				{
+				}
+			}
+			return null;
 		}
 
-		public static async Task<byte[]> ReadBytesAsync(string path)
-		{
-			return await ReadBytesInternal(path, true);
-		}
-
-		protected static async Task<byte[]> ReadBytesInternal(string path, bool async)
+		public static async UniTask<byte[]> ReadBytesAsync(string path)
 		{
 			foreach (Mod mod in mods)
 			{
 				try
 				{
-					if (async)
-						return await mod.ReadBytesAsync(path);
-					else
-						return mod.ReadBytes(path);
+					return await mod.ReadBytesAsync(path);
 				}
-				catch (FileNotFoundException)
+				catch
 				{
 				}
 			}
@@ -367,25 +431,28 @@ namespace Modding
 
 		public static List<byte[]> ReadBytesAll(string path)
 		{
-			return ReadBytesAllInternal(path, false).Result;
+			List<byte[]> all = new List<byte[]>();
+			foreach (Mod mod in mods)
+			{
+				try
+				{
+					all.Add(mod.ReadBytes(path));
+				}
+				catch
+				{
+				}
+			}
+			return all;
 		}
 
-		public static async Task<List<byte[]>> ReadBytesAllAsync(string path)
-		{
-			return await ReadBytesAllInternal(path, true);
-		}
-
-		protected static async Task<List<byte[]>> ReadBytesAllInternal(string path, bool async)
+		public static async UniTask<List<byte[]>> ReadBytesAllAsync(string path)
 		{
 			List<byte[]> all = new List<byte[]>();
 			foreach (Mod mod in mods)
 			{
 				try
 				{
-					if (async)
-						all.Add(await mod.ReadBytesAsync(path));
-					else
-						all.Add(mod.ReadBytes(path));
+					all.Add(await mod.ReadBytesAsync(path));
 				}
 				catch (FileNotFoundException)
 				{
@@ -393,7 +460,7 @@ namespace Modding
 			}
 			return all;
 		}
-		
+
 		public static void ReloadMods()
         {
             UnloadMods();
