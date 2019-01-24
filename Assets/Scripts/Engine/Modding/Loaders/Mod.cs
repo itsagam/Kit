@@ -1,12 +1,12 @@
 ﻿using System;
 using System.IO;
 using System.Collections;
-using System.Threading.Tasks;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using Modding.Parsers;
 using UniRx;
+using UniRx.Async;
 using XLua;
 
 namespace Modding
@@ -28,8 +28,10 @@ namespace Modding
 		
 		public abstract IEnumerable<string> FindFiles(string path);
 		public abstract bool Exists(string path);
-		protected abstract Task<string> ReadTextInternal(string path, bool async);
-		protected abstract Task<byte[]> ReadBytesInternal(string path, bool async);
+		public abstract string ReadText(string path);
+		public abstract UniTask<string> ReadTextAsync(string path);
+		public abstract byte[] ReadBytes(string path);
+		public abstract UniTask<byte[]> ReadBytesAsync(string path);
 
 		protected LuaEnv scriptEnv;
 		protected IDisposable scriptUpdate;
@@ -48,7 +50,7 @@ namespace Modding
 			return false;
 		}
 
-		public virtual async Task<bool> LoadMetadataAsync()
+		public virtual async UniTask<bool> LoadMetadataAsync()
 		{
 			if (Exists(MetadataFile))
 			{
@@ -63,16 +65,6 @@ namespace Modding
 		}
 
 		public virtual void ExecuteScripts()
-		{
-			ExecuteScriptsInternal(false).Wait();
-		}
-
-		public virtual async Task ExecuteScriptsAsync()
-		{
-			await ExecuteScriptsInternal(true);
-		}
-
-		protected virtual async Task ExecuteScriptsInternal(bool async)
 		{
 			if (Metadata?.Scripts == null)
 				return;
@@ -89,7 +81,36 @@ namespace Modding
 			{
 				try
 				{
-					var script = async ? await ReadBytesAsync(scriptFile) : ReadBytes(scriptFile);
+					var script = ReadBytes(scriptFile);
+					scriptEnv.DoString(script, scriptFile);
+				}
+				catch (Exception e)
+				{
+					Debug.LogException(e);
+				}
+			}
+
+			scriptUpdate = Observable.EveryUpdate().Subscribe(f => scriptEnv.Tick());
+		}
+
+		public virtual async UniTask ExecuteScriptsAsync()
+		{
+			if (Metadata?.Scripts == null)
+				return;
+
+			var validScripts = Metadata.Scripts.Where(s => !s.IsNullOrEmpty() && Exists(s));
+			if (!validScripts.Any())
+				return;
+
+			scriptEnv = new LuaEnv();
+			scriptEnv.Global.Set("self", this);
+			scriptEnv.DoString("require 'Lua/General'");
+			scriptEnv.DoString("require 'Lua/Modding'");
+			foreach (string scriptFile in validScripts)
+			{
+				try
+				{
+					var script = await ReadBytesAsync(scriptFile);
 					scriptEnv.DoString(script, scriptFile);
 				}
 				catch (Exception e)
@@ -108,20 +129,10 @@ namespace Modding
 
 		public virtual (T reference, ResourceParser parser) Load<T>(string path) where T : class
 		{
-			return LoadInternal<T>(path, false).Result;
-		}
-
-		public virtual async Task<(T reference, ResourceParser parser)> LoadAsync<T>(string path) where T : class
-		{
-			return await LoadInternal<T>(path, true);
-		}
-
-		protected virtual async Task<(T reference, ResourceParser parser)> LoadInternal<T>(string path, bool async) where T : class
-		{
 			IEnumerable<string> matchingFiles = FindFiles(path);
 			if (matchingFiles == null)
-				return (null, null);
-			
+				return default;
+
 			var certainties = matchingFiles
 								.SelectMany(file => ModManager.Parsers.Select(parser => (file, parser, certainty: parser.CanRead<T>(file))))
 								.Where(d => d.certainty > 0)
@@ -135,13 +146,13 @@ namespace Modding
 					if (parser.OperateWith == OperateType.Bytes)
 					{
 						if (bytes == null)
-							bytes = await ReadBytesInternal(file, async);
+							bytes = ReadBytes(file);
 						return ((T) parser.Read<T>(bytes, file), parser);
 					}
 					else
 					{
 						if (text == null)
-							text = await ReadTextInternal(file, async);
+							text = ReadText(file);
 						return ((T) parser.Read<T>(text, file), parser);
 					}
 				}
@@ -150,27 +161,44 @@ namespace Modding
 				}
 			}
 
-			return (null, null);
+			return default;
 		}
 
-		public virtual string ReadText(string path)
+		public virtual async UniTask<(T reference, ResourceParser parser)> LoadAsync<T>(string path) where T : class
 		{
-			return ReadTextInternal(path, false).Result;
-		}
+			IEnumerable<string> matchingFiles = FindFiles(path);
+			if (matchingFiles == null)
+				return default;
 
-		public virtual async Task<string> ReadTextAsync(string path)
-		{
-			return await ReadTextInternal(path, true);
-		}
+			var certainties = matchingFiles
+								.SelectMany(file => ModManager.Parsers.Select(parser => (file, parser, certainty: parser.CanRead<T>(file))))
+								.Where(d => d.certainty > 0)
+								.OrderByDescending(d => d.certainty);
+			string text = null;
+			byte[] bytes = null;
+			foreach (var (file, parser, certainty) in certainties)
+			{
+				try
+				{
+					if (parser.OperateWith == OperateType.Bytes)
+					{
+						if (bytes == null)
+							bytes = await ReadBytesAsync(file);
+						return ((T) parser.Read<T>(bytes, file), parser);
+					}
+					else
+					{
+						if (text == null)
+							text = await ReadTextAsync(file);
+						return ((T) parser.Read<T>(text, file), parser);
+					}
+				}
+				catch
+				{
+				}
+			}
 
-		public virtual byte[] ReadBytes(string path)
-		{
-			return ReadBytesInternal(path, false).Result;
-		}
-
-		public virtual async Task<byte[]> ReadBytesAsync(string path)
-		{
-			return await ReadBytesInternal(path, true);
+			return default;
 		}
 
 		protected virtual FileNotFoundException GetNotFoundException(string path)

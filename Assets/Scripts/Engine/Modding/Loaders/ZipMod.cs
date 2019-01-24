@@ -3,10 +3,9 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
-using System.Threading.Tasks;
 using System.Linq;
 using UnityEngine;
-using Modding.Parsers;
+using UniRx.Async;
 
 namespace Modding.Loaders
 {
@@ -19,7 +18,7 @@ namespace Modding.Loaders
 			MetadataFile = metadataFile;
 		}
 
-		protected override async Task<Mod> LoadModInternal(string path, bool async)
+		public override Mod LoadMod(string path)
 		{
 			FileAttributes attributes = File.GetAttributes(path);
 			if (attributes.HasFlag(FileAttributes.Directory))
@@ -28,10 +27,29 @@ namespace Modding.Loaders
 			try
 			{
 				ZipMod mod = new ZipMod(path);
-				if (async ? await mod.LoadMetadataAsync() : mod.LoadMetadata())
+				if (mod.LoadMetadata())
 					return mod;
 			}
-			catch
+			catch (Exception)
+			{
+			}
+
+			return null;
+		}
+
+		public override async UniTask<Mod> LoadModAsync(string path)
+		{
+			FileAttributes attributes = File.GetAttributes(path);
+			if (attributes.HasFlag(FileAttributes.Directory))
+				return null;
+
+			try
+			{
+				ZipMod mod = new ZipMod(path);
+				if (await mod.LoadMetadataAsync())
+					return mod;
+			}
+			catch (Exception)
 			{
 			}
 
@@ -56,7 +74,7 @@ namespace Modding.Loaders
 			return Archive.GetEntry(path) != null;
 		}
 
-		protected override async Task<string> ReadTextInternal(string path, bool async)
+		public override string ReadText(string path)
 		{
 			string matching = FindFile(path);
 			if (matching == null)
@@ -65,17 +83,28 @@ namespace Modding.Loaders
 			ZipArchiveEntry entry = Archive.GetEntry(matching);
 			Stream stream = entry.Open();
 			TextReader text = new StreamReader(stream);
-			string data = null;
-			if (async)
-				data = await text.ReadToEndAsync();
-			else
-				data = text.ReadToEnd();
+			string data = text.ReadToEnd();
 			text.Dispose();
 			stream.Dispose();
 			return data;
 		}
 
-		protected override async Task<byte[]> ReadBytesInternal(string path, bool async)
+		public override async UniTask<string> ReadTextAsync(string path)
+		{
+			string matching = FindFile(path);
+			if (matching == null)
+				throw GetNotFoundException(path);
+
+			ZipArchiveEntry entry = Archive.GetEntry(matching);
+			Stream stream = entry.Open();
+			TextReader text = new StreamReader(stream);
+			string data = await text.ReadToEndAsync();
+			text.Dispose();
+			stream.Dispose();
+			return data;
+		}
+
+		public override byte[] ReadBytes(string path)
 		{
 			string matching = FindFile(path);
 			if (matching == null)
@@ -84,10 +113,21 @@ namespace Modding.Loaders
 			ZipArchiveEntry entry = Archive.GetEntry(matching);
 			Stream stream = entry.Open();
 			byte[] data = new byte[entry.Length];
-			if (async)
-				await stream.ReadAsync(data, 0, (int)entry.Length);
-			else
-				stream.Read(data, 0, (int)entry.Length);
+			stream.Read(data, 0, (int) entry.Length);
+			stream.Dispose();
+			return data;
+		}
+
+		public override async UniTask<byte[]> ReadBytesAsync(string path)
+		{
+			string matching = FindFile(path);
+			if (matching == null)
+				throw GetNotFoundException(path);
+
+			ZipArchiveEntry entry = Archive.GetEntry(matching);
+			Stream stream = entry.Open();
+			byte[] data = new byte[entry.Length];
+			await stream.ReadAsync(data, 0, (int)entry.Length);
 			stream.Dispose();
 			return data;
 		}

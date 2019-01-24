@@ -226,6 +226,7 @@ namespace Modding
 					return reference;
 				}
 			}
+
 			return null;
 		}
 
@@ -255,6 +256,7 @@ namespace Modding
 					return reference;
 				}
 			}
+
 			return null;
 		}
 
@@ -454,7 +456,7 @@ namespace Modding
 				{
 					all.Add(await mod.ReadBytesAsync(path));
 				}
-				catch (FileNotFoundException)
+				catch
 				{
 				}
 			}

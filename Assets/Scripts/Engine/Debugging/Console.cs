@@ -1,12 +1,10 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Text;
 using System.Linq;
 using System.Reflection;
 using UnityEngine;
-using UnityEngine.EventSystems;
 using UnityEngine.UI;
 using TouchScript.Gestures;
 using UniRx;

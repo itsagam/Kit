@@ -31,7 +31,17 @@ public class ResourceManager
 	// Default mode for modding in individual calls
 	public const bool DefaultModding = true;
 
+	public static event Action<ResourceFolder, string, object> ResourceLoaded;
+	public static event Action<ResourceFolder, string, object> ResourceReused;
+
 	protected static Dictionary<string, object> resources = new Dictionary<string, object>();
+	protected static Dictionary<ResourceFolder, string> folderToString = new Dictionary<ResourceFolder, string>();
+
+	static ResourceManager()
+	{
+		foreach (var kvp in Paths)
+			folderToString[kvp.Key] = kvp.Key.ToString();
+	}
 
 	#region Loading
 	public static T Load<T>(ResourceFolder folder, string file, bool modded = DefaultModding, bool merge = false) where T : class
@@ -70,6 +80,7 @@ public class ResourceManager
 		return await LoadUnmoddedAsync<T>(folder, file);
 	}
 
+	// TODO: Handle conflict between loading same filename from two different ResourceFolder
 	public static T LoadUnmodded<T>(ResourceFolder folder, string file) where T : class
 	{
 		object reference = null;
@@ -87,12 +98,16 @@ public class ResourceManager
 			}
 
 			if (reference != null)
+			{
 				resources.Add(file, reference);
+				ResourceLoaded?.Invoke(folder, file, reference);
+			}
 		}
+		else
+			ResourceReused?.Invoke(folder, file, reference);
 		return (T) reference;
 	}
 
-	// TODO: Tasks are slowing down sync methods (along with StringComparer.OrdinalIgnoreCase) -- use UniTask from UniRx?
 	public static async UniTask<T> LoadUnmoddedAsync<T>(ResourceFolder folder, string file) where T : class
 	{
 		object reference = null;
@@ -110,8 +125,13 @@ public class ResourceManager
 			}
 
 			if (reference != null)
+			{
 				resources.Add(file, reference);
+				ResourceLoaded?.Invoke(folder, file, reference);
+			}
 		}
+		else
+			ResourceReused?.Invoke(folder, file, reference);
 		return (T) reference;
 	}
 
@@ -389,7 +409,6 @@ public class ResourceManager
 		return await ReadBytesAsync(GetPath(folder, file));
 	}
 
-	// TODO: Log exceptions wherever adequate
 	public static string ReadText(string fullPath)
 	{
 		try
@@ -590,17 +609,17 @@ public class ResourceManager
 
 	public static string GetPath(ResourceFolder folder, string file)
 	{
-		return Path.Combine(GetPath(folder), file);
+		return GetPath(folder) + "/" + file;
 	}
 
 	public static string GetModdingPath(ResourceFolder folder)
 	{
-		return folder.ToString();
+		return folderToString[folder];
 	}
 
 	public static string GetModdingPath(ResourceFolder folder, string file)
 	{
-		return Path.Combine(GetModdingPath(folder), file);
+		return GetModdingPath(folder) + "/" + file;
 	}
 
 	public static string LocalToURLPath(string path)

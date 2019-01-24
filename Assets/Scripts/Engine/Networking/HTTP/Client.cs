@@ -2,7 +2,6 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Net;
-using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.Networking;
 using UniRx.Async;
@@ -25,10 +24,10 @@ namespace HTTP
 
 		public void Send(Request request)
 		{
-			SendAsync(request).Wait();
+			SendAsync(request).Forget();
 		}
 
-		public async Task SendAsync(Request request)
+		public async UniTask SendAsync(Request request)
 		{
 			if (BaseURI == null)
 			{

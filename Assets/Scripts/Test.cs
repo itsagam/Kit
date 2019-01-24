@@ -12,6 +12,7 @@ using UnityEngine.UI;
 using UniRx;
 using UniRx.Async;
 using XLua;
+using System.Text;
 
 public class GameData
 {
@@ -56,6 +57,10 @@ public class Test: MonoBehaviour
 #pragma warning disable CS1998
 	async void  Start()
 	{
+		//await ModdingTest();
+		//InjectTest();
+		//await ConsoleTest();
+
 		/*
 		Debugger.StartProfile("async");
 		for (int i = 0; i <= 1000; i++)
@@ -76,31 +81,34 @@ public class Test: MonoBehaviour
 			await GetNumUniTask(1000);
 		Debugger.EndAndLogProfile();
 		*/
-		
+
+		//ResourceManager.ResourceLoaded += ResourceLoaded;
+		//ResourceManager.ResourceReused += ResourceReused;
+
 		/*
 		Debugger.StartProfile("Resources.Load");
-		for (int i = 0; i <= 10000; i++)
+		for (int i = 0; i <= 100000; i++)
 			Resources.Load<Texture>("Textures/test");
 		Debugger.EndAndLogProfile();
-		*/
 
-		/*
 		Debugger.StartProfile("ResourceManager.Load");
-		for (int i = 0; i <= 10000; i++)
-			ResourceManager.Load<Texture>(ResourceFolder.Resources, "Textures/test", false);
+		for (int i = 0; i <= 100000; i++)
+			ResourceManager.Load<Texture>(ResourceFolder.Resources, "Textures/test", true);
 		Debugger.EndAndLogProfile();
 		*/
-
-		await ModdingTest();
-		//InjectTest();
-		//await ConsoleTest();
 	}
 #pragma warning restore CS1998
 
-	protected void Func()
+	private void ResourceReused(ResourceFolder folder, string path, object obj)
 	{
-
+		Debug.Log($"File \"{path}\" reused from folder \"{folder.ToString()}\"");
 	}
+
+	private void ResourceLoaded(ResourceFolder folder, string path, object obj)
+	{
+		Debug.Log($"File \"{path}\" loaded from folder \"{folder.ToString()}\"");
+	}
+
 	public async Task<int> GetNumAsync(int i)
 	{
 		if (i > 0)
@@ -125,7 +133,7 @@ public class Test: MonoBehaviour
 			return 0 ;
 	}
 
-	protected async Task LoadMods()
+	protected async UniTask LoadMods()
 	{
 		await ModManager.LoadModsAsync();
 		foreach (Mod mod in ModManager.Mods)
@@ -134,7 +142,7 @@ public class Test: MonoBehaviour
 		ModManager.ResourceReused += ModManager_ResourceReused;
 	}
 
-	protected async Task ModdingTest()
+	protected async UniTask ModdingTest()
 	{
 		await LoadMods();
 		Debugger.Log(await ResourceManager.LoadAsync<GameData>(ResourceFolder.StreamingAssets, "Data/Test.json", true), true);
@@ -162,15 +170,7 @@ public class Test: MonoBehaviour
 		ModManager.UnloadMods();
 	}
 
-	protected void ProfileTest()
-	{
-		Debugger.StartProfile("Normal");
-		for (int i = 0; i < 100000; i++)
-			Resources.Load<Texture>("Textures/test");
-		Debugger.EndAndLogProfile();
-	}
-
-	async Task ConsoleTest()
+	async UniTask ConsoleTest()
 	{
 		for (int i = 0; i < 30; i++)
 			await Observable.Timer(TimeSpan.FromSeconds(0.1f));

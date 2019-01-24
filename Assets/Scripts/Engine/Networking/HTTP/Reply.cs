@@ -11,7 +11,7 @@ namespace HTTP
 			Data = data;
 		}
 
-		public string DataAsString
+		public string Text
 		{
 			get
 			{
@@ -24,7 +24,7 @@ namespace HTTP
 			string output = "{";
 
 			if (Data != null)
-				output += $"Data: {DataAsString}";
+				output += $"Text: {Text}";
 
 			output += "}";
 
