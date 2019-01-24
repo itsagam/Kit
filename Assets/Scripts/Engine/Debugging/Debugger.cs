@@ -2,11 +2,11 @@
 using System.Collections;
 using System.Collections.Specialized;
 using System.Collections.Generic;
+using System.Text;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.Profiling;
 using UniRx;
-using System.Text;
 
 public class Debugger : MonoBehaviour
 {
@@ -137,42 +137,61 @@ public class Debugger : MonoBehaviour
 
 	public static string ObjectOrEnumerableToString(object obj, bool serialize, string nullString = NullString)
 	{
-		if (obj is IEnumerable e && !(e is string))
-			return EnumerableToString(e, serialize, nullString);
+		var output = new StringBuilder();
+		ObjectOrEnumerableToString(output, obj, serialize, nullString);
+		return output.ToString();
+	}
+
+	public static void ObjectOrEnumerableToString(StringBuilder output, object obj, bool serialize, string nullString)
+	{
+		if (obj is IEnumerable enumerable && !(enumerable is string))
+			EnumerableToString(output, enumerable, serialize, nullString);
 		else
-			return ObjectToString(obj, serialize, nullString);
+			ObjectToString(output, obj, serialize, nullString);
 	}
 
 	public static string ObjectToString(object obj, bool serialize, string nullString = NullString)
 	{
 		if (obj == null)
 			return nullString;
-		
+
 		if (obj.GetType().IsValueType || (obj is string))
 			return obj.ToString();
 		else
 			return serialize ? SerializeObject(obj) : obj.ToString();
 	}
 
+	public static void ObjectToString(StringBuilder output, object obj, bool serialize, string nullString)
+	{
+		output.Append(ObjectToString(obj, serialize, nullString));
+	}
+
 	public static string EnumerableToString(IEnumerable enumerable, bool serialize, string nullString = NullString)
 	{
-		if (enumerable == null)
-			return nullString;
+		var output = new StringBuilder();
+		EnumerableToString(output, enumerable, serialize, nullString);
+		return output.ToString();
+	}
 
-		StringBuilder output = new StringBuilder();
+	public static void EnumerableToString(StringBuilder output, IEnumerable enumerable, bool serialize, string nullString)
+	{
+		if (enumerable == null)
+		{
+			output.Append(nullString);
+			return;
+		}
+
 		output.Append("{");
 		bool first = true;
 		foreach (object item in enumerable)
 		{
-			string itemString = ObjectOrEnumerableToString(item, serialize, nullString);
 			if (first)
 				first = false;
 			else
 				output.Append(", ");
-			output.Append(itemString);
+			ObjectOrEnumerableToString(output, item, serialize, nullString);
 		}
-		output.Append("}");	
-		return output.ToString();
+		output.Append("}");
 	}
 
 	public static string SerializeObject(object obj)

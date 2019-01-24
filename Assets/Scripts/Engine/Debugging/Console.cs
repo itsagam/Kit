@@ -184,13 +184,12 @@ public class Console : MonoBehaviour
 
 	public static void Log(object obj)
 	{
-		Log(ObjectOrEnumerableToString(obj));
+		Log(ObjectOrTableToString(obj));
 	}
 
 	public static void Log(string line)
 	{
 		var log = instance.log;
-
 		int newLength = log.Length + line.Length;
 		if (newLength > Length)
 		{
@@ -203,55 +202,54 @@ public class Console : MonoBehaviour
 		Observable.NextFrame().Subscribe(t => ScrollToBottom());
 	}
 
-	public static string ObjectOrEnumerableToString(object obj)
+	public static string ObjectOrTableToString(object obj)
 	{
-		return ObjectOrEnumerableToString(obj, Depth, new List<object> { obj });
+		StringBuilder output = new StringBuilder();
+		ObjectOrTableToString(output, obj, Depth, new List<object>());
+		return output.ToString();
 	}
 
-	protected static string ObjectOrEnumerableToString(object obj, int depth, List<object> traversed)
+	protected static void ObjectOrTableToString(StringBuilder output, object obj, int depth, List<object> traversed)
 	{
 		if (obj is LuaTable table)
 		{
 			bool first = true;
-			StringBuilder output = new StringBuilder();
 			output.Append("{");
+			traversed.Add(table);
 			table.ForEach<object, object>((key, value) => {
-				string keyString = CheckForCycles(key, depth, traversed);
-				string valueString = CheckForCycles(value, depth, traversed);
 				if (first)
 					first = false;
 				else
 					output.Append(", ");
-				output.Append(keyString);
+				CyclicObjectOrTableToString(output, key, depth, traversed);
 				output.Append(" = ");
-				output.Append(valueString);
+				CyclicObjectOrTableToString(output, value, depth, traversed);
 			});
 			output.Append("}");
-			return output.ToString();
 		}
 		else
-			return Debugger.ObjectOrEnumerableToString(obj, false, NullString);
+			Debugger.ObjectOrEnumerableToString(output, obj, false, NullString);
 	}
 
-	protected static string CheckForCycles(object obj, int depth, List<object> traversed)
+	protected static void CyclicObjectOrTableToString(StringBuilder output, object obj, int depth, List<object> traversed)
 	{
 		if (obj is LuaTable)
 		{
 			if (traversed.Contains(obj))
-				return "*";
+				output.Append("*");
 			else
 			{
 				if (depth > 1)
 				{
 					traversed.Add(obj);
-					return ObjectOrEnumerableToString(obj, depth - 1, traversed);
+					ObjectOrTableToString(output, obj, depth - 1, traversed);
 				}
 				else
-					return "...";
+					output.Append("...");
 			}
-	
 		}
-		return ObjectOrEnumerableToString(obj, depth, traversed);
+		else
+			Debugger.ObjectOrEnumerableToString(output, obj, false, NullString);
 	}
 
 	public static void List(Type type)
@@ -263,26 +261,27 @@ public class Console : MonoBehaviour
 
 	protected static string MemberToString(Type type, MemberInfo member)
 	{
-		string output = $"{type.FullName}.{member.Name}";
+		StringBuilder output = new StringBuilder();
+		output.Append($"{type.FullName}.{member.Name}");
 		switch (member.MemberType)
 		{
 			case MemberTypes.Field:
 				{
 					FieldInfo field = (FieldInfo) member;
-					output += $" = {field.FieldType}";
+					output.Append($" = {field.FieldType}");
 					if (field.IsLiteral)
-						output += " (Read-only)";
+						output.Append(" (Read-only)");
 					if (field.IsStatic)
-						output += " [Static]";
+						output.Append(" [Static]");
 				}
 				break;
 
 			case MemberTypes.Property:
 				{
 					PropertyInfo property = (PropertyInfo) member;
-					output += $" = {property.PropertyType}";
+					output.Append($" = {property.PropertyType}");
 					if (!property.CanWrite)
-						output += " (Read-only)";
+						output.Append(" (Read-only)");
 				}
 				break;
 
@@ -290,22 +289,23 @@ public class Console : MonoBehaviour
 				{
 					MethodInfo method = (MethodInfo) member;
 					ParameterInfo[] parameters = method.GetParameters();
-					output += "(";
+					output.Append("(");
 					bool first = true;
 					foreach (ParameterInfo parameterInfo in parameters)
 					{
-						if (!first)
-							output += ", ";
-						output += parameterInfo.ParameterType.Name;
-						first = false;
+						if (first)
+							first = false;
+						else
+							output.Append(", ");
+						output.Append(parameterInfo.ParameterType.Name);
 					}
-					output += ")";
+					output.Append(")");
 					if (method.IsStatic)
-						output += " [Static]";
+						output.Append(" [Static]");
 				}
 				break;
 		}
-		return output;
+		return output.ToString();
 	}
 
 	public static void ScrollToBottom()

@@ -26,8 +26,6 @@ public class GameData
 [Hotfix]
 public class Test: MonoBehaviour
 {
-	public static List<string> List = new List<string> { "agam", "saran" };
-
 	public static string String = "Default";
 	public static int Integer = 1;
 	public static float Float = 1.5f;
