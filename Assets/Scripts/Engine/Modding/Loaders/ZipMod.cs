@@ -136,17 +136,10 @@ namespace Modding.Loaders
 
 			if (! System.IO.Path.HasExtension(path))
 			{
-				string fileName = System.IO.Path.GetFileName(path);
-				string fileDir = System.IO.Path.GetDirectoryName(path);
-				
-				var matching = Archive.Entries
-									.Where(	e => System.IO.Path.GetDirectoryName(e.FullName).Equals(fileDir, StringComparison.OrdinalIgnoreCase) &&
-											e.Name != null &&
-											System.IO.Path.GetFileNameWithoutExtension(e.Name).Equals(fileName, StringComparison.OrdinalIgnoreCase))
-									.Select(e => e.FullName);
-
+				// Name is empty string for directory ZipArchiveEntries and we strip the extension of files to compare with our own
+				var matching = Archive.Entries.Where(e => e.Name != "" && path.Equals(System.IO.Path.ChangeExtension(e.FullName, null), StringComparison.OrdinalIgnoreCase));
 				if (matching.Any())
-					return matching.ToList();
+					return matching.Select(e => e.FullName);
 			}
 
 			return null;

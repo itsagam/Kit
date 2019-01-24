@@ -83,8 +83,7 @@ public class Test: MonoBehaviour
 		//ResourceManager.ResourceLoaded += ResourceLoaded;
 		//ResourceManager.ResourceReused += ResourceReused;
 
-		ResourceManager.Load<Texture>(ResourceFolder.Resources, "Textures/test", true);
-
+		/*
 		Debugger.StartProfile("Resources.Load");
 		for (int i = 0; i <= 100000; i++)
 			Resources.Load<Texture>("Textures/test");
@@ -94,6 +93,7 @@ public class Test: MonoBehaviour
 		for (int i = 0; i <= 100000; i++)
 			ResourceManager.Load<Texture>(ResourceFolder.Resources, "Textures/test", true);
 		Debugger.EndAndLogProfile();
+		*/
 	}
 #pragma warning restore CS1998
 
@@ -130,28 +130,28 @@ public class Test: MonoBehaviour
 		else
 			return 0 ;
 	}
+	protected async UniTask ModdingTest()
+	{
+		await LoadMods();
+		//Debugger.Log(await ResourceManager.LoadAsync<GameData>(ResourceFolder.StreamingAssets, @"Data/Test", true), true);
+
+		//Texture tex = await ResourceManager.LoadAsync<Texture>(ResourceFolder.StreamingAssets, @"Textures/test");
+		//obj.GetComponent<MeshRenderer>().material.mainTexture = tex;
+
+		//AudioClip clip = await ResourceManager.LoadAsync<AudioClip>(ResourceFolder.Resources, @"Sounds/Test");
+		//GetComponent<AudioSource>().clip = clip;
+		//GetComponent<AudioSource>().Play();
+	}
 
 	protected async UniTask LoadMods()
 	{
 		await ModManager.LoadModsAsync();
-		foreach (Mod mod in ModManager.Mods)
-			Debug.Log(mod.Metadata.Name);
-		//ModManager.ResourceLoaded += ModManager_ResourceLoaded;
-		//ModManager.ResourceReused += ModManager_ResourceReused;
+		//foreach (Mod mod in ModManager.Mods)
+		//	Debug.Log(mod.Metadata.Name);
+		ModManager.ResourceLoaded += ModManager_ResourceLoaded;
+		ModManager.ResourceReused += ModManager_ResourceReused;
 	}
 
-	protected async UniTask ModdingTest()
-	{
-		await LoadMods();
-		Debugger.Log(await ResourceManager.LoadAsync<GameData>(ResourceFolder.StreamingAssets, "Data/Test.json", true), true);
-
-		Texture tex = await ResourceManager.LoadAsync<Texture>(ResourceFolder.Resources, @"Textures/Test");
-		obj.GetComponent<MeshRenderer>().material.mainTexture = tex;
-
-		AudioClip clip = await ResourceManager.LoadAsync<AudioClip>(ResourceFolder.Resources, @"Sounds/Test");
-		GetComponent<AudioSource>().clip = clip;
-		//GetComponent<AudioSource>().Play();
-	}
 
 	private void ModManager_ResourceReused(string path, ResourceInfo info)
 	{

@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Threading.Tasks;
 using System.IO;
 using System.Linq;
 using UnityEngine;
@@ -9,6 +8,16 @@ using UnityEngine.Networking;
 using UniRx.Async;
 using Modding;
 using Modding.Parsers;
+
+// Limitations: 1)	You have to provide file extension for ResourceFolder other than Resources if its not loaded 
+//					by ModManager because you can't enumerate and match files in StreamingAssets on platforms like 
+//					Android. If the file is found in ModManager they can be loaded without providing an extension.
+//				2)	IO operations other than readtext/readbytes/loadfile/dofile may not work in mods since they 
+//					can be in archives. Working directory is also different (project/application path instead of
+//					mod path). The implementations of above methods are provided by using Mod's Read functions.
+//				3)	If two files with same name are loaded from ModManager without an extension, it'll create a 
+//					conflict (ModManager.Load<AudioClip>("Files/Test") and ModManager.Load<Texture>("Files/Test")),
+//					since the first object would be cached and a second call would try to reuse and cast it.
 
 public enum ResourceFolder
 {
@@ -21,10 +30,10 @@ public enum ResourceFolder
 public class ResourceManager
 {
 	public static Dictionary<ResourceFolder, string> Paths = new Dictionary<ResourceFolder, string>
-	{   { ResourceFolder.Data, Path.Combine(Application.dataPath, "/") },
-		{ ResourceFolder.StreamingAssets,  Path.Combine(Application.streamingAssetsPath, "/") },
-		{ ResourceFolder.PersistentData, Path.Combine(Application.persistentDataPath, "/") },
-		{ ResourceFolder.Resources, Path.Combine(Application.dataPath, "Resources/")} };
+	{   { ResourceFolder.Data, Application.dataPath + "/"},
+		{ ResourceFolder.StreamingAssets, Application.streamingAssetsPath + "/"},
+		{ ResourceFolder.PersistentData, Application.persistentDataPath + "/"},
+		{ ResourceFolder.Resources, Application.dataPath + "/Resources/"} };
 
 	// Global variable to enable/disable modding
 	public static bool Modding = true;

@@ -65,42 +65,38 @@ namespace Modding.Loaders
 
 		public override string ReadText(string path)
 		{
-			string matching = FindFile(path);
+			string matching = FindFileEx(path, false, true);
 			if (matching == null)
 				throw GetNotFoundException(path);
 
-			matching = GetFullPath(matching);
 			return File.ReadAllText(matching);
 		}
 
 		public override async UniTask<string> ReadTextAsync(string path)
 		{
-			string matching = FindFile(path);
+			string matching = FindFileEx(path, false, true);
 			if (matching == null)
 				throw GetNotFoundException(path);
 
-			matching = GetFullPath(matching);
 			using (StreamReader stream = new StreamReader(matching))
 				return await stream.ReadToEndAsync();
 		}
 
 		public override byte[] ReadBytes(string path)
 		{
-			string matching = FindFile(path);
+			string matching = FindFileEx(path, false, true);
 			if (matching == null)
 				throw GetNotFoundException(path);
 
-			matching = GetFullPath(matching);
 			return File.ReadAllBytes(matching);
 		}
 
 		public override async UniTask<byte[]> ReadBytesAsync(string path)
 		{
-			string matching = FindFile(path);
+			string matching = FindFileEx(path, false, true);
 			if (matching == null)
 				throw GetNotFoundException(path);
 
-			matching = GetFullPath(matching);
 			byte[] content;
 			using (FileStream stream = new FileStream(matching, FileMode.Open))
 			{
@@ -112,21 +108,30 @@ namespace Modding.Loaders
 
 		public override IEnumerable<string> FindFiles(string path)
 		{
-			string fullPath = GetFullPath(path);
-			if (File.Exists(fullPath))
-				return path.Yield();
+			return FindFilesEx(path, false, false);
+		}
 
-			if (!System.IO.Path.HasExtension(path))
+		public virtual string FindFileEx(string path, bool inFullPath, bool outFullPath)
+		{
+			return FindFilesEx(path, inFullPath, outFullPath).FirstOrDefault();
+		}
+
+		// Will not work for inFullPath = true, outFullPath = false
+		public virtual IEnumerable<string> FindFilesEx(string path, bool inFullPath, bool outFullPath)
+		{
+			string fullPath = inFullPath ? path : GetFullPath(path);
+			if (File.Exists(fullPath))
+				return outFullPath ? fullPath.Yield() : path.Yield();
+
+			if (!System.IO.Path.HasExtension(fullPath))
 			{
 				string fullDir = System.IO.Path.GetDirectoryName(fullPath);
 				if (Directory.Exists(fullDir))
 				{
 					string fullFile = System.IO.Path.GetFileName(fullPath);
-					string relativeDir = System.IO.Path.GetDirectoryName(path);
-					var matching = Directory.EnumerateFiles(fullDir, $"{fullFile}.*")
-						.Select(p => System.IO.Path.Combine(relativeDir, System.IO.Path.GetFileName(p)));
+					var matching = Directory.EnumerateFiles(fullDir, $"{fullFile}.*");
 					if (matching.Any())
-						return matching;
+						return outFullPath ? matching : matching.Select(p => path + System.IO.Path.GetExtension(p));
 				}
 			}
 
@@ -138,7 +143,6 @@ namespace Modding.Loaders
 			return File.Exists(GetFullPath(path));
 		}
 
-		//TODO: Path.Combine is slowing down the thing
 		public virtual string GetFullPath(string subPath)
 		{
 			return Path + subPath;

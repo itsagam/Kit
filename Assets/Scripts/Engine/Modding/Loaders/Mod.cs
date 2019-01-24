@@ -38,28 +38,22 @@ namespace Modding
 
 		public virtual bool LoadMetadata()
 		{
-			if (Exists(MetadataFile))
+			string metadataText = ReadText(MetadataFile);
+			if (metadataText != null)
 			{
-				string metadataText = ReadText(MetadataFile);
-				if (metadataText != null)
-				{
-					Metadata = JSONParser.FromJson<ModMetadata>(metadataText);
-					return true;
-				}
+				Metadata = JSONParser.FromJson<ModMetadata>(metadataText);
+				return true;
 			}
 			return false;
 		}
 
 		public virtual async UniTask<bool> LoadMetadataAsync()
 		{
-			if (Exists(MetadataFile))
+			string metadataText = await ReadTextAsync(MetadataFile);
+			if (metadataText != null)
 			{
-				string metadataText = await ReadTextAsync(MetadataFile);
-				if (metadataText != null)
-				{
-					Metadata = JSONParser.FromJson<ModMetadata>(metadataText);
-					return true;
-				}
+				Metadata = JSONParser.FromJson<ModMetadata>(metadataText);
+				return true;
 			}
 			return false;
 		}

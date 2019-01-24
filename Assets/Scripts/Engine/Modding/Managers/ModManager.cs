@@ -68,7 +68,7 @@ namespace Modding
         {
 			// TODO: Adding "Patches" and patching system
 			string writeableFolder = GetWriteableFolder();
-			SearchPaths.Add(Path.Combine(writeableFolder, DefaultModFolderName));
+			SearchPaths.Add(writeableFolder + "/" + DefaultModFolderName + "/");
 		}
 
 		protected static string GetWriteableFolder()
