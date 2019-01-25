@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Newtonsoft.Json;
 
 namespace Modding.Parsers
 {
@@ -28,14 +29,15 @@ namespace Modding.Parsers
 
 		public static T FromJson<T>(string json)
 		{
-			return JsonUtility.FromJson<T>(json);
+			return JsonConvert.DeserializeObject<T>(json);
 		}
 
 		public static string ToJson(object data)
 		{
-			return JsonUtility.ToJson(data, true);
+			return JsonConvert.SerializeObject(data);
 		}
 
+		// TODO: Use JSON.NET
 		public static void OverwriteJson(object data, string overwrite)
 		{
 			JsonUtility.FromJsonOverwrite(overwrite, data);

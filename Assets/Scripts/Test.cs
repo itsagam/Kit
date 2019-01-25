@@ -55,14 +55,13 @@ public class Test: MonoBehaviour
 		ResourceManager.ResourceLoaded += ResourceLoaded;
 		ResourceManager.ResourceReused += ResourceReused;
 
-		ResourceManager.Load<Texture>(ResourceFolder.Resources, "Textures/test.jpeg");
-		ResourceManager.Load<AudioClip>(ResourceFolder.Resources, "Sounds/test");
-		ResourceManager.Load<Texture>(ResourceFolder.StreamingAssets, "Textures/test.jpeg");
-
+		//ResourceManager.Load<Texture>(ResourceFolder.Resources, "Textures/test.jpeg");
+		//ResourceManager.Load<AudioClip>(ResourceFolder.Resources, "Sounds/test");
+		//ResourceManager.Load<Texture>(ResourceFolder.StreamingAssets, "Textures/TesT");
 		//InjectTest();
 		//await ConsoleTest();
 
-		
+
 		/*
 		Debugger.StartProfile("Resources.Load");
 		for (int i = 0; i <= 1000000; i++)
@@ -89,7 +88,7 @@ public class Test: MonoBehaviour
 
 	protected void ModdingTest()
 	{
-		//ModManager.LoadMods();
+		ModManager.LoadMods();
 		//ModManager.ResourceLoaded += ModManager_ResourceLoaded;
 		//ModManager.ResourceReused += ModManager_ResourceReused;
 

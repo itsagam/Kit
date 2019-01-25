@@ -101,8 +101,10 @@ namespace Modding.Loaders
 				{
 					string fullFile = System.IO.Path.GetFileName(fullPath);
 					var matching = Directory.EnumerateFiles(fullDir, $"{fullFile}.*");
+					string relativeDir = System.IO.Path.GetDirectoryName(path);
 					if (matching.Any())
-						return matching.Select(p => path + System.IO.Path.GetExtension(p));
+						return matching.Select(p => relativeDir + "/" + System.IO.Path.GetFileName(p));
+						//return matching.Select(p => path + System.IO.Path.GetExtension(p));
 				}
 			}
 

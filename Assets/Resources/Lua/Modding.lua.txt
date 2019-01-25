@@ -1,3 +1,10 @@
+io = nil
+os.execute = nil
+os.exit = nil
+os.remove = nil
+os.rename = nil
+os.tmpname = nil
+
 function readtext(file)
 	return self:ReadText(file)
 end

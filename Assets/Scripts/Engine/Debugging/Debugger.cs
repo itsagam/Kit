@@ -7,6 +7,7 @@ using System.Linq;
 using UnityEngine;
 using UnityEngine.Profiling;
 using UniRx;
+using Newtonsoft.Json;
 
 public class Debugger : MonoBehaviour
 {
@@ -210,7 +211,7 @@ public class Debugger : MonoBehaviour
 
 	protected static string SerializeObject(object obj)
 	{
-		return JsonUtility.ToJson(obj, true);
+		return JsonConvert.SerializeObject(obj);
 	}
 	#endregion
 }

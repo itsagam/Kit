@@ -17,12 +17,14 @@ namespace Modding
 	public struct ResourceInfo
 	{
 		public Mod Mod;
+		public string File;
 		public ResourceParser Parser;
 		public object Reference;
 		
-		public ResourceInfo(Mod mod, ResourceParser parser, object reference)
+		public ResourceInfo(Mod mod, string file, ResourceParser parser, object reference)
 		{
 			Mod = mod;
+			File = file;
 			Parser = parser;
 			Reference = reference;
 		}
@@ -49,6 +51,7 @@ namespace Modding
 
 		public static List<string> SearchPaths = new List<string>();
 		public static List<ModLoader> Loaders = new List<ModLoader>() {
+			//UNDONE: new AssetBundleLoader(),
 			new DirectModLoader(),
 			new ZipModLoader()
 		};
@@ -65,11 +68,12 @@ namespace Modding
         {
 			// TODO: Adding "Patches" and patching system
 			string writeableFolder = GetWriteableFolder();
-			SearchPaths.Add(writeableFolder + "/" + DefaultModFolderName + "/");
+			SearchPaths.Add(writeableFolder + DefaultModFolderName + "/");
 		}
 
 		protected static string GetWriteableFolder()
 		{
+			string folder = null;
 			switch (Application.platform)
 			{
 				case RuntimePlatform.WindowsEditor:
@@ -77,13 +81,18 @@ namespace Modding
 				case RuntimePlatform.LinuxEditor:
 				case RuntimePlatform.WindowsPlayer:
 				case RuntimePlatform.LinuxPlayer:
-					return Path.GetDirectoryName(Application.dataPath);
-		
+					folder = Path.GetDirectoryName(Application.dataPath);
+					break;
+
+				case RuntimePlatform.OSXPlayer:
 				case RuntimePlatform.IPhonePlayer:
 				case RuntimePlatform.Android:
-					return Application.persistentDataPath;
+					folder = Application.persistentDataPath;
+					break;
 			}
-			return null;
+			if (folder != null)
+				folder += "/";
+			return folder;
 		}
 
 		public static void LoadMods()
@@ -197,7 +206,6 @@ namespace Modding
 				PlayerPrefs.SetInt($"Mods/{mods[i].Metadata.Name}.Order", i);
 		}
 
-		// TODO: Save actual filenames
 		public static T Load<T>(string path) where T : class
 		{
 			List<ResourceInfo> loadedResources = GetFileInfo(path);
@@ -210,7 +218,7 @@ namespace Modding
 
 			foreach (Mod mod in mods)
 			{
-				var (reference, parser) = mod.Load<T>(path);
+				var (reference, file, parser) = mod.Load<T>(path);
 				if (reference != null)
 				{
 					if (!resourceInfos.TryGetValue(path, out loadedResources))
@@ -218,7 +226,7 @@ namespace Modding
 						loadedResources = new List<ResourceInfo>();
 						resourceInfos[path] = loadedResources;
 					}
-					ResourceInfo resourceInfo = new ResourceInfo(mod, parser, reference);
+					ResourceInfo resourceInfo = new ResourceInfo(mod, file, parser, reference);
 					loadedResources.Add(resourceInfo);
 					ResourceLoaded?.Invoke(path, resourceInfo);
 					return reference;
@@ -240,7 +248,7 @@ namespace Modding
 
 			foreach (Mod mod in mods)
 			{
-				var (reference, parser) = await mod.LoadAsync<T>(path);
+				var (reference, file, parser) = await mod.LoadAsync<T>(path);
 				if (reference != null)
 				{
 					if (!resourceInfos.TryGetValue(path, out loadedResources))
@@ -248,7 +256,7 @@ namespace Modding
 						loadedResources = new List<ResourceInfo>();
 						resourceInfos[path] = loadedResources;
 					}
-					ResourceInfo resourceInfo = new ResourceInfo(mod, parser, reference);
+					ResourceInfo resourceInfo = new ResourceInfo(mod, file, parser, reference);
 					loadedResources.Add(resourceInfo);
 					ResourceLoaded?.Invoke(path, resourceInfo);
 					return reference;
@@ -272,10 +280,10 @@ namespace Modding
 				ResourceInfo loadedResource = loadedResources.Find(r => r.Mod == mod);
 				if (loadedResource.Reference == null)
 				{
-					var (reference, parser) =  mod.Load<T>(path);
+					var (reference, file, parser) =  mod.Load<T>(path);
 					if (reference != null)
 					{
-						ResourceInfo resourceInfo = new ResourceInfo(mod, parser, reference);
+						ResourceInfo resourceInfo = new ResourceInfo(mod, file, parser, reference);
 						loadedResources.Add(resourceInfo);
 						ResourceLoaded?.Invoke(path, resourceInfo);
 						all.Add(reference);
@@ -304,10 +312,10 @@ namespace Modding
 				ResourceInfo loadedResource = loadedResources.Find(r => r.Mod == mod);
 				if (loadedResource.Reference == null)
 				{
-					var (reference, parser) = await mod.LoadAsync<T>(path);
+					var (reference, file, parser) = await mod.LoadAsync<T>(path);
 					if (reference != null)
 					{
-						ResourceInfo resourceInfo = new ResourceInfo(mod, parser, reference);
+						ResourceInfo resourceInfo = new ResourceInfo(mod, file, parser, reference);
 						loadedResources.Add(resourceInfo);
 						ResourceLoaded?.Invoke(path, resourceInfo);
 						all.Add(reference);

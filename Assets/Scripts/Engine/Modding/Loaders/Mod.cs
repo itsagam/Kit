@@ -117,7 +117,7 @@ namespace Modding
 			scriptUpdate = Observable.EveryUpdate().Subscribe(f => scriptEnv.Tick());
 		}
 
-		public virtual (T reference, ResourceParser parser) Load<T>(string path) where T : class
+		public virtual (T reference, string file, ResourceParser parser) Load<T>(string path) where T : class
 		{
 			IEnumerable<string> matchingFiles = FindFiles(path);
 			if (matchingFiles == null)
@@ -137,13 +137,13 @@ namespace Modding
 					{
 						if (bytes == null)
 							bytes = ReadBytes(file);
-						return ((T) parser.Read<T>(bytes, file), parser);
+						return ((T) parser.Read<T>(bytes, file), file, parser);
 					}
 					else
 					{
 						if (text == null)
 							text = ReadText(file);
-						return ((T) parser.Read<T>(text, file), parser);
+						return ((T) parser.Read<T>(text, file), file, parser);
 					}
 				}
 				catch
@@ -154,7 +154,7 @@ namespace Modding
 			return default;
 		}
 
-		public virtual async UniTask<(T reference, ResourceParser parser)> LoadAsync<T>(string path) where T : class
+		public virtual async UniTask<(T reference, string file, ResourceParser parser)> LoadAsync<T>(string path) where T : class
 		{
 			IEnumerable<string> matchingFiles = FindFiles(path);
 			if (matchingFiles == null)
@@ -174,13 +174,13 @@ namespace Modding
 					{
 						if (bytes == null)
 							bytes = await ReadBytesAsync(file);
-						return ((T) parser.Read<T>(bytes, file), parser);
+						return ((T) parser.Read<T>(bytes, file), file, parser);
 					}
 					else
 					{
 						if (text == null)
 							text = await ReadTextAsync(file);
-						return ((T) parser.Read<T>(text, file), parser);
+						return ((T) parser.Read<T>(text, file), file, parser);
 					}
 				}
 				catch

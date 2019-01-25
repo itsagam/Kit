@@ -10,15 +10,20 @@ using TouchScript.Gestures;
 using UniRx;
 using XLua;
 
+// TODO: Create EventSystem only if needed
+// TODO: Detect flick without TouchScript
 // TODO: Provide hotfix helper functions
 // TODO: Provide multiple-line support
 
+// TODO: Textfield sign
+// TODO: Textfield size
 public class Console : MonoBehaviour
 {
 	public Animator Animator;
 	public ScrollRect LogScroll;
 	public Text LogText;
-	public CustomInputField CommandInput;
+	public InputFieldEx CommandInput;
+	public ContentSizeFitter CommandInputFitter;
 
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
 	public const string Prefab = "Console/Console";
@@ -31,7 +36,7 @@ public class Console : MonoBehaviour
 	protected static Console instance = null;
 
 	#region Initialization
-	[RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
+	[RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
 	public static void Initialize()
 	{
 		if (instance == null)
@@ -94,10 +99,18 @@ public class Console : MonoBehaviour
 			.AddTo(this);
 		*/
 
-		CommandInput.AddKeyHandler(KeyCode.Return, NewLine, EventModifiers.Shift);
-		CommandInput.AddKeyHandler(KeyCode.Return, Submit);
-		CommandInput.AddKeyHandler(KeyCode.UpArrow, SelectPreviousCommand);
-		CommandInput.AddKeyHandler(KeyCode.DownArrow, SelectNextCommand);
+		EventModifiers disregard = EventModifiers.FunctionKey | EventModifiers.Numeric | EventModifiers.CapsLock;
+		var input = CommandInput;
+		input.AddKeyHandler(KeyCode.BackQuote,	() =>	{ },										EventModifiers.None,	disregard);
+		input.AddKeyHandler(KeyCode.Return,				Submit,										EventModifiers.None,	disregard);
+		input.AddKeyHandler(KeyCode.Return,		() =>	input.SendKeyEvent(KeyCode.Return,'\n'),	EventModifiers.Shift,	disregard);
+		input.AddKeyHandler(KeyCode.UpArrow,			SelectPreviousCommand,						EventModifiers.None,	disregard);
+		input.AddKeyHandler(KeyCode.DownArrow,			SelectNextCommand,							EventModifiers.None,	disregard);
+		input.AddKeyHandler(KeyCode.UpArrow,	() =>	input.SendKeyEvent(KeyCode.UpArrow),		EventModifiers.Shift,	disregard);
+		input.AddKeyHandler(KeyCode.DownArrow,	() =>	input.SendKeyEvent(KeyCode.DownArrow),		EventModifiers.Shift,	disregard);
+		input.AddKeyHandler(KeyCode.LeftArrow,	() =>	input.SendKeyEvent(KeyCode.LeftArrow),		EventModifiers.Shift,	disregard);
+		input.AddKeyHandler(KeyCode.RightArrow,	() =>	input.SendKeyEvent(KeyCode.RightArrow),		EventModifiers.Shift,	disregard);
+		input.onValueChanged.AddListener(OnValueChanged);
 	}
 	#endregion
 
@@ -106,21 +119,6 @@ public class Console : MonoBehaviour
 	{
 		LogText.text = "";
 		CommandInput.text = "";
-		CommandInput.onValidateInput += OnValidateInput;
-	}
-
-	protected void NewLine()
-	{
-	}
-
-	protected char OnValidateInput(string text, int charIndex, char addedChar)
-	{
-		if (addedChar == '`')
-			return '\0';
-		//else if (addedChar == '\n')
-		//	return '\0';
-		else
-			return addedChar;
 	}
 
 	public static void Show()
@@ -324,17 +322,30 @@ public class Console : MonoBehaviour
 	#endregion
 
 	#region Command
+	protected void OnValueChanged(string value)
+	{
+		CommandInputFitter.SetLayoutVertical();
+	}
+
 	protected void Submit()
 	{
 		string command = CommandInput.text;
 		if (command != "")
 		{
-			Log($"<b>{CommandPrefix}{command}</b>");
+			Log(FormatCommand(command));
 			AddToHistory(command);
 			Execute(command);
 			ClearCommand();
 			Observable.NextFrame().Subscribe(t => ScrollToBottom());
 		}
+	}
+
+	protected string FormatCommand(string command)
+	{
+		string[] lines = command.Split('\n');
+		lines[0] = CommandPrefix + lines[0];
+		string output = string.Join("\n  ", lines);
+		return "<b>" + output + "</b>";
 	}
 
 	public static void ClearCommand()
