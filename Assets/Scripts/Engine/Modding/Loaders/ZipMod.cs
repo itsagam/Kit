@@ -11,17 +11,16 @@ namespace Modding.Loaders
 {
 	public class ZipModLoader : ModLoader
 	{
-		public string MetadataFile;
-
-		public ZipModLoader(string metadataFile = "Metadata.json")
-		{
-			MetadataFile = metadataFile;
-		}
+		public List<string> SupportedExtensions = new List<string> { ".zip" };
 
 		public override Mod LoadMod(string path)
 		{
 			FileAttributes attributes = File.GetAttributes(path);
 			if (attributes.HasFlag(FileAttributes.Directory))
+				return null;
+
+			string fileExtension = Path.GetExtension(path);
+			if (!SupportedExtensions.Contains(fileExtension))
 				return null;
 
 			try
@@ -41,6 +40,10 @@ namespace Modding.Loaders
 		{
 			FileAttributes attributes = File.GetAttributes(path);
 			if (attributes.HasFlag(FileAttributes.Directory))
+				return null;
+
+			string fileExtension = Path.GetExtension(path);
+			if (!SupportedExtensions.Contains(fileExtension))
 				return null;
 
 			try
@@ -76,11 +79,7 @@ namespace Modding.Loaders
 
 		public override string ReadText(string path)
 		{
-			string matching = FindFile(path);
-			if (matching == null)
-				throw GetNotFoundException(path);
-
-			ZipArchiveEntry entry = Archive.GetEntry(matching);
+			ZipArchiveEntry entry = Archive.GetEntry(path);
 			using (Stream stream = entry.Open())
 			using (TextReader text = new StreamReader(stream))
 				return text.ReadToEnd();
@@ -88,11 +87,7 @@ namespace Modding.Loaders
 
 		public override async UniTask<string> ReadTextAsync(string path)
 		{
-			string matching = FindFile(path);
-			if (matching == null)
-				throw GetNotFoundException(path);
-
-			ZipArchiveEntry entry = Archive.GetEntry(matching);
+			ZipArchiveEntry entry = Archive.GetEntry(path);
 			using (Stream stream = entry.Open())
 			using (TextReader text = new StreamReader(stream))
 				return await text.ReadToEndAsync();
@@ -100,11 +95,7 @@ namespace Modding.Loaders
 
 		public override byte[] ReadBytes(string path)
 		{
-			string matching = FindFile(path);
-			if (matching == null)
-				throw GetNotFoundException(path);
-
-			ZipArchiveEntry entry = Archive.GetEntry(matching);
+			ZipArchiveEntry entry = Archive.GetEntry(path);
 			using (Stream stream = entry.Open())
 			{
 				byte[] data = new byte[entry.Length];
@@ -115,11 +106,7 @@ namespace Modding.Loaders
 
 		public override async UniTask<byte[]> ReadBytesAsync(string path)
 		{
-			string matching = FindFile(path);
-			if (matching == null)
-				throw GetNotFoundException(path);
-
-			ZipArchiveEntry entry = Archive.GetEntry(matching);
+			ZipArchiveEntry entry = Archive.GetEntry(path);
 			using (Stream stream = entry.Open())
 			{
 				byte[] data = new byte[entry.Length];

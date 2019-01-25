@@ -200,6 +200,7 @@ namespace Modding
 				PlayerPrefs.SetInt($"Mods/{mods[i].Metadata.Name}.Order", i);
 		}
 
+		// TODO: Save actual filenames
 		public static T Load<T>(string path) where T : class
 		{
 			List<ResourceInfo> loadedResources = GetResourceInfo(path);

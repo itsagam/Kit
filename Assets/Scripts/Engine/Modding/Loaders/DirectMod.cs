@@ -10,13 +10,6 @@ namespace Modding.Loaders
 {
 	public class DirectModLoader: ModLoader
 	{
-        public string MetadataFile;
-
-        public DirectModLoader(string metadataFile = "Metadata.json")
-        {
-            MetadataFile = metadataFile;
-        }
-
 		public override Mod LoadMod(string path)
 		{
 			FileAttributes attributes = File.GetAttributes(path);
@@ -65,40 +58,28 @@ namespace Modding.Loaders
 
 		public override string ReadText(string path)
 		{
-			string matching = FindFileEx(path, false, true);
-			if (matching == null)
-				throw GetNotFoundException(path);
-
-			return File.ReadAllText(matching);
+			string fullPath = GetFullPath(path);
+			return File.ReadAllText(fullPath);
 		}
 
 		public override async UniTask<string> ReadTextAsync(string path)
 		{
-			string matching = FindFileEx(path, false, true);
-			if (matching == null)
-				throw GetNotFoundException(path);
-
-			using (StreamReader stream = new StreamReader(matching))
+			string fullPath = GetFullPath(path);
+			using (StreamReader stream = new StreamReader(fullPath))
 				return await stream.ReadToEndAsync();
 		}
 
 		public override byte[] ReadBytes(string path)
 		{
-			string matching = FindFileEx(path, false, true);
-			if (matching == null)
-				throw GetNotFoundException(path);
-
-			return File.ReadAllBytes(matching);
+			string fullPath = GetFullPath(path);
+			return File.ReadAllBytes(fullPath);
 		}
 
 		public override async UniTask<byte[]> ReadBytesAsync(string path)
 		{
-			string matching = FindFileEx(path, false, true);
-			if (matching == null)
-				throw GetNotFoundException(path);
-
+			string fullPath = GetFullPath(path);
 			byte[] content;
-			using (FileStream stream = new FileStream(matching, FileMode.Open))
+			using (FileStream stream = new FileStream(fullPath, FileMode.Open))
 			{
 				content = new byte[stream.Length];
 				await stream.ReadAsync(content, 0, (int)stream.Length);
@@ -108,22 +89,11 @@ namespace Modding.Loaders
 
 		public override IEnumerable<string> FindFiles(string path)
 		{
-			return FindFilesEx(path, false, false);
-		}
-
-		public virtual string FindFileEx(string path, bool inFullPath, bool outFullPath)
-		{
-			return FindFilesEx(path, inFullPath, outFullPath).FirstOrDefault();
-		}
-
-		// Will not work for inFullPath = true, outFullPath = false
-		public virtual IEnumerable<string> FindFilesEx(string path, bool inFullPath, bool outFullPath)
-		{
-			string fullPath = inFullPath ? path : GetFullPath(path);
+			string fullPath = GetFullPath(path);
 			if (File.Exists(fullPath))
-				return outFullPath ? fullPath.Yield() : path.Yield();
+				return path.Yield();
 
-			if (!System.IO.Path.HasExtension(fullPath))
+			if (!System.IO.Path.HasExtension(path))
 			{
 				string fullDir = System.IO.Path.GetDirectoryName(fullPath);
 				if (Directory.Exists(fullDir))
@@ -131,7 +101,7 @@ namespace Modding.Loaders
 					string fullFile = System.IO.Path.GetFileName(fullPath);
 					var matching = Directory.EnumerateFiles(fullDir, $"{fullFile}.*");
 					if (matching.Any())
-						return outFullPath ? matching : matching.Select(p => path + System.IO.Path.GetExtension(p));
+						return matching.Select(p => path + System.IO.Path.GetExtension(p));
 				}
 			}
 

@@ -23,7 +23,6 @@ public class GameData
 	public double Value;
 }
 
-[Hotfix]
 public class Test: MonoBehaviour
 {
 	public static string String = "Default";
@@ -53,46 +52,31 @@ public class Test: MonoBehaviour
 	public GameObject obj;
 
 #pragma warning disable CS1998
-	async void  Start()
+	 void  Start()
 	{
-		await ModdingTest();
+		ModdingTest();
+
+		ResourceManager.ResourceLoaded += ResourceLoaded;
+		ResourceManager.ResourceReused += ResourceReused;
+
+		ResourceManager.Load<Texture>(ResourceFolder.Resources, "Textures/test", false);
+		ResourceManager.Load<AudioClip>(ResourceFolder.Resources, "Sounds/test", false);
+		ResourceManager.Load<Texture>(ResourceFolder.StreamingAssets, "Textures/test", false);
+
 		//InjectTest();
 		//await ConsoleTest();
 
-		/*
-		Debugger.StartProfile("async");
-		for (int i = 0; i <= 1000; i++)
-			await GetNumAsync(1000);
-		Debugger.EndAndLogProfile();
-		*/
-
-		/*
-		Debugger.StartProfile("void");
-		for (int i = 0; i <= 1000; i++)
-			GetNum(1000);
-		Debugger.EndAndLogProfile();
-		*/
-
-		/*
-		Debugger.StartProfile("UniTask");
-		for (int i = 0; i <= 1000; i++)
-			await GetNumUniTask(1000);
-		Debugger.EndAndLogProfile();
-		*/
-
-		//ResourceManager.ResourceLoaded += ResourceLoaded;
-		//ResourceManager.ResourceReused += ResourceReused;
-
+		
 		/*
 		Debugger.StartProfile("Resources.Load");
-		for (int i = 0; i <= 100000; i++)
+		for (int i = 0; i <= 1000000; i++)
 			Resources.Load<Texture>("Textures/test");
-		Debugger.EndAndLogProfile();
+		Debugger.EndProfile();
 
 		Debugger.StartProfile("ResourceManager.Load");
-		for (int i = 0; i <= 100000; i++)
-			ResourceManager.Load<Texture>(ResourceFolder.Resources, "Textures/test", true);
-		Debugger.EndAndLogProfile();
+		for (int i = 0; i <= 1000000; i++)
+			ResourceManager.Load<Texture>(ResourceFolder.Resources, "Textures/test.jpeg", true);
+		Debugger.EndProfile();
 		*/
 	}
 #pragma warning restore CS1998
@@ -107,51 +91,21 @@ public class Test: MonoBehaviour
 		Debug.Log($"File \"{path}\" loaded from folder \"{folder.ToString()}\"");
 	}
 
-	public async Task<int> GetNumAsync(int i)
+	protected void ModdingTest()
 	{
-		if (i > 0)
-			return i + await GetNumAsync(i - 1);
-		else
-			return 0;
-	}
+		ModManager.LoadMods();
+		//ModManager.ResourceLoaded += ModManager_ResourceLoaded;
+		//ModManager.ResourceReused += ModManager_ResourceReused;
 
-	public async UniTask<int> GetNumUniTask(int i)
-	{
-		if (i > 0)
-			return i + await GetNumUniTask(i - 1);
-		else
-			return 0;
-	}
+		//Debugger.Log(ResourceManager.Load<GameData>(ResourceFolder.StreamingAssets, @"Data/Test", true), true);
 
-	public int GetNum(int i)
-	{
-		if (i > 0)
-			return i + GetNum(i - 1);
-		else
-			return 0 ;
-	}
-	protected async UniTask ModdingTest()
-	{
-		await LoadMods();
-		//Debugger.Log(await ResourceManager.LoadAsync<GameData>(ResourceFolder.StreamingAssets, @"Data/Test", true), true);
-
-		//Texture tex = await ResourceManager.LoadAsync<Texture>(ResourceFolder.StreamingAssets, @"Textures/test");
+		//Texture tex = ResourceManager.Load<Texture>(ResourceFolder.StreamingAssets, @"Textures/test");
 		//obj.GetComponent<MeshRenderer>().material.mainTexture = tex;
 
-		//AudioClip clip = await ResourceManager.LoadAsync<AudioClip>(ResourceFolder.Resources, @"Sounds/Test");
+		//AudioClip clip = ResourceManager.Load<AudioClip>(ResourceFolder.Resources, @"Sounds/Test");
 		//GetComponent<AudioSource>().clip = clip;
 		//GetComponent<AudioSource>().Play();
 	}
-
-	protected async UniTask LoadMods()
-	{
-		await ModManager.LoadModsAsync();
-		//foreach (Mod mod in ModManager.Mods)
-		//	Debug.Log(mod.Metadata.Name);
-		ModManager.ResourceLoaded += ModManager_ResourceLoaded;
-		ModManager.ResourceReused += ModManager_ResourceReused;
-	}
-
 
 	private void ModManager_ResourceReused(string path, ResourceInfo info)
 	{

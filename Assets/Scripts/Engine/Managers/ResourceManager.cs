@@ -12,12 +12,12 @@ using Modding.Parsers;
 // Limitations: 1)	You have to provide file extension for ResourceFolder other than Resources if its not loaded 
 //					by ModManager because you can't enumerate and match files in StreamingAssets on platforms like 
 //					Android. If the file is found in ModManager they can be loaded without providing an extension.
-//				2)	IO operations other than readtext/readbytes/loadfile/dofile may not work in mods since they 
-//					can be in archives. Working directory is also different (project/application path instead of
-//					mod path). The implementations of above methods are provided by using Mod's Read functions.
-//				3)	If two files with same name are loaded from ModManager without an extension, it'll create a 
+//				2)	If two files with same name are loaded from ModManager without an extension, it'll create a 
 //					conflict (ModManager.Load<AudioClip>("Files/Test") and ModManager.Load<Texture>("Files/Test")),
 //					since the first object would be cached and a second call would try to reuse and cast it.
+//				3)	IO operations other than readtext/readbytes/loadfile/dofile may not work in mods since they 
+//					can be in archives. Working directory is also different (project/application path instead of
+//					mod path). The implementations of above methods are provided by using Mod's Read functions.
 
 public enum ResourceFolder
 {

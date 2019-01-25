@@ -3,10 +3,6 @@ function print(line)
 end
 CS.UnityEngine.Debug.Log = print
 
-function clear()
-	CS.Console.ClearLog()
-end
-
 function list(object)
 	if type(object) == "table" and typeof(object) ~= nil then
 		CS.Console.List(typeof(object))
@@ -14,6 +10,19 @@ function list(object)
 		CS.Console.Log(object)
 	end
 end
+
+function depth(count)
+	if (count == nil) then
+		return CS.Console.Depth
+	else
+		CS.Console.Depth = count
+	end
+end
+
+function clear()
+	CS.Console.ClearLog()
+end
+cls = clear
 
 function go(path, comp)
 	if type(path) == "string" then

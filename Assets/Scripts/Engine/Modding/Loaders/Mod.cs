@@ -116,11 +116,6 @@ namespace Modding
 			scriptUpdate = Observable.EveryUpdate().Subscribe(f => scriptEnv.Tick());
 		}
 
-		public virtual string FindFile(string path)
-		{
-			return FindFiles(path)?.FirstOrDefault();
-		}
-
 		public virtual (T reference, ResourceParser parser) Load<T>(string path) where T : class
 		{
 			IEnumerable<string> matchingFiles = FindFiles(path);
@@ -194,11 +189,6 @@ namespace Modding
 
 			return default;
 		}
-
-		protected virtual FileNotFoundException GetNotFoundException(string path)
-        {
-			return new FileNotFoundException($"File \"{path}\" not found in mod \"{Metadata.Name}\".");
-        }
 
 		public virtual void Unload()
 		{

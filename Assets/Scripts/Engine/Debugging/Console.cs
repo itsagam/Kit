@@ -15,18 +15,18 @@ using XLua;
 
 public class Console : MonoBehaviour
 {
-	public const bool Enabled = true;
-	public const string Prefab = "Console/Console";
-	public const int Length = 5000;
-	public const string LogColor = "#00DDFF"; //#DDDDDDD
-	public const string CommandPrefix = "> ";
-	public const string NullString = "nil";
-	public static int Depth = 2;
-
 	public Animator Animator;
 	public ScrollRect LogScroll;
 	public Text LogText;
 	public CustomInputField CommandInput;
+
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
+	public const string Prefab = "Console/Console";
+	public const int Length = 5000;
+	public const string LogColor = "#7EF9FF";
+	public const string CommandPrefix = "> ";
+	public const string NullString = "nil";
+	public static int Depth = 2;
 
 	protected static Console instance = null;
 
@@ -34,7 +34,7 @@ public class Console : MonoBehaviour
 	[RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
 	public static void Initialize()
 	{
-		if (Enabled && instance == null)
+		if (instance == null)
 		{
 			Console prefab = Resources.Load<Console>(Prefab);
 			instance = Instantiate(prefab);
@@ -199,7 +199,6 @@ public class Console : MonoBehaviour
 		}
 		log.AppendLine(line);
 		instance.LogText.text = log.ToString();
-		Observable.NextFrame().Subscribe(t => ScrollToBottom());
 	}
 
 	public static string ObjectOrTableToString(object obj)
@@ -331,10 +330,11 @@ public class Console : MonoBehaviour
 		string command = CommandInput.text;
 		if (command != "")
 		{
-			Log(CommandPrefix + command);
+			Log($"<b>{CommandPrefix}{command}</b>");
 			AddToHistory(command);
 			Execute(command);
 			ClearCommand();
+			Observable.NextFrame().Subscribe(t => ScrollToBottom());
 		}
 	}
 
@@ -445,4 +445,6 @@ public class Console : MonoBehaviour
 		UnregisterLogging();
 	}
 	#endregion
+
+#endif
 }
