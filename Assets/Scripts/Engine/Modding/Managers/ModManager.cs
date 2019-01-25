@@ -4,12 +4,16 @@ using System.Collections.ObjectModel;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using Modding.Parsers;
+
+#if MODDING
 using UniRx.Async;
 using Modding.Loaders;
-using Modding.Parsers;
+#endif
 
 namespace Modding
 {
+	#if MODDING
 	public struct ResourceInfo
 	{
 		public Mod Mod;
@@ -23,9 +27,18 @@ namespace Modding
 			Reference = reference;
 		}
 	}
+	#endif
 
 	public class ModManager
 	{
+		public static List<ResourceParser> Parsers = new List<ResourceParser>() {
+			new JSONParser(),
+			new TextureParser(),
+			new AudioParser(),
+			new TextParser()
+		};
+
+#if MODDING
 		public static event Action<Mod> ModLoaded;
 		public static event Action<Mod> ModUnloaded;
 		public static event Action<string, ResourceInfo> ResourceLoaded;
@@ -34,34 +47,18 @@ namespace Modding
 
 		public const string DefaultModFolderName = "Mods";
 
-        public static List<ModLoader> Loaders = new List<ModLoader>();
-		public static List<ResourceParser> Parsers = new List<ResourceParser>();
 		public static List<string> SearchPaths = new List<string>();
-
+		public static List<ModLoader> Loaders = new List<ModLoader>() {
+			new DirectModLoader(),
+			new ZipModLoader()
+		};
+		
 		protected static List<Mod> mods = new List<Mod>();
 		protected static Dictionary<string, List<ResourceInfo>> resourceInfos = new Dictionary<string, List<ResourceInfo>>();
 
 		static ModManager()
 		{
-			AddDefaultLoaders();
-			AddDefaultParsers();
 			AddDefaultSearchPaths();
-		}
-
-		protected static void AddDefaultLoaders()
-        {
-			Loaders.Add(new DirectModLoader());
-			Loaders.Add(new ZipModLoader());
-			// UNDONE: Loaders.Add(new AssetBundleModLoader());
-		}
-
-		protected static void AddDefaultParsers()
-		{
-			Parsers.Add(new JSONParser());
-
-			Parsers.Add(new TextureParser());
-			Parsers.Add(new AudioParser());
-			Parsers.Add(new TextParser());
 		}
 
 		protected static void AddDefaultSearchPaths()
@@ -543,5 +540,6 @@ namespace Modding
 				return mods.AsReadOnly();
 			}
 		}
+#endif
 	}
 }

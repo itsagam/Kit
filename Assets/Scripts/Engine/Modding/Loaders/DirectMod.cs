@@ -1,4 +1,5 @@
-﻿using System;
+﻿#if MODDING
+using System;
 using System.Collections;
 using System.IO;
 using System.Collections.Generic;
@@ -119,3 +120,4 @@ namespace Modding.Loaders
 		}
 	}
 }
+#endif

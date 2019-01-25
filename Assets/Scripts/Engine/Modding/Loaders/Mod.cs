@@ -1,4 +1,5 @@
-﻿using System;
+﻿#if MODDING
+using System;
 using System.IO;
 using System.Collections;
 using System.Collections.Generic;
@@ -80,7 +81,7 @@ namespace Modding
 				}
 				catch (Exception e)
 				{
-					Debug.LogException(e);
+					Debugger.Log("ModManager", e.Message);
 				}
 			}
 
@@ -109,7 +110,7 @@ namespace Modding
 				}
 				catch (Exception e)
 				{
-					Debug.LogException(e);
+					Debugger.Log("ModManager", e.Message);
 				}
 			}
 
@@ -197,4 +198,4 @@ namespace Modding
 		}
 	}
 }
- 
+#endif

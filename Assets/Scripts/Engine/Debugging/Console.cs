@@ -111,7 +111,6 @@ public class Console : MonoBehaviour
 
 	protected void NewLine()
 	{
-		//CommandInput.caretPosition;
 	}
 
 	protected char OnValidateInput(string text, int charIndex, char addedChar)

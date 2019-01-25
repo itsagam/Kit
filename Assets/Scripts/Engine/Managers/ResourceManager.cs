@@ -10,8 +10,9 @@ using Modding;
 using Modding.Parsers;
 
 // Limitations: 1)	You have to provide file extension for ResourceFolder other than Resources if its not loaded 
-//					by ModManager because you can't enumerate and match files in StreamingAssets on platforms like 
-//					Android. If the file is found in ModManager they can be loaded without providing an extension.
+//					by ModManager because you can't enumerate and match files in Data/Resources/StreamingAssets on 
+//					platforms like Android. If the file is found in ModManager they can be loaded without providing 
+//					an extension since mods are always in an accessible folder.
 //				2)	If two files with same name are loaded from ModManager without an extension, it'll create a 
 //					conflict (ModManager.Load<AudioClip>("Files/Test") and ModManager.Load<Texture>("Files/Test")),
 //					since the first object would be cached and a second call would try to reuse and cast it.
@@ -35,8 +36,6 @@ public class ResourceManager
 		{ ResourceFolder.PersistentData, Application.persistentDataPath + "/"},
 		{ ResourceFolder.Resources, Application.dataPath + "/Resources/"} };
 
-	// Global variable to enable/disable modding
-	public static bool Modding = true;
 	// Default mode for modding in individual calls
 	public const bool DefaultModding = true;
 
@@ -55,45 +54,64 @@ public class ResourceManager
 	#region Loading
 	public static T Load<T>(ResourceFolder folder, string file, bool modded = DefaultModding, bool merge = false) where T : class
 	{
-		if (Modding && modded)
+#if MODDING
+		if (modded)
 		{
-			if (!merge)
+			if (merge)
 			{
-				string moddingPath = GetModdingPath(folder, file);
-				T moddedFile = ModManager.Load<T>(moddingPath);
-				if (moddedFile != null)
-					return moddedFile;
+				return LoadMerged<T>(folder, file);
 			}
 			else
-				return LoadMerged<T>(folder, file);
+			{
+				T moddedFile = LoadModded<T>(folder, file);
+				if (moddedFile != null)
+					return moddedFile;
+			}		
 		}
-
+#endif
 		return LoadUnmodded<T>(folder, file);
 	}
 
 	public static async UniTask<T> LoadAsync<T>(ResourceFolder folder, string file, bool modded = DefaultModding, bool merge = false) where T : class
 	{
-		if (Modding && modded)
+#if MODDING
+		if (modded)
 		{
-			if (!merge)
+			if (merge)
 			{
-				string moddingPath = GetModdingPath(folder, file);
-				T moddedFile = await ModManager.LoadAsync<T>(moddingPath);
+				return await LoadMergedAsync<T>(folder, file);
+			}
+			else
+			{
+				T moddedFile = await LoadModdedAsync<T>(folder, file);
 				if (moddedFile != null)
 					return moddedFile;
 			}
-			else
-				return await LoadMergedAsync<T>(folder, file);
 		}
-
+#endif
 		return await LoadUnmoddedAsync<T>(folder, file);
 	}
+
+#if MODDING
+	public static T LoadModded<T>(ResourceFolder folder, string file) where T : class
+	{
+		string moddingPath = GetModdingPath(folder, file);
+		return ModManager.Load<T>(moddingPath);
+	}
+
+	public static async UniTask<T> LoadModdedAsync<T>(ResourceFolder folder, string file) where T : class
+	{
+		string moddingPath = GetModdingPath(folder, file);
+		return await ModManager.LoadAsync<T>(moddingPath);
+	}
+#endif
 
 	// TODO: Handle conflict between loading same filename from two different ResourceFolder
 	public static T LoadUnmodded<T>(ResourceFolder folder, string file) where T : class
 	{
 		object reference = null;
-		if (!resources.TryGetValue(file, out reference))
+		string moddingPath = GetModdingPath(folder, file);
+		if (!resources.TryGetValue(moddingPath, out reference))
 		{
 			if (folder == ResourceFolder.Resources)
 			{
@@ -108,7 +126,7 @@ public class ResourceManager
 
 			if (reference != null)
 			{
-				resources.Add(file, reference);
+				resources.Add(moddingPath, reference);
 				ResourceLoaded?.Invoke(folder, file, reference);
 			}
 		}
@@ -120,7 +138,8 @@ public class ResourceManager
 	public static async UniTask<T> LoadUnmoddedAsync<T>(ResourceFolder folder, string file) where T : class
 	{
 		object reference = null;
-		if (!resources.TryGetValue(file, out reference))
+		string moddingPath = GetModdingPath(folder, file);
+		if (!resources.TryGetValue(moddingPath, out reference))
 		{
 			if (folder == ResourceFolder.Resources)
 			{
@@ -135,7 +154,7 @@ public class ResourceManager
 
 			if (reference != null)
 			{
-				resources.Add(file, reference);
+				resources.Add(moddingPath, reference);
 				ResourceLoaded?.Invoke(folder, file, reference);
 			}
 		}
@@ -144,10 +163,12 @@ public class ResourceManager
 		return (T) reference;
 	}
 
+#if MODDING
 	public static T LoadMerged<T>(ResourceFolder folder, string file) where T : class
 	{
 		object reference = null;
-		if (resources.TryGetValue(file, out reference))
+		string moddingPath = GetModdingPath(folder, file);
+		if (resources.TryGetValue(moddingPath, out reference))
 			return (T) reference;
 
 		ResourceParser parser = null;
@@ -172,7 +193,6 @@ public class ResourceManager
 		{
 			try
 			{
-				string moddingPath = GetModdingPath(folder, file);
 				if (parser.OperateWith == OperateType.Text)
 				{
 					List<string> textList = ModManager.ReadTextAll(moddingPath);
@@ -188,17 +208,18 @@ public class ResourceManager
 			}
 			catch (Exception e)
 			{
-				Debug.LogException(e);
+				Debugger.Log("ResourceManager", e.Message);
 			}
 		}
-		resources[file] = merged;
+		resources[moddingPath] = merged;
 		return merged;
 	}
 
 	public static async UniTask<T> LoadMergedAsync<T>(ResourceFolder folder, string file) where T : class
 	{
 		object reference = null;
-		if (resources.TryGetValue(file, out reference))
+		string moddingPath = GetModdingPath(folder, file);
+		if (resources.TryGetValue(moddingPath, out reference))
 			return (T) reference;
 
 		ResourceParser parser = null;
@@ -223,7 +244,6 @@ public class ResourceManager
 		{
 			try
 			{
-				string moddingPath = GetModdingPath(folder, file);
 				if (parser.OperateWith == OperateType.Text)
 				{
 					List<string> textList = await ModManager.ReadTextAllAsync(moddingPath);
@@ -239,12 +259,13 @@ public class ResourceManager
 			}
 			catch (Exception e)
 			{
-				Debug.LogException(e);
+				Debugger.Log("ResourceManager", e.Message);
 			}
 		}
-		resources[file] = merged;
+		resources[moddingPath] = merged;
 		return merged;
 	}
+#endif
 
 	public static (T reference, ResourceParser parser) Load<T>(string fullPath) where T : class
 	{
@@ -311,8 +332,10 @@ public class ResourceManager
 
 	public static bool Unload(object resource)
 	{
-		if (Modding && ModManager.Unload(resource))
+#if MODDING
+		if (ModManager.Unload(resource))
 			return true;
+#endif
 
 		bool found = false;
 		foreach (var kvp in resources.Reverse())
@@ -343,12 +366,15 @@ public class ResourceManager
 	public static bool Unload(ResourceFolder folder, string file)
 	{
 		string moddingPath = GetModdingPath(folder, file);
-		if (Modding && ModManager.UnloadAll(moddingPath))
+
+#if MODDING
+		if (ModManager.UnloadAll(moddingPath))
 			return true;
+#endif
 		
-		if (resources.TryGetValue(file, out object resource))
+		if (resources.TryGetValue(moddingPath, out object resource))
 		{
-			resources.Remove(file);
+			resources.Remove(moddingPath);
 			if (resource is UnityEngine.Object unityObject)
 			{
 				if (folder == ResourceFolder.Resources)
@@ -371,50 +397,58 @@ public class ResourceManager
 		resources.Clear();
 	}
 
-	#endregion
+#endregion
 
-	#region Reading
+#region Reading
 	public static string ReadText(ResourceFolder folder, string file, bool modded = DefaultModding)
 	{
-		if (Modding && modded)
+#if MODDING
+		if (modded)
 		{
 			string moddedFile = ModManager.ReadText(GetModdingPath(folder, file));
 			if (moddedFile != null)
 				return moddedFile;
 		}
+#endif
 		return ReadText(GetPath(folder, file));
 	}
 
 	public static async UniTask<string> ReadTextAsync(ResourceFolder folder, string file, bool modded = DefaultModding)
 	{
-		if (Modding && modded)
+#if MODDING
+		if (modded)
 		{
 			string moddedFile = await ModManager.ReadTextAsync(GetModdingPath(folder, file));
 			if (moddedFile != null)
 				return moddedFile;
 		}
+#endif
 		return await ReadTextAsync(GetPath(folder, file));
 	}
 
 	public static byte[] ReadBytes(ResourceFolder folder, string file, bool modded = DefaultModding)
 	{
-		if (Modding && modded)
+#if MODDING
+		if (modded)
 		{
 			byte[] moddedFile = ModManager.ReadBytes(GetModdingPath(folder, file));
 			if (moddedFile != null)
 				return moddedFile;
 		}
+#endif
 		return ReadBytes(GetPath(folder, file));
 	}
 
 	public static async UniTask<byte[]> ReadBytesAsync(ResourceFolder folder, string file, bool modded = DefaultModding)
 	{
-		if (Modding && modded)
+#if MODDING
+		if (modded)
 		{
 			byte[] moddedFile = await ModManager.ReadBytesAsync(GetModdingPath(folder, file));
 			if (moddedFile != null)
 				return moddedFile;
 		}
+#endif
 		return await ReadBytesAsync(GetPath(folder, file));
 	}
 
@@ -426,7 +460,7 @@ public class ResourceManager
 		}
 		catch (Exception e)
 		{
-			Debug.LogException(e);
+			Debugger.Log("ResourceManager", e.Message);
 			return null;
 		}
 	}
@@ -448,7 +482,7 @@ public class ResourceManager
 		}
 		catch (Exception e)
 		{
-			Debug.LogException(e);
+			Debugger.Log("ResourceManager", e.Message);
 			return null;
 		}
 	}
@@ -468,9 +502,9 @@ public class ResourceManager
 		await request.SendWebRequest();
 		return request;
 	}
-	#endregion
+#endregion
 
-	#region Saving/Deleting
+#region Saving/Deleting
 	public static bool Save(ResourceFolder folder, string file, object contents, ResourceParser parser)
 	{
 		return Save(GetPath(folder, file), contents, parser);
@@ -526,7 +560,7 @@ public class ResourceManager
 		}
 		catch (Exception e)
 		{
-			Debug.LogException(e);
+			Debugger.Log("ResourceManager", e.Message);
 			return false;
 		}
 	}
@@ -541,7 +575,7 @@ public class ResourceManager
 		}
 		catch (Exception e)
 		{
-			Debug.LogException(e);
+			Debugger.Log("ResourceManager", e.Message);
 			return false;
 		}
 	}
@@ -555,7 +589,7 @@ public class ResourceManager
 		}
 		catch (Exception e)
 		{
-			Debug.LogException(e);
+			Debugger.Log("ResourceManager", e.Message);
 			return false;
 		}
 	}
@@ -570,7 +604,7 @@ public class ResourceManager
 		}
 		catch (Exception e)
 		{
-			Debug.LogException(e);
+			Debugger.Log("ResourceManager", e.Message);
 			return false;
 		}
 	}
@@ -589,7 +623,7 @@ public class ResourceManager
 		}
 		catch (Exception e)
 		{
-			Debug.LogException(e);
+			Debugger.Log("ResourceManager", e.Message);
 			return false;
 		}
 	}
@@ -603,13 +637,15 @@ public class ResourceManager
 	{
 		return File.Exists(fullPath);
 	}
-	#endregion
+#endregion
 
-	#region Other
-	public static List<ResourceInfo> GetModdedResourceInfo(ResourceFolder folder, string file)
+#region Other
+#if MODDING
+	public static List<ResourceInfo> GetModdedFileInfo(ResourceFolder folder, string file)
 	{
 		return ModManager.GetResourceInfo(GetModdingPath(folder, file));
 	}
+#endif
 
 	public static string GetPath(ResourceFolder folder)
 	{
@@ -637,5 +673,5 @@ public class ResourceManager
 			path = "file://" + path;
 		return path;
 	}
-	#endregion
+#endregion
 }

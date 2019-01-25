@@ -1,18 +1,14 @@
 ﻿using System;
-using System.ComponentModel;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
-using System.Threading.Tasks;
+using System.Text;
 using System.IO;
 using UnityEngine;
 using Modding;
-using UnityEngine.UI;
 using UniRx;
 using UniRx.Async;
 using XLua;
-using System.Text;
 
 public class GameData
 {
@@ -54,14 +50,14 @@ public class Test: MonoBehaviour
 #pragma warning disable CS1998
 	 void  Start()
 	{
-		ModdingTest();
+		//ModdingTest();
 
 		ResourceManager.ResourceLoaded += ResourceLoaded;
 		ResourceManager.ResourceReused += ResourceReused;
 
-		ResourceManager.Load<Texture>(ResourceFolder.Resources, "Textures/test", false);
-		ResourceManager.Load<AudioClip>(ResourceFolder.Resources, "Sounds/test", false);
-		ResourceManager.Load<Texture>(ResourceFolder.StreamingAssets, "Textures/test", false);
+		ResourceManager.Load<Texture>(ResourceFolder.Resources, "Textures/test.jpeg");
+		ResourceManager.Load<AudioClip>(ResourceFolder.Resources, "Sounds/test");
+		ResourceManager.Load<Texture>(ResourceFolder.StreamingAssets, "Textures/test.jpeg");
 
 		//InjectTest();
 		//await ConsoleTest();
@@ -93,7 +89,7 @@ public class Test: MonoBehaviour
 
 	protected void ModdingTest()
 	{
-		ModManager.LoadMods();
+		//ModManager.LoadMods();
 		//ModManager.ResourceLoaded += ModManager_ResourceLoaded;
 		//ModManager.ResourceReused += ModManager_ResourceReused;
 
@@ -107,6 +103,7 @@ public class Test: MonoBehaviour
 		//GetComponent<AudioSource>().Play();
 	}
 
+	/*
 	private void ModManager_ResourceReused(string path, ResourceInfo info)
 	{
 		Debug.Log($"File \"{path}\" resused from \"{info.Mod.Path}\"");
@@ -116,10 +113,11 @@ public class Test: MonoBehaviour
 	{
 		Debug.Log($"File \"{path}\" loaded from \"{info.Mod.Path}\"");
 	}
+	*/
 
 	void OnDestroy()
 	{
-		ModManager.UnloadMods();
+		//ModManager.UnloadMods();
 	}
 
 	async UniTask ConsoleTest()

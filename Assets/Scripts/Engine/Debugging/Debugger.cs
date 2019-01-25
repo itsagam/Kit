@@ -107,32 +107,44 @@ public class Debugger : MonoBehaviour
 	#region Logging
 	public static void Log(string line)
 	{
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
 		Debug.Log(line);
+#endif
 	}
 
 	public static void Log(string type, string line)
 	{
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
 		Log("[" + type + "] " + line);
+#endif
 	}
 
 	public static void Log(object obj, bool serialize = false)
 	{
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
 		Log(ObjectToString(obj, serialize));
+#endif
 	}
 
 	public static void Log(string type, object obj, bool serialize = false)
 	{
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
 		Log(type, ObjectToString(obj, serialize));
+#endif
 	}
 
 	public static void Log(IEnumerable enumerable, bool serialize = false)
 	{
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
 		Log(EnumerableToString(enumerable, serialize));
+#endif
 	}
 
 	public static void Log(string type, IEnumerable enumerable, bool serialize = false)
 	{
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
 		Log(type, EnumerableToString(enumerable, serialize));
+#endif
 	}
 
 	public static string ObjectOrEnumerableToString(object obj, bool serialize, string nullString = NullString)
