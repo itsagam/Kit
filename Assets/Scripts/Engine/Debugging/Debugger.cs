@@ -173,7 +173,7 @@ public class Debugger : MonoBehaviour
 		if (obj.GetType().IsValueType || (obj is string))
 			return obj.ToString();
 		else
-			return serialize ? SerializeObject(obj) : obj.ToString();
+			return serialize ? JsonConvert.SerializeObject(obj) : obj.ToString();
 	}
 
 	public static void ObjectToString(StringBuilder output, object obj, bool serialize, string nullString)
@@ -207,11 +207,6 @@ public class Debugger : MonoBehaviour
 			ObjectOrEnumerableToString(output, item, serialize, nullString);
 		}
 		output.Append("}");
-	}
-
-	protected static string SerializeObject(object obj)
-	{
-		return JsonConvert.SerializeObject(obj);
 	}
 	#endregion
 }

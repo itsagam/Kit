@@ -45,23 +45,15 @@ public class Test: MonoBehaviour
 		}
 	}
 
-	public GameObject obj;
-
 #pragma warning disable CS1998
 	 void  Start()
 	{
 		//ModdingTest();
-
-		ResourceManager.ResourceLoaded += ResourceLoaded;
-		ResourceManager.ResourceReused += ResourceReused;
-
-		//ResourceManager.Load<Texture>(ResourceFolder.Resources, "Textures/test.jpeg");
-		//ResourceManager.Load<AudioClip>(ResourceFolder.Resources, "Sounds/test");
-		//ResourceManager.Load<Texture>(ResourceFolder.StreamingAssets, "Textures/TesT");
 		//InjectTest();
 		//await ConsoleTest();
 
-
+		//ResourceManager.ResourceLoaded += ResourceLoaded;
+		//ResourceManager.ResourceReused += ResourceReused;
 		/*
 		Debugger.StartProfile("Resources.Load");
 		for (int i = 0; i <= 1000000; i++)

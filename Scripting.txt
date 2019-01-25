@@ -30,7 +30,7 @@ Lots of high-level functionalities
 Hotfix functionality does voodoo (https://github.com/Tencent/xLua/blob/master/Assets/XLua/Doc/Hotfix_EN.md) to allow to change C# methods (create a property somewhere marked with [Hotfix] attribute that returns all modifiable classes)
 To enable hotfix funtionality you have to inject project .dll after every recompile with xLua->Hotfix in Editor
 Both static-binding via code generation and reflection supported
-A bit more consistent and cleaner than xLua
+A bit more consistent and cleaner than ToLua
 Maintained by Tencent
 
 ToLua:

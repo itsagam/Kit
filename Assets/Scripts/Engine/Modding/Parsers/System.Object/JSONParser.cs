@@ -36,11 +36,10 @@ namespace Modding.Parsers
 		{
 			return JsonConvert.SerializeObject(data);
 		}
-
-		// TODO: Use JSON.NET
+		
 		public static void OverwriteJson(object data, string overwrite)
 		{
-			JsonUtility.FromJsonOverwrite(overwrite, data);
+			JsonConvert.PopulateObject(overwrite, data);
 		}
 	}
 }

@@ -6,14 +6,13 @@ using System.Linq;
 using System.Reflection;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.EventSystems;
 using TouchScript.Gestures;
 using UniRx;
 using XLua;
 
-// TODO: Create EventSystem only if needed
 // TODO: Detect flick without TouchScript
 // TODO: Provide hotfix helper functions
-// TODO: Provide multiple-line support
 
 // TODO: Textfield sign
 // TODO: Textfield size
@@ -45,17 +44,19 @@ public class Console : MonoBehaviour
 			instance = Instantiate(prefab);
 			instance.name = prefab.name;
 		}
+
+		if (EventSystem.current == null)
+			new GameObject("EventSystem", typeof(EventSystem), typeof(StandaloneInputModule));
 	}
 
 	protected void Awake()
 	{
 		instance = this;
-
+		
 		RegisterLogging();
 		RegisterInput();
-		InitializeScripting();
 		InitializeUI();
-		InitializeHistory();
+		InitializeScripting();
 		DontDestroyOnLoad(gameObject);
 	}
 
@@ -399,14 +400,8 @@ public class Console : MonoBehaviour
 	#endregion
 
 	#region History
-	protected List<string> history;
-	protected int currentCommandIndex;
-
-	protected void InitializeHistory()
-	{
-		history = new List<string>();
-		currentCommandIndex = 0;
-	}
+	protected List<string> history = new List<string>();
+	protected int currentCommandIndex = 0;
 
 	protected void AddToHistory(string command)
 	{
