@@ -11,7 +11,8 @@ using UniRx;
 public class Debugger : MonoBehaviour
 {
 	public const string NullString = "Null";
-	
+
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
 	#region Profiling
 	protected static OrderedDictionary Samples = new OrderedDictionary();
 
@@ -103,6 +104,7 @@ public class Debugger : MonoBehaviour
 		return Math.Round(time / 1000000f, 5) + "ms";
 	}
 	#endregion
+#endif
 
 	#region Logging
 	public static void Log(string line)
@@ -206,7 +208,7 @@ public class Debugger : MonoBehaviour
 		output.Append("}");
 	}
 
-	public static string SerializeObject(object obj)
+	protected static string SerializeObject(object obj)
 	{
 		return JsonUtility.ToJson(obj, true);
 	}

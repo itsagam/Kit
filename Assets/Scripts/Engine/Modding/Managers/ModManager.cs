@@ -200,7 +200,7 @@ namespace Modding
 		// TODO: Save actual filenames
 		public static T Load<T>(string path) where T : class
 		{
-			List<ResourceInfo> loadedResources = GetResourceInfo(path);
+			List<ResourceInfo> loadedResources = GetFileInfo(path);
 			if (loadedResources != null)
 			{
 				ResourceInfo loadedResource = loadedResources[0];
@@ -230,7 +230,7 @@ namespace Modding
 
 		public static async UniTask<T> LoadAsync<T>(string path) where T : class
 		{
-			List<ResourceInfo> loadedResources = GetResourceInfo(path);
+			List<ResourceInfo> loadedResources = GetFileInfo(path);
 			if (loadedResources != null)
 			{
 				ResourceInfo loadedResource = loadedResources[0];
@@ -260,7 +260,7 @@ namespace Modding
 
 		public static List<T> LoadAll<T>(string path) where T : class
 		{
-			List<ResourceInfo> loadedResources = GetResourceInfo(path);
+			List<ResourceInfo> loadedResources = GetFileInfo(path);
 			if (loadedResources == null)
 			{
 				loadedResources = new List<ResourceInfo>();
@@ -292,7 +292,7 @@ namespace Modding
 
 		public static async UniTask<List<T>> LoadAllAsync<T>(string path) where T : class
 		{
-			List<ResourceInfo> loadedResources = GetResourceInfo(path);
+			List<ResourceInfo> loadedResources = GetFileInfo(path);
 			if (loadedResources == null)
 			{
 				loadedResources = new List<ResourceInfo>();
@@ -322,7 +322,7 @@ namespace Modding
 			return all;
 		}
 
-		public static List<ResourceInfo> GetResourceInfo(string path)
+		public static List<ResourceInfo> GetFileInfo(string path)
 		{
 			if (resourceInfos.TryGetValue(path, out List<ResourceInfo> resourceInfo))
 				if (resourceInfo.Count > 0)
@@ -506,7 +506,7 @@ namespace Modding
 
 		public static bool UnloadAll(string path)
 		{
-			List<ResourceInfo> infos = GetResourceInfo(path);
+			List<ResourceInfo> infos = GetFileInfo(path);
 			if (infos != null)
 			{
 				foreach (ResourceInfo info in infos)
