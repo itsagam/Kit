@@ -11,11 +11,11 @@ using TouchScript.Gestures;
 using UniRx;
 using XLua;
 
+// TODO: Prefab Mode in Play Mode was blocked by the script 'FullscreenLayer' to prevent the script accidentally affecting Play Mode. See the documentation for [ExecuteInEditMode] and [ExecuteAlways] for info on how to make scripts compatible with Prefab Mode during Play Mode.
 // TODO: Detect flick without TouchScript
 // TODO: Provide hotfix helper functions
-
-// TODO: Textfield sign
 // TODO: Textfield size
+
 public class Console : MonoBehaviour
 {
 	public Animator Animator;
