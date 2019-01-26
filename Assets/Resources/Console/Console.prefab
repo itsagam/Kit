@@ -277,8 +277,6 @@ GameObject:
   m_Component:
   - component: {fileID: 1879828061914024699}
   - component: {fileID: 2894759613888487253}
-  - component: {fileID: 1986073387605176328}
-  - component: {fileID: 3489085759895675148}
   - component: {fileID: 5388090233271769688}
   - component: {fileID: 1879828061913884729}
   - component: {fileID: 1879828061907201791}
@@ -327,55 +325,6 @@ MonoBehaviour:
   LogText: {fileID: 3695907222108606023}
   CommandInput: {fileID: 8369937396697903020}
   CommandInputFitter: {fileID: 1534744822929488390}
---- !u!114 &1986073387605176328
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1879828061900639465}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1ba67d04e07d3491989322c6414feaf3, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  OnStateChange:
-    m_PersistentCalls:
-      m_Calls: []
-    m_TypeName: TouchScript.Gestures.Gesture+GestureEvent, Assembly-CSharp-firstpass,
-      Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
-  basicEditor: 0
-  generalProps: 0
-  limitsProps: 0
-  advancedProps: 0
-  minPointers: 0
-  maxPointers: 0
-  useSendMessage: 0
-  sendStateChangeMessages: 0
-  sendMessageTarget: {fileID: 0}
-  useUnityEvents: 0
-  sendStateChangeEvents: 0
-  requireGestureToFail: {fileID: 0}
-  friendlyGestures: []
-  flickTime: 0.1
-  minDistance: 1
-  movementThreshold: 0.5
-  direction: 2
---- !u!114 &3489085759895675148
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1879828061900639465}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: bc7fd33c57d694994b0ab9f33fcdcbea, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  Name: Global Fullscreen
-  type: 2
-  _camera: {fileID: 0}
 --- !u!95 &5388090233271769688
 Animator:
   serializedVersion: 3

@@ -7,14 +7,13 @@ using System.Reflection;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
+using TouchScript.Layers;
 using TouchScript.Gestures;
 using UniRx;
 using XLua;
 
 // TODO: Provide hotfix functions
 // TODO: Find a way to set default values in MonoBehaviours and use Lua to set them
-
-// TODO: Detect flick without TouchScript
 
 public class Console : MonoBehaviour
 {
@@ -62,17 +61,7 @@ public class Console : MonoBehaviour
 
 	protected void RegisterInput()
 	{
-		if (Application.isMobilePlatform)
-		{
-			var flick = GetComponent<FlickGesture>();
-			flick.Flicked += (object o, EventArgs e) => {
-				if (flick.ScreenFlickVector.y < 0 && !IsVisible)
-					Show();
-				else if (flick.ScreenFlickVector.y > 0 && IsVisible)
-					Hide();
-			};
-		}
-		else
+		if (!(Application.isMobilePlatform || Application.isConsolePlatform))
 		{
 			var keyStream = Observable
 				.EveryUpdate()
@@ -80,25 +69,20 @@ public class Console : MonoBehaviour
 				.Subscribe(l => Toggle())
 				.AddTo(this);
 		}
+		else
+		{
+			var layer = gameObject.AddComponent<FullscreenLayer>();
+			layer.Type = FullscreenLayer.LayerType.Global;
 
-		/*
-		// Toggle Console with double-tap (without TouchScript)
-		const double GestureTime = 250;
-		const float GestureDistance = 0.05f;
-		const float TransitionTime = 0.3f;
-
-		var clickStream = Observable
-			.EveryUpdate()
-			.Where(l => Input.GetMouseButtonDown(0))
-			.Select(l => Input.mousePosition / new Vector2(Screen.width, Screen.height));
-
-		clickStream
-			.Buffer(clickStream.Throttle(TimeSpan.FromMilliseconds(GestureTime)))
-			.Where(b => b.Count >= 2)
-			.Where(b => b.All(v => Math.Abs(v.x - b.Average(w => w.x)) + Math.Abs(v.y - b.Average(w => w.y)) < GestureDistance))
-			.Subscribe(b => Toggle())
-			.AddTo(this);
-		*/
+			var flick = gameObject.AddComponent<FlickGesture>();
+			flick.Direction = FlickGesture.GestureDirection.Vertical;
+			flick.Flicked += (object o, EventArgs e) => {
+				if (flick.ScreenFlickVector.y < 0 && !IsVisible)
+					Show();
+				else if (flick.ScreenFlickVector.y > 0 && IsVisible)
+					Hide();
+			};
+		}
 
 		EventModifiers disregard = EventModifiers.FunctionKey | EventModifiers.Numeric | EventModifiers.CapsLock;
 		var input = CommandInput;
