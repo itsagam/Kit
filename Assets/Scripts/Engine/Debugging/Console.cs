@@ -11,8 +11,10 @@ using TouchScript.Gestures;
 using UniRx;
 using XLua;
 
+// TODO: Provide hotfix functions
+// TODO: Find a way to set default values in MonoBehaviours and use Lua to set them
+
 // TODO: Detect flick without TouchScript
-// TODO: Provide hotfix helper functions
 
 public class Console : MonoBehaviour
 {

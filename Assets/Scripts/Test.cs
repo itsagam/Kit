@@ -50,10 +50,7 @@ public class Test: MonoBehaviour
 	{
 		//ModdingTest();
 		//InjectTest();
-		//await ConsoleTest();
 
-		//ResourceManager.ResourceLoaded += ResourceLoaded;
-		//ResourceManager.ResourceReused += ResourceReused;
 		/*
 		Debugger.StartProfile("Resources.Load");
 		for (int i = 0; i <= 1000000; i++)
@@ -109,12 +106,6 @@ public class Test: MonoBehaviour
 	void OnDestroy()
 	{
 		//ModManager.UnloadMods();
-	}
-
-	async UniTask ConsoleTest()
-	{
-		for (int i = 0; i < 30; i++)
-			await Observable.Timer(TimeSpan.FromSeconds(0.1f));
 	}
 
 	void InjectTest()

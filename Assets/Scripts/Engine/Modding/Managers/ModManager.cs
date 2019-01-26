@@ -66,7 +66,7 @@ namespace Modding
 
 		protected static void AddDefaultSearchPaths()
         {
-			// TODO: Adding "Patches" and patching system
+			// UNDONE: Adding "Patches" and patching system
 			string writeableFolder = GetWriteableFolder();
 			SearchPaths.Add(writeableFolder + DefaultModFolderName + "/");
 		}

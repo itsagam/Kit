@@ -41,6 +41,8 @@ public class ResourceManager
 	public static event Action<ResourceFolder, string, object> ResourceLoaded;
 	public static event Action<ResourceFolder, string, object> ResourceReused;
 
+	// TODO: Use weak references
+	// TODO: Profile memory and do memory management
 	protected static Dictionary<string, object> resources = new Dictionary<string, object>();
 	protected static Dictionary<ResourceFolder, string> folderToString = new Dictionary<ResourceFolder, string>();
 
