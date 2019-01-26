@@ -13,7 +13,7 @@ using XLua;
 
 // TODO: Detect flick without TouchScript
 // TODO: Provide hotfix helper functions
-// TODO: Textfield size
+// TODO: Can't click on textfield
 
 public class Console : MonoBehaviour
 {
@@ -110,7 +110,6 @@ public class Console : MonoBehaviour
 		input.AddKeyHandler(KeyCode.DownArrow,	() =>	input.SendKeyEvent(KeyCode.DownArrow),		EventModifiers.Shift,	disregard);
 		input.AddKeyHandler(KeyCode.LeftArrow,	() =>	input.SendKeyEvent(KeyCode.LeftArrow),		EventModifiers.Shift,	disregard);
 		input.AddKeyHandler(KeyCode.RightArrow,	() =>	input.SendKeyEvent(KeyCode.RightArrow),		EventModifiers.Shift,	disregard);
-		input.onValueChanged.AddListener(OnValueChanged);
 	}
 	#endregion
 
@@ -322,11 +321,6 @@ public class Console : MonoBehaviour
 	#endregion
 
 	#region Command
-	protected void OnValueChanged(string value)
-	{
-		CommandInputFitter.SetLayoutVertical();
-	}
-
 	protected void Submit()
 	{
 		string command = CommandInput.text;
