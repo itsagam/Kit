@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-// Give Element the size of this transform whenever it's changed
+// Give Element the size of this transform whenever it's resized
 public class MatchSize : MonoBehaviour
 {
 	public RectTransform Element;

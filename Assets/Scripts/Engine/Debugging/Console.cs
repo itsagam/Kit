@@ -13,7 +13,6 @@ using XLua;
 
 // TODO: Detect flick without TouchScript
 // TODO: Provide hotfix helper functions
-// TODO: Can't click on textfield
 
 public class Console : MonoBehaviour
 {
