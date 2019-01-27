@@ -18,8 +18,6 @@ using Modding.Parsers;
 //					since the first object would be cached and a second call would try to reuse and cast it.
 //					TODO: Solve this by making cache in ResourceManager a list (ModManager already is) and comparing
 //					types as well as path. If either does not match, find and load a new file otherwise return null.
-//				3)	WeakReferences work as intended on System.Object but UnityEngine.Objects are only garbage collected
-//					on scene load.
 
 public enum ResourceFolder
 {
@@ -44,7 +42,7 @@ public class ResourceManager
 	public static event Action<ResourceFolder, string, object> ResourceReused;
 
 	// TODO: Profile memory and do memory management
-	protected static Dictionary<string, WeakReference> resources = new Dictionary<string, WeakReference>();
+	protected static Dictionary<(Type type, string path), WeakReference> cachedResources = new Dictionary<(Type, string), WeakReference>();
 	protected static Dictionary<ResourceFolder, string> folderToString = new Dictionary<ResourceFolder, string>();
 
 	static ResourceManager()
@@ -65,8 +63,7 @@ public class ResourceManager
 			}
 			else
 			{
-				string cachePath = GetCachePath(folder, file);
-				T moddedFile = ModManager.Load<T>(cachePath);
+				T moddedFile = ModManager.Load<T>(GetCachePath(folder, file));
 				if (moddedFile != null)
 					return moddedFile;
 			}		
@@ -86,8 +83,7 @@ public class ResourceManager
 			}
 			else
 			{
-				string cachePath = GetCachePath(folder, file);
-				T moddedFile = await ModManager.LoadAsync<T>(cachePath);
+				T moddedFile = await ModManager.LoadAsync<T>(GetCachePath(folder, file));
 				if (moddedFile != null)
 					return moddedFile;
 			}
@@ -96,21 +92,28 @@ public class ResourceManager
 		return await LoadUnmoddedAsync<T>(folder, file);
 	}
 
+	protected static ((Type type, string path) key, T reference) LoadCached<T>(ResourceFolder folder, string file) where T : class
+	{
+		(Type, string) key = (typeof(T), GetCachePath(folder, file));
+		if (cachedResources.TryGetValue(key, out WeakReference weakReference) && weakReference.IsAlive)
+		{
+			object reference = weakReference.Target;
+			ResourceReused.Invoke(folder, file, reference);
+			return (key, (T) reference);
+		}
+		return default;
+	}
+
 	public static T LoadUnmodded<T>(ResourceFolder folder, string file) where T : class
 	{
-		object reference = null;
-		string cachePath = GetCachePath(folder, file);
-		if (resources.TryGetValue(cachePath, out WeakReference weakReference) && weakReference.IsAlive)
-		{
-			reference = weakReference.Target;
-			ResourceReused.Invoke(folder, file, reference);
-			return (T) reference;
-		}
+		((Type, string) key, T reference) = LoadCached<T>(folder, file);
+		if (reference != null)
+			return reference;
 
 		if (folder == ResourceFolder.Resources)
 		{
 			string fileNoExt = Path.ChangeExtension(file, null);
-			reference = Resources.Load(fileNoExt);
+			reference = Resources.Load(fileNoExt) as T;
 		}
 		else
 		{
@@ -120,27 +123,22 @@ public class ResourceManager
 
 		if (reference != null)
 		{
-			resources.Add(cachePath, new WeakReference(reference));
+			cachedResources.Add(key, new WeakReference(reference));
 			ResourceLoaded?.Invoke(folder, file, reference);
 		}
-		return (T) reference;
+		return reference;
 	}
 
 	public static async UniTask<T> LoadUnmoddedAsync<T>(ResourceFolder folder, string file) where T : class
 	{
-		object reference = null;
-		string cachePath = GetCachePath(folder, file);
-		if (resources.TryGetValue(cachePath, out WeakReference weakReference) && weakReference.IsAlive)
-		{
-			reference = weakReference.Target;
-			ResourceReused.Invoke(folder, file, reference);
-			return (T) reference;
-		}
+		((Type, string) key, T reference) = LoadCached<T>(folder, file);
+		if (reference != null)
+			return reference;
 
 		if (folder == ResourceFolder.Resources)
 		{
 			string fileNoExt = Path.ChangeExtension(file, null);
-			reference = await Resources.LoadAsync(fileNoExt);
+			reference = (await Resources.LoadAsync(fileNoExt)) as T;
 		}
 		else
 		{
@@ -150,30 +148,25 @@ public class ResourceManager
 
 		if (reference != null)
 		{
-			resources.Add(cachePath, new WeakReference(reference));
+			cachedResources.Add(key, new WeakReference(reference));
 			ResourceLoaded?.Invoke(folder, file, reference);
 		}
-		return (T) reference;
+		return reference;
 	}
 
 #if MODDING
 	public static T LoadMerged<T>(ResourceFolder folder, string file) where T : class
 	{
-		object reference = null;
-		string cachePath = GetCachePath(folder, file);
-		if (resources.TryGetValue(cachePath, out WeakReference weakReference) && weakReference.IsAlive)
-		{
-			reference = weakReference.Target;
-			ResourceReused.Invoke(folder, file, reference);
-			return (T) reference;
-		}
+		((Type type, string path) key, T reference) = LoadCached<T>(folder, file);
+		if (reference != null)
+			return reference;
 
 		ResourceParser parser = null;
 		string fullPath = GetPath(folder, file);
 		if (folder == ResourceFolder.Resources)
 		{
 			string fileNoExt = Path.ChangeExtension(file, null);
-			reference = Resources.Load(fileNoExt);
+			reference = Resources.Load(fileNoExt) as T;
 			if (reference == null)
 				return null;
 			parser = RankParsers<T>(fullPath).FirstOrDefault().parser;
@@ -185,20 +178,20 @@ public class ResourceManager
 				return null;
 		}
 
-		T merged = (T) reference;
+		T merged = reference;
 		if (parser != null)
 		{
 			try
 			{
 				if (parser.OperateWith == OperateType.Text)
 				{
-					List<string> textList = ModManager.ReadTextAll(cachePath);
+					List<string> textList = ModManager.ReadTextAll(key.path);
 					foreach (string text in textList)
 						parser.Merge<T>(merged, text);
 				}
 				else
 				{
-					List<byte[]> bytesList = ModManager.ReadBytesAll(cachePath);
+					List<byte[]> bytesList = ModManager.ReadBytesAll(key.path);
 					foreach (byte[] bytes in bytesList)
 						parser.Merge<T>(merged, bytes);
 				}
@@ -208,28 +201,23 @@ public class ResourceManager
 				Debugger.Log("ResourceManager", e.Message);
 			}
 		}
-		resources.Add(cachePath, new WeakReference(merged));
+		cachedResources.Add(key, new WeakReference(merged));
 		ResourceLoaded.Invoke(folder, file, merged);
 		return merged;
 	}
 
 	public static async UniTask<T> LoadMergedAsync<T>(ResourceFolder folder, string file) where T : class
 	{
-		object reference = null;
-		string cachePath = GetCachePath(folder, file);
-		if (resources.TryGetValue(cachePath, out WeakReference weakReference) && weakReference.IsAlive)
-		{
-			reference = weakReference.Target;
-			ResourceReused.Invoke(folder, file, reference);
-			return (T) reference;
-		}
+		((Type type, string path) key, T reference) = LoadCached<T>(folder, file);
+		if (reference != null)
+			return reference;
 
 		ResourceParser parser = null;
 		string fullPath = GetPath(folder, file);
 		if (folder == ResourceFolder.Resources)
 		{
 			string fileNoExt = Path.ChangeExtension(file, null);
-			reference = await Resources.LoadAsync(fileNoExt);
+			reference = (await Resources.LoadAsync(fileNoExt)) as T;
 			if (reference == null)
 				return null;
 			parser = RankParsers<T>(fullPath).FirstOrDefault().parser;
@@ -241,20 +229,20 @@ public class ResourceManager
 				return null;
 		}
 
-		T merged = (T) reference;
+		T merged = reference;
 		if (parser != null)
 		{
 			try
 			{
 				if (parser.OperateWith == OperateType.Text)
 				{
-					List<string> textList = await ModManager.ReadTextAllAsync(cachePath);
+					List<string> textList = await ModManager.ReadTextAllAsync(key.path);
 					foreach (string text in textList)
 						parser.Merge<T>(merged, text);
 				}
 				else
 				{
-					List<byte[]> bytesList = await ModManager.ReadBytesAllAsync(cachePath);
+					List<byte[]> bytesList = await ModManager.ReadBytesAllAsync(key.path);
 					foreach (byte[] bytes in bytesList)
 						parser.Merge<T>(merged, bytes);
 				}
@@ -264,7 +252,7 @@ public class ResourceManager
 				Debugger.Log("ResourceManager", e.Message);
 			}
 		}
-		resources.Add(cachePath, new WeakReference(merged));
+		cachedResources.Add(key, new WeakReference(merged));
 		ResourceLoaded.Invoke(folder, file, merged);
 		return merged;
 	}
@@ -341,45 +329,38 @@ public class ResourceManager
 #endif
 
 		string cachePath = null;
-		foreach (var kvp in resources.Reverse())
+		foreach (var kvp in cachedResources.Reverse())
 			if (kvp.Value.Target == resource)
 			{
-				cachePath = kvp.Key;
-				resources.Remove(cachePath);
+				cachePath = kvp.Key.path;
+				cachedResources.Remove(kvp.Key);
 				break;
 			}
 
 		if (resource is UnityEngine.Object unityObject)
 		{
-			try
-			{
-				// GetInstanceID() seems to return positive values for loaded assets and negative for created ones				
-				//if (unityObject.GetInstanceID() > 0)
-				if (cachePath == null || cachePath.IsLeft(GetCachePath(ResourceFolder.Resources)))
-					Resources.UnloadAsset(unityObject);
-				else
-					UnityEngine.Object.Destroy(unityObject);
-			}
-			catch (Exception)
-			{
-			}
+			if (cachePath == null || cachePath.IsLeft(GetCachePath(ResourceFolder.Resources)))
+				Resources.UnloadAsset(unityObject);
+			else
+				UnityEngine.Object.Destroy(unityObject);
 		}
 
 		return cachePath != null;
 	}
 
-	public static bool Unload(ResourceFolder folder, string file)
+	public static bool Unload<T>(ResourceFolder folder, string file)
 	{
 		string cachePath = GetCachePath(folder, file);
-
+		
 #if MODDING
 		if (ModManager.UnloadAll(cachePath))
 			return true;
 #endif
-		
-		if (resources.TryGetValue(cachePath, out WeakReference weakReference))
+
+		(Type, string) key = (typeof(T), cachePath);
+		if (cachedResources.TryGetValue(key, out WeakReference weakReference))
 		{
-			resources.Remove(cachePath);
+			cachedResources.Remove(key);
 			if (weakReference.Target is UnityEngine.Object unityObject)
 			{
 				if (folder == ResourceFolder.Resources)
@@ -399,7 +380,7 @@ public class ResourceManager
 
 	public static void ClearCache()
 	{
-		resources.Clear();
+		cachedResources.Clear();
 	}
 
 #endregion
@@ -674,7 +655,7 @@ public class ResourceManager
 
 	public static string GetCachePath(ResourceFolder folder, string file)
 	{
-		return folderToString[folder] + file;
+		return GetCachePath(folder) + file;
 	}
 
 	public static string LocalToURLPath(string path)

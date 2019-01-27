@@ -57,7 +57,7 @@ namespace Modding
 		};
 		
 		protected static List<Mod> mods = new List<Mod>();
-		protected static Dictionary<string, List<ResourceInfo>> resources = new Dictionary<string, List<ResourceInfo>>();
+		protected static Dictionary<string, List<ResourceInfo>> cachedResources = new Dictionary<string, List<ResourceInfo>>();
 
 		static ModManager()
 		{
@@ -224,7 +224,7 @@ namespace Modding
 					if (matchingResources == null)
 					{
 						matchingResources = new List<ResourceInfo>();
-						resources[path] = matchingResources;
+						cachedResources[path] = matchingResources;
 					}
 					ResourceInfo newResource = new ResourceInfo(mod, file, parser, reference);
 					matchingResources.Add(newResource);
@@ -254,7 +254,7 @@ namespace Modding
 					if (matchingResources == null)
 					{
 						matchingResources = new List<ResourceInfo>();
-						resources[path] = matchingResources;
+						cachedResources[path] = matchingResources;
 					}
 					ResourceInfo newResource = new ResourceInfo(mod, file, parser, reference);
 					matchingResources.Add(newResource);
@@ -282,7 +282,7 @@ namespace Modding
 						if (matchingResources == null)
 						{
 							matchingResources = new List<ResourceInfo>();
-							resources[path] = matchingResources;
+							cachedResources[path] = matchingResources;
 						}
 						ResourceInfo newResource = new ResourceInfo(mod, file, parser, reference);
 						matchingResources.Add(newResource);
@@ -315,7 +315,7 @@ namespace Modding
 						if (matchingResources == null)
 						{
 							matchingResources = new List<ResourceInfo>();
-							resources[path] = matchingResources;
+							cachedResources[path] = matchingResources;
 						}
 						ResourceInfo newResource = new ResourceInfo(mod, file, parser, reference);
 						matchingResources.Add(newResource);
@@ -334,24 +334,24 @@ namespace Modding
 
 		public static List<ResourceInfo> GetResources(string path)
 		{
-			if (resources.TryGetValue(path, out List<ResourceInfo> matchingResources))
+			if (cachedResources.TryGetValue(path, out List<ResourceInfo> resources))
 			{
-				CleanupDeadResources(matchingResources);
-				return matchingResources;
+				CleanupDeadResources(resources);
+				return resources;
 			}
 			return null;
 		}
 
-		protected static void CleanupDeadResources(List<ResourceInfo> matchingResources)
+		protected static void CleanupDeadResources(List<ResourceInfo> list)
 		{
-			for (int i = matchingResources.Count - 1; i >= 0; i--)
-				if (!matchingResources[i].Reference.IsAlive)
-					matchingResources.RemoveAt(i);
+			for (int i = list.Count - 1; i >= 0; i--)
+				if (!list[i].Reference.IsAlive)
+					list.RemoveAt(i);
 		}
 
 		public static ResourceInfo? GetResourceInfo(object resource)
 		{
-			return resources.SelectMany(r => r.Value).FirstOrDefault(r => r.Reference.Target == resource);
+			return cachedResources.SelectMany(r => r.Value).FirstOrDefault(r => r.Reference.Target == resource);
 		}
 
 		public static string ReadText(string path)
@@ -494,7 +494,7 @@ namespace Modding
 
 		public static void UnloadMod(Mod mod)
 		{
-			Unload(o => o.Mod == mod);
+			UnloadAll(o => o.Mod == mod);
 			mod.Unload();
 			mods.Remove(mod);
 			ModUnloaded?.Invoke(mod);
@@ -502,13 +502,30 @@ namespace Modding
 
 		public static bool Unload(object reference)
 		{
-			return Unload(o => o.Reference.Target == reference, false);
+			return Unload(o => o.Reference.Target == reference);
 		}
 
-		public static bool Unload(Func<ResourceInfo, bool> predicate, bool all = true)
+		public static bool Unload(Func<ResourceInfo, bool> predicate)
+		{
+			foreach (var kvp in cachedResources.Reverse())
+			{
+				foreach (var resource in kvp.Value.Where(predicate).Reverse())
+				{
+					UnloadInternal(resource.Reference.Target);
+					kvp.Value.Remove(resource);
+					ResourceUnloaded?.Invoke(kvp.Key, resource.Mod);
+					if (kvp.Value.Count <= 0)
+						cachedResources.Remove(kvp.Key);
+					return true;
+				}
+			}
+			return false;
+		}
+
+		public static bool UnloadAll(Func<ResourceInfo, bool> predicate)
 		{
 			bool found = false;
-			foreach (var kvp in resources.Reverse())
+			foreach (var kvp in cachedResources.Reverse())
 			{
 				foreach (var resource in kvp.Value.Where(predicate).Reverse())
 				{
@@ -516,15 +533,9 @@ namespace Modding
 					kvp.Value.Remove(resource);
 					ResourceUnloaded?.Invoke(kvp.Key, resource.Mod);
 					found = true;
-					if (! all)
-					{
-						if (kvp.Value.Count <= 0)
-							resources.Remove(kvp.Key);
-						return true;
-					}
 				}
 				if (kvp.Value.Count <= 0)
-					resources.Remove(kvp.Key);
+					cachedResources.Remove(kvp.Key);
 			}
 			return found;
 		}
@@ -539,7 +550,7 @@ namespace Modding
 					UnloadInternal(resource.Reference.Target);
 					ResourceUnloaded?.Invoke(path, resource.Mod);
 				}
-				resources.Remove(path);
+				cachedResources.Remove(path);
 				return true;
 			}
 			return false;
@@ -553,7 +564,7 @@ namespace Modding
 
 		public static void ClearCache()
 		{
-			resources.Clear();
+			cachedResources.Clear();
 		}
 
 		public static ReadOnlyCollection<Mod> Mods
