@@ -98,22 +98,22 @@ public class ResourceManager
 		if (cachedResources.TryGetValue(key, out WeakReference weakReference) && weakReference.IsAlive)
 		{
 			object reference = weakReference.Target;
-			ResourceReused.Invoke(folder, file, reference);
+			ResourceReused?.Invoke(folder, file, reference);
 			return (key, (T) reference);
 		}
-		return default;
+		return (key, null);
 	}
 
 	public static T LoadUnmodded<T>(ResourceFolder folder, string file) where T : class
 	{
-		((Type, string) key, T reference) = LoadCached<T>(folder, file);
+		((Type type, string path) key, T reference) = LoadCached<T>(folder, file);
 		if (reference != null)
 			return reference;
 
 		if (folder == ResourceFolder.Resources)
 		{
 			string fileNoExt = Path.ChangeExtension(file, null);
-			reference = Resources.Load(fileNoExt) as T;
+			reference = Resources.Load(fileNoExt, key.type) as T;
 		}
 		else
 		{
@@ -131,14 +131,14 @@ public class ResourceManager
 
 	public static async UniTask<T> LoadUnmoddedAsync<T>(ResourceFolder folder, string file) where T : class
 	{
-		((Type, string) key, T reference) = LoadCached<T>(folder, file);
+		((Type type, string path) key, T reference) = LoadCached<T>(folder, file);
 		if (reference != null)
 			return reference;
 
 		if (folder == ResourceFolder.Resources)
 		{
 			string fileNoExt = Path.ChangeExtension(file, null);
-			reference = (await Resources.LoadAsync(fileNoExt)) as T;
+			reference = (await Resources.LoadAsync(fileNoExt, key.type)) as T;
 		}
 		else
 		{
@@ -202,7 +202,7 @@ public class ResourceManager
 			}
 		}
 		cachedResources.Add(key, new WeakReference(merged));
-		ResourceLoaded.Invoke(folder, file, merged);
+		ResourceLoaded?.Invoke(folder, file, merged);
 		return merged;
 	}
 
@@ -253,7 +253,7 @@ public class ResourceManager
 			}
 		}
 		cachedResources.Add(key, new WeakReference(merged));
-		ResourceLoaded.Invoke(folder, file, merged);
+		ResourceLoaded?.Invoke(folder, file, merged);
 		return merged;
 	}
 #endif

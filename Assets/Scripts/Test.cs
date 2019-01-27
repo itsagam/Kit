@@ -47,23 +47,25 @@ public class Test: MonoBehaviour
 
 	public static AudioClip global;
 
+	public GameObject cube;
+
 #pragma warning disable CS1998
 	 void  Awake()
 	{
-		//ModdingTest();
+		ModdingTest();
 		//InjectTest()
 
 		//global = new WeakReference(new Modding.Loaders.DirectModLoader());
-		if (global == null)
-		{
-			//Texture tex = LoadTexture(ResourceManager.ReadBytes(ResourceFolder.Resources, "Textures/test.jpeg"));
-			var clip = WavUtility.ToAudioClip(ResourceManager.ReadBytes(ResourceFolder.Resources, "Sounds/test.wav"), 0);
-			//var text = LoadTextAsset("agam");
-			global = clip;//new WeakReference(clip, false);
-		}
-		print(global); //.Target);
-		SceneManager.ReloadScene();
-
+		//if (global == null)
+		//{
+		//Texture tex = LoadTexture(ResourceManager.ReadBytes(ResourceFolder.Resources, "Textures/test.jpeg"));
+		//var clip = WavUtility.ToAudioClip(ResourceManager.ReadBytes(ResourceFolder.Resources, "Sounds/test.wav"), 0);
+		//var text = LoadTextAsset("agam");
+		//global = clip;//new WeakReference(clip, false);
+		//}
+		//print(global); //.Target);
+		//SceneManager.ReloadScene();
+		
 		/*
 		Debugger.StartProfile("Resources.Load");
 		for (int i = 0; i <= 1000000; i++)
@@ -105,20 +107,23 @@ public class Test: MonoBehaviour
 	protected void ModdingTest()
 	{
 		ModManager.LoadMods();
-		//ModManager.ResourceLoaded += ModManager_ResourceLoaded;
-		//ModManager.ResourceReused += ModManager_ResourceReused;
 
-		//Debugger.Log(ResourceManager.Load<GameData>(ResourceFolder.StreamingAssets, @"Data/Test", true), true);
+		ResourceManager.ResourceLoaded += ResourceLoaded;
+		ResourceManager.ResourceReused += ResourceReused;
 
-		//Texture tex = ResourceManager.Load<Texture>(ResourceFolder.StreamingAssets, @"Textures/test");
-		//obj.GetComponent<MeshRenderer>().material.mainTexture = tex;
+		ModManager.ResourceLoaded += ModManager_ResourceLoaded;
+		ModManager.ResourceReused += ModManager_ResourceReused;
 
-		//AudioClip clip = ResourceManager.Load<AudioClip>(ResourceFolder.Resources, @"Sounds/Test");
+		//Debugger.Log(ResourceManager.Load<GameData>(ResourceFolder.StreamingAssets, @"Data/Test.json", false), true);
+
+		//Texture tex = ResourceManager.Load<Texture>(ResourceFolder.Resources, @"Textures/Test", false);
+		//cube.GetComponent<MeshRenderer>().material.mainTexture = tex;
+
+		//AudioClip clip = ResourceManager.Load<AudioClip>(ResourceFolder.Resources, @"Textures/Test", true);
 		//GetComponent<AudioSource>().clip = clip;
 		//GetComponent<AudioSource>().Play();
 	}
 
-	/*
 	private void ModManager_ResourceReused(string path, ResourceInfo info)
 	{
 		Debug.Log($"File \"{path}\" resused from \"{info.Mod.Path}\"");
@@ -128,7 +133,6 @@ public class Test: MonoBehaviour
 	{
 		Debug.Log($"File \"{path}\" loaded from \"{info.Mod.Path}\"");
 	}
-	*/
 
 	void OnDestroy()
 	{

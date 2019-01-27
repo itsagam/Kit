@@ -95,7 +95,7 @@ namespace Modding
 			return folder;
 		}
 
-		public static void LoadMods()
+		public static void LoadMods(bool executeScripts = false)
 		{
 			foreach (string path in SearchPaths)
 			{
@@ -120,14 +120,11 @@ namespace Modding
 			LoadModOrder();
 			SaveModOrder();
 
-			foreach (Mod mod in mods)
-			{
-				mod.ExecuteScripts();
-				ModLoaded?.Invoke(mod);
-			}
+			if (executeScripts)
+				ExecuteModScripts();
 		}
 
-		public static async UniTask LoadModsAsync()
+		public static async UniTask LoadModsAsync(bool executeScripts = false)
 		{
 			foreach (string path in SearchPaths)
 			{
@@ -152,6 +149,21 @@ namespace Modding
 			LoadModOrder();
 			SaveModOrder();
 
+			if (executeScripts)
+				await ExecuteModScriptsAsync();
+		}
+
+		public static void ExecuteModScripts()
+		{
+			foreach (Mod mod in mods)
+			{
+				mod.ExecuteScripts();
+				ModLoaded?.Invoke(mod);
+			}
+		}
+
+		public static async UniTask ExecuteModScriptsAsync()
+		{
 			foreach (Mod mod in mods)
 			{
 				await mod.ExecuteScriptsAsync();

@@ -81,7 +81,7 @@ namespace Modding
 				}
 				catch (Exception e)
 				{
-					Debugger.Log("ModManager", e.Message);
+					Debugger.Log("ModManager", $"{Metadata.Name} – {e.Message}");
 				}
 			}
 
@@ -110,7 +110,7 @@ namespace Modding
 				}
 				catch (Exception e)
 				{
-					Debugger.Log("ModManager", e.Message);
+					Debugger.Log("ModManager", $"{Metadata.Name} – {e.Message}");
 				}
 			}
 
