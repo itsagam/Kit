@@ -43,10 +43,8 @@ public class ResourceManager
 	public static event Action<ResourceFolder, string, object> ResourceLoaded;
 	public static event Action<ResourceFolder, string, object> ResourceReused;
 
-	// TODO: Use weak references
-	// TODO: Destroyed/garbage collected resources turn to null, handle them
 	// TODO: Profile memory and do memory management
-	protected static Dictionary<string, object> resources = new Dictionary<string, object>();
+	protected static Dictionary<string, WeakReference> resources = new Dictionary<string, WeakReference>();
 	protected static Dictionary<ResourceFolder, string> folderToString = new Dictionary<ResourceFolder, string>();
 
 	static ResourceManager()
@@ -102,27 +100,29 @@ public class ResourceManager
 	{
 		object reference = null;
 		string cachePath = GetCachePath(folder, file);
-		if (!resources.TryGetValue(cachePath, out reference) && reference != null)
+		if (resources.TryGetValue(cachePath, out WeakReference weakReference) && weakReference.IsAlive)
 		{
-			if (folder == ResourceFolder.Resources)
-			{
-				string fileNoExt = Path.ChangeExtension(file, null);
-				reference = Resources.Load(fileNoExt);
-			}
-			else
-			{
-				string fullPath = GetPath(folder, file);
-				reference = Load<T>(fullPath).reference;
-			}
+			reference = weakReference.Target;
+			ResourceReused.Invoke(folder, file, reference);
+			return (T) reference;
+		}
 
-			if (reference != null)
-			{
-				resources.Add(cachePath, reference);
-				ResourceLoaded?.Invoke(folder, file, reference);
-			}
+		if (folder == ResourceFolder.Resources)
+		{
+			string fileNoExt = Path.ChangeExtension(file, null);
+			reference = Resources.Load(fileNoExt);
 		}
 		else
-			ResourceReused?.Invoke(folder, file, reference);
+		{
+			string fullPath = GetPath(folder, file);
+			reference = Load<T>(fullPath).reference;
+		}
+
+		if (reference != null)
+		{
+			resources.Add(cachePath, new WeakReference(reference));
+			ResourceLoaded?.Invoke(folder, file, reference);
+		}
 		return (T) reference;
 	}
 
@@ -130,27 +130,29 @@ public class ResourceManager
 	{
 		object reference = null;
 		string cachePath = GetCachePath(folder, file);
-		if (!resources.TryGetValue(cachePath, out reference) && reference != null)
+		if (resources.TryGetValue(cachePath, out WeakReference weakReference) && weakReference.IsAlive)
 		{
-			if (folder == ResourceFolder.Resources)
-			{
-				string fileNoExt = Path.ChangeExtension(file, null);
-				reference = await Resources.LoadAsync(fileNoExt);
-			}
-			else
-			{
-				string fullPath = GetPath(folder, file);
-				reference = (await LoadAsync<T>(fullPath)).reference;
-			}
+			reference = weakReference.Target;
+			ResourceReused.Invoke(folder, file, reference);
+			return (T) reference;
+		}
 
-			if (reference != null)
-			{
-				resources.Add(cachePath, reference);
-				ResourceLoaded?.Invoke(folder, file, reference);
-			}
+		if (folder == ResourceFolder.Resources)
+		{
+			string fileNoExt = Path.ChangeExtension(file, null);
+			reference = await Resources.LoadAsync(fileNoExt);
 		}
 		else
-			ResourceReused?.Invoke(folder, file, reference);
+		{
+			string fullPath = GetPath(folder, file);
+			reference = (await LoadAsync<T>(fullPath)).reference;
+		}
+
+		if (reference != null)
+		{
+			resources.Add(cachePath, new WeakReference(reference));
+			ResourceLoaded?.Invoke(folder, file, reference);
+		}
 		return (T) reference;
 	}
 
@@ -159,8 +161,12 @@ public class ResourceManager
 	{
 		object reference = null;
 		string cachePath = GetCachePath(folder, file);
-		if (resources.TryGetValue(cachePath, out reference) && reference != null)
+		if (resources.TryGetValue(cachePath, out WeakReference weakReference) && weakReference.IsAlive)
+		{
+			reference = weakReference.Target;
+			ResourceReused.Invoke(folder, file, reference);
 			return (T) reference;
+		}
 
 		ResourceParser parser = null;
 		string fullPath = GetPath(folder, file);
@@ -202,7 +208,8 @@ public class ResourceManager
 				Debugger.Log("ResourceManager", e.Message);
 			}
 		}
-		resources[cachePath] = merged;
+		resources.Add(cachePath, new WeakReference(merged));
+		ResourceLoaded.Invoke(folder, file, merged);
 		return merged;
 	}
 
@@ -210,8 +217,12 @@ public class ResourceManager
 	{
 		object reference = null;
 		string cachePath = GetCachePath(folder, file);
-		if (resources.TryGetValue(cachePath, out reference) && reference != null)
+		if (resources.TryGetValue(cachePath, out WeakReference weakReference) && weakReference.IsAlive)
+		{
+			reference = weakReference.Target;
+			ResourceReused.Invoke(folder, file, reference);
 			return (T) reference;
+		}
 
 		ResourceParser parser = null;
 		string fullPath = GetPath(folder, file);
@@ -253,7 +264,8 @@ public class ResourceManager
 				Debugger.Log("ResourceManager", e.Message);
 			}
 		}
-		resources[cachePath] = merged;
+		resources.Add(cachePath, new WeakReference(merged));
+		ResourceLoaded.Invoke(folder, file, merged);
 		return merged;
 	}
 #endif
@@ -330,7 +342,7 @@ public class ResourceManager
 
 		string cachePath = null;
 		foreach (var kvp in resources.Reverse())
-			if (kvp.Value == resource)
+			if (kvp.Value.Target == resource)
 			{
 				cachePath = kvp.Key;
 				resources.Remove(cachePath);
@@ -364,12 +376,11 @@ public class ResourceManager
 		if (ModManager.UnloadAll(cachePath))
 			return true;
 #endif
-
-		object reference = null;
-		if (resources.TryGetValue(cachePath, out reference) && reference != null)
+		
+		if (resources.TryGetValue(cachePath, out WeakReference weakReference))
 		{
 			resources.Remove(cachePath);
-			if (reference is UnityEngine.Object unityObject)
+			if (weakReference.Target is UnityEngine.Object unityObject)
 			{
 				if (folder == ResourceFolder.Resources)
 					Resources.UnloadAsset(unityObject);
@@ -637,7 +648,7 @@ public class ResourceManager
 #if MODDING
 	public static List<ResourceInfo> GetModdedResourceInfo(ResourceFolder folder, string file)
 	{
-		return ModManager.GetResourceInfo(GetCachePath(folder, file));
+		return ModManager.GetResources(GetCachePath(folder, file));
 	}
 
 	public static ResourceInfo? GetModdedResourceInfo(object resource)

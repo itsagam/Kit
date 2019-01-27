@@ -17,16 +17,16 @@ namespace Modding
 	public struct ResourceInfo
 	{
 		public Mod Mod;
-		public string File;
+		public string File; // Actual filename, maybe different from the one resource was loaded with if extension was not provided
 		public ResourceParser Parser;
-		public object Reference;
+		public WeakReference Reference;
 		
 		public ResourceInfo(Mod mod, string file, ResourceParser parser, object reference)
 		{
 			Mod = mod;
 			File = file;
 			Parser = parser;
-			Reference = reference;
+			Reference = new WeakReference(reference);
 		}
 	}
 	#endif
@@ -57,7 +57,7 @@ namespace Modding
 		};
 		
 		protected static List<Mod> mods = new List<Mod>();
-		protected static Dictionary<string, List<ResourceInfo>> resourceInfos = new Dictionary<string, List<ResourceInfo>>();
+		protected static Dictionary<string, List<ResourceInfo>> resources = new Dictionary<string, List<ResourceInfo>>();
 
 		static ModManager()
 		{
@@ -208,12 +208,12 @@ namespace Modding
 
 		public static T Load<T>(string path) where T : class
 		{
-			List<ResourceInfo> loadedResources = GetResourceInfo(path);
-			if (loadedResources != null)
+			List<ResourceInfo> matchingResources = GetResources(path);
+			if (matchingResources != null && matchingResources.Count > 0)
 			{
-				ResourceInfo loadedResource = loadedResources[0];
-				ResourceReused?.Invoke(path, loadedResource);
-				return (T) loadedResource.Reference;
+				ResourceInfo matchingResource = matchingResources[0];
+				ResourceReused?.Invoke(path, matchingResource);
+				return (T) matchingResource.Reference.Target;
 			}
 
 			foreach (Mod mod in mods)
@@ -221,14 +221,14 @@ namespace Modding
 				var (reference, file, parser) = mod.Load<T>(path);
 				if (reference != null)
 				{
-					if (!resourceInfos.TryGetValue(path, out loadedResources))
+					if (matchingResources == null)
 					{
-						loadedResources = new List<ResourceInfo>();
-						resourceInfos[path] = loadedResources;
+						matchingResources = new List<ResourceInfo>();
+						resources[path] = matchingResources;
 					}
-					ResourceInfo resourceInfo = new ResourceInfo(mod, file, parser, reference);
-					loadedResources.Add(resourceInfo);
-					ResourceLoaded?.Invoke(path, resourceInfo);
+					ResourceInfo newResource = new ResourceInfo(mod, file, parser, reference);
+					matchingResources.Add(newResource);
+					ResourceLoaded?.Invoke(path, newResource);
 					return reference;
 				}
 			}
@@ -238,12 +238,12 @@ namespace Modding
 
 		public static async UniTask<T> LoadAsync<T>(string path) where T : class
 		{
-			List<ResourceInfo> loadedResources = GetResourceInfo(path);
-			if (loadedResources != null)
+			List<ResourceInfo> matchingResources = GetResources(path);
+			if (matchingResources != null && matchingResources.Count > 0)
 			{
-				ResourceInfo loadedResource = loadedResources[0];
-				ResourceReused?.Invoke(path, loadedResource);
-				return (T) loadedResource.Reference;
+				ResourceInfo matchingResource = matchingResources[0];
+				ResourceReused?.Invoke(path, matchingResource);
+				return (T) matchingResource.Reference.Target;
 			}
 
 			foreach (Mod mod in mods)
@@ -251,14 +251,14 @@ namespace Modding
 				var (reference, file, parser) = await mod.LoadAsync<T>(path);
 				if (reference != null)
 				{
-					if (!resourceInfos.TryGetValue(path, out loadedResources))
+					if (matchingResources == null)
 					{
-						loadedResources = new List<ResourceInfo>();
-						resourceInfos[path] = loadedResources;
+						matchingResources = new List<ResourceInfo>();
+						resources[path] = matchingResources;
 					}
-					ResourceInfo resourceInfo = new ResourceInfo(mod, file, parser, reference);
-					loadedResources.Add(resourceInfo);
-					ResourceLoaded?.Invoke(path, resourceInfo);
+					ResourceInfo newResource = new ResourceInfo(mod, file, parser, reference);
+					matchingResources.Add(newResource);
+					ResourceLoaded?.Invoke(path, newResource);
 					return reference;
 				}
 			}
@@ -268,31 +268,32 @@ namespace Modding
 
 		public static List<T> LoadAll<T>(string path) where T : class
 		{
-			List<ResourceInfo> loadedResources = GetResourceInfo(path);
-			if (loadedResources == null)
-			{
-				loadedResources = new List<ResourceInfo>();
-				resourceInfos[path] = loadedResources;
-			}
+			List<ResourceInfo> matchingResources = GetResources(path);
+			Dictionary<Mod, ResourceInfo> matchingByMod = matchingResources.ToDictionary(r => r.Mod);
 			List<T> all = new List<T>();
 			foreach (Mod mod in mods)
 			{
-				ResourceInfo loadedResource = loadedResources.Find(r => r.Mod == mod);
-				if (loadedResource.Reference == null)
+				ResourceInfo matchingResource;
+				if (!matchingByMod.TryGetValue(mod, out matchingResource))
 				{
 					var (reference, file, parser) =  mod.Load<T>(path);
 					if (reference != null)
 					{
-						ResourceInfo resourceInfo = new ResourceInfo(mod, file, parser, reference);
-						loadedResources.Add(resourceInfo);
-						ResourceLoaded?.Invoke(path, resourceInfo);
+						if (matchingResources == null)
+						{
+							matchingResources = new List<ResourceInfo>();
+							resources[path] = matchingResources;
+						}
+						ResourceInfo newResource = new ResourceInfo(mod, file, parser, reference);
+						matchingResources.Add(newResource);
+						ResourceLoaded?.Invoke(path, newResource);
 						all.Add(reference);
 					}
 				}
 				else
 				{
-					ResourceReused?.Invoke(path, loadedResource);
-					all.Add((T) loadedResource.Reference);
+					ResourceReused?.Invoke(path, matchingResource);
+					all.Add((T) matchingResource.Reference.Target);
 				}
 			}
 			return all;
@@ -300,47 +301,57 @@ namespace Modding
 
 		public static async UniTask<List<T>> LoadAllAsync<T>(string path) where T : class
 		{
-			List<ResourceInfo> loadedResources = GetResourceInfo(path);
-			if (loadedResources == null)
-			{
-				loadedResources = new List<ResourceInfo>();
-				resourceInfos[path] = loadedResources;
-			}
+			List<ResourceInfo> matchingResources = GetResources(path);
+			Dictionary<Mod, ResourceInfo> matchingByMod = matchingResources.ToDictionary(r => r.Mod);
 			List<T> all = new List<T>();
 			foreach (Mod mod in mods)
 			{
-				ResourceInfo loadedResource = loadedResources.Find(r => r.Mod == mod);
-				if (loadedResource.Reference == null)
+				ResourceInfo matchingResource;
+				if (!matchingByMod.TryGetValue(mod, out matchingResource))
 				{
 					var (reference, file, parser) = await mod.LoadAsync<T>(path);
 					if (reference != null)
 					{
-						ResourceInfo resourceInfo = new ResourceInfo(mod, file, parser, reference);
-						loadedResources.Add(resourceInfo);
-						ResourceLoaded?.Invoke(path, resourceInfo);
+						if (matchingResources == null)
+						{
+							matchingResources = new List<ResourceInfo>();
+							resources[path] = matchingResources;
+						}
+						ResourceInfo newResource = new ResourceInfo(mod, file, parser, reference);
+						matchingResources.Add(newResource);
+						ResourceLoaded?.Invoke(path, newResource);
 						all.Add(reference);
 					}
 				}
 				else
 				{
-					ResourceReused?.Invoke(path, loadedResource);
-					all.Add((T) loadedResource.Reference);
+					ResourceReused?.Invoke(path, matchingResource);
+					all.Add((T) matchingResource.Reference.Target);
 				}
 			}
 			return all;
 		}
 
-		public static List<ResourceInfo> GetResourceInfo(string path)
+		public static List<ResourceInfo> GetResources(string path)
 		{
-			if (resourceInfos.TryGetValue(path, out List<ResourceInfo> resourceInfo))
-				if (resourceInfo.Count > 0)
-					return resourceInfo;
+			if (resources.TryGetValue(path, out List<ResourceInfo> matchingResources))
+			{
+				CleanupDeadResources(matchingResources);
+				return matchingResources;
+			}
 			return null;
+		}
+
+		protected static void CleanupDeadResources(List<ResourceInfo> matchingResources)
+		{
+			for (int i = matchingResources.Count - 1; i >= 0; i--)
+				if (!matchingResources[i].Reference.IsAlive)
+					matchingResources.RemoveAt(i);
 		}
 
 		public static ResourceInfo? GetResourceInfo(object resource)
 		{
-			return resourceInfos.SelectMany(r => r.Value).FirstOrDefault(r => r.Reference == resource);
+			return resources.SelectMany(r => r.Value).FirstOrDefault(r => r.Reference.Target == resource);
 		}
 
 		public static string ReadText(string path)
@@ -491,38 +502,44 @@ namespace Modding
 
 		public static bool Unload(object reference)
 		{
-			return Unload(o => o.Reference == reference);
+			return Unload(o => o.Reference.Target == reference, false);
 		}
 
-		public static bool Unload(Func<ResourceInfo, bool> predicate)
+		public static bool Unload(Func<ResourceInfo, bool> predicate, bool all = true)
 		{
 			bool found = false;
-			foreach (var kvp in resourceInfos.Reverse())
+			foreach (var kvp in resources.Reverse())
 			{
-				foreach (var info in kvp.Value.Where(predicate).Reverse())
+				foreach (var resource in kvp.Value.Where(predicate).Reverse())
 				{
-					UnloadInternal(info.Reference);
-					kvp.Value.Remove(info);
-					ResourceUnloaded?.Invoke(kvp.Key, info.Mod);
+					UnloadInternal(resource.Reference.Target);
+					kvp.Value.Remove(resource);
+					ResourceUnloaded?.Invoke(kvp.Key, resource.Mod);
 					found = true;
+					if (! all)
+					{
+						if (kvp.Value.Count <= 0)
+							resources.Remove(kvp.Key);
+						return true;
+					}
 				}
 				if (kvp.Value.Count <= 0)
-					resourceInfos.Remove(kvp.Key);
+					resources.Remove(kvp.Key);
 			}
 			return found;
 		}
 
 		public static bool UnloadAll(string path)
 		{
-			List<ResourceInfo> infos = GetResourceInfo(path);
-			if (infos != null)
+			List<ResourceInfo> matchingResources = GetResources(path);
+			if (matchingResources != null)
 			{
-				foreach (ResourceInfo info in infos)
+				foreach (ResourceInfo resource in matchingResources)
 				{
-					UnloadInternal(info.Reference);
-					ResourceUnloaded?.Invoke(path, info.Mod);
+					UnloadInternal(resource.Reference.Target);
+					ResourceUnloaded?.Invoke(path, resource.Mod);
 				}
-				resourceInfos.Remove(path);
+				resources.Remove(path);
 				return true;
 			}
 			return false;
@@ -536,7 +553,7 @@ namespace Modding
 
 		public static void ClearCache()
 		{
-			resourceInfos.Clear();
+			resources.Clear();
 		}
 
 		public static ReadOnlyCollection<Mod> Mods
