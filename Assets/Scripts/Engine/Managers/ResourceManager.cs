@@ -18,6 +18,8 @@ using Modding.Parsers;
 //					since the first object would be cached and a second call would try to reuse and cast it.
 //					TODO: Solve this by making cache in ResourceManager a list (ModManager already is) and comparing
 //					types as well as path. If either does not match, find and load a new file otherwise return null.
+//				3)	WeakReferences work as intended on System.Object but UnityEngine.Objects are only garbage collected
+//					on scene load.
 
 public enum ResourceFolder
 {
@@ -42,6 +44,7 @@ public class ResourceManager
 	public static event Action<ResourceFolder, string, object> ResourceReused;
 
 	// TODO: Use weak references
+	// TODO: Destroyed/garbage collected resources turn to null, handle them
 	// TODO: Profile memory and do memory management
 	protected static Dictionary<string, object> resources = new Dictionary<string, object>();
 	protected static Dictionary<ResourceFolder, string> folderToString = new Dictionary<ResourceFolder, string>();
@@ -99,7 +102,7 @@ public class ResourceManager
 	{
 		object reference = null;
 		string cachePath = GetCachePath(folder, file);
-		if (!resources.TryGetValue(cachePath, out reference))
+		if (!resources.TryGetValue(cachePath, out reference) && reference != null)
 		{
 			if (folder == ResourceFolder.Resources)
 			{
@@ -127,7 +130,7 @@ public class ResourceManager
 	{
 		object reference = null;
 		string cachePath = GetCachePath(folder, file);
-		if (!resources.TryGetValue(cachePath, out reference))
+		if (!resources.TryGetValue(cachePath, out reference) && reference != null)
 		{
 			if (folder == ResourceFolder.Resources)
 			{
@@ -156,7 +159,7 @@ public class ResourceManager
 	{
 		object reference = null;
 		string cachePath = GetCachePath(folder, file);
-		if (resources.TryGetValue(cachePath, out reference))
+		if (resources.TryGetValue(cachePath, out reference) && reference != null)
 			return (T) reference;
 
 		ResourceParser parser = null;
@@ -207,7 +210,7 @@ public class ResourceManager
 	{
 		object reference = null;
 		string cachePath = GetCachePath(folder, file);
-		if (resources.TryGetValue(cachePath, out reference))
+		if (resources.TryGetValue(cachePath, out reference) && reference != null)
 			return (T) reference;
 
 		ResourceParser parser = null;
@@ -325,12 +328,12 @@ public class ResourceManager
 			return true;
 #endif
 
-		bool found = false;
+		string cachePath = null;
 		foreach (var kvp in resources.Reverse())
 			if (kvp.Value == resource)
 			{
-				resources.Remove(kvp.Key);
-				found = true;
+				cachePath = kvp.Key;
+				resources.Remove(cachePath);
 				break;
 			}
 
@@ -338,8 +341,9 @@ public class ResourceManager
 		{
 			try
 			{
-				// GetInstanceID() seems to return positive values for loaded assets and negative for created ones
-				if (unityObject.GetInstanceID() > 0)
+				// GetInstanceID() seems to return positive values for loaded assets and negative for created ones				
+				//if (unityObject.GetInstanceID() > 0)
+				if (cachePath == null || cachePath.IsLeft(GetCachePath(ResourceFolder.Resources)))
 					Resources.UnloadAsset(unityObject);
 				else
 					UnityEngine.Object.Destroy(unityObject);
@@ -348,7 +352,8 @@ public class ResourceManager
 			{
 			}
 		}
-		return found;
+
+		return cachePath != null;
 	}
 
 	public static bool Unload(ResourceFolder folder, string file)
@@ -359,11 +364,12 @@ public class ResourceManager
 		if (ModManager.UnloadAll(cachePath))
 			return true;
 #endif
-		
-		if (resources.TryGetValue(cachePath, out object resource))
+
+		object reference = null;
+		if (resources.TryGetValue(cachePath, out reference) && reference != null)
 		{
 			resources.Remove(cachePath);
-			if (resource is UnityEngine.Object unityObject)
+			if (reference is UnityEngine.Object unityObject)
 			{
 				if (folder == ResourceFolder.Resources)
 					Resources.UnloadAsset(unityObject);
@@ -629,9 +635,9 @@ public class ResourceManager
 
 #region Other
 #if MODDING
-	public static List<ResourceInfo> GetModdedFileInfo(ResourceFolder folder, string file)
+	public static List<ResourceInfo> GetModdedResourceInfo(ResourceFolder folder, string file)
 	{
-		return ModManager.GetFileInfo(GetCachePath(folder, file));
+		return ModManager.GetResourceInfo(GetCachePath(folder, file));
 	}
 
 	public static ResourceInfo? GetModdedResourceInfo(object resource)
@@ -648,6 +654,11 @@ public class ResourceManager
 	public static string GetPath(ResourceFolder folder, string file)
 	{
 		return GetPath(folder) + file;
+	}
+
+	public static string GetCachePath(ResourceFolder folder)
+	{
+		return folderToString[folder];
 	}
 
 	public static string GetCachePath(ResourceFolder folder, string file)

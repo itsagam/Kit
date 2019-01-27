@@ -5,9 +5,34 @@ using UnityEngine;
 
 public static class StringExtensions
 {
+	public static string Left(this string str, int count)
+	{
+		return str.Substring(0, count);
+	}
+
+	public static string Right(this string str, int count)
+	{
+		return str.Substring(count);
+	}
+
 	public static string Slice(this string str, int startIndex, int endIndex)
 	{
 		return str.Substring(startIndex, endIndex - startIndex);
+	}
+
+	public static bool IsLeft(this string str, string compare)
+	{
+		return str.Left(compare.Length) == compare;
+	}
+
+	public static bool IsRight(this string str, string compare)
+	{
+		return str.Right(compare.Length) == compare;
+	}
+
+	public static bool IsSlice(this string str, int startIndex, string compare)
+	{
+		return str.Slice(startIndex, compare.Length) == compare;
 	}
 
 	public static string[] SplitAndTrim(this string str, params char[] separators)

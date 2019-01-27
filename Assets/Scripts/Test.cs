@@ -45,11 +45,24 @@ public class Test: MonoBehaviour
 		}
 	}
 
+	public static AudioClip global;
+
 #pragma warning disable CS1998
-	 void  Start()
+	 void  Awake()
 	{
 		//ModdingTest();
-		//InjectTest();
+		//InjectTest()
+
+		//global = new WeakReference(new Modding.Loaders.DirectModLoader());
+		if (global == null)
+		{
+			//Texture tex = LoadTexture(ResourceManager.ReadBytes(ResourceFolder.Resources, "Textures/test.jpeg"));
+			var clip = WavUtility.ToAudioClip(ResourceManager.ReadBytes(ResourceFolder.Resources, "Sounds/test.wav"), 0);
+			//var text = LoadTextAsset("agam");
+			global = clip;//new WeakReference(clip, false);
+		}
+		print(global); //.Target);
+		SceneManager.ReloadScene();
 
 		/*
 		Debugger.StartProfile("Resources.Load");
@@ -64,6 +77,20 @@ public class Test: MonoBehaviour
 		*/
 	}
 #pragma warning restore CS1998
+
+	public TextAsset LoadTextAsset(string data)
+	{
+		TextAsset asset = new TextAsset(data);
+		return asset;
+	}
+
+	public Texture LoadTexture(object data)
+	{
+		Texture2D texture = null;
+		texture = new Texture2D(0, 0);
+		texture.LoadImage((byte[]) data);
+		return texture;
+	}
 
 	private void ResourceReused(ResourceFolder folder, string path, object obj)
 	{

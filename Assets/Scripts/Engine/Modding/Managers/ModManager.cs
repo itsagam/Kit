@@ -208,7 +208,7 @@ namespace Modding
 
 		public static T Load<T>(string path) where T : class
 		{
-			List<ResourceInfo> loadedResources = GetFileInfo(path);
+			List<ResourceInfo> loadedResources = GetResourceInfo(path);
 			if (loadedResources != null)
 			{
 				ResourceInfo loadedResource = loadedResources[0];
@@ -238,7 +238,7 @@ namespace Modding
 
 		public static async UniTask<T> LoadAsync<T>(string path) where T : class
 		{
-			List<ResourceInfo> loadedResources = GetFileInfo(path);
+			List<ResourceInfo> loadedResources = GetResourceInfo(path);
 			if (loadedResources != null)
 			{
 				ResourceInfo loadedResource = loadedResources[0];
@@ -268,7 +268,7 @@ namespace Modding
 
 		public static List<T> LoadAll<T>(string path) where T : class
 		{
-			List<ResourceInfo> loadedResources = GetFileInfo(path);
+			List<ResourceInfo> loadedResources = GetResourceInfo(path);
 			if (loadedResources == null)
 			{
 				loadedResources = new List<ResourceInfo>();
@@ -300,7 +300,7 @@ namespace Modding
 
 		public static async UniTask<List<T>> LoadAllAsync<T>(string path) where T : class
 		{
-			List<ResourceInfo> loadedResources = GetFileInfo(path);
+			List<ResourceInfo> loadedResources = GetResourceInfo(path);
 			if (loadedResources == null)
 			{
 				loadedResources = new List<ResourceInfo>();
@@ -330,7 +330,7 @@ namespace Modding
 			return all;
 		}
 
-		public static List<ResourceInfo> GetFileInfo(string path)
+		public static List<ResourceInfo> GetResourceInfo(string path)
 		{
 			if (resourceInfos.TryGetValue(path, out List<ResourceInfo> resourceInfo))
 				if (resourceInfo.Count > 0)
@@ -514,7 +514,7 @@ namespace Modding
 
 		public static bool UnloadAll(string path)
 		{
-			List<ResourceInfo> infos = GetFileInfo(path);
+			List<ResourceInfo> infos = GetResourceInfo(path);
 			if (infos != null)
 			{
 				foreach (ResourceInfo info in infos)
@@ -531,9 +531,7 @@ namespace Modding
 		protected static void UnloadInternal(object resource)
 		{
 			if (resource is UnityEngine.Object)
-			{
 				UnityEngine.Object.Destroy((UnityEngine.Object)resource);
-			}
 		}
 
 		public static void ClearCache()

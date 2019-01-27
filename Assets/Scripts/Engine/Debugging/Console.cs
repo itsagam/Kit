@@ -12,8 +12,8 @@ using TouchScript.Gestures;
 using UniRx;
 using XLua;
 
+// UNDONE: Find a way to set default values in MonoBehaviours and use Lua to set them
 // TODO: Provide hotfix functions
-// TODO: Find a way to set default values in MonoBehaviours and use Lua to set them
 
 public class Console : MonoBehaviour
 {
