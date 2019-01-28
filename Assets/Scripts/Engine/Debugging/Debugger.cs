@@ -81,7 +81,7 @@ public class Debugger : MonoBehaviour
 	public static void LogProfile(string name)
 	{
 		// Recorder values are valid only for one frame, and in which frame they register Begin/End seems random
-		// This checks for registered recorder blocks for 100 frames after a call to this function
+		// HACK: This checks for registered recorder blocks for 100 frames after a call to this function
 		IDisposable observer = null;
 		int count = 0;	
 		observer = Observable.EveryUpdate().Subscribe(l => {
@@ -170,10 +170,10 @@ public class Debugger : MonoBehaviour
 		if (obj == null)
 			return nullString;
 
-		if (obj.GetType().IsValueType || (obj is string))
-			return obj.ToString();
+		if (serialize)
+			return JsonConvert.SerializeObject(obj, Formatting.Indented);
 		else
-			return serialize ? JsonConvert.SerializeObject(obj) : obj.ToString();
+			return obj.ToString();
 	}
 
 	public static void ObjectToString(StringBuilder output, object obj, bool serialize, string nullString)

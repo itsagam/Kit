@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Runtime.CompilerServices;
 using System.Collections.ObjectModel;
 using System.Collections.Generic;
 using System.Linq;
@@ -21,12 +22,17 @@ namespace Modding
 		public ResourceParser Parser;
 		public WeakReference Reference;
 		
-		public ResourceInfo(Mod mod, string file, ResourceParser parser, object reference)
+		public ResourceInfo(Mod mod, string file, ResourceParser parser, object reference) 
+			: this(mod, file, parser, new WeakReference(reference)) 
+		{
+		}
+
+		public ResourceInfo(Mod mod, string file, ResourceParser parser, WeakReference reference)
 		{
 			Mod = mod;
 			File = file;
 			Parser = parser;
-			Reference = new WeakReference(reference);
+			Reference = reference;
 		}
 	}
 	#endif
@@ -57,7 +63,7 @@ namespace Modding
 		};
 		
 		protected static List<Mod> mods = new List<Mod>();
-		protected static Dictionary<string, List<ResourceInfo>> cachedResources = new Dictionary<string, List<ResourceInfo>>();
+		protected static Dictionary<(Type type, string path), List<ResourceInfo>> cachedResources = new Dictionary<(Type, string), List<ResourceInfo>>();
 
 		static ModManager()
 		{
@@ -171,6 +177,7 @@ namespace Modding
 			}
 		}
 
+		// UNDONE: Make a "Mods" UI, allowing to change mod order and displaying mod information
 		public static void LoadModOrder()
 		{
 			// Reversing the list makes sure new mods (whose entries we do not have and will all return -1) are ordered in reverse
@@ -220,7 +227,8 @@ namespace Modding
 
 		public static T Load<T>(string path) where T : class
 		{
-			List<ResourceInfo> matchingResources = GetResources(path);
+			(Type, string) key = (typeof(T), path);
+			List<ResourceInfo> matchingResources = GetResources(key);
 			if (matchingResources != null && matchingResources.Count > 0)
 			{
 				ResourceInfo matchingResource = matchingResources[0];
@@ -236,11 +244,11 @@ namespace Modding
 					if (matchingResources == null)
 					{
 						matchingResources = new List<ResourceInfo>();
-						cachedResources[path] = matchingResources;
+						cachedResources[key] = matchingResources;
 					}
 					ResourceInfo newResource = new ResourceInfo(mod, file, parser, reference);
 					matchingResources.Add(newResource);
-					ResourceLoaded?.Invoke(path, newResource);
+					ResourceLoaded?.Invoke(file, newResource);
 					return reference;
 				}
 			}
@@ -250,7 +258,8 @@ namespace Modding
 
 		public static async UniTask<T> LoadAsync<T>(string path) where T : class
 		{
-			List<ResourceInfo> matchingResources = GetResources(path);
+			(Type, string) key = (typeof(T), path);
+			List<ResourceInfo> matchingResources = GetResources(key);
 			if (matchingResources != null && matchingResources.Count > 0)
 			{
 				ResourceInfo matchingResource = matchingResources[0];
@@ -266,11 +275,11 @@ namespace Modding
 					if (matchingResources == null)
 					{
 						matchingResources = new List<ResourceInfo>();
-						cachedResources[path] = matchingResources;
+						cachedResources[key] = matchingResources;
 					}
 					ResourceInfo newResource = new ResourceInfo(mod, file, parser, reference);
 					matchingResources.Add(newResource);
-					ResourceLoaded?.Invoke(path, newResource);
+					ResourceLoaded?.Invoke(file, newResource);
 					return reference;
 				}
 			}
@@ -280,7 +289,8 @@ namespace Modding
 
 		public static List<T> LoadAll<T>(string path) where T : class
 		{
-			List<ResourceInfo> matchingResources = GetResources(path);
+			(Type, string) key = (typeof(T), path);
+			List<ResourceInfo> matchingResources = GetResources(key);
 			Dictionary<Mod, ResourceInfo> matchingByMod = matchingResources.ToDictionary(r => r.Mod);
 			List<T> all = new List<T>();
 			foreach (Mod mod in mods)
@@ -294,11 +304,11 @@ namespace Modding
 						if (matchingResources == null)
 						{
 							matchingResources = new List<ResourceInfo>();
-							cachedResources[path] = matchingResources;
+							cachedResources[key] = matchingResources;
 						}
 						ResourceInfo newResource = new ResourceInfo(mod, file, parser, reference);
 						matchingResources.Add(newResource);
-						ResourceLoaded?.Invoke(path, newResource);
+						ResourceLoaded?.Invoke(file, newResource);
 						all.Add(reference);
 					}
 				}
@@ -313,7 +323,8 @@ namespace Modding
 
 		public static async UniTask<List<T>> LoadAllAsync<T>(string path) where T : class
 		{
-			List<ResourceInfo> matchingResources = GetResources(path);
+			(Type, string) key = (typeof(T), path);
+			List<ResourceInfo> matchingResources = GetResources(key);
 			Dictionary<Mod, ResourceInfo> matchingByMod = matchingResources.ToDictionary(r => r.Mod);
 			List<T> all = new List<T>();
 			foreach (Mod mod in mods)
@@ -327,11 +338,11 @@ namespace Modding
 						if (matchingResources == null)
 						{
 							matchingResources = new List<ResourceInfo>();
-							cachedResources[path] = matchingResources;
+							cachedResources[key] = matchingResources;
 						}
 						ResourceInfo newResource = new ResourceInfo(mod, file, parser, reference);
 						matchingResources.Add(newResource);
-						ResourceLoaded?.Invoke(path, newResource);
+						ResourceLoaded?.Invoke(file, newResource);
 						all.Add(reference);
 					}
 				}
@@ -344,9 +355,19 @@ namespace Modding
 			return all;
 		}
 
-		public static List<ResourceInfo> GetResources(string path)
+		public static List<ResourceInfo> GetResources<T>(string path)
 		{
-			if (cachedResources.TryGetValue(path, out List<ResourceInfo> resources))
+			return GetResources((typeof(T), path));
+		}
+
+		public static ResourceInfo GetResourceInfo(object resource)
+		{
+			return cachedResources.SelectMany(r => r.Value).FirstOrDefault(r => r.Reference.Target == resource);
+		}
+
+		protected static List<ResourceInfo> GetResources((Type type, string path) key)
+		{
+			if (cachedResources.TryGetValue(key, out List<ResourceInfo> resources))
 			{
 				CleanupDeadResources(resources);
 				return resources;
@@ -354,16 +375,12 @@ namespace Modding
 			return null;
 		}
 
+		// HACK: This cleans up resources that have been garbage collected 
 		protected static void CleanupDeadResources(List<ResourceInfo> list)
 		{
 			for (int i = list.Count - 1; i >= 0; i--)
 				if (!list[i].Reference.IsAlive)
 					list.RemoveAt(i);
-		}
-
-		public static ResourceInfo? GetResourceInfo(object resource)
-		{
-			return cachedResources.SelectMany(r => r.Value).FirstOrDefault(r => r.Reference.Target == resource);
 		}
 
 		public static string ReadText(string path)
@@ -498,71 +515,75 @@ namespace Modding
             LoadMods();
         }
 
-        public static void UnloadMods()
+        public static void UnloadMods(bool destroyLoaded = false)
 		{
 			for (int i = mods.Count - 1; i >= 0; i--)
-				UnloadMod(mods[i]);
+				UnloadMod(mods[i], destroyLoaded);
 		}
 
-		public static void UnloadMod(Mod mod)
+		public static void UnloadMod(Mod mod, bool destroyLoaded = true)
 		{
-			UnloadAll(o => o.Mod == mod);
+			if (destroyLoaded)
+				UnloadAll(mod);
 			mod.Unload();
 			mods.Remove(mod);
 			ModUnloaded?.Invoke(mod);
 		}
 
-		public static bool Unload(object reference)
+		public static bool UnloadAll(Mod mod)
 		{
-			return Unload(o => o.Reference.Target == reference);
+			bool found = false;
+			foreach (var kvp in cachedResources.Reverse())
+			{
+				List<ResourceInfo> resourceList = kvp.Value;
+				// FirstOrDefault will return "default" if not found and resource.Reference itself will be null
+				ResourceInfo resource = resourceList.FirstOrDefault(r => r.Mod == mod);
+				if (resource.Reference != null)
+				{
+					// No need to check for null because UnloadInternal checks type
+					UnloadInternal(resource.Reference.Target);
+					resourceList.Remove(resource);
+					if (resourceList.Count <= 0)
+						cachedResources.Remove(kvp.Key);
+					found = true;
+					ResourceUnloaded?.Invoke(resource.File, resource.Mod);
+				}
+			}
+			return found;
 		}
 
-		public static bool Unload(Func<ResourceInfo, bool> predicate)
+		public static bool Unload(object reference)
 		{
 			foreach (var kvp in cachedResources.Reverse())
 			{
-				foreach (var resource in kvp.Value.Where(predicate).Reverse())
+				// This differs from above in only that it returns immediately once a matching reference is found
+				List<ResourceInfo> resourceList = kvp.Value;
+				ResourceInfo resource = resourceList.FirstOrDefault(r => r.Reference.Target == reference);
+				if (resource.Reference != null)
 				{
 					UnloadInternal(resource.Reference.Target);
-					kvp.Value.Remove(resource);
-					ResourceUnloaded?.Invoke(kvp.Key, resource.Mod);
-					if (kvp.Value.Count <= 0)
+					resourceList.Remove(resource);
+					if (resourceList.Count <= 0)
 						cachedResources.Remove(kvp.Key);
+					ResourceUnloaded?.Invoke(resource.File, resource.Mod);
 					return true;
 				}
 			}
 			return false;
 		}
 
-		public static bool UnloadAll(Func<ResourceInfo, bool> predicate)
+		public static bool Unload<T>(string path)
 		{
-			bool found = false;
-			foreach (var kvp in cachedResources.Reverse())
-			{
-				foreach (var resource in kvp.Value.Where(predicate).Reverse())
-				{
-					UnloadInternal(resource.Reference.Target);
-					kvp.Value.Remove(resource);
-					ResourceUnloaded?.Invoke(kvp.Key, resource.Mod);
-					found = true;
-				}
-				if (kvp.Value.Count <= 0)
-					cachedResources.Remove(kvp.Key);
-			}
-			return found;
-		}
-
-		public static bool UnloadAll(string path)
-		{
-			List<ResourceInfo> matchingResources = GetResources(path);
+			(Type, string) key = (typeof(T), path);			
+			List<ResourceInfo> matchingResources = GetResources(key);
 			if (matchingResources != null)
 			{
 				foreach (ResourceInfo resource in matchingResources)
 				{
 					UnloadInternal(resource.Reference.Target);
-					ResourceUnloaded?.Invoke(path, resource.Mod);
+					ResourceUnloaded?.Invoke(resource.File, resource.Mod);
 				}
-				cachedResources.Remove(path);
+				cachedResources.Remove(key);
 				return true;
 			}
 			return false;
@@ -570,8 +591,8 @@ namespace Modding
 
 		protected static void UnloadInternal(object resource)
 		{
-			if (resource is UnityEngine.Object)
-				UnityEngine.Object.Destroy((UnityEngine.Object)resource);
+			if (resource is UnityEngine.Object unityObject)
+				UnityEngine.Object.Destroy(unityObject);
 		}
 
 		public static void ClearCache()

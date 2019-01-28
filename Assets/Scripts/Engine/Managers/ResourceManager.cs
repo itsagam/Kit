@@ -9,15 +9,10 @@ using UniRx.Async;
 using Modding;
 using Modding.Parsers;
 
-// Limitations: 1)	You have to provide file extension for ResourceFolder other than Resources if its not loaded 
+// Limitations: 1)	You have to provide file extension for ResourceFolder other than Resources if it is not loaded
 //					by ModManager because you can't enumerate and match files in Data/Resources/StreamingAssets on 
-//					platforms like Android. If the file is found in ModManager they can be loaded without providing 
+//					platforms like Android. If the file is loaded by ModManager it can be loaded without providing 
 //					an extension since mods are always in an accessible folder which we can enumerate.
-//				2)	If two files with same name are loaded from ModManager without an extension, it'll create a 
-//					conflict (ModManager.Load<AudioClip>("Files/Test") and ModManager.Load<Texture>("Files/Test")),
-//					since the first object would be cached and a second call would try to reuse and cast it.
-//					TODO: Solve this by making cache in ResourceManager a list (ModManager already is) and comparing
-//					types as well as path. If either does not match, find and load a new file otherwise return null.
 
 public enum ResourceFolder
 {
@@ -38,10 +33,10 @@ public class ResourceManager
 	// Default mode for modding in individual calls
 	public const bool DefaultModding = true;
 
-	public static event Action<ResourceFolder, string, object> ResourceLoaded;
-	public static event Action<ResourceFolder, string, object> ResourceReused;
+	public static event Action<string, object> ResourceLoaded;
+	public static event Action<string, object> ResourceReused;
+	public static event Action<string> ResourceUnloaded;
 
-	// TODO: Profile memory and do memory management
 	protected static Dictionary<(Type type, string path), WeakReference> cachedResources = new Dictionary<(Type, string), WeakReference>();
 	protected static Dictionary<ResourceFolder, string> folderToString = new Dictionary<ResourceFolder, string>();
 
@@ -94,11 +89,11 @@ public class ResourceManager
 
 	protected static ((Type type, string path) key, T reference) LoadCached<T>(ResourceFolder folder, string file) where T : class
 	{
-		(Type, string) key = (typeof(T), GetCachePath(folder, file));
+		(Type type, string path) key = (typeof(T), GetCachePath(folder, file));
 		if (cachedResources.TryGetValue(key, out WeakReference weakReference) && weakReference.IsAlive)
 		{
 			object reference = weakReference.Target;
-			ResourceReused?.Invoke(folder, file, reference);
+			ResourceReused?.Invoke(key.path, reference);
 			return (key, (T) reference);
 		}
 		return (key, null);
@@ -123,8 +118,9 @@ public class ResourceManager
 
 		if (reference != null)
 		{
-			cachedResources.Add(key, new WeakReference(reference));
-			ResourceLoaded?.Invoke(folder, file, reference);
+			// Important to use [key], not Add(key) because the latter generates an error if key exists
+			cachedResources[key] = new WeakReference(reference);
+			ResourceLoaded?.Invoke(key.path, reference);
 		}
 		return reference;
 	}
@@ -148,8 +144,8 @@ public class ResourceManager
 
 		if (reference != null)
 		{
-			cachedResources.Add(key, new WeakReference(reference));
-			ResourceLoaded?.Invoke(folder, file, reference);
+			cachedResources[key] = new WeakReference(reference);
+			ResourceLoaded?.Invoke(key.path, reference);
 		}
 		return reference;
 	}
@@ -201,8 +197,8 @@ public class ResourceManager
 				Debugger.Log("ResourceManager", e.Message);
 			}
 		}
-		cachedResources.Add(key, new WeakReference(merged));
-		ResourceLoaded?.Invoke(folder, file, merged);
+		cachedResources[key] = new WeakReference(merged);
+		ResourceLoaded?.Invoke(key.path, merged);
 		return merged;
 	}
 
@@ -252,8 +248,8 @@ public class ResourceManager
 				Debugger.Log("ResourceManager", e.Message);
 			}
 		}
-		cachedResources.Add(key, new WeakReference(merged));
-		ResourceLoaded?.Invoke(folder, file, merged);
+		cachedResources[key] = new WeakReference(merged);
+		ResourceLoaded?.Invoke(key.path, merged);
 		return merged;
 	}
 #endif
@@ -327,15 +323,9 @@ public class ResourceManager
 		if (ModManager.Unload(resource))
 			return true;
 #endif
-
-		string cachePath = null;
-		foreach (var kvp in cachedResources.Reverse())
-			if (kvp.Value.Target == resource)
-			{
-				cachePath = kvp.Key.path;
-				cachedResources.Remove(kvp.Key);
-				break;
-			}
+	
+		var key = cachedResources.FirstOrDefault(kvp => kvp.Value.Target == resource).Key;
+		string cachePath = key.path;
 
 		if (resource is UnityEngine.Object unityObject)
 		{
@@ -344,8 +334,14 @@ public class ResourceManager
 			else
 				UnityEngine.Object.Destroy(unityObject);
 		}
-
-		return cachePath != null;
+		
+		if (cachePath != null)
+		{
+			cachedResources.Remove(key);
+			ResourceUnloaded(cachePath);
+			return true;
+		}
+		return false;
 	}
 
 	public static bool Unload<T>(ResourceFolder folder, string file)
@@ -353,14 +349,13 @@ public class ResourceManager
 		string cachePath = GetCachePath(folder, file);
 		
 #if MODDING
-		if (ModManager.UnloadAll(cachePath))
+		if (ModManager.Unload<T>(cachePath))
 			return true;
 #endif
 
 		(Type, string) key = (typeof(T), cachePath);
 		if (cachedResources.TryGetValue(key, out WeakReference weakReference))
 		{
-			cachedResources.Remove(key);
 			if (weakReference.Target is UnityEngine.Object unityObject)
 			{
 				if (folder == ResourceFolder.Resources)
@@ -368,6 +363,8 @@ public class ResourceManager
 				else
 					UnityEngine.Object.Destroy(unityObject);
 			}
+			cachedResources.Remove(key);
+			ResourceUnloaded(cachePath);
 			return true;
 		}
 		return false;
@@ -627,12 +624,12 @@ public class ResourceManager
 
 #region Other
 #if MODDING
-	public static List<ResourceInfo> GetModdedResourceInfo(ResourceFolder folder, string file)
+	public static List<ResourceInfo> GetModdedResourceInfo<T>(ResourceFolder folder, string file)
 	{
-		return ModManager.GetResources(GetCachePath(folder, file));
+		return ModManager.GetResources<T>(GetCachePath(folder, file));
 	}
 
-	public static ResourceInfo? GetModdedResourceInfo(object resource)
+	public static ResourceInfo GetModdedResourceInfo(object resource)
 	{
 		return ModManager.GetResourceInfo(resource);
 	}

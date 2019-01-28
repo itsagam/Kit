@@ -12,7 +12,7 @@ using TouchScript.Gestures;
 using UniRx;
 using XLua;
 
-// UNDONE: Find a way to set default values in MonoBehaviours and use Lua to set them
+// UNDONE: Find a way to set default values in MonoBehaviours (LoadMerged with JSON/Lua...)
 // TODO: Provide hotfix functions
 
 public class Console : MonoBehaviour
@@ -86,7 +86,7 @@ public class Console : MonoBehaviour
 
 		EventModifiers disregard = EventModifiers.FunctionKey | EventModifiers.Numeric | EventModifiers.CapsLock;
 		var input = CommandInput;
-		input.AddKeyHandler(KeyCode.BackQuote,	() =>	{ },										EventModifiers.None,	disregard);
+		input.AddKeyHandler(KeyCode.BackQuote,	() =>	{},											EventModifiers.None,	disregard);
 		input.AddKeyHandler(KeyCode.Return,				Submit,										EventModifiers.None,	disregard);
 		input.AddKeyHandler(KeyCode.Return,		() =>	input.SendKeyEvent(KeyCode.Return,'\n'),	EventModifiers.Shift,	disregard);
 		input.AddKeyHandler(KeyCode.UpArrow,			SelectPreviousCommand,						EventModifiers.None,	disregard);
