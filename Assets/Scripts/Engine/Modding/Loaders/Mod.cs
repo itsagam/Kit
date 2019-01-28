@@ -117,33 +117,33 @@ namespace Modding
 			scriptUpdate = Observable.EveryUpdate().Subscribe(f => scriptEnv.Tick());
 		}
 
-		public virtual (T reference, string file, ResourceParser parser) Load<T>(string path) where T : class
+		public virtual (T reference, string filePath, ResourceParser parser) Load<T>(string path) where T : class
 		{
 			IEnumerable<string> matchingFiles = FindFiles(path);
 			if (matchingFiles == null)
 				return default;
 
 			var certainties = matchingFiles
-								.SelectMany(file => ModManager.Parsers.Select(parser => (file, parser, certainty: parser.CanRead<T>(file))))
+								.SelectMany(filePath => ModManager.Parsers.Select(parser => (filePath, parser, certainty: parser.CanRead<T>(filePath))))
 								.Where(d => d.certainty > 0)
 								.OrderByDescending(d => d.certainty);
 			string text = null;
 			byte[] bytes = null;
-			foreach (var (file, parser, certainty) in certainties)
+			foreach (var (filePath, parser, certainty) in certainties)
 			{
 				try
 				{
 					if (parser.OperateWith == OperateType.Bytes)
 					{
 						if (bytes == null)
-							bytes = ReadBytes(file);
-						return ((T) parser.Read<T>(bytes, file), file, parser);
+							bytes = ReadBytes(filePath);
+						return ((T) parser.Read<T>(bytes, filePath), filePath, parser);
 					}
 					else
 					{
 						if (text == null)
-							text = ReadText(file);
-						return ((T) parser.Read<T>(text, file), file, parser);
+							text = ReadText(filePath);
+						return ((T) parser.Read<T>(text, filePath), filePath, parser);
 					}
 				}
 				catch
@@ -154,33 +154,33 @@ namespace Modding
 			return default;
 		}
 
-		public virtual async UniTask<(T reference, string file, ResourceParser parser)> LoadAsync<T>(string path) where T : class
+		public virtual async UniTask<(T reference, string filePath, ResourceParser parser)> LoadAsync<T>(string path) where T : class
 		{
 			IEnumerable<string> matchingFiles = FindFiles(path);
 			if (matchingFiles == null)
 				return default;
 
 			var certainties = matchingFiles
-								.SelectMany(file => ModManager.Parsers.Select(parser => (file, parser, certainty: parser.CanRead<T>(file))))
+								.SelectMany(filePath => ModManager.Parsers.Select(parser => (filePath, parser, certainty: parser.CanRead<T>(filePath))))
 								.Where(d => d.certainty > 0)
 								.OrderByDescending(d => d.certainty);
 			string text = null;
 			byte[] bytes = null;
-			foreach (var (file, parser, certainty) in certainties)
+			foreach (var (filePath, parser, certainty) in certainties)
 			{
 				try
 				{
 					if (parser.OperateWith == OperateType.Bytes)
 					{
 						if (bytes == null)
-							bytes = await ReadBytesAsync(file);
-						return ((T) parser.Read<T>(bytes, file), file, parser);
+							bytes = await ReadBytesAsync(filePath);
+						return ((T) parser.Read<T>(bytes, filePath), filePath, parser);
 					}
 					else
 					{
 						if (text == null)
-							text = await ReadTextAsync(file);
-						return ((T) parser.Read<T>(text, file), file, parser);
+							text = await ReadTextAsync(filePath);
+						return ((T) parser.Read<T>(text, filePath), filePath, parser);
 					}
 				}
 				catch

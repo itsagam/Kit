@@ -13,11 +13,19 @@ using Modding.Loaders;
 
 namespace Modding
 {
-	#if MODDING
+	public enum ResourceFolder
+	{
+		Data,
+		StreamingAssets,
+		PersistentData,
+		Resources
+	}
+
+#if MODDING
 	public struct ResourceInfo
 	{
 		public Mod Mod;
-		public string File; // Actual filename, maybe different from the one resource was loaded with if extension was not provided
+		public string Path;
 		public ResourceParser Parser;
 		public WeakReference Reference;
 		
@@ -29,7 +37,7 @@ namespace Modding
 		public ResourceInfo(Mod mod, string file, ResourceParser parser, WeakReference reference)
 		{
 			Mod = mod;
-			File = file;
+			Path = file;
 			Parser = parser;
 			Reference = reference;
 		}
@@ -48,9 +56,9 @@ namespace Modding
 #if MODDING
 		public static event Action<Mod> ModLoaded;
 		public static event Action<Mod> ModUnloaded;
-		public static event Action<string, ResourceInfo> ResourceLoaded;
-		public static event Action<string, ResourceInfo> ResourceReused;
-		public static event Action<string, Mod> ResourceUnloaded;
+		public static event Action<ResourceFolder, string, ResourceInfo> ResourceLoaded;
+		public static event Action<ResourceFolder, string, ResourceInfo> ResourceReused;
+		public static event Action<ResourceFolder, string, Mod> ResourceUnloaded;
 
 		public const string DefaultModFolderName = "Mods";
 
@@ -62,11 +70,14 @@ namespace Modding
 		};
 		
 		protected static List<Mod> mods = new List<Mod>();
-		protected static Dictionary<(Type type, string path), List<ResourceInfo>> cachedResources = new Dictionary<(Type, string), List<ResourceInfo>>();
+		protected static Dictionary<(Type type, ResourceFolder folder, string file), List<ResourceInfo>> cachedResources 
+			= new Dictionary<(Type, ResourceFolder, string), List<ResourceInfo>>();
+		protected static Dictionary<ResourceFolder, string> folderToString = new Dictionary<ResourceFolder, string>();
 
 		static ModManager()
 		{
 			AddDefaultSearchPaths();
+			CacheFolderNames();
 		}
 
 		protected static void AddDefaultSearchPaths()
@@ -98,6 +109,13 @@ namespace Modding
 			if (folder != null)
 				folder += "/";
 			return folder;
+		}
+
+		// The "+" operator and Path.Combine are really costly and have a huge perfomance impact
+		protected static void CacheFolderNames()
+		{
+			foreach (ResourceFolder value in Enum.GetValues(typeof(ResourceFolder)))
+				folderToString[value] = Enum.GetName(typeof(ResourceFolder), value) + "/";
 		}
 
 		public static void LoadMods(bool executeScripts = false)
@@ -224,20 +242,21 @@ namespace Modding
 				PlayerPrefs.SetInt($"Mods/{mods[i].Metadata.Name}.Order", i);
 		}
 
-		public static T Load<T>(string path) where T : class
+		public static T Load<T>(ResourceFolder folder, string file) where T : class
 		{
-			(Type, string) key = (typeof(T), path);
+			var key = (typeof(T), folder, file);
 			List<ResourceInfo> matchingResources = GetResources(key);
 			if (matchingResources != null && matchingResources.Count > 0)
 			{
 				ResourceInfo matchingResource = matchingResources[0];
-				ResourceReused?.Invoke(path, matchingResource);
+				ResourceReused?.Invoke(folder, file, matchingResource);
 				return (T) matchingResource.Reference.Target;
 			}
 
+			string path = GetModdingPath(folder, file);
 			foreach (Mod mod in mods)
 			{
-				var (reference, file, parser) = mod.Load<T>(path);
+				var (reference, filePath, parser) = mod.Load<T>(path);
 				if (reference != null)
 				{
 					if (matchingResources == null)
@@ -245,9 +264,9 @@ namespace Modding
 						matchingResources = new List<ResourceInfo>();
 						cachedResources[key] = matchingResources;
 					}
-					ResourceInfo newResource = new ResourceInfo(mod, file, parser, reference);
+					ResourceInfo newResource = new ResourceInfo(mod, filePath, parser, reference);
 					matchingResources.Add(newResource);
-					ResourceLoaded?.Invoke(file, newResource);
+					ResourceLoaded?.Invoke(folder, file, newResource);
 					return reference;
 				}
 			}
@@ -255,20 +274,21 @@ namespace Modding
 			return null;
 		}
 
-		public static async UniTask<T> LoadAsync<T>(string path) where T : class
+		public static async UniTask<T> LoadAsync<T>(ResourceFolder folder, string file) where T : class
 		{
-			(Type, string) key = (typeof(T), path);
+			var key = (typeof(T), folder, file);
 			List<ResourceInfo> matchingResources = GetResources(key);
 			if (matchingResources != null && matchingResources.Count > 0)
 			{
 				ResourceInfo matchingResource = matchingResources[0];
-				ResourceReused?.Invoke(path, matchingResource);
+				ResourceReused?.Invoke(folder, file, matchingResource);
 				return (T) matchingResource.Reference.Target;
 			}
 
+			string path = GetModdingPath(folder, file);
 			foreach (Mod mod in mods)
 			{
-				var (reference, file, parser) = await mod.LoadAsync<T>(path);
+				var (reference, filePath, parser) = await mod.LoadAsync<T>(path);
 				if (reference != null)
 				{
 					if (matchingResources == null)
@@ -276,9 +296,9 @@ namespace Modding
 						matchingResources = new List<ResourceInfo>();
 						cachedResources[key] = matchingResources;
 					}
-					ResourceInfo newResource = new ResourceInfo(mod, file, parser, reference);
+					ResourceInfo newResource = new ResourceInfo(mod, filePath, parser, reference);
 					matchingResources.Add(newResource);
-					ResourceLoaded?.Invoke(file, newResource);
+					ResourceLoaded?.Invoke(folder, file, newResource);
 					return reference;
 				}
 			}
@@ -286,18 +306,21 @@ namespace Modding
 			return null;
 		}
 
-		public static List<T> LoadAll<T>(string path) where T : class
+		public static List<T> LoadAll<T>(ResourceFolder folder, string file) where T : class
 		{
-			(Type, string) key = (typeof(T), path);
+			var key = (typeof(T), folder, file);
 			List<ResourceInfo> matchingResources = GetResources(key);
-			Dictionary<Mod, ResourceInfo> matchingByMod = matchingResources.ToDictionary(r => r.Mod);
+			// TODO: Maybe be incorrect
+			Dictionary<Mod, ResourceInfo> matchingResourceByMod = matchingResources.ToDictionary(r => r.Mod);
+			string path = GetModdingPath(folder, file);
+
 			List<T> all = new List<T>();
 			foreach (Mod mod in mods)
 			{
 				ResourceInfo matchingResource;
-				if (!matchingByMod.TryGetValue(mod, out matchingResource))
+				if (!matchingResourceByMod.TryGetValue(mod, out matchingResource))
 				{
-					var (reference, file, parser) =  mod.Load<T>(path);
+					var (reference, filePath, parser) = mod.Load<T>(path);
 					if (reference != null)
 					{
 						if (matchingResources == null)
@@ -305,33 +328,35 @@ namespace Modding
 							matchingResources = new List<ResourceInfo>();
 							cachedResources[key] = matchingResources;
 						}
-						ResourceInfo newResource = new ResourceInfo(mod, file, parser, reference);
+						ResourceInfo newResource = new ResourceInfo(mod, filePath, parser, reference);
 						matchingResources.Add(newResource);
-						ResourceLoaded?.Invoke(file, newResource);
+						ResourceLoaded?.Invoke(folder, file, newResource);
 						all.Add(reference);
 					}
 				}
 				else
 				{
-					ResourceReused?.Invoke(path, matchingResource);
+					ResourceReused?.Invoke(folder, file, matchingResource);
 					all.Add((T) matchingResource.Reference.Target);
 				}
 			}
 			return all;
 		}
 
-		public static async UniTask<List<T>> LoadAllAsync<T>(string path) where T : class
+		public static async UniTask<List<T>> LoadAllAsync<T>(ResourceFolder folder, string file) where T : class
 		{
-			(Type, string) key = (typeof(T), path);
+			var key = (typeof(T), folder, file);
 			List<ResourceInfo> matchingResources = GetResources(key);
-			Dictionary<Mod, ResourceInfo> matchingByMod = matchingResources.ToDictionary(r => r.Mod);
+			Dictionary<Mod, ResourceInfo> matchingResourceByMod = matchingResources.ToDictionary(r => r.Mod);
+			string path = GetModdingPath(folder, file);
+
 			List<T> all = new List<T>();
 			foreach (Mod mod in mods)
 			{
 				ResourceInfo matchingResource;
-				if (!matchingByMod.TryGetValue(mod, out matchingResource))
+				if (!matchingResourceByMod.TryGetValue(mod, out matchingResource))
 				{
-					var (reference, file, parser) = await mod.LoadAsync<T>(path);
+					var (reference, filePath, parser) = await mod.LoadAsync<T>(path);
 					if (reference != null)
 					{
 						if (matchingResources == null)
@@ -339,24 +364,24 @@ namespace Modding
 							matchingResources = new List<ResourceInfo>();
 							cachedResources[key] = matchingResources;
 						}
-						ResourceInfo newResource = new ResourceInfo(mod, file, parser, reference);
+						ResourceInfo newResource = new ResourceInfo(mod, filePath, parser, reference);
 						matchingResources.Add(newResource);
-						ResourceLoaded?.Invoke(file, newResource);
+						ResourceLoaded?.Invoke(folder, file, newResource);
 						all.Add(reference);
 					}
 				}
 				else
 				{
-					ResourceReused?.Invoke(path, matchingResource);
+					ResourceReused?.Invoke(folder, file, matchingResource);
 					all.Add((T) matchingResource.Reference.Target);
 				}
 			}
 			return all;
 		}
-
-		public static List<ResourceInfo> GetResources<T>(string path)
+		
+		public static List<ResourceInfo> GetResources<T>(ResourceFolder folder, string file)
 		{
-			return GetResources((typeof(T), path));
+			return GetResources((typeof(T), folder, file));
 		}
 
 		public static ResourceInfo GetResourceInfo(object resource)
@@ -364,7 +389,7 @@ namespace Modding
 			return cachedResources.SelectMany(r => r.Value).FirstOrDefault(r => r.Reference.Target == resource);
 		}
 
-		protected static List<ResourceInfo> GetResources((Type type, string path) key)
+		protected static List<ResourceInfo> GetResources((Type type, ResourceFolder folder, string file) key)
 		{
 			if (cachedResources.TryGetValue(key, out List<ResourceInfo> resources))
 			{
@@ -382,6 +407,11 @@ namespace Modding
 					list.RemoveAt(i);
 		}
 
+		public static string ReadText(ResourceFolder folder, string file)
+		{
+			return ReadText(GetModdingPath(folder, file));
+		}
+
 		public static string ReadText(string path)
 		{
 			foreach (Mod mod in mods)
@@ -395,6 +425,11 @@ namespace Modding
 				}
 			}
 			return null;
+		}
+
+		public static async UniTask<string> ReadTextAsync(ResourceFolder folder, string file)
+		{
+			return await ReadTextAsync(GetModdingPath(folder, file));
 		}
 
 		public static async UniTask<string> ReadTextAsync(string path)
@@ -412,6 +447,11 @@ namespace Modding
 			return null;
 		}
 
+		public static List<string> ReadTextAll(ResourceFolder folder, string file)
+		{
+			return ReadTextAll(GetModdingPath(folder, file));
+		}
+
 		public static List<string> ReadTextAll(string path)
 		{
 			List<string> all = new List<string>();
@@ -425,8 +465,12 @@ namespace Modding
 				{
 				}
 			}
-
 			return all;
+		}
+
+		public static async UniTask<List<string>> ReadTextAllAsync(ResourceFolder folder, string file)
+		{
+			return await ReadTextAllAsync(GetModdingPath(folder, file));
 		}
 
 		public static async UniTask<List<string>> ReadTextAllAsync(string path)
@@ -442,8 +486,12 @@ namespace Modding
 				{
 				}
 			}
-
 			return all;
+		}
+
+		public static byte[] ReadBytes(ResourceFolder folder, string file)
+		{
+			return ReadBytes(GetModdingPath(folder, file));
 		}
 
 		public static byte[] ReadBytes(string path)
@@ -461,6 +509,11 @@ namespace Modding
 			return null;
 		}
 
+		public static async UniTask<byte[]> ReadBytesAsync(ResourceFolder folder, string file)
+		{
+			return await ReadBytesAsync(GetModdingPath(folder, file));
+		}
+
 		public static async UniTask<byte[]> ReadBytesAsync(string path)
 		{
 			foreach (Mod mod in mods)
@@ -474,6 +527,11 @@ namespace Modding
 				}
 			}
 			return null;
+		}
+
+		public static List<byte[]> ReadBytesAll(ResourceFolder folder, string file)
+		{
+			return ReadBytesAll(GetModdingPath(folder, file));
 		}
 
 		public static List<byte[]> ReadBytesAll(string path)
@@ -492,6 +550,11 @@ namespace Modding
 			return all;
 		}
 
+		public static async UniTask<List<byte[]>> ReadBytesAllAsync(ResourceFolder folder, string file)
+		{
+			return await ReadBytesAllAsync(GetModdingPath(folder, file));
+		}
+
 		public static async UniTask<List<byte[]>> ReadBytesAllAsync(string path)
 		{
 			List<byte[]> all = new List<byte[]>();
@@ -508,7 +571,7 @@ namespace Modding
 			return all;
 		}
 
-        public static void UnloadMods(bool destroyLoaded = false)
+		public static void UnloadMods(bool destroyLoaded = false)
 		{
 			for (int i = mods.Count - 1; i >= 0; i--)
 				UnloadMod(mods[i], destroyLoaded);
@@ -539,7 +602,7 @@ namespace Modding
 					if (resourceList.Count <= 0)
 						cachedResources.Remove(kvp.Key);
 					found = true;
-					ResourceUnloaded?.Invoke(resource.File, resource.Mod);
+					ResourceUnloaded?.Invoke(kvp.Key.folder, kvp.Key.file, resource.Mod);
 				}
 			}
 			return found;
@@ -558,23 +621,23 @@ namespace Modding
 					resourceList.Remove(resource);
 					if (resourceList.Count <= 0)
 						cachedResources.Remove(kvp.Key);
-					ResourceUnloaded?.Invoke(resource.File, resource.Mod);
+					ResourceUnloaded?.Invoke(kvp.Key.folder, kvp.Key.file, resource.Mod);
 					return true;
 				}
 			}
 			return false;
 		}
 
-		public static bool Unload<T>(string path)
+		public static bool Unload<T>(ResourceFolder folder, string file)
 		{
-			(Type, string) key = (typeof(T), path);			
+			var key = (typeof(T), folder, file);			
 			List<ResourceInfo> matchingResources = GetResources(key);
 			if (matchingResources != null)
 			{
 				foreach (ResourceInfo resource in matchingResources)
 				{
 					UnloadInternal(resource.Reference.Target);
-					ResourceUnloaded?.Invoke(resource.File, resource.Mod);
+					ResourceUnloaded?.Invoke(folder, file, resource.Mod);
 				}
 				cachedResources.Remove(key);
 				return true;
@@ -591,6 +654,16 @@ namespace Modding
 		public static void ClearCache()
 		{
 			cachedResources.Clear();
+		}
+
+		public static string GetModdingPath(ResourceFolder folder)
+		{
+			return folderToString[folder];
+		}
+
+		public static string GetModdingPath(ResourceFolder folder, string file)
+		{
+			return GetModdingPath(folder) + file;
 		}
 
 		public static ReadOnlyCollection<Mod> Mods

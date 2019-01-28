@@ -51,7 +51,7 @@ public class Test: MonoBehaviour
 #pragma warning disable CS1998
 	async Task Start()
 	{
-		//ModdingTest();
+		ModdingTest();
 		//InjectTest()
 
 	}
@@ -67,7 +67,7 @@ public class Test: MonoBehaviour
 
 		Debugger.StartProfile("ResourceManager.Load");
 		for (int i = 0; i <= 100000; i++)
-			ResourceManager.LoadUnmodded<Texture>(ResourceFolder.Resources, "Textures/test");
+			ResourceManager.Load<Texture>(ResourceFolder.Resources, "Textures/test");
 		Debugger.EndProfile();
 	}
 
@@ -92,34 +92,34 @@ public class Test: MonoBehaviour
 		//GetComponent<AudioSource>().Play();
 	}
 
-	private static void ResourceReused(string path, object obj)
+	private static void ResourceReused(ResourceFolder folder, string file, object obj)
 	{
-		Debug.Log($"File \"{path}\" reused.");
+		Debug.Log($"File \"{file}\" reused.");
 	}
 
-	private static void ResourceLoaded(string path, object obj)
+	private static void ResourceLoaded(ResourceFolder folder, string file, object obj)
 	{
-		Debug.Log($"File \"{path}\" loaded.");
+		Debug.Log($"File \"{file}\" loaded.");
 	}
 
-	private static void ResourceUnloaded(string path)
+	private static void ResourceUnloaded(ResourceFolder folder, string file)
 	{
-		Debug.Log($"File \"{path}\" unloaded.");
+		Debug.Log($"File \"{file}\" unloaded.");
 	}
 
-	private static void ModManager_ResourceUnloaded(string path, Mod mod)
+	private static void ModManager_ResourceUnloaded(ResourceFolder folder, string file, Mod mod)
 	{
-		Debug.Log($"File \"{path}\" unloaded from \"{mod.Path}\"");
+		Debug.Log($"File \"{file}\" unloaded from \"{mod.Path}\"");
 	}
 
-	private static void ModManager_ResourceReused(string path, ResourceInfo info)
+	private static void ModManager_ResourceReused(ResourceFolder folder, string file, ResourceInfo info)
 	{
-		Debug.Log($"File \"{path}\" resused from \"{info.Mod.Path}\"");
+		Debug.Log($"File \"{file}\" resused from \"{info.Mod.Path}\"");
 	}
 
-	private static void ModManager_ResourceLoaded(string path, ResourceInfo info)
+	private static void ModManager_ResourceLoaded(ResourceFolder folder, string file, ResourceInfo info)
 	{
-		Debug.Log($"File \"{path}\" loaded from \"{info.Mod.Path}\"");
+		Debug.Log($"File \"{file}\" loaded from \"{info.Mod.Path}\"");
 	}
 
 	void OnDestroy()
