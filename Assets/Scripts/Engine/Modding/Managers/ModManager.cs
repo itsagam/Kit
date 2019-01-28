@@ -508,12 +508,6 @@ namespace Modding
 			return all;
 		}
 
-		public static void ReloadMods()
-        {
-            UnloadMods();
-            LoadMods();
-        }
-
         public static void UnloadMods(bool destroyLoaded = false)
 		{
 			for (int i = mods.Count - 1; i >= 0; i--)

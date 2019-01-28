@@ -9,10 +9,10 @@ using UniRx.Async;
 using Modding;
 using Modding.Parsers;
 
-// Limitations: 1)	You have to provide file extension for ResourceFolder other than Resources if it is not loaded
-//					by ModManager because you can't enumerate and match files in Data/Resources/StreamingAssets on 
-//					platforms like Android. If the file is loaded by ModManager it can be loaded without providing 
-//					an extension since mods are always in an accessible folder which we can enumerate.
+// Notes: 1)	You have to provide file extension for ResourceFolder other than Resources if it is not loaded
+//				by ModManager because you can't enumerate and match files in Data/Resources/StreamingAssets on 
+//				platforms like Android. If the file is loaded by ModManager it can be loaded without providing 
+//				an extension since mods are always in an accessible folder which we can enumerate.
 
 public enum ResourceFolder
 {
@@ -47,6 +47,7 @@ public class ResourceManager
 	}
 
 	#region Loading
+	// The "where" clause hints the return type is a reference type and allows to return null
 	public static T Load<T>(ResourceFolder folder, string file, bool modded = DefaultModding, bool merge = false) where T : class
 	{
 #if MODDING
@@ -87,28 +88,31 @@ public class ResourceManager
 		return await LoadUnmoddedAsync<T>(folder, file);
 	}
 
-	protected static ((Type type, ResourceFolder folder, string file) key, T reference) LoadCached<T>(ResourceFolder folder, string file) where T : class
+	protected static T LoadCached<T>(ResourceFolder folder, string file) where T : class
 	{
-		var key = (typeof(T), folder, file);
-		if (cachedResources.TryGetValue(key, out WeakReference weakReference) && weakReference.IsAlive)
+		if (cachedResources.TryGetValue((typeof(T), folder, file), out WeakReference weakReference))
 		{
 			object reference = weakReference.Target;
-			ResourceReused?.Invoke(folder, file, reference);
-			return (key, (T) reference);
+			if (reference != null)
+			{
+				ResourceReused?.Invoke(folder, file, reference);
+				return (T) reference;
+			}
 		}
-		return (key, null);
+		return null;
 	}
 
 	public static T LoadUnmodded<T>(ResourceFolder folder, string file) where T : class
 	{
-		(var key, T reference) = LoadCached<T>(folder, file);
+		T reference = LoadCached<T>(folder, file);
 		if (reference != null)
 			return reference;
 
+		Type type = typeof(T);
 		if (folder == ResourceFolder.Resources)
 		{
 			string fileNoExt = Path.ChangeExtension(file, null);
-			reference = Resources.Load(fileNoExt, key.type) as T;
+			reference = Resources.Load(fileNoExt, type) as T;
 		}
 		else
 		{
@@ -119,7 +123,7 @@ public class ResourceManager
 		if (reference != null)
 		{
 			// Important to use [key], not Add(key) because the latter generates an error if key exists
-			cachedResources[key] = new WeakReference(reference);
+			cachedResources[(type, folder, file)] = new WeakReference(reference);
 			ResourceLoaded?.Invoke(folder, file, reference);
 		}
 		return reference;
@@ -127,14 +131,15 @@ public class ResourceManager
 
 	public static async UniTask<T> LoadUnmoddedAsync<T>(ResourceFolder folder, string file) where T : class
 	{
-		(var key, T reference) = LoadCached<T>(folder, file);
+		T reference = LoadCached<T>(folder, file);
 		if (reference != null)
 			return reference;
 
+		Type type = typeof(T);
 		if (folder == ResourceFolder.Resources)
 		{
 			string fileNoExt = Path.ChangeExtension(file, null);
-			reference = (await Resources.LoadAsync(fileNoExt, key.type)) as T;
+			reference = (await Resources.LoadAsync(fileNoExt, type)) as T;
 		}
 		else
 		{
@@ -144,7 +149,7 @@ public class ResourceManager
 
 		if (reference != null)
 		{
-			cachedResources[key] = new WeakReference(reference);
+			cachedResources[(type, folder, file)] = new WeakReference(reference);
 			ResourceLoaded?.Invoke(folder, file, reference);
 		}
 		return reference;
@@ -153,7 +158,7 @@ public class ResourceManager
 #if MODDING
 	public static T LoadMerged<T>(ResourceFolder folder, string file) where T : class
 	{
-		(var key, T reference) = LoadCached<T>(folder, file);
+		T reference = LoadCached<T>(folder, file);
 		if (reference != null)
 			return reference;
 
@@ -197,14 +202,14 @@ public class ResourceManager
 				Debugger.Log("ResourceManager", e.Message);
 			}
 		}
-		cachedResources[key] = new WeakReference(merged);
+		cachedResources[(typeof(T), folder, file)] = new WeakReference(merged);
 		ResourceLoaded?.Invoke(folder, file, merged);
 		return merged;
 	}
 
 	public static async UniTask<T> LoadMergedAsync<T>(ResourceFolder folder, string file) where T : class
 	{
-		(var key, T reference) = LoadCached<T>(folder, file);
+		T reference = LoadCached<T>(folder, file);
 		if (reference != null)
 			return reference;
 
@@ -248,7 +253,7 @@ public class ResourceManager
 				Debugger.Log("ResourceManager", e.Message);
 			}
 		}
-		cachedResources[key] = new WeakReference(merged);
+		cachedResources[(typeof(T), folder, file)] = new WeakReference(merged);
 		ResourceLoaded?.Invoke(folder, file, merged);
 		return merged;
 	}
