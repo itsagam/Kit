@@ -33,11 +33,11 @@ public class ResourceManager
 	// Default mode for modding in individual calls
 	public const bool DefaultModding = true;
 
-	public static event Action<string, object> ResourceLoaded;
-	public static event Action<string, object> ResourceReused;
-	public static event Action<string> ResourceUnloaded;
+	public static event Action<ResourceFolder, string, object> ResourceLoaded;
+	public static event Action<ResourceFolder, string, object> ResourceReused;
+	public static event Action<ResourceFolder, string> ResourceUnloaded;
 
-	protected static Dictionary<(Type type, string path), WeakReference> cachedResources = new Dictionary<(Type, string), WeakReference>();
+	protected static Dictionary<(Type type, ResourceFolder folder, string file), WeakReference> cachedResources = new Dictionary<(Type, ResourceFolder, string), WeakReference>();
 	protected static Dictionary<ResourceFolder, string> folderToString = new Dictionary<ResourceFolder, string>();
 
 	static ResourceManager()
@@ -87,13 +87,13 @@ public class ResourceManager
 		return await LoadUnmoddedAsync<T>(folder, file);
 	}
 
-	protected static ((Type type, string path) key, T reference) LoadCached<T>(ResourceFolder folder, string file) where T : class
+	protected static ((Type type, ResourceFolder folder, string file) key, T reference) LoadCached<T>(ResourceFolder folder, string file) where T : class
 	{
-		(Type type, string path) key = (typeof(T), GetCachePath(folder, file));
+		var key = (typeof(T), folder, file);
 		if (cachedResources.TryGetValue(key, out WeakReference weakReference) && weakReference.IsAlive)
 		{
 			object reference = weakReference.Target;
-			ResourceReused?.Invoke(key.path, reference);
+			ResourceReused?.Invoke(folder, file, reference);
 			return (key, (T) reference);
 		}
 		return (key, null);
@@ -101,7 +101,7 @@ public class ResourceManager
 
 	public static T LoadUnmodded<T>(ResourceFolder folder, string file) where T : class
 	{
-		((Type type, string path) key, T reference) = LoadCached<T>(folder, file);
+		(var key, T reference) = LoadCached<T>(folder, file);
 		if (reference != null)
 			return reference;
 
@@ -120,14 +120,14 @@ public class ResourceManager
 		{
 			// Important to use [key], not Add(key) because the latter generates an error if key exists
 			cachedResources[key] = new WeakReference(reference);
-			ResourceLoaded?.Invoke(key.path, reference);
+			ResourceLoaded?.Invoke(folder, file, reference);
 		}
 		return reference;
 	}
 
 	public static async UniTask<T> LoadUnmoddedAsync<T>(ResourceFolder folder, string file) where T : class
 	{
-		((Type type, string path) key, T reference) = LoadCached<T>(folder, file);
+		(var key, T reference) = LoadCached<T>(folder, file);
 		if (reference != null)
 			return reference;
 
@@ -145,7 +145,7 @@ public class ResourceManager
 		if (reference != null)
 		{
 			cachedResources[key] = new WeakReference(reference);
-			ResourceLoaded?.Invoke(key.path, reference);
+			ResourceLoaded?.Invoke(folder, file, reference);
 		}
 		return reference;
 	}
@@ -153,7 +153,7 @@ public class ResourceManager
 #if MODDING
 	public static T LoadMerged<T>(ResourceFolder folder, string file) where T : class
 	{
-		((Type type, string path) key, T reference) = LoadCached<T>(folder, file);
+		(var key, T reference) = LoadCached<T>(folder, file);
 		if (reference != null)
 			return reference;
 
@@ -181,13 +181,13 @@ public class ResourceManager
 			{
 				if (parser.OperateWith == OperateType.Text)
 				{
-					List<string> textList = ModManager.ReadTextAll(key.path);
+					List<string> textList = ModManager.ReadTextAll(GetCachePath(folder, file));
 					foreach (string text in textList)
 						parser.Merge<T>(merged, text);
 				}
 				else
 				{
-					List<byte[]> bytesList = ModManager.ReadBytesAll(key.path);
+					List<byte[]> bytesList = ModManager.ReadBytesAll(GetCachePath(folder, file));
 					foreach (byte[] bytes in bytesList)
 						parser.Merge<T>(merged, bytes);
 				}
@@ -198,13 +198,13 @@ public class ResourceManager
 			}
 		}
 		cachedResources[key] = new WeakReference(merged);
-		ResourceLoaded?.Invoke(key.path, merged);
+		ResourceLoaded?.Invoke(folder, file, merged);
 		return merged;
 	}
 
 	public static async UniTask<T> LoadMergedAsync<T>(ResourceFolder folder, string file) where T : class
 	{
-		((Type type, string path) key, T reference) = LoadCached<T>(folder, file);
+		(var key, T reference) = LoadCached<T>(folder, file);
 		if (reference != null)
 			return reference;
 
@@ -232,13 +232,13 @@ public class ResourceManager
 			{
 				if (parser.OperateWith == OperateType.Text)
 				{
-					List<string> textList = await ModManager.ReadTextAllAsync(key.path);
+					List<string> textList = await ModManager.ReadTextAllAsync(GetCachePath(folder, file));
 					foreach (string text in textList)
 						parser.Merge<T>(merged, text);
 				}
 				else
 				{
-					List<byte[]> bytesList = await ModManager.ReadBytesAllAsync(key.path);
+					List<byte[]> bytesList = await ModManager.ReadBytesAllAsync(GetCachePath(folder, file));
 					foreach (byte[] bytes in bytesList)
 						parser.Merge<T>(merged, bytes);
 				}
@@ -249,7 +249,7 @@ public class ResourceManager
 			}
 		}
 		cachedResources[key] = new WeakReference(merged);
-		ResourceLoaded?.Invoke(key.path, merged);
+		ResourceLoaded?.Invoke(folder, file, merged);
 		return merged;
 	}
 #endif
@@ -325,20 +325,19 @@ public class ResourceManager
 #endif
 	
 		var key = cachedResources.FirstOrDefault(kvp => kvp.Value.Target == resource).Key;
-		string cachePath = key.path;
-
+	
 		if (resource is UnityEngine.Object unityObject)
 		{
-			if (cachePath == null || cachePath.IsLeft(GetCachePath(ResourceFolder.Resources)))
+			if (key.file == null || key.folder == ResourceFolder.Resources)
 				Resources.UnloadAsset(unityObject);
 			else
 				UnityEngine.Object.Destroy(unityObject);
 		}
 		
-		if (cachePath != null)
+		if (key.file != null)
 		{
 			cachedResources.Remove(key);
-			ResourceUnloaded(cachePath);
+			ResourceUnloaded?.Invoke(key.folder, key.file);
 			return true;
 		}
 		return false;
@@ -346,14 +345,13 @@ public class ResourceManager
 
 	public static bool Unload<T>(ResourceFolder folder, string file)
 	{
-		string cachePath = GetCachePath(folder, file);
-		
+
 #if MODDING
-		if (ModManager.Unload<T>(cachePath))
+		if (ModManager.Unload<T>(GetCachePath(folder, file)))
 			return true;
 #endif
 
-		(Type, string) key = (typeof(T), cachePath);
+		var key = (typeof(T), folder, file);
 		if (cachedResources.TryGetValue(key, out WeakReference weakReference))
 		{
 			if (weakReference.Target is UnityEngine.Object unityObject)
@@ -364,7 +362,7 @@ public class ResourceManager
 					UnityEngine.Object.Destroy(unityObject);
 			}
 			cachedResources.Remove(key);
-			ResourceUnloaded(cachePath);
+			ResourceUnloaded?.Invoke(folder, file);
 			return true;
 		}
 		return false;
