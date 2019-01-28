@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using System.Linq;
 using System.Text;
 using System.IO;
@@ -48,36 +49,39 @@ public class Test: MonoBehaviour
 	public GameObject cube;
 
 #pragma warning disable CS1998
-	void  Awake()
+	async Task Start()
 	{
-		ModdingTest();
+		//ModdingTest();
 		//InjectTest()
 
-		/*
+	}
+
+#pragma warning restore CS1998
+
+	public void RunProfile()
+	{
 		Debugger.StartProfile("Resources.Load");
-		for (int i = 0; i <= 1000000; i++)
+		for (int i = 0; i <= 100000; i++)
 			Resources.Load<Texture>("Textures/test");
 		Debugger.EndProfile();
 
 		Debugger.StartProfile("ResourceManager.Load");
-		for (int i = 0; i <= 1000000; i++)
-			ResourceManager.Load<Texture>(ResourceFolder.Resources, "Textures/test.jpeg", true);
+		for (int i = 0; i <= 100000; i++)
+			ResourceManager.Load<Texture>(ResourceFolder.Resources, "Textures/test", false);
 		Debugger.EndProfile();
-		*/
 	}
-#pragma warning restore CS1998
 
 	protected static void ModdingTest()
 	{
 		ModManager.LoadMods();
 
-		ResourceManager.ResourceLoaded += ResourceLoaded;
-		ResourceManager.ResourceReused += ResourceReused;
-		ResourceManager.ResourceUnloaded += ResourceUnloaded;
+		//ResourceManager.ResourceLoaded += ResourceLoaded;
+		//ResourceManager.ResourceReused += ResourceReused;
+		//ResourceManager.ResourceUnloaded += ResourceUnloaded;
 
-		ModManager.ResourceLoaded += ModManager_ResourceLoaded;
-		ModManager.ResourceReused += ModManager_ResourceReused;
-		ModManager.ResourceUnloaded += ModManager_ResourceUnloaded;
+		//ModManager.ResourceLoaded += ModManager_ResourceLoaded;
+		//ModManager.ResourceReused += ModManager_ResourceReused;
+		//ModManager.ResourceUnloaded += ModManager_ResourceUnloaded;
 		//Debugger.Log(ResourceManager.Load<GameData>(ResourceFolder.StreamingAssets, @"Data/Test.json", false), true);
 
 		//Texture tex = ResourceManager.Load<Texture>(ResourceFolder.Resources, @"Textures/Test", true);

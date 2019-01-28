@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Collections;
 using System.Collections.Specialized;
 using System.Collections.Generic;
@@ -9,96 +10,47 @@ using UnityEngine.Profiling;
 using UniRx;
 using Newtonsoft.Json;
 
-public class Debugger : MonoBehaviour
+public class Debugger
 {
 	public const string NullString = "Null";
 
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
 	#region Profiling
-	protected static OrderedDictionary Samples = new OrderedDictionary();
+	protected static Stack<CustomSampler> runningProfiles = new Stack<CustomSampler>();
 
 	public static void StartProfile(string name)
 	{
-		CustomSampler sample = CustomSampler.Create(name);
-		sample.GetRecorder().enabled = true;
+		CustomSampler sample = GetProfile(name);
+		if (sample == null)
+		{
+			sample = CustomSampler.Create(name);
+			LogProfile(sample);
+		}
+		runningProfiles.Push(sample);
 		sample.Begin();
-
-		Samples.Add(name, sample);
 	}
 
 	public static CustomSampler GetProfile(string name)
 	{
-		if (Samples.Contains(name))
-			return (CustomSampler)Samples[name];
-		return null;
-	}
-
-	public static CustomSampler GetProfile(int index)
-	{
-		return (CustomSampler)Samples[index];
-	}
-
-	public static CustomSampler GetFirstProfile()
-	{
-		if (Samples.Count <= 0)
-			return null;
-		return GetProfile(0);
-	}
-
-	public static CustomSampler GetLastProfile()
-	{
-		if (Samples.Count <= 0)
-			return null;
-		return GetProfile(Samples.Count - 1);
+		return Sampler.Get(name) as CustomSampler;
 	}
 
 	public static void EndProfile()
 	{
-		GetLastProfile()?.End();
+		runningProfiles.Pop()?.End();
 	}
 
-	public static void EndProfile(string name)
+	protected static void LogProfile(CustomSampler sample)
 	{
-		GetProfile(name)?.End();
-	}
-
-	public static void EndAndLogProfile()
-	{
-		CustomSampler sample = GetLastProfile();
-		if (sample != null)
-		{
-			sample.End();
-			LogProfile(sample.name);
-		}
-	}
-
-	public static void EndAndLogProfile(string name)
-	{
-		EndProfile(name);
-		LogProfile(name);
-	}
-
-	public static void LogProfile(string name)
-	{
-		// Recorder values are valid only for one frame, and in which frame they register Begin/End seems random
-		// HACK: This checks for registered recorder blocks for 100 frames after a call to this function
-		IDisposable observer = null;
-		int count = 0;	
-		observer = Observable.EveryUpdate().Subscribe(l => {
-			Recorder recorder = GetProfile(name)?.GetRecorder();
-			if (recorder != null && recorder.sampleBlockCount > 0)
-			{
-				Log(name + ": " + ConvertTime(recorder.elapsedNanoseconds));
-				observer.Dispose();
-			}
-			else if (count++ >= 100)
-			{
-				observer.Dispose();
-			}
+		Recorder recorder = sample.GetRecorder();
+		recorder.enabled = true;
+		Observable.EveryEndOfFrame().Subscribe(l => {
+			if (recorder.sampleBlockCount > 0)
+				Log(sample.name + ": " + ConvertTime(recorder.elapsedNanoseconds));
 		});
 	}
 
-	public static string ConvertTime(long time)
+	protected static string ConvertTime(long time)
 	{
 		if (time < 0)
 			return null;
@@ -108,46 +60,42 @@ public class Debugger : MonoBehaviour
 #endif
 
 	#region Logging
+
+	// Conditionals make these methods calls to be ignored in Release builds
+	[Conditional("UNITY_EDITOR"), Conditional("DEVELOPMENT_BUILD")]
 	public static void Log(string line)
 	{
-#if UNITY_EDITOR || DEVELOPMENT_BUILD
-		Debug.Log(line);
-#endif
+		UnityEngine.Debug.Log(line);
 	}
 
+	[Conditional("UNITY_EDITOR"), Conditional("DEVELOPMENT_BUILD")]
 	public static void Log(string type, string line)
 	{
-#if UNITY_EDITOR || DEVELOPMENT_BUILD
 		Log("[" + type + "] " + line);
-#endif
 	}
 
+	[Conditional("UNITY_EDITOR"), Conditional("DEVELOPMENT_BUILD")]
 	public static void Log(object obj, bool serialize = false)
 	{
-#if UNITY_EDITOR || DEVELOPMENT_BUILD
 		Log(ObjectToString(obj, serialize));
-#endif
 	}
 
+	[Conditional("UNITY_EDITOR"), Conditional("DEVELOPMENT_BUILD")]
 	public static void Log(string type, object obj, bool serialize = false)
 	{
-#if UNITY_EDITOR || DEVELOPMENT_BUILD
 		Log(type, ObjectToString(obj, serialize));
-#endif
 	}
 
+	[Conditional("UNITY_EDITOR"), Conditional("DEVELOPMENT_BUILD")]
 	public static void Log(IEnumerable enumerable, bool serialize = false)
 	{
-#if UNITY_EDITOR || DEVELOPMENT_BUILD
 		Log(EnumerableToString(enumerable, serialize));
-#endif
 	}
 
+	[Conditional("UNITY_EDITOR"), Conditional("DEVELOPMENT_BUILD")]
 	public static void Log(string type, IEnumerable enumerable, bool serialize = false)
 	{
-#if UNITY_EDITOR || DEVELOPMENT_BUILD
 		Log(type, EnumerableToString(enumerable, serialize));
-#endif
 	}
 
 	public static string ObjectOrEnumerableToString(object obj, bool serialize, string nullString = NullString)
