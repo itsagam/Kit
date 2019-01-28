@@ -427,9 +427,9 @@ namespace Modding
 			return null;
 		}
 
-		public static async UniTask<string> ReadTextAsync(ResourceFolder folder, string file)
+		public static UniTask<string> ReadTextAsync(ResourceFolder folder, string file)
 		{
-			return await ReadTextAsync(GetModdingPath(folder, file));
+			return ReadTextAsync(GetModdingPath(folder, file));
 		}
 
 		public static async UniTask<string> ReadTextAsync(string path)
@@ -468,9 +468,9 @@ namespace Modding
 			return all;
 		}
 
-		public static async UniTask<List<string>> ReadTextAllAsync(ResourceFolder folder, string file)
+		public static UniTask<List<string>> ReadTextAllAsync(ResourceFolder folder, string file)
 		{
-			return await ReadTextAllAsync(GetModdingPath(folder, file));
+			return ReadTextAllAsync(GetModdingPath(folder, file));
 		}
 
 		public static async UniTask<List<string>> ReadTextAllAsync(string path)
@@ -509,9 +509,9 @@ namespace Modding
 			return null;
 		}
 
-		public static async UniTask<byte[]> ReadBytesAsync(ResourceFolder folder, string file)
+		public static UniTask<byte[]> ReadBytesAsync(ResourceFolder folder, string file)
 		{
-			return await ReadBytesAsync(GetModdingPath(folder, file));
+			return ReadBytesAsync(GetModdingPath(folder, file));
 		}
 
 		public static async UniTask<byte[]> ReadBytesAsync(string path)
@@ -550,9 +550,9 @@ namespace Modding
 			return all;
 		}
 
-		public static async UniTask<List<byte[]>> ReadBytesAllAsync(ResourceFolder folder, string file)
+		public static UniTask<List<byte[]>> ReadBytesAllAsync(ResourceFolder folder, string file)
 		{
-			return await ReadBytesAllAsync(GetModdingPath(folder, file));
+			return ReadBytesAllAsync(GetModdingPath(folder, file));
 		}
 
 		public static async UniTask<List<byte[]>> ReadBytesAllAsync(string path)

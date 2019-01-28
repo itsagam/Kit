@@ -482,9 +482,9 @@ public class ResourceManager
 		return Save(GetPath(folder, file), contents, parser);
 	}
 
-	public static async UniTask<bool> SaveAsync(ResourceFolder folder, string file, object contents, ResourceParser parser)
+	public static UniTask<bool> SaveAsync(ResourceFolder folder, string file, object contents, ResourceParser parser)
 	{
-		return await SaveAsync(GetPath(folder, file), contents, parser);
+		return SaveAsync(GetPath(folder, file), contents, parser);
 	}
 
 	public static bool Save(string fullPath, object contents, ResourceParser parser)
@@ -495,12 +495,12 @@ public class ResourceManager
 			return SaveBytes(fullPath, (byte[])parser.Write(contents));
 	}
 
-	public static async UniTask<bool> SaveAsync(string fullPath, object contents, ResourceParser parser)
+	public static UniTask<bool> SaveAsync(string fullPath, object contents, ResourceParser parser)
 	{
 		if (parser.OperateWith == OperateType.Text)
-			return await SaveTextAsync(fullPath, (string)parser.Write(contents));
+			return SaveTextAsync(fullPath, (string)parser.Write(contents));
 		else
-			return await SaveBytesAsync(fullPath, (byte[])parser.Write(contents));
+			return SaveBytesAsync(fullPath, (byte[])parser.Write(contents));
 	}
 
 	public static bool SaveText(ResourceFolder folder, string file, string contents)
@@ -508,9 +508,9 @@ public class ResourceManager
 		return SaveText(GetPath(folder, file), contents);
 	}
 
-	public static async UniTask<bool> SaveTextAsync(ResourceFolder folder, string file, string contents)
+	public static UniTask<bool> SaveTextAsync(ResourceFolder folder, string file, string contents)
 	{
-		return await SaveTextAsync(GetPath(folder, file), contents);
+		return SaveTextAsync(GetPath(folder, file), contents);
 	}
 
 	public static bool SaveBytes(ResourceFolder folder, string file, byte[] bytes)
@@ -518,9 +518,9 @@ public class ResourceManager
 		return SaveBytes(GetPath(folder, file), bytes);
 	}
 
-	public static async UniTask<bool> SaveBytesAsync(ResourceFolder folder, string file, byte[] bytes)
+	public static UniTask<bool> SaveBytesAsync(ResourceFolder folder, string file, byte[] bytes)
 	{
-		return await SaveBytesAsync(GetPath(folder, file), bytes);
+		return SaveBytesAsync(GetPath(folder, file), bytes);
 	}
 
 	public static bool SaveText(string fullPath, string contents)

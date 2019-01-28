@@ -66,6 +66,7 @@ namespace Modding.Loaders
 		public override async UniTask<string> ReadTextAsync(string path)
 		{
 			string fullPath = GetFullPath(path);
+			// TODO: Turn "return await"s into "return UniTask" or use ".Unwrap"
 			using (StreamReader stream = new StreamReader(fullPath))
 				return await stream.ReadToEndAsync();
 		}
