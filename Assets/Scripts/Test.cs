@@ -20,7 +20,7 @@ public class GameData
 	public double Value;
 }
 
-public class Test: MonoBehaviour
+public class Test : MonoBehaviour
 {
 	public static string String = "Default";
 	public static int Integer = 1;
@@ -60,6 +60,8 @@ public class Test: MonoBehaviour
 
 	public void RunProfile()
 	{
+		ModManager.UnloadMods();
+		/*
 		Debugger.StartProfile("Resources.Load");
 		for (int i = 0; i <= 100000; i++)
 			Resources.Load<Texture>("Textures/test");
@@ -69,12 +71,13 @@ public class Test: MonoBehaviour
 		for (int i = 0; i <= 100000; i++)
 			ResourceManager.Load<Texture>(ResourceFolder.Resources, "Textures/test");
 		Debugger.EndProfile();
+		*/
 	}
 
 	protected static void ModdingTest()
 	{
 		ModManager.LoadMods();
-
+		ModManager.ExecuteScripts();
 		//ResourceManager.ResourceLoaded += ResourceLoaded;
 		//ResourceManager.ResourceReused += ResourceReused;
 		//ResourceManager.ResourceUnloaded += ResourceUnloaded;

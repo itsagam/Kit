@@ -10,6 +10,10 @@ using UniRx;
 using UniRx.Async;
 using XLua;
 
+// UNDONE: Find a way to set default values in MonoBehaviours (LoadMerged with JSON/Lua...)
+// TODO: Provide hotfix functions
+// TODO: Provide support for coroutines
+
 namespace Modding
 {
     public class ModMetadata
@@ -23,6 +27,14 @@ namespace Modding
 	public abstract class Mod
 	{
 		public const string MetadataFile = "Metadata.json";
+		public const float GCInterval = 3.0f;
+		public static Dictionary<string, Func<IObservable<long>>> UpdateDelegates = new Dictionary<string, Func<IObservable<long>>>
+			{
+				{ "update", Observable.EveryUpdate },
+				{ "fixedUpdate", Observable.EveryFixedUpdate },
+				{ "lateUpdate", Observable.EveryLateUpdate },
+				{ "endOfFrame", Observable.EveryEndOfFrame }
+			};
 
 		public string Path { get;  protected set; }
 		public ModMetadata Metadata { get; protected set; }
@@ -35,7 +47,7 @@ namespace Modding
 		public abstract UniTask<byte[]> ReadBytesAsync(string path);
 
 		protected LuaEnv scriptEnv;
-		protected IDisposable scriptUpdate;
+		protected CompositeDisposable scriptDisposables;
 
 		public virtual bool LoadMetadata()
 		{
@@ -59,74 +71,13 @@ namespace Modding
 			return false;
 		}
 
-		public virtual void ExecuteScripts()
-		{
-			if (Metadata?.Scripts == null)
-				return;
-
-			var validScripts = Metadata.Scripts.Where(s => !s.IsNullOrEmpty() && Exists(s));
-			if (!validScripts.Any())
-				return;
-
-			scriptEnv = new LuaEnv();
-			scriptEnv.Global.Set("self", this);
-			scriptEnv.DoString("require 'Lua/General'");
-			scriptEnv.DoString("require 'Lua/Modding'");
-			foreach (string scriptFile in validScripts)
-			{
-				try
-				{
-					var script = ReadBytes(scriptFile);
-					scriptEnv.DoString(script, scriptFile);
-				}
-				catch (Exception e)
-				{
-					Debugger.Log("ModManager", $"{Metadata.Name} – {e.Message}");
-				}
-			}
-
-			scriptUpdate = Observable.EveryUpdate().Subscribe(f => scriptEnv.Tick());
-		}
-
-		public virtual async UniTask ExecuteScriptsAsync()
-		{
-			if (Metadata?.Scripts == null)
-				return;
-
-			var validScripts = Metadata.Scripts.Where(s => !s.IsNullOrEmpty() && Exists(s));
-			if (!validScripts.Any())
-				return;
-
-			scriptEnv = new LuaEnv();
-			scriptEnv.Global.Set("self", this);
-			scriptEnv.DoString("require 'Lua/General'");
-			scriptEnv.DoString("require 'Lua/Modding'");
-			foreach (string scriptFile in validScripts)
-			{
-				try
-				{
-					var script = await ReadBytesAsync(scriptFile);
-					scriptEnv.DoString(script, scriptFile);
-				}
-				catch (Exception e)
-				{
-					Debugger.Log("ModManager", $"{Metadata.Name} – {e.Message}");
-				}
-			}
-
-			scriptUpdate = Observable.EveryUpdate().Subscribe(f => scriptEnv.Tick());
-		}
-
 		public virtual (T reference, string filePath, ResourceParser parser) Load<T>(string path) where T : class
 		{
 			IEnumerable<string> matchingFiles = FindFiles(path);
 			if (matchingFiles == null)
 				return default;
 
-			var certainties = matchingFiles
-								.SelectMany(filePath => ModManager.Parsers.Select(parser => (filePath, parser, certainty: parser.CanRead<T>(filePath))))
-								.Where(d => d.certainty > 0)
-								.OrderByDescending(d => d.certainty);
+			var certainties = RankParsers<T>(matchingFiles);
 			string text = null;
 			byte[] bytes = null;
 			foreach (var (filePath, parser, certainty) in certainties)
@@ -160,10 +111,7 @@ namespace Modding
 			if (matchingFiles == null)
 				return default;
 
-			var certainties = matchingFiles
-								.SelectMany(filePath => ModManager.Parsers.Select(parser => (filePath, parser, certainty: parser.CanRead<T>(filePath))))
-								.Where(d => d.certainty > 0)
-								.OrderByDescending(d => d.certainty);
+			var certainties = RankParsers<T>(matchingFiles);
 			string text = null;
 			byte[] bytes = null;
 			foreach (var (filePath, parser, certainty) in certainties)
@@ -191,10 +139,107 @@ namespace Modding
 			return default;
 		}
 
+		protected static IEnumerable<(string filePath, ResourceParser parser, float certainty)> RankParsers<T>(IEnumerable<string> matchingFiles) where T : class
+		{
+			return matchingFiles.SelectMany(filePath => ModManager.Parsers.Select(parser => (filePath, parser, certainty: parser.CanRead<T>(filePath))))
+								.Where(d => d.certainty > 0)
+								.OrderByDescending(d => d.certainty);
+		}
+
+		protected virtual IEnumerable<string> SetupScripting()
+		{
+			if (Metadata?.Scripts == null)
+				return null;
+
+			var validScripts = Metadata.Scripts.Where(s => !s.IsNullOrEmpty() && Exists(s));
+			if (!validScripts.Any())
+				return null;
+
+			scriptEnv = new LuaEnv();
+			scriptEnv.Global.Set("self", this);
+			scriptEnv.DoString("require 'Lua/General'");
+			scriptEnv.DoString("require 'Lua/Modding'");
+
+			scriptDisposables = new CompositeDisposable();
+			Observable.Interval(TimeSpan.FromSeconds(GCInterval)).Subscribe(l => scriptEnv.Tick()).AddTo(scriptDisposables);
+
+			return validScripts;
+		}
+
+		public virtual void ExecuteScripts()
+		{
+			var scripts = SetupScripting();
+			if (scripts == null)
+				return;
+
+			foreach (string scriptFile in scripts)
+			{
+				try
+				{
+					var script = ReadBytes(scriptFile);
+					scriptEnv.DoString(script, scriptFile);
+				}
+				catch (Exception e)
+				{
+					Debugger.Log("ModManager", $"{Metadata.Name} – {e.Message}");
+				}
+			}
+			HookMethods();
+		}
+
+		public virtual async UniTask ExecuteScriptsAsync()
+		{
+			var scripts = SetupScripting();
+			if (scripts == null)
+				return;
+
+			foreach (string scriptFile in scripts)
+			{
+				try
+				{
+					var script = await ReadBytesAsync(scriptFile);
+					scriptEnv.DoString(script, scriptFile);
+				}
+				catch (Exception e)
+				{
+					Debugger.Log("ModManager", $"{Metadata.Name} – {e.Message}");
+				}
+			}
+			HookMethods();
+		}
+
+		protected virtual void HookMethods()
+		{
+			scriptEnv.Global.Get<Action>("awake")?.Invoke();
+
+			Action start = scriptEnv.Global.Get<Action>("start");
+			if (start != null)
+				Observable.NextFrame().Subscribe(u => start());
+
+			foreach (var kvp in UpdateDelegates)
+			{
+				Action action = scriptEnv.Global.Get<Action>(kvp.Key);
+				if (action != null)
+					kvp.Value().Subscribe(l => action()).AddTo(scriptDisposables);
+			}
+		}
+
+		public void Schedule(string type, Action action)
+		{
+			if (UpdateDelegates.TryGetValue(type, out var function))
+				function().Subscribe(l => action()).AddTo(scriptDisposables);
+		}
+
 		public virtual void Unload()
 		{
-			scriptUpdate?.Dispose();
-			scriptEnv?.Dispose();
+			if (scriptEnv != null)
+			{
+				scriptEnv.Global.Get<Action>("destroy")?.Invoke();
+				scriptDisposables.Dispose();
+				// Have to Dispose the environment the next frame as functions may hold references to prevent disposal
+				// TODO: Check whether NextFrame calls are Disposed automatically
+				Observable.NextFrame().Subscribe(u => scriptEnv?.Dispose() );
+			}
 		}
 	}
 }

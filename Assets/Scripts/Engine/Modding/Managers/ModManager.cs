@@ -144,7 +144,7 @@ namespace Modding
 			SaveModOrder();
 
 			if (executeScripts)
-				ExecuteModScripts();
+				ExecuteScripts();
 		}
 
 		public static async UniTask LoadModsAsync(bool executeScripts = false)
@@ -173,10 +173,10 @@ namespace Modding
 			SaveModOrder();
 
 			if (executeScripts)
-				await ExecuteModScriptsAsync();
+				await ExecuteScriptsAsync();
 		}
 
-		public static void ExecuteModScripts()
+		public static void ExecuteScripts()
 		{
 			foreach (Mod mod in mods)
 			{
@@ -185,7 +185,7 @@ namespace Modding
 			}
 		}
 
-		public static async UniTask ExecuteModScriptsAsync()
+		public static async UniTask ExecuteScriptsAsync()
 		{
 			foreach (Mod mod in mods)
 			{

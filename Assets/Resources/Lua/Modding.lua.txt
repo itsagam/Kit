@@ -5,11 +5,11 @@ os.remove = nil
 os.rename = nil
 os.tmpname = nil
 
-function readtext(file)
+function readText(file)
 	return self:ReadText(file)
 end
 
-function readbytes(file)
+function readBytes(file)
 	return self:ReadBytes(file)
 end
 
@@ -19,4 +19,8 @@ end
 
 function dofile(file)
 	return assert(loadfile(file))()
+end
+
+function schedule(type, action)
+	self:Schedule(type, action)
 end

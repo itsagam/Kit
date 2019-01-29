@@ -12,9 +12,6 @@ using TouchScript.Gestures;
 using UniRx;
 using XLua;
 
-// UNDONE: Find a way to set default values in MonoBehaviours (LoadMerged with JSON/Lua...)
-// TODO: Provide hotfix functions
-
 public class Console : MonoBehaviour
 {
 	public Animator Animator;
