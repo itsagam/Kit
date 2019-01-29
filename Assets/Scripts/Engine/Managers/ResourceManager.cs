@@ -308,16 +308,16 @@ public class ResourceManager
 			.OrderByDescending(d => d.certainty);
 	}
 
-	public static bool Unload(object resource)
+	public static bool Unload(object reference)
 	{
 #if MODDING
-		if (ModManager.Unload(resource))
+		if (ModManager.Unload(reference))
 			return true;
 #endif
 	
-		var key = cachedResources.FirstOrDefault(kvp => kvp.Value.Target == resource).Key;
+		var key = cachedResources.FirstOrDefault(kvp => kvp.Value.Target == reference).Key;
 	
-		if (resource is UnityEngine.Object unityObject)
+		if (reference is UnityEngine.Object unityObject)
 		{
 			if (key.file == null || key.folder == ResourceFolder.Resources)
 				Resources.UnloadAsset(unityObject);
@@ -325,6 +325,7 @@ public class ResourceManager
 				UnityEngine.Object.Destroy(unityObject);
 		}
 		
+		// Because of FirstOrDefault, if key is not found "file" will be null
 		if (key.file != null)
 		{
 			cachedResources.Remove(key);

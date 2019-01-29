@@ -11,16 +11,16 @@ using UniRx.Async;
 using Modding.Loaders;
 #endif
 
+public enum ResourceFolder
+{
+	Data,
+	StreamingAssets,
+	PersistentData,
+	Resources
+}
+
 namespace Modding
 {
-	public enum ResourceFolder
-	{
-		Data,
-		StreamingAssets,
-		PersistentData,
-		Resources
-	}
-
 #if MODDING
 	public struct ResourceInfo
 	{
@@ -70,8 +70,8 @@ namespace Modding
 		};
 		
 		protected static List<Mod> mods = new List<Mod>();
-		protected static Dictionary<(Type type, ResourceFolder folder, string file), List<ResourceInfo>> cachedResources 
-			= new Dictionary<(Type, ResourceFolder, string), List<ResourceInfo>>();
+		protected static Dictionary<(Type type, ResourceFolder folder, string file), ResourceInfo> cachedResources 
+			= new Dictionary<(Type, ResourceFolder, string), ResourceInfo>();
 		protected static Dictionary<ResourceFolder, string> folderToString = new Dictionary<ResourceFolder, string>();
 
 		static ModManager()
@@ -242,16 +242,25 @@ namespace Modding
 				PlayerPrefs.SetInt($"Mods/{mods[i].Metadata.Name}.Order", i);
 		}
 
+		protected static T LoadCached<T>(ResourceFolder folder, string file) where T : class
+		{
+			if (cachedResources.TryGetValue((typeof(T), folder, file), out ResourceInfo resource))
+			{
+				object reference = resource.Reference.Target;
+				if (reference != null)
+				{
+					ResourceReused?.Invoke(folder, file, resource);
+					return (T) reference;
+				}
+			}
+			return null;
+		}
+
 		public static T Load<T>(ResourceFolder folder, string file) where T : class
 		{
-			var key = (typeof(T), folder, file);
-			List<ResourceInfo> matchingResources = GetResources(key);
-			if (matchingResources != null && matchingResources.Count > 0)
-			{
-				ResourceInfo matchingResource = matchingResources[0];
-				ResourceReused?.Invoke(folder, file, matchingResource);
-				return (T) matchingResource.Reference.Target;
-			}
+			T cachedReference = LoadCached<T>(folder, file);
+			if (cachedReference != null)
+				return cachedReference;
 
 			string path = GetModdingPath(folder, file);
 			foreach (Mod mod in mods)
@@ -259,14 +268,9 @@ namespace Modding
 				var (reference, filePath, parser) = mod.Load<T>(path);
 				if (reference != null)
 				{
-					if (matchingResources == null)
-					{
-						matchingResources = new List<ResourceInfo>();
-						cachedResources[key] = matchingResources;
-					}
-					ResourceInfo newResource = new ResourceInfo(mod, filePath, parser, reference);
-					matchingResources.Add(newResource);
-					ResourceLoaded?.Invoke(folder, file, newResource);
+					ResourceInfo resource = new ResourceInfo(mod, filePath, parser, reference);
+					cachedResources[(typeof(T), folder, file)] = resource;
+					ResourceLoaded?.Invoke(folder, file, resource);
 					return reference;
 				}
 			}
@@ -276,14 +280,9 @@ namespace Modding
 
 		public static async UniTask<T> LoadAsync<T>(ResourceFolder folder, string file) where T : class
 		{
-			var key = (typeof(T), folder, file);
-			List<ResourceInfo> matchingResources = GetResources(key);
-			if (matchingResources != null && matchingResources.Count > 0)
-			{
-				ResourceInfo matchingResource = matchingResources[0];
-				ResourceReused?.Invoke(folder, file, matchingResource);
-				return (T) matchingResource.Reference.Target;
-			}
+			T cachedReference = LoadCached<T>(folder, file);
+			if (cachedReference != null)
+				return cachedReference;
 
 			string path = GetModdingPath(folder, file);
 			foreach (Mod mod in mods)
@@ -291,14 +290,9 @@ namespace Modding
 				var (reference, filePath, parser) = await mod.LoadAsync<T>(path);
 				if (reference != null)
 				{
-					if (matchingResources == null)
-					{
-						matchingResources = new List<ResourceInfo>();
-						cachedResources[key] = matchingResources;
-					}
-					ResourceInfo newResource = new ResourceInfo(mod, filePath, parser, reference);
-					matchingResources.Add(newResource);
-					ResourceLoaded?.Invoke(folder, file, newResource);
+					ResourceInfo resource = new ResourceInfo(mod, filePath, parser, reference);
+					cachedResources[(typeof(T), folder, file)] = resource;
+					ResourceLoaded?.Invoke(folder, file, resource);
 					return reference;
 				}
 			}
@@ -308,103 +302,46 @@ namespace Modding
 
 		public static List<T> LoadAll<T>(ResourceFolder folder, string file) where T : class
 		{
-			var key = (typeof(T), folder, file);
-			List<ResourceInfo> matchingResources = GetResources(key);
-			// TODO: Maybe be incorrect
-			Dictionary<Mod, ResourceInfo> matchingResourceByMod = matchingResources.ToDictionary(r => r.Mod);
-			string path = GetModdingPath(folder, file);
+			return LoadAll<T>(GetModdingPath(folder, file));
+		}
 
+		public static List<T> LoadAll<T>(string path) where T : class
+		{
 			List<T> all = new List<T>();
 			foreach (Mod mod in mods)
 			{
-				ResourceInfo matchingResource;
-				if (!matchingResourceByMod.TryGetValue(mod, out matchingResource))
-				{
-					var (reference, filePath, parser) = mod.Load<T>(path);
-					if (reference != null)
-					{
-						if (matchingResources == null)
-						{
-							matchingResources = new List<ResourceInfo>();
-							cachedResources[key] = matchingResources;
-						}
-						ResourceInfo newResource = new ResourceInfo(mod, filePath, parser, reference);
-						matchingResources.Add(newResource);
-						ResourceLoaded?.Invoke(folder, file, newResource);
-						all.Add(reference);
-					}
-				}
-				else
-				{
-					ResourceReused?.Invoke(folder, file, matchingResource);
-					all.Add((T) matchingResource.Reference.Target);
-				}
+				var (reference, filePath, parser) = mod.Load<T>(path);
+				all.Add(reference);
 			}
 			return all;
 		}
 
-		public static async UniTask<List<T>> LoadAllAsync<T>(ResourceFolder folder, string file) where T : class
+		public static UniTask<List<T>> LoadAllAsync<T>(ResourceFolder folder, string file) where T : class
 		{
-			var key = (typeof(T), folder, file);
-			List<ResourceInfo> matchingResources = GetResources(key);
-			Dictionary<Mod, ResourceInfo> matchingResourceByMod = matchingResources.ToDictionary(r => r.Mod);
-			string path = GetModdingPath(folder, file);
+			return LoadAllAsync<T>(GetModdingPath(folder, file));
+		}
 
+		public static async UniTask<List<T>> LoadAllAsync<T>(string path) where T : class
+		{
 			List<T> all = new List<T>();
 			foreach (Mod mod in mods)
 			{
-				ResourceInfo matchingResource;
-				if (!matchingResourceByMod.TryGetValue(mod, out matchingResource))
-				{
-					var (reference, filePath, parser) = await mod.LoadAsync<T>(path);
-					if (reference != null)
-					{
-						if (matchingResources == null)
-						{
-							matchingResources = new List<ResourceInfo>();
-							cachedResources[key] = matchingResources;
-						}
-						ResourceInfo newResource = new ResourceInfo(mod, filePath, parser, reference);
-						matchingResources.Add(newResource);
-						ResourceLoaded?.Invoke(folder, file, newResource);
-						all.Add(reference);
-					}
-				}
-				else
-				{
-					ResourceReused?.Invoke(folder, file, matchingResource);
-					all.Add((T) matchingResource.Reference.Target);
-				}
+				var (reference, filePath, parser) = await mod.LoadAsync<T>(path);
+				all.Add(reference);
 			}
 			return all;
 		}
-		
-		public static List<ResourceInfo> GetResources<T>(ResourceFolder folder, string file)
+
+		public static ResourceInfo GetResourceInfo<T>(ResourceFolder folder, string file)
 		{
-			return GetResources((typeof(T), folder, file));
+			if (cachedResources.TryGetValue((typeof(T), folder, file), out ResourceInfo resource))
+				return resource;
+			return default;
 		}
 
 		public static ResourceInfo GetResourceInfo(object resource)
 		{
-			return cachedResources.SelectMany(r => r.Value).FirstOrDefault(r => r.Reference.Target == resource);
-		}
-
-		protected static List<ResourceInfo> GetResources((Type type, ResourceFolder folder, string file) key)
-		{
-			if (cachedResources.TryGetValue(key, out List<ResourceInfo> resources))
-			{
-				CleanupDeadResources(resources);
-				return resources;
-			}
-			return null;
-		}
-
-		// HACK: This cleans up resources that have been garbage collected 
-		protected static void CleanupDeadResources(List<ResourceInfo> list)
-		{
-			for (int i = list.Count - 1; i >= 0; i--)
-				if (!list[i].Reference.IsAlive)
-					list.RemoveAt(i);
+			return cachedResources.FirstOrDefault(r => r.Value.Reference.Target == resource).Value;
 		}
 
 		public static string ReadText(ResourceFolder folder, string file)
@@ -591,18 +528,14 @@ namespace Modding
 			bool found = false;
 			foreach (var kvp in cachedResources.Reverse())
 			{
-				List<ResourceInfo> resourceList = kvp.Value;
-				// FirstOrDefault will return "default" if not found and resource.Reference itself will be null
-				ResourceInfo resource = resourceList.FirstOrDefault(r => r.Mod == mod);
-				if (resource.Reference != null)
+				ResourceInfo resource = kvp.Value;
+				var key = kvp.Key;
+				if (resource.Mod == mod)
 				{
-					// No need to check for null because UnloadInternal checks type
 					UnloadInternal(resource.Reference.Target);
-					resourceList.Remove(resource);
-					if (resourceList.Count <= 0)
-						cachedResources.Remove(kvp.Key);
+					cachedResources.Remove(key);
 					found = true;
-					ResourceUnloaded?.Invoke(kvp.Key.folder, kvp.Key.file, resource.Mod);
+					ResourceUnloaded?.Invoke(key.folder, key.file, resource.Mod);
 				}
 			}
 			return found;
@@ -610,36 +543,28 @@ namespace Modding
 
 		public static bool Unload(object reference)
 		{
-			foreach (var kvp in cachedResources.Reverse())
+			var kvp = cachedResources.FirstOrDefault(k => k.Value.Reference.Target == reference);
+			var key = kvp.Key;
+			// Because of FirstOrDefault, kvp.file will be null if key is not found
+			if (key.file != null)
 			{
-				// This differs from above in only that it returns immediately once a matching reference is found
-				List<ResourceInfo> resourceList = kvp.Value;
-				ResourceInfo resource = resourceList.FirstOrDefault(r => r.Reference.Target == reference);
-				if (resource.Reference != null)
-				{
-					UnloadInternal(resource.Reference.Target);
-					resourceList.Remove(resource);
-					if (resourceList.Count <= 0)
-						cachedResources.Remove(kvp.Key);
-					ResourceUnloaded?.Invoke(kvp.Key.folder, kvp.Key.file, resource.Mod);
-					return true;
-				}
+				ResourceInfo resource = kvp.Value;
+				UnloadInternal(resource.Reference.Target);
+				cachedResources.Remove(key);
+				ResourceUnloaded?.Invoke(key.folder, key.file, resource.Mod);
+				return true;
 			}
 			return false;
 		}
 
 		public static bool Unload<T>(ResourceFolder folder, string file)
 		{
-			var key = (typeof(T), folder, file);			
-			List<ResourceInfo> matchingResources = GetResources(key);
-			if (matchingResources != null)
+			var key = (typeof(T), folder, file);
+			if (cachedResources.TryGetValue(key, out ResourceInfo resource))
 			{
-				foreach (ResourceInfo resource in matchingResources)
-				{
-					UnloadInternal(resource.Reference.Target);
-					ResourceUnloaded?.Invoke(folder, file, resource.Mod);
-				}
+				UnloadInternal(resource.Reference.Target);
 				cachedResources.Remove(key);
+				ResourceUnloaded?.Invoke(folder, file, resource.Mod);
 				return true;
 			}
 			return false;
