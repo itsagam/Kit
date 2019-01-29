@@ -63,12 +63,12 @@ namespace Modding.Loaders
 			return File.ReadAllText(fullPath);
 		}
 
-		public override async UniTask<string> ReadTextAsync(string path)
+		public override UniTask<string> ReadTextAsync(string path)
 		{
 			string fullPath = GetFullPath(path);
 			// TODO: Turn "return await"s into "return UniTask" or use ".Unwrap"
 			using (StreamReader stream = new StreamReader(fullPath))
-				return await stream.ReadToEndAsync();
+				return stream.ReadToEndAsync().AsUniTask();
 		}
 
 		public override byte[] ReadBytes(string path)
@@ -80,13 +80,12 @@ namespace Modding.Loaders
 		public override async UniTask<byte[]> ReadBytesAsync(string path)
 		{
 			string fullPath = GetFullPath(path);
-			byte[] content;
 			using (FileStream stream = new FileStream(fullPath, FileMode.Open))
 			{
-				content = new byte[stream.Length];
-				await stream.ReadAsync(content, 0, (int)stream.Length);
+				byte[] data = new byte[stream.Length];
+				await stream.ReadAsync(data, 0, (int)stream.Length);
+				return data;
 			}
-			return content;
 		}
 
 		public override IEnumerable<string> FindFiles(string path)

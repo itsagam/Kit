@@ -469,11 +469,10 @@ public class ResourceManager
 			return request.downloadHandler.data;
 	}
 
-	public static async UniTask<UnityWebRequest> WebAsync(string filePath)
+	protected static UnityWebRequestAsyncOperation WebAsync(string filePath)
 	{
 		UnityWebRequest request = UnityWebRequest.Get(LocalToURLPath(filePath));
-		await request.SendWebRequest();
-		return request;
+		return request.SendWebRequest();
 	}
 #endregion
 

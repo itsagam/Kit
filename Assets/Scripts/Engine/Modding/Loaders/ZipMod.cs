@@ -86,12 +86,12 @@ namespace Modding.Loaders
 				return text.ReadToEnd();
 		}
 
-		public override async UniTask<string> ReadTextAsync(string path)
+		public override UniTask<string> ReadTextAsync(string path)
 		{
 			ZipArchiveEntry entry = Archive.GetEntry(path);
 			using (Stream stream = entry.Open())
 			using (TextReader text = new StreamReader(stream))
-				return await text.ReadToEndAsync();
+				return text.ReadToEndAsync().AsUniTask();
 		}
 
 		public override byte[] ReadBytes(string path)
