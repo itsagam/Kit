@@ -1,3 +1,6 @@
+util = require "xlua/util"
+
+-- Unsecure methods
 io = nil
 os.execute = nil
 os.exit = nil
@@ -5,6 +8,7 @@ os.remove = nil
 os.rename = nil
 os.tmpname = nil
 
+-- File-handling
 function readText(file)
 	return self:ReadText(file)
 end
@@ -14,13 +18,36 @@ function readBytes(file)
 end
 
 function loadfile(file)
-	return load(readbytes(file))
+	return load(readBytes(file))
 end
 
 function dofile(file)
 	return assert(loadfile(file))()
 end
 
+-- Scheduling
 function schedule(type, action)
 	self:Schedule(type, action)
 end
+
+-- Injection
+function inject(type, method, fast, code)
+	if code == nil then
+	 	code = fast
+	 	fast = false
+	end
+	-- "xlua.hotfix" is faster but doesn't allow calling the original function from the injected method,
+	-- "util.hotfix_ex" does – provide a way for both using a "fast" toggle, defaulting to false	
+	if fast == true then
+		xlua.hotfix(type, method, code)
+	else
+		util.hotfix_ex(type, method, code)
+	end
+end
+
+-- Coroutines
+function startCoroutine(...)
+   self:StartCoroutine(util.cs_generator(...))
+end
+
+yield = coroutine.yield

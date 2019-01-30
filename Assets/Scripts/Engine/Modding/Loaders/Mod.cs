@@ -11,8 +11,6 @@ using UniRx.Async;
 using XLua;
 
 // UNDONE: Find a way to set default values in MonoBehaviours (LoadMerged with JSON/Lua...)
-// TODO: Provide hotfix functions
-// TODO: Provide support for coroutines
 
 namespace Modding
 {
@@ -20,14 +18,16 @@ namespace Modding
     {
         public string Name;
         public string Author;
+		public string Description;
         public string Version;
+		public bool Persistent;
 		public List<string> Scripts;
     }
 
 	public abstract class Mod
 	{
 		public const string MetadataFile = "Metadata.json";
-		public const float GCInterval = 3.0f;
+		public const float GCInterval = 1.0f;
 		public static Dictionary<string, Func<IObservable<long>>> UpdateDelegates = new Dictionary<string, Func<IObservable<long>>>
 			{
 				{ "update", Observable.EveryUpdate },
@@ -161,8 +161,7 @@ namespace Modding
 			scriptEnv.DoString("require 'Lua/Modding'");
 
 			scriptDisposables = new CompositeDisposable();
-			Observable.Interval(TimeSpan.FromSeconds(GCInterval)).Subscribe(l => scriptEnv.Tick()).AddTo(scriptDisposables);
-
+			
 			return validScripts;
 		}
 
@@ -174,17 +173,11 @@ namespace Modding
 
 			foreach (string scriptFile in scripts)
 			{
-				try
-				{
-					var script = ReadBytes(scriptFile);
-					scriptEnv.DoString(script, scriptFile);
-				}
-				catch (Exception e)
-				{
-					Debugger.Log("ModManager", $"{Metadata.Name} – {e.Message}");
-				}
+				var script = ReadBytes(scriptFile);
+				ExecuteSafe(() => scriptEnv.DoString(script, scriptFile));
 			}
-			HookMethods();
+
+			HookOrDispose();
 		}
 
 		public virtual async UniTask ExecuteScriptsAsync()
@@ -195,51 +188,106 @@ namespace Modding
 
 			foreach (string scriptFile in scripts)
 			{
-				try
-				{
-					var script = await ReadBytesAsync(scriptFile);
-					scriptEnv.DoString(script, scriptFile);
-				}
-				catch (Exception e)
-				{
-					Debugger.Log("ModManager", $"{Metadata.Name} – {e.Message}");
-				}
+				var script = await ReadBytesAsync(scriptFile);
+				ExecuteSafe(() => scriptEnv.DoString(script, scriptFile));
 			}
-			HookMethods();
+
+			HookOrDispose();
+		}
+
+		protected void HookOrDispose()
+		{
+			if (Metadata.Persistent)
+				HookMethods();
+			else
+				DisposeScripting();
 		}
 
 		protected virtual void HookMethods()
 		{
-			scriptEnv.Global.Get<Action>("awake")?.Invoke();
+			Observable.Interval(TimeSpan.FromSeconds(GCInterval)).Subscribe(l => scriptEnv.Tick()).AddTo(scriptDisposables);
+
+			Action awake = scriptEnv.Global.Get<Action>("awake");
+			if (awake != null)
+				ExecuteSafe(awake);
 
 			Action start = scriptEnv.Global.Get<Action>("start");
 			if (start != null)
-				Observable.NextFrame().Subscribe(u => start());
+				Observable.NextFrame().Subscribe(u => ExecuteSafe(start));
 
 			foreach (var kvp in UpdateDelegates)
 			{
 				Action action = scriptEnv.Global.Get<Action>(kvp.Key);
 				if (action != null)
-					kvp.Value().Subscribe(l => action()).AddTo(scriptDisposables);
+					kvp.Value().Subscribe(l => ExecuteSafe(action)).AddTo(scriptDisposables);
 			}
 		}
 
 		public void Schedule(string type, Action action)
 		{
 			if (UpdateDelegates.TryGetValue(type, out var function))
-				function().Subscribe(l => action()).AddTo(scriptDisposables);
+				function().Subscribe(l => ExecuteSafe(action)).AddTo(scriptDisposables);
 		}
 
-		public virtual void Unload()
+		public void StartCoroutine(IEnumerator enumerator)
+		{
+			MainThreadDispatcher.StartCoroutine(ExecuteSafe(enumerator));
+		}
+
+		protected IEnumerator ExecuteSafe(IEnumerator enumerator)
+		{
+			while (true)
+			{
+				object current;
+				try
+				{
+					if (enumerator.MoveNext() == false)
+						break;
+					current = enumerator.Current;
+				}
+				catch (Exception e)
+				{
+					Debugger.Log("ModManager", $"{Metadata.Name} – {e.Message}");
+					yield break;
+				}
+				yield return current;
+			}
+		}
+
+		protected void ExecuteSafe(Action action)
+		{
+			try
+			{
+				action();
+			}
+			catch (Exception e)
+			{
+				Debugger.Log("ModManager", $"{Metadata.Name} – {e.Message}");
+			}	
+		}
+
+		protected void DisposeScripting()
 		{
 			if (scriptEnv != null)
 			{
 				scriptEnv.Global.Get<Action>("destroy")?.Invoke();
-				scriptDisposables.Dispose();
-				// Have to Dispose the environment the next frame as functions may hold references to prevent disposal
-				// TODO: Check whether NextFrame calls are Disposed automatically
-				Observable.NextFrame().Subscribe(u => scriptEnv?.Dispose() );
+				if (scriptDisposables != null)
+				{
+					scriptDisposables.Dispose();
+					scriptDisposables = null;
+				}				
+				// HACK: Have to Dispose the environment the next frame as functions may hold references to prevent disposal
+				Observable.NextFrame().Subscribe(u =>
+				{
+					scriptEnv.Dispose();
+					scriptEnv = null;
+				});
 			}
+		}
+
+		public virtual void Unload()
+		{
+			DisposeScripting();
 		}
 	}
 }

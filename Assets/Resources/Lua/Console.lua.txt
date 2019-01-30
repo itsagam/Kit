@@ -1,3 +1,4 @@
+-- Logging
 function print(line)
 	CS.Console.Log(line)
 end
@@ -24,6 +25,7 @@ function clear()
 end
 cls = clear
 
+-- GameObject handling
 function go(path, comp)
 	if type(path) == "string" then
 		if comp == nil then
@@ -45,7 +47,7 @@ function gos(tag)
 end
 
 function create(name, ...)
-	go = UE.GameObject(name)
+	local go = UE.GameObject(name)
 	for k, v in pairs({...}) do
 		go:AddComponent(typeof(v))
 	end
@@ -53,7 +55,7 @@ function create(name, ...)
 end
 
 function instantiate(path)
-	prefab = UE.Resources.Load(path)
+	local prefab = UE.Resources.Load(path)
 	if prefab ~= nil then
 		return UE.GameObject.Instantiate(prefab);
 	else

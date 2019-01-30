@@ -144,6 +144,7 @@ public class Console : MonoBehaviour
 
 	#region Log
 	protected StringBuilder log = new StringBuilder(Length);
+	protected static string LogEnd = "</color>" + Environment.NewLine;
 
 	public void RegisterLogging()
 	{
@@ -172,7 +173,7 @@ public class Console : MonoBehaviour
 		if (newLength > Length)
 		{
 			int removeLength = newLength - Length;
-			removeLength = log.IndexOf('\n', removeLength) + 1;
+			removeLength = log.IndexOf(LogEnd, removeLength) + LogEnd.Length;
 			log.Remove(0, removeLength);
 		}
 		log.AppendLine(line);
@@ -297,7 +298,7 @@ public class Console : MonoBehaviour
 	
 	public static void ClearLog()
 	{
-		instance.log.Clear();
+		//instance.log.Clear();
 		instance.LogText.text = "";
 	}
 	#endregion

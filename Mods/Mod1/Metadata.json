@@ -1,8 +1,8 @@
 {
 	"Name": "Mod1",
+	"Persistent": true,
 	"Scripts": 
 	[
-		"Script1.lua",
-		"Script2.lua"
+		"Script.lua"
 	]
 }

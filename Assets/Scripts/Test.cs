@@ -11,49 +11,15 @@ using UniRx;
 using UniRx.Async;
 using XLua;
 
-public class GameData
-{
-	public string Mod0;
-	public string Mod1;
-	public string Mod2;
-	public string Mod3;
-	public double Value;
-}
-
+[Hotfix]
 public class Test : MonoBehaviour
 {
-	public static string String = "Default";
-	public static int Integer = 1;
-	public static float Float = 1.5f;
-	public static void Call()
-	{
-		print("Called");
-	}
-	public static void Call(int value)
-	{
-		print("Called I " + value);
-	}
-	public static void Call(string value)
-	{
-		print("Called S " + value);
-	}
-
-	public static int PropertyInt
-	{
-		get
-		{
-			return 1;
-		}
-	}
-
 	public GameObject cube;
 
 #pragma warning disable CS1998
 	async Task Start()
 	{
 		ModdingTest();
-		//InjectTest()
-
 	}
 
 #pragma warning restore CS1998
@@ -128,23 +94,5 @@ public class Test : MonoBehaviour
 	void OnDestroy()
 	{
 		ModManager.UnloadMods();
-	}
-
-	void InjectTest()
-	{
-		LuaEnv luaenv = new LuaEnv();
-		luaenv.DoString(@"
-				local util = require 'xlua.util'
-				util.hotfix_ex(CS.Test, 'Hello', function(self)
-					self:Hello()
-                    print('Hello from Lua')
-                end)
-            ");
-		Hello();
-	}
-	
-	public void Hello()
-	{
-		Debug.Log("Hello from C#");
 	}
 }

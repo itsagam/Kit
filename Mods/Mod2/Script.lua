@@ -1,1 +1,0 @@
-print("Hello from Mod2 script")
