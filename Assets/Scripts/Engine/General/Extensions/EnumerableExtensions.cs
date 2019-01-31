@@ -16,4 +16,28 @@ public static class EnumerableExtensions
 	{
 		yield return item;
 	}
+
+	public static int IndexOf<T>(this IEnumerable<T> source, T value)
+	{
+		int index = 0;
+		foreach (T item in source)
+		{
+			if (item.Equals(value))
+				return index;
+			index++;
+		}
+		return -1;
+	}
+
+	public static int IndexOf<T>(this IEnumerable<T> source, T value, IEqualityComparer<T> comparer)
+	{
+		int index = 0;
+		foreach (T item in source)
+		{
+			if (comparer.Equals(item, value))
+				return index;
+			index++;
+		}
+		return -1;
+	}
 }

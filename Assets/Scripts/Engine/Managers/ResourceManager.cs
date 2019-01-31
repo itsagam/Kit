@@ -372,7 +372,7 @@ public class ResourceManager
 
 #endregion
 
-#region Reading
+	#region Reading
 	public static string ReadText(ResourceFolder folder, string file, bool modded = DefaultModding)
 	{
 #if MODDING
@@ -474,9 +474,9 @@ public class ResourceManager
 		UnityWebRequest request = UnityWebRequest.Get(LocalToURLPath(filePath));
 		return request.SendWebRequest();
 	}
-#endregion
+	#endregion
 
-#region Saving/Deleting
+	#region Saving/Deleting
 	public static bool Save(ResourceFolder folder, string file, object contents, ResourceParser parser)
 	{
 		return Save(GetPath(folder, file), contents, parser);
@@ -609,9 +609,9 @@ public class ResourceManager
 	{
 		return File.Exists(fullPath);
 	}
-#endregion
+	#endregion
 
-#region Other
+	#region Other
 	public static string GetPath(ResourceFolder folder)
 	{
 		return Paths[folder];
@@ -628,5 +628,5 @@ public class ResourceManager
 			path = "file://" + path;
 		return path;
 	}
-#endregion
+	#endregion
 }

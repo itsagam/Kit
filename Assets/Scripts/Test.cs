@@ -20,6 +20,7 @@ public class Test : MonoBehaviour
 	async Task Start()
 	{
 		ModdingTest();
+		//ModManager.DisableMod(ModManager.Groups[ModType.Mod].Mods[1]);	
 	}
 
 #pragma warning restore CS1998
@@ -44,6 +45,9 @@ public class Test : MonoBehaviour
 	{
 		ModManager.LoadMods();
 		ModManager.ExecuteScripts();
+		foreach (Mod mod in ModManager.Mods)
+			print(mod.Group.Name + ": " + mod.Metadata.Name);
+
 		//ResourceManager.ResourceLoaded += ResourceLoaded;
 		//ResourceManager.ResourceReused += ResourceReused;
 		//ResourceManager.ResourceUnloaded += ResourceUnloaded;

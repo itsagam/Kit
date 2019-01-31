@@ -38,7 +38,9 @@ namespace Modding
 
 		public string Path { get;  protected set; }
 		public ModMetadata Metadata { get; protected set; }
-		
+
+		public ModGroup Group { get; set; }
+
 		public abstract IEnumerable<string> FindFiles(string path);
 		public abstract bool Exists(string path);
 		public abstract string ReadText(string path);

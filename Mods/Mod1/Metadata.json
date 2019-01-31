@@ -1,6 +1,5 @@
 {
 	"Name": "Mod1",
-	"Persistent": true,
 	"Scripts": 
 	[
 		"Script.lua"

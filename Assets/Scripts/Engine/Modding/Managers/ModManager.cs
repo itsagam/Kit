@@ -1,6 +1,5 @@
 ﻿using System;
 using System.IO;
-using System.Collections.ObjectModel;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -21,16 +20,40 @@ public enum ResourceFolder
 
 namespace Modding
 {
-#if MODDING
+	#if MODDING
+	public enum ModType
+	{
+		Patch,
+		Mod
+	}
+
+	public struct ModGroup
+	{
+		public ModType Name;
+		public string Path;
+		public List<Mod> Mods;
+		public bool Deactivateable;
+		public bool Reorderable;
+
+		public ModGroup(ModType name, string path, bool deactivatable = true, bool reorderable = true)
+		{
+			Name = name;
+			Path = path;
+			Mods = new List<Mod>();
+			Deactivateable = deactivatable;
+			Reorderable = reorderable;
+		}
+	}
+
 	public struct ResourceInfo
 	{
 		public Mod Mod;
 		public string Path;
 		public ResourceParser Parser;
 		public WeakReference Reference;
-		
-		public ResourceInfo(Mod mod, string file, ResourceParser parser, object reference) 
-			: this(mod, file, parser, new WeakReference(reference)) 
+
+		public ResourceInfo(Mod mod, string file, ResourceParser parser, object reference)
+			: this(mod, file, parser, new WeakReference(reference))
 		{
 		}
 
@@ -60,31 +83,31 @@ namespace Modding
 		public static event Action<ResourceFolder, string, ResourceInfo> ResourceReused;
 		public static event Action<ResourceFolder, string, Mod> ResourceUnloaded;
 
-		public const string DefaultModFolderName = "Mods";
-
-		public static List<string> SearchPaths = new List<string>();
+		public static Dictionary<ModType, ModGroup> Groups = new Dictionary<ModType, ModGroup>();
 		public static List<ModLoader> Loaders = new List<ModLoader>() {
 			//UNDONE: new AssetBundleLoader(),
 			new DirectModLoader(),
 			new ZipModLoader()
 		};
 		
-		protected static List<Mod> mods = new List<Mod>();
+		protected static IEnumerable<Mod> mods = new List<Mod>();
 		protected static Dictionary<(Type type, ResourceFolder folder, string file), ResourceInfo> cachedResources 
 			= new Dictionary<(Type, ResourceFolder, string), ResourceInfo>();
 		protected static Dictionary<ResourceFolder, string> folderToString = new Dictionary<ResourceFolder, string>();
 
+		#region Initialization
 		static ModManager()
 		{
-			AddDefaultSearchPaths();
+			AddDefaultGroups();
 			CacheFolderNames();
 		}
 
-		protected static void AddDefaultSearchPaths()
+		protected static void AddDefaultGroups()
         {
-			// UNDONE: Adding "Patches" and patching system
+			// The order in which groups are added is taken into account in mod order and cannot be changed by any means
 			string writeableFolder = GetWriteableFolder();
-			SearchPaths.Add(writeableFolder + DefaultModFolderName + "/");
+			AddGroup(new ModGroup(ModType.Patch, writeableFolder + "Patches/", false, false));
+			AddGroup(new ModGroup(ModType.Mod, writeableFolder + "Mods/", true, true));
 		}
 
 		protected static string GetWriteableFolder()
@@ -110,22 +133,17 @@ namespace Modding
 				folder += "/";
 			return folder;
 		}
+		#endregion
 
-		// The "+" operator and Path.Combine are really costly and have a huge perfomance impact
-		protected static void CacheFolderNames()
-		{
-			foreach (ResourceFolder value in Enum.GetValues(typeof(ResourceFolder)))
-				folderToString[value] = Enum.GetName(typeof(ResourceFolder), value) + "/";
-		}
-
+		#region Mod-loading
 		public static void LoadMods(bool executeScripts = false)
 		{
-			foreach (string path in SearchPaths)
+			foreach (ModGroup group in Groups.Values)
 			{
-				if (!Directory.Exists(path))
+				if (!Directory.Exists(group.Path))
 					continue;
-
-				string[] childPaths = Directory.GetFileSystemEntries(path);
+				
+				string[] childPaths = Directory.GetFileSystemEntries(group.Path);
 				foreach (string childPath in childPaths)
 				{
 					foreach (ModLoader loader in Loaders)
@@ -133,7 +151,9 @@ namespace Modding
 						Mod mod = loader.LoadMod(childPath);
 						if (mod != null)
 						{
-							mods.Add(mod);
+							mod.Group = group;
+							if (IsModEnabled(mod))
+								group.Mods.Add(mod);
 							break;
 						}
 					}
@@ -142,6 +162,7 @@ namespace Modding
 
 			LoadModOrder();
 			SaveModOrder();
+			RefreshModList();
 
 			if (executeScripts)
 				ExecuteScripts();
@@ -149,12 +170,12 @@ namespace Modding
 
 		public static async UniTask LoadModsAsync(bool executeScripts = false)
 		{
-			foreach (string path in SearchPaths)
+			foreach (ModGroup group in Groups.Values)
 			{
-				if (!Directory.Exists(path))
+				if (!Directory.Exists(group.Path))
 					continue;
 
-				string[] childPaths = Directory.GetFileSystemEntries(path);
+				string[] childPaths = Directory.GetFileSystemEntries(group.Path);
 				foreach (string childPath in childPaths)
 				{
 					foreach (ModLoader loader in Loaders)
@@ -162,7 +183,9 @@ namespace Modding
 						Mod mod = await loader.LoadModAsync(childPath);
 						if (mod != null)
 						{
-							mods.Add(mod);
+							mod.Group = group;
+							if (IsModEnabled(mod))
+								group.Mods.Add(mod);
 							break;
 						}
 					}
@@ -171,9 +194,10 @@ namespace Modding
 
 			LoadModOrder();
 			SaveModOrder();
+			RefreshModList();
 
 			if (executeScripts)
-				await ExecuteScriptsAsync();
+				ExecuteScripts();
 		}
 
 		public static void ExecuteScripts()
@@ -194,26 +218,55 @@ namespace Modding
 			}
 		}
 
-		// UNDONE: Make a "Mods" UI, allowing to change mod order and displaying mod information
-		public static void LoadModOrder()
+		protected static void RefreshModList()
 		{
-			// Reversing the list makes sure new mods (whose entries we do not have and will all return -1) are ordered in reverse
-			mods = mods.AsEnumerable().Reverse().OrderBy(m => PlayerPrefs.GetInt($"Mods/{m.Metadata.Name}.Order", -1)).ToList();
+			mods = Groups.SelectMany(kvp => kvp.Value.Mods);
 		}
-	
-		public static int GetModOrder(Mod mod)
+		#endregion
+
+		#region Settings
+		public static void EnableMod(Mod mod)
 		{
-			return mods.FindIndex(p => p == mod);
+			ToggleMod(mod, true);
 		}
 
-		public static void MoveModFirst(Mod mod)
+		public static void DisableMod(Mod mod)
+		{
+			ToggleMod(mod, false);
+		}
+
+		public static void ToggleMod(Mod mod)
+		{
+			ToggleMod(mod, !IsModEnabled(mod));
+		}
+
+		public static void ToggleMod(Mod mod, bool value)
+		{
+			if (!mod.Group.Deactivateable)
+				return;
+			PlayerPrefs.SetInt($"{mod.Group.Name}/{mod.Metadata.Name}.Enabled", value ? 1 : 0);
+		}
+
+		public static bool IsModEnabled(Mod mod)
+		{
+			if (!mod.Group.Deactivateable)
+				return true;
+			return PlayerPrefs.GetInt($"{mod.Group.Name}/{mod.Metadata.Name}.Enabled", 1) == 1;
+		}
+
+		public static int GetModOrder(Mod mod)
+		{
+			return mod.Group.Mods.FindIndex(p => p == mod);
+		}
+
+		public static void MoveModTop(Mod mod)
 		{
 			MoveModOrder(mod, 0);
 		}
 
-		public static void MoveModLast(Mod mod)
+		public static void MoveModBottom(Mod mod)
 		{
-			MoveModOrder(mod, mods.Count-1);
+			MoveModOrder(mod, mod.Group.Mods.Count-1);
 		}
 
 		public static void MoveModUp(Mod mod)
@@ -228,18 +281,57 @@ namespace Modding
 
 		public static void MoveModOrder(Mod mod, int index)
 		{
-			if (index < 0 || index >= mods.Count)
+			if (!mod.Group.Reorderable)
 				return;
 
-			mods.Remove(mod);
-			mods.Insert(index, mod);
-			SaveModOrder();
+			if (index < 0 || index >= mod.Group.Mods.Count)
+				return;
+
+			mod.Group.Mods.Remove(mod);
+			mod.Group.Mods.Insert(index, mod);
+			RefreshModList();
+		}
+
+		// UNDONE: Make a "Mods" UI, allowing to change mod order and displaying mod information
+		public static void LoadModOrder()
+		{
+			foreach (var kvp in Groups)
+			{
+				ModGroup group = kvp.Value;
+				if (group.Reorderable)
+				{
+					// Reversing the list makes sure new mods (whose entries we do not have and will have all the same value -1)
+					// are ordered in reverse (newer on top)
+					group.Mods = group.Mods.AsEnumerable()
+						.Reverse()
+						.OrderBy(m => PlayerPrefs.GetInt($"{group.Name}/{m.Metadata.Name}.Order", -1))
+						.ToList();
+				}
+			}
 		}
 
 		public static void SaveModOrder()
 		{
-			for (int i = 0; i < mods.Count; i++)
-				PlayerPrefs.SetInt($"Mods/{mods[i].Metadata.Name}.Order", i);
+			foreach (ModGroup group in Groups.Values)
+			{
+				if (group.Reorderable)
+				{
+					for (int i = 0; i < group.Mods.Count; i++)
+					{
+						Mod mod = group.Mods[i];
+						PlayerPrefs.SetInt($"{group.Name}/{mod.Metadata.Name}.Order", i);
+					}
+				}
+			}	
+		}
+		#endregion
+
+		#region Resource-loading
+		// The "+" operator and Path.Combine are really costly and have a huge perfomance impact, thus this
+		protected static void CacheFolderNames()
+		{
+			foreach (ResourceFolder value in Enum.GetValues(typeof(ResourceFolder)))
+				folderToString[value] = Enum.GetName(typeof(ResourceFolder), value) + "/";
 		}
 
 		protected static T LoadCached<T>(ResourceFolder folder, string file) where T : class
@@ -343,7 +435,9 @@ namespace Modding
 		{
 			return cachedResources.FirstOrDefault(r => r.Value.Reference.Target == resource).Value;
 		}
+		#endregion
 
+		#region Reading
 		public static string ReadText(ResourceFolder folder, string file)
 		{
 			return ReadText(GetModdingPath(folder, file));
@@ -507,11 +601,13 @@ namespace Modding
 			}
 			return all;
 		}
+		#endregion
 
+		#region Unloading
 		public static void UnloadMods(bool destroyLoaded = false)
 		{
-			for (int i = mods.Count - 1; i >= 0; i--)
-				UnloadMod(mods[i], destroyLoaded);
+			foreach (Mod mod in mods.Reverse())
+				UnloadMod(mod);
 		}
 
 		public static void UnloadMod(Mod mod, bool destroyLoaded = true)
@@ -519,7 +615,7 @@ namespace Modding
 			if (destroyLoaded)
 				UnloadAll(mod);
 			mod.Unload();
-			mods.Remove(mod);
+			mod.Group.Mods.Remove(mod);
 			ModUnloaded?.Invoke(mod);
 		}
 
@@ -575,10 +671,29 @@ namespace Modding
 			if (resource is UnityEngine.Object unityObject)
 				UnityEngine.Object.Destroy(unityObject);
 		}
+		#endregion
 
-		public static void ClearCache()
+		#region Public methods
+		public static void AddGroup(ModGroup group)
 		{
-			cachedResources.Clear();
+			Groups.Add(group.Name, group);
+		}
+
+		public static void RemoveGroup(ModGroup group)
+		{
+			Groups.Remove(group.Name);
+		}
+
+		public static List<Mod> GetModsByGroup(ModType name)
+		{
+			if (Groups.TryGetValue(name, out ModGroup group))
+				return group.Mods;
+			return null;
+		}
+
+		public static int GetActualModOrder(Mod mod)
+		{
+			return mods.IndexOf(mod);
 		}
 
 		public static string GetModdingPath(ResourceFolder folder)
@@ -591,13 +706,19 @@ namespace Modding
 			return GetModdingPath(folder) + file;
 		}
 
-		public static ReadOnlyCollection<Mod> Mods
+		public static void ClearCache()
+		{
+			cachedResources.Clear();
+		}
+
+		public static IEnumerable<Mod> Mods
 		{
 			get
 			{
-				return mods.AsReadOnly();
+				return mods;
 			}
 		}
+		#endregion
 #endif
 	}
 }
