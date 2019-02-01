@@ -156,7 +156,7 @@ public class ResourceManager
 			reference = Resources.Load(fileNoExt) as T;
 			if (reference == null)
 				return null;
-			parser = RankParsers<T>(fullPath).FirstOrDefault().parser;
+			parser = RankParsers(fullPath, typeof(T)).FirstOrDefault().parser;
 		}
 		else
 		{
@@ -174,13 +174,13 @@ public class ResourceManager
 				{
 					List<string> textList = ModManager.ReadTextAll(folder, file);
 					foreach (string text in textList)
-						parser.Merge<T>(merged, text);
+						parser.Merge(merged, text);
 				}
 				else
 				{
 					List<byte[]> bytesList = ModManager.ReadBytesAll(folder, file);
 					foreach (byte[] bytes in bytesList)
-						parser.Merge<T>(merged, bytes);
+						parser.Merge(merged, bytes);
 				}
 			}
 			catch (Exception e)
@@ -207,7 +207,7 @@ public class ResourceManager
 			reference = (await Resources.LoadAsync(fileNoExt)) as T;
 			if (reference == null)
 				return null;
-			parser = RankParsers<T>(fullPath).FirstOrDefault().parser;
+			parser = RankParsers(fullPath, typeof(T)).FirstOrDefault().parser;
 		}
 		else
 		{
@@ -225,13 +225,13 @@ public class ResourceManager
 				{
 					List<string> textList = await ModManager.ReadTextAllAsync(folder, file);
 					foreach (string text in textList)
-						parser.Merge<T>(merged, text);
+						parser.Merge(merged, text);
 				}
 				else
 				{
 					List<byte[]> bytesList = await ModManager.ReadBytesAllAsync(folder, file);
 					foreach (byte[] bytes in bytesList)
-						parser.Merge<T>(merged, bytes);
+						parser.Merge(merged, bytes);
 				}
 			}
 			catch (Exception e)
@@ -249,7 +249,7 @@ public class ResourceManager
 	{
 		string text = null;
 		byte[] bytes = null;
-		foreach (var (parser, certainty) in RankParsers<T>(fullPath))
+		foreach (var (parser, certainty) in RankParsers(fullPath, typeof(T)))
 		{
 			try
 			{
@@ -257,13 +257,13 @@ public class ResourceManager
 				{
 					if (text == null)
 						text = ReadText(fullPath);
-					return text != null ? ((T) parser.Read<T>(text, fullPath), parser) : default;
+					return text != null ? (parser.Read<T>(text, fullPath), parser) : default;
 				}
 				else
 				{
 					if (bytes == null)
 						bytes = ReadBytes(fullPath);
-					return bytes != null ? ((T) parser.Read<T>(bytes, fullPath), parser) : default;
+					return bytes != null ? (parser.Read<T>(bytes, fullPath), parser) : default;
 				}
 			}
 			catch (Exception)
@@ -277,7 +277,7 @@ public class ResourceManager
 	{
 		string text = null;
 		byte[] bytes = null;
-		foreach (var (parser, certainty) in RankParsers<T>(fullPath))
+		foreach (var (parser, certainty) in RankParsers(fullPath, typeof(T)))
 		{
 			try
 			{
@@ -285,13 +285,13 @@ public class ResourceManager
 				{
 					if (text == null)
 						text = await ReadTextAsync(fullPath);
-					return text != null ? ((T) parser.Read<T>(text, fullPath), parser) : default;
+					return text != null ? (parser.Read<T>(text, fullPath), parser) : default;
 				}
 				else
 				{
 					if (bytes == null)
 						bytes = await ReadBytesAsync(fullPath);
-					return bytes != null ? ((T) parser.Read<T>(bytes, fullPath), parser) : default;
+					return bytes != null ? (parser.Read<T>(bytes, fullPath), parser) : default;
 				}
 			}
 			catch (Exception)
@@ -299,13 +299,6 @@ public class ResourceManager
 			}
 		}
 		return default;
-	}
-
-	protected static IEnumerable<(ResourceParser parser, float certainty)> RankParsers<T>(string fullPath)
-	{
-		return ModManager.Parsers.Select(parser => (parser, certainty: parser.CanRead<T>(fullPath)))
-			.Where(d => d.certainty > 0)
-			.OrderByDescending(d => d.certainty);
 	}
 
 	public static bool Unload(object reference)
@@ -477,30 +470,43 @@ public class ResourceManager
 	#endregion
 
 	#region Saving/Deleting
-	public static bool Save(ResourceFolder folder, string file, object contents, ResourceParser parser)
+	public static bool Save(ResourceFolder folder, string file, object contents)
 	{
-		return Save(GetPath(folder, file), contents, parser);
+		return Save(GetPath(folder, file), contents);
 	}
 
-	public static UniTask<bool> SaveAsync(ResourceFolder folder, string file, object contents, ResourceParser parser)
+	public static UniTask<bool> SaveAsync(ResourceFolder folder, string file, object contents)
 	{
-		return SaveAsync(GetPath(folder, file), contents, parser);
+		return SaveAsync(GetPath(folder, file), contents);
 	}
 
-	public static bool Save(string fullPath, object contents, ResourceParser parser)
+	public static bool Save(string fullPath, object contents)
 	{
+		var certainties = RankParsers(fullPath, contents.GetType());
+		ResourceParser parser = certainties.First().parser;
+
 		if (parser.OperateWith == OperateType.Text)
-			return SaveText(fullPath, (string)parser.Write(contents));
+			return SaveText(fullPath, parser.Write<string>(contents));
 		else
-			return SaveBytes(fullPath, (byte[])parser.Write(contents));
+			return SaveBytes(fullPath, parser.Write<byte[]>(contents));
 	}
 
-	public static UniTask<bool> SaveAsync(string fullPath, object contents, ResourceParser parser)
+	public static UniTask<bool> SaveAsync(string fullPath, object contents)
 	{
-		if (parser.OperateWith == OperateType.Text)
-			return SaveTextAsync(fullPath, (string)parser.Write(contents));
-		else
-			return SaveBytesAsync(fullPath, (byte[])parser.Write(contents));
+		foreach (var (parser, certainty) in RankParsers(fullPath, contents.GetType()))
+		{
+			try
+			{
+				if (parser.OperateWith == OperateType.Text)
+					return SaveTextAsync(fullPath, parser.Write<string>(contents));
+				else
+					return SaveBytesAsync(fullPath, parser.Write<byte[]>(contents));
+			}
+			catch (Exception)
+			{
+			}
+		}
+		return UniTask.FromResult(false);
 	}
 
 	public static bool SaveText(ResourceFolder folder, string file, string contents)
@@ -612,6 +618,13 @@ public class ResourceManager
 	#endregion
 
 	#region Other
+	protected static IEnumerable<(ResourceParser parser, float certainty)> RankParsers(string fullPath, Type type)
+	{
+		return ModManager.Parsers.Select(parser => (parser, certainty: parser.CanRead(fullPath, type)))
+			.Where(d => d.certainty > 0)
+			.OrderByDescending(d => d.certainty);
+	}
+
 	public static string GetPath(ResourceFolder folder)
 	{
 		return Paths[folder];

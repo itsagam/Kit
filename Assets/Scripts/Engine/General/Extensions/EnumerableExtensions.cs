@@ -6,15 +6,15 @@ using UnityEngine;
 
 public static class EnumerableExtensions
 {
+	public static IEnumerable<T> Yield<T>(T item)
+	{
+		yield return item;
+	}
+
 	public static void ForEach<T>(this IEnumerable<T> enumerable, Action<T> action)
 	{
 		foreach (T obj in enumerable)
 			action(obj);
-	}
-
-	public static IEnumerable<T> Yield<T>(this T item)
-	{
-		yield return item;
 	}
 
 	public static int IndexOf<T>(this IEnumerable<T> source, T value)

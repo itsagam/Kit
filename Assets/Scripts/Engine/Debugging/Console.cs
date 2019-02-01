@@ -206,7 +206,7 @@ public class Console : MonoBehaviour
 			output.Append("}");
 		}
 		else
-			Debugger.ObjectOrEnumerableToString(output, obj, false, NullString);
+			Debugger.ObjectToString(output, obj, false, NullString);
 	}
 
 	protected static void CyclicObjectOrTableToString(StringBuilder output, object obj, int depth, List<object> traversed)
@@ -227,7 +227,7 @@ public class Console : MonoBehaviour
 			}
 		}
 		else
-			Debugger.ObjectOrEnumerableToString(output, obj, false, NullString);
+			Debugger.ObjectToString(output, obj, false, NullString);
 	}
 
 	public static void List(Type type)

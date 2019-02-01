@@ -7,27 +7,39 @@ using System.Text;
 using System.IO;
 using UnityEngine;
 using Modding;
+using Modding.Parsers;
 using UniRx;
 using UniRx.Async;
 using XLua;
+using Newtonsoft.Json;
+
+// JSON:
+//		Pros: Works with inhereted types
+//		Cons: Have to manually write property accessors, properties don't show in inspector
+
+// Static-fields to be modifiable in Lua
+//		Pros: No extra work required, properties show in inspector
+//		Cons: Can't find a way to work with inhereted types (statically bound)
 
 [Hotfix]
 public class Test : MonoBehaviour
-{
+{	
 	public GameObject cube;
 
 #pragma warning disable CS1998
 	async Task Start()
 	{
-		ModdingTest();
-		//ModManager.DisableMod(ModManager.Groups[ModType.Mod].Mods[1]);	
-	}
+		//ModdingTest();
+		await DataManager.LoadData();
+		Debugger.Log(DataManager.GameData);
 
+	}
 #pragma warning restore CS1998
 
 	public void RunProfile()
 	{
-		ModManager.UnloadMods();
+		//ModManager.UnloadMods();
+		
 		/*
 		Debugger.StartProfile("Resources.Load");
 		for (int i = 0; i <= 100000; i++)

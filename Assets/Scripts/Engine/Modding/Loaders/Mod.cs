@@ -79,7 +79,7 @@ namespace Modding
 			if (matchingFiles == null)
 				return default;
 
-			var certainties = RankParsers<T>(matchingFiles);
+			var certainties = RankParsers(matchingFiles, typeof(T));
 			string text = null;
 			byte[] bytes = null;
 			foreach (var (filePath, parser, certainty) in certainties)
@@ -90,13 +90,13 @@ namespace Modding
 					{
 						if (bytes == null)
 							bytes = ReadBytes(filePath);
-						return ((T) parser.Read<T>(bytes, filePath), filePath, parser);
+						return (parser.Read<T>(bytes, filePath), filePath, parser);
 					}
 					else
 					{
 						if (text == null)
 							text = ReadText(filePath);
-						return ((T) parser.Read<T>(text, filePath), filePath, parser);
+						return (parser.Read<T>(text, filePath), filePath, parser);
 					}
 				}
 				catch
@@ -113,7 +113,7 @@ namespace Modding
 			if (matchingFiles == null)
 				return default;
 
-			var certainties = RankParsers<T>(matchingFiles);
+			var certainties = RankParsers(matchingFiles, typeof(T));
 			string text = null;
 			byte[] bytes = null;
 			foreach (var (filePath, parser, certainty) in certainties)
@@ -124,13 +124,13 @@ namespace Modding
 					{
 						if (bytes == null)
 							bytes = await ReadBytesAsync(filePath);
-						return ((T) parser.Read<T>(bytes, filePath), filePath, parser);
+						return (parser.Read<T>(bytes, filePath), filePath, parser);
 					}
 					else
 					{
 						if (text == null)
 							text = await ReadTextAsync(filePath);
-						return ((T) parser.Read<T>(text, filePath), filePath, parser);
+						return (parser.Read<T>(text, filePath), filePath, parser);
 					}
 				}
 				catch
@@ -141,9 +141,9 @@ namespace Modding
 			return default;
 		}
 
-		protected static IEnumerable<(string filePath, ResourceParser parser, float certainty)> RankParsers<T>(IEnumerable<string> matchingFiles) where T : class
+		protected static IEnumerable<(string filePath, ResourceParser parser, float certainty)> RankParsers(IEnumerable<string> matchingFiles, Type type)
 		{
-			return matchingFiles.SelectMany(filePath => ModManager.Parsers.Select(parser => (filePath, parser, certainty: parser.CanRead<T>(filePath))))
+			return matchingFiles.SelectMany(filePath => ModManager.Parsers.Select(parser => (filePath, parser, certainty: parser.CanRead(filePath, type))))
 								.Where(d => d.certainty > 0)
 								.OrderByDescending(d => d.certainty);
 		}

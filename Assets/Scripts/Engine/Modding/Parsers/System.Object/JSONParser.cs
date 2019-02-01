@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using Newtonsoft.Json;
 
@@ -8,21 +9,34 @@ namespace Modding.Parsers
 {
 	public class JSONParser : ResourceParser
 	{
-		public override List<Type> SupportedTypes => new List<Type> { };
-		public override List<string> SupportedExtensions => new List<string> { ".json" };
+		public override IEnumerable<Type> SupportedReadTypes => Enumerable.Empty<Type>();
+		public override IEnumerable<Type> SupportedWriteTypes
+		{
+			get
+			{
+				yield return typeof(string);
+			}
+		}
+		public override IEnumerable<string> SupportedExtensions
+		{
+			get
+			{
+				yield return ".json";
+			}
+		}
 		public override OperateType OperateWith => OperateType.Text;
 
-		public override object Read<T>(object data, string path = null)
+		public override T Read<T>(object data, string path = null)
 		{
 			return FromJson<T>((string) data);
 		}
 
-		public override object Write(object data, string path = null)
+		public override T Write<T>(object data, string path = null)
 		{
-			return ToJson(data);
+			return (T) (object) ToJson(data);
 		}
 
-		public override void Merge<T>(object current, object overwrite)
+		public override void Merge(object current, object overwrite)
 		{
 			OverwriteJson(current, (string) overwrite);
 		}

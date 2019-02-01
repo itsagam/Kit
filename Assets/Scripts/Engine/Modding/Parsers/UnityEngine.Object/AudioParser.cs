@@ -16,43 +16,27 @@ namespace Modding.Parsers
 	//				WWW._uwr is private so you cannot change to a custom web request with custom download handler
 	//				All data downloaing and posting is done internally from C++ and passed to DownloadHandler.ReceiveData which is protected
 
-	/*
-	class DummyAudioRequest : UnityWebRequest
-	{
-	}
-
-	class DummyDownloadHandler : DownloadHandlerScript
-	{
-		public byte[] Data { get; protected set; }
-
-		public DummyDownloadHandler(byte[] data)
-		{
-			Data = data;
-		}
-
-		protected override byte[] GetData()
-		{
-			return Data;
-		}
-	}
-
-	internal class DummyWWW : WWW
-	{
-		public DummyWWW(string url) : base(url)
-		{			
-		}
-	}
-	*/
-
 	public class AudioParser : ResourceParser
 	{
-		public override List<Type> SupportedTypes => new List<Type> { typeof(AudioClip) };
-		public override List<string> SupportedExtensions => new List<string> { ".wav" };
+		public override IEnumerable<Type> SupportedReadTypes
+		{
+			get
+			{
+				yield return typeof(AudioClip);
+			}
+		}
+		public override IEnumerable<string> SupportedExtensions
+		{
+			get
+			{
+				yield return ".wav";
+			}
+		}
 		public override OperateType OperateWith => OperateType.Bytes;
 
-		public override object Read<T>(object data, string path)
+		public override T Read<T>(object data, string path)
 		{
-			return WavUtility.ToAudioClip((byte[]) data, 0, path);
+			return (T) (object) WavUtility.ToAudioClip((byte[]) data, 0, path);
 		}
 	}
 }

@@ -91,7 +91,7 @@ namespace Modding.Loaders
 		{
 			string fullPath = GetFullPath(path);
 			if (File.Exists(fullPath))
-				return path.Yield();
+				return EnumerableExtensions.Yield(path);
 
 			if (!System.IO.Path.HasExtension(path))
 			{

@@ -7,15 +7,27 @@ namespace Modding.Parsers
 {
 	public class TextParser : ResourceParser
 	{
-		public override List<Type> SupportedTypes => new List<Type> { typeof(TextAsset) };
-		public override List<string> SupportedExtensions => new List<string> { ".txt" };
+		public override IEnumerable<Type> SupportedReadTypes
+		{
+			get
+			{
+				yield return typeof(TextAsset);
+			}
+		}
+		public override IEnumerable<string> SupportedExtensions
+		{
+			get
+			{
+				yield return ".txt";
+			}
+		}
 		public override OperateType OperateWith => OperateType.Text;
 
-		public override object Read<T>(object data, string path)
+		public override T Read<T>(object data, string path)
 		{
 			TextAsset asset = new TextAsset((string) data);
 			asset.name = path;
-			return asset;
+			return (T) (object) asset;
 		}
 	}
 }

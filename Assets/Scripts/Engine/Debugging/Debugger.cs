@@ -14,8 +14,8 @@ public class Debugger
 {
 	public const string NullString = "Null";
 
-#if UNITY_EDITOR || DEVELOPMENT_BUILD
 	#region Profiling
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
 	protected static Stack<CustomSampler> runningProfiles = new Stack<CustomSampler>();
 
 	public static void StartProfile(string name)
@@ -56,8 +56,8 @@ public class Debugger
 			return null;
 		return Math.Round(time / 1000000f, 5) + "ms";
 	}
-	#endregion
 #endif
+	#endregion
 
 	#region Logging
 
@@ -75,42 +75,15 @@ public class Debugger
 	}
 
 	[Conditional("UNITY_EDITOR"), Conditional("DEVELOPMENT_BUILD")]
-	public static void Log(object obj, bool serialize = false)
+	public static void Log(object obj, bool serialize = true)
 	{
 		Log(ObjectToString(obj, serialize));
 	}
 
 	[Conditional("UNITY_EDITOR"), Conditional("DEVELOPMENT_BUILD")]
-	public static void Log(string type, object obj, bool serialize = false)
+	public static void Log(string type, object obj, bool serialize = true)
 	{
 		Log(type, ObjectToString(obj, serialize));
-	}
-
-	[Conditional("UNITY_EDITOR"), Conditional("DEVELOPMENT_BUILD")]
-	public static void Log(IEnumerable enumerable, bool serialize = false)
-	{
-		Log(EnumerableToString(enumerable, serialize));
-	}
-
-	[Conditional("UNITY_EDITOR"), Conditional("DEVELOPMENT_BUILD")]
-	public static void Log(string type, IEnumerable enumerable, bool serialize = false)
-	{
-		Log(type, EnumerableToString(enumerable, serialize));
-	}
-
-	public static string ObjectOrEnumerableToString(object obj, bool serialize, string nullString = NullString)
-	{
-		var output = new StringBuilder();
-		ObjectOrEnumerableToString(output, obj, serialize, nullString);
-		return output.ToString();
-	}
-
-	public static void ObjectOrEnumerableToString(StringBuilder output, object obj, bool serialize, string nullString)
-	{
-		if (obj is IEnumerable enumerable && !(enumerable is string))
-			EnumerableToString(output, enumerable, serialize, nullString);
-		else
-			ObjectToString(output, obj, serialize, nullString);
 	}
 
 	public static string ObjectToString(object obj, bool serialize, string nullString = NullString)
@@ -127,6 +100,34 @@ public class Debugger
 	public static void ObjectToString(StringBuilder output, object obj, bool serialize, string nullString)
 	{
 		output.Append(ObjectToString(obj, serialize, nullString));
+	}
+
+	/*
+	[Conditional("UNITY_EDITOR"), Conditional("DEVELOPMENT_BUILD")]
+	public static void Log(IEnumerable enumerable, bool serialize = false)
+	{
+		Log(EnumerableToString(enumerable, serialize));
+	}
+	
+	[Conditional("UNITY_EDITOR"), Conditional("DEVELOPMENT_BUILD")]
+	public static void Log(string type, IEnumerable enumerable, bool serialize = false)
+	{
+		Log(type, EnumerableToString(enumerable, serialize));
+	}
+	
+	public static string ObjectOrEnumerableToString(object obj, bool serialize, string nullString = NullString)
+	{
+		var output = new StringBuilder();
+		ObjectOrEnumerableToString(output, obj, serialize, nullString);
+		return output.ToString();
+	}
+
+	public static void ObjectOrEnumerableToString(StringBuilder output, object obj, bool serialize, string nullString)
+	{
+		if (obj is IEnumerable enumerable && !(enumerable is string))
+			EnumerableToString(output, enumerable, serialize, nullString);
+		else
+			ObjectToString(output, obj, serialize, nullString);
 	}
 
 	public static string EnumerableToString(IEnumerable enumerable, bool serialize, string nullString = NullString)
@@ -156,5 +157,7 @@ public class Debugger
 		}
 		output.Append("}");
 	}
+	*/
+
 	#endregion
 }

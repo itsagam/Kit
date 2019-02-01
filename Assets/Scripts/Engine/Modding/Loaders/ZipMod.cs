@@ -120,7 +120,7 @@ namespace Modding.Loaders
 		{
 			ZipArchiveEntry result = Archive.GetEntry(path);
 			if (result != null)
-				return path.Yield();
+				return EnumerableExtensions.Yield(path);
 
 			if (! System.IO.Path.HasExtension(path))
 			{
