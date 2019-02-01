@@ -27,11 +27,8 @@ public class DataManager
 
 	public static async UniTask LoadData()
 	{
-		if (GameData == null)
-			GameData = await LoadGameData();
-
-		if (GameState == null)
-			GameState = await LoadGameState();
+		GameData = await LoadGameData();
+		GameState = await LoadGameState();
 	}
 
 	public static UniTask<GameData> LoadGameData()

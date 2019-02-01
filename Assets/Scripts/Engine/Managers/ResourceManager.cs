@@ -470,37 +470,44 @@ public class ResourceManager
 	#endregion
 
 	#region Saving/Deleting
-	public static bool Save(ResourceFolder folder, string file, object contents)
+	public static bool Save<T>(ResourceFolder folder, string file, T contents)
 	{
 		return Save(GetPath(folder, file), contents);
 	}
 
-	public static UniTask<bool> SaveAsync(ResourceFolder folder, string file, object contents)
+	public static UniTask<bool> SaveAsync<T>(ResourceFolder folder, string file, T contents)
 	{
 		return SaveAsync(GetPath(folder, file), contents);
 	}
 
-	public static bool Save(string fullPath, object contents)
-	{
-		var certainties = RankParsers(fullPath, contents.GetType());
-		ResourceParser parser = certainties.First().parser;
-
-		if (parser.OperateWith == OperateType.Text)
-			return SaveText(fullPath, parser.Write<string>(contents));
-		else
-			return SaveBytes(fullPath, parser.Write<byte[]>(contents));
-	}
-
-	public static UniTask<bool> SaveAsync(string fullPath, object contents)
+	public static bool Save<T>(string fullPath, T contents)
 	{
 		foreach (var (parser, certainty) in RankParsers(fullPath, contents.GetType()))
 		{
 			try
 			{
 				if (parser.OperateWith == OperateType.Text)
-					return SaveTextAsync(fullPath, parser.Write<string>(contents));
+					return SaveText(fullPath, (string) parser.Write(contents));
 				else
-					return SaveBytesAsync(fullPath, parser.Write<byte[]>(contents));
+					return SaveBytes(fullPath, (byte[]) parser.Write(contents));
+			}
+			catch (Exception)
+			{
+			}
+		}
+		return false;
+	}
+
+	public static UniTask<bool> SaveAsync<T>(string fullPath, T contents)
+	{
+		foreach (var (parser, certainty) in RankParsers(fullPath, contents.GetType()))
+		{
+			try
+			{
+				if (parser.OperateWith == OperateType.Text)
+					return SaveTextAsync(fullPath, (string) parser.Write(contents));
+				else
+					return SaveBytesAsync(fullPath, (byte[]) parser.Write(contents));
 			}
 			catch (Exception)
 			{
@@ -533,6 +540,7 @@ public class ResourceManager
 	{
 		try
 		{
+			Directory.CreateDirectory(Path.GetDirectoryName(fullPath));
 			File.WriteAllText(fullPath, contents);
 			return true;
 		}
@@ -547,6 +555,7 @@ public class ResourceManager
 	{
 		try
 		{
+			Directory.CreateDirectory(Path.GetDirectoryName(fullPath));
 			using (StreamWriter stream = new StreamWriter(fullPath))
 				await stream.WriteAsync(contents);
 			return true;
@@ -562,6 +571,7 @@ public class ResourceManager
 	{
 		try
 		{
+			Directory.CreateDirectory(Path.GetDirectoryName(fullPath));
 			File.WriteAllBytes(fullPath, bytes);
 			return true;
 		}
@@ -576,6 +586,7 @@ public class ResourceManager
 	{
 		try
 		{
+			Directory.CreateDirectory(Path.GetDirectoryName(fullPath));
 			using (FileStream stream = new FileStream(fullPath, FileMode.Create))
 				await stream.WriteAsync(bytes, 0, bytes.Length);
 			return true;
@@ -620,7 +631,7 @@ public class ResourceManager
 	#region Other
 	protected static IEnumerable<(ResourceParser parser, float certainty)> RankParsers(string fullPath, Type type)
 	{
-		return ModManager.Parsers.Select(parser => (parser, certainty: parser.CanRead(fullPath, type)))
+		return ModManager.Parsers.Select(parser => (parser, certainty: parser.CanOperate(fullPath, type)))
 			.Where(d => d.certainty > 0)
 			.OrderByDescending(d => d.certainty);
 	}

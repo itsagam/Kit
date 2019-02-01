@@ -9,14 +9,7 @@ namespace Modding.Parsers
 {
 	public class JSONParser : ResourceParser
 	{
-		public override IEnumerable<Type> SupportedReadTypes => Enumerable.Empty<Type>();
-		public override IEnumerable<Type> SupportedWriteTypes
-		{
-			get
-			{
-				yield return typeof(string);
-			}
-		}
+		public override IEnumerable<Type> SupportedTypes => Enumerable.Empty<Type>();
 		public override IEnumerable<string> SupportedExtensions
 		{
 			get
@@ -31,9 +24,9 @@ namespace Modding.Parsers
 			return FromJson<T>((string) data);
 		}
 
-		public override T Write<T>(object data, string path = null)
+		public override object Write<T>(T data, string path = null)
 		{
-			return (T) (object) ToJson(data);
+			return ToJson(data);
 		}
 
 		public override void Merge(object current, object overwrite)

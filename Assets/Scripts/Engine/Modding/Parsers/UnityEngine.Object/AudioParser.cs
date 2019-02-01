@@ -18,7 +18,7 @@ namespace Modding.Parsers
 
 	public class AudioParser : ResourceParser
 	{
-		public override IEnumerable<Type> SupportedReadTypes
+		public override IEnumerable<Type> SupportedTypes
 		{
 			get
 			{

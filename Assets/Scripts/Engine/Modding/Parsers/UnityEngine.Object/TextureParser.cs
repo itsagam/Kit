@@ -7,7 +7,7 @@ namespace Modding.Parsers
 {
 	public class TextureParser : ResourceParser
 	{
-		public override IEnumerable<Type> SupportedReadTypes
+		public override IEnumerable<Type> SupportedTypes
 		{
 			get
 			{
