@@ -5,7 +5,7 @@ using System.Linq;
 using UnityEngine;
 using DG.Tweening;
 
-public class AudioHelper : MonoBehaviour
+public class AudioFader : MonoBehaviour
 {
     public AudioSource Audio;
     public float Speed = 0.75f;
@@ -193,14 +193,6 @@ public class AudioHelper : MonoBehaviour
                 Play();
             else
                 Stop();
-        }
-    }
-
-    public static AudioHelper Main
-    {
-        get
-        {
-            return Camera.main.GetComponent<AudioHelper>();
         }
     }
 }

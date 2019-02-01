@@ -5,7 +5,7 @@ using UnityEngine;
 
 public class RangedEnemy : Enemy
 {
-	public float AttackRange;
+	public float FireRange;
 
 	//public new static float DefaultSpeed = 15.0f;
 }

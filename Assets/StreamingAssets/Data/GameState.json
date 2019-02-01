@@ -1,3 +1,9 @@
 {
-
+	"Enemies":
+	[
+		{
+			"Type": "RangedEnemy",
+			"Position": {"x": 1, "y": 1, "z": 1}
+		}
+	]
 }

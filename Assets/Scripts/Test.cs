@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Threading.Tasks;
 using System.Linq;
 using System.Text;
 using System.IO;
@@ -12,6 +11,14 @@ using UniRx;
 using UniRx.Async;
 using XLua;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+
+// JObject
+//	[Prefab] attribute to tell which prefab to use while instantiating
+//	[GameData] and [GameState] attribute on fields to tell which fields to use in which file while serializing
+//	(or not? GameData is not serialized...)
+//		Pros: Works with inhereted types, manually work is not needed, properties show in inspector
+//		Cons: Have to go through files once, changing Game Data would be harder since properties are duplicated
 
 // JSON:
 //		Pros: Works with inhereted types
@@ -21,19 +28,36 @@ using Newtonsoft.Json;
 //		Pros: No extra work required, properties show in inspector
 //		Cons: Can't find a way to work with inhereted types (statically bound)
 
+public static class TestExtensions
+{
+	public static float Extension(this Test t, int y)
+	{
+		return 0;
+	}
+}
+
 [Hotfix]
 public class Test : MonoBehaviour
 {	
 	public GameObject cube;
 
 #pragma warning disable CS1998
-	async Task Start()
+	async UniTask Start()
 	{
 		//ModdingTest();
-		await DataManager.LoadData();
-		Debugger.Log(DataManager.GameData);
+		//await DataManager.LoadData();
 
+		string stateJson = await ResourceManager.ReadTextAsync(ResourceFolder.StreamingAssets, DataManager.GameStateFile);
+		JObject stateObject = JObject.Parse(stateJson);
+		var serializer = JsonSerializer.CreateDefault();
+		foreach (var child in stateObject["Enemies"].Children())
+		{
+			var instance = Instantiate(ResourceManager.Load<Enemy>(ResourceFolder.Resources, "Enemy"));
+			using (var sr = child.CreateReader())
+				serializer.Populate(sr, instance);
+		}
 	}
+
 #pragma warning restore CS1998
 
 	public void RunProfile()

@@ -1,3 +1,8 @@
 {
-
+	"Enemies":
+	[
+		{
+			"MoveSpeed": 50
+		}
+	]
 }

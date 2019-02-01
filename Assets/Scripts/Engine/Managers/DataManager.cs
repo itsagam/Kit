@@ -18,7 +18,7 @@ public class DataManager
 	public static GameData GameData;
 	public static GameState GameState;
 
-	public static bool ClearGameState = false;
+	public static bool ClearGameState = true;
 	
 	static DataManager()
 	{

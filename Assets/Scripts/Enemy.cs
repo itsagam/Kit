@@ -5,10 +5,10 @@ using UnityEngine;
 using UniRx;
 using UniRx.Toolkit;
 
-public class Enemy// : MonoBehaviour
+public class Enemy: MonoBehaviour
 {
 	public float MoveSpeed;
-	public Vector3 Position { get; set; }
+	public Vector3 Position;
 
 	//public FloatReactiveProperty Speed = new FloatReactiveProperty(25.0f);
 
@@ -18,7 +18,8 @@ public class Enemy// : MonoBehaviour
 	/*
 	public float Speed
 	{
-		get
+		get6324
+
 		{
 			return 10.0f;
 		}

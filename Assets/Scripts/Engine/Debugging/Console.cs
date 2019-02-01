@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Linq;
 using System.Reflection;
@@ -22,7 +23,7 @@ public class Console : MonoBehaviour
 
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
 	public const string Prefab = "Console/Console";
-	public const int Length = 5000;
+	public const int Length = 10000;
 	public const string LogColor = "#7EF9FF";
 	public const string CommandPrefix = "> ";
 	public const string NullString = "nil";
@@ -144,7 +145,7 @@ public class Console : MonoBehaviour
 
 	#region Log
 	protected StringBuilder log = new StringBuilder(Length);
-	protected static string LogEnd = "</color>" + Environment.NewLine;
+	protected static string LogEnd = Environment.NewLine;
 
 	public void RegisterLogging()
 	{
@@ -233,8 +234,20 @@ public class Console : MonoBehaviour
 	public static void List(Type type)
 	{
 		MemberInfo[] members = type.GetMembers(BindingFlags.Public | BindingFlags.DeclaredOnly | BindingFlags.Static | BindingFlags.Instance);
-		Log($"{type.FullName} : {type.BaseType.FullName}");
-		members.ForEach(member => Log(MemberToString(type, member)));
+		var extensions =  from t in Assembly.GetExecutingAssembly().GetTypes() //from t in AppDomain.CurrentDomain.GetAssemblies().SelectMany(a => a.GetTypes())
+						where t.IsSealed && !t.IsGenericType() && !t.IsNested
+						from method in t.GetMethods(BindingFlags.Static
+							| BindingFlags.Public | BindingFlags.NonPublic)
+						where method.IsDefined(typeof(ExtensionAttribute), false)
+						where method.GetParameters()[0].ParameterType == type
+						select method;
+
+		var allMembers = members.Select(member => MemberToString(type, member))
+			.Union(extensions.Select(member => ExtensionToString(type, member)))
+			.OrderBy(member => member);
+
+		Log($"<b>{type.FullName} : {type.BaseType.FullName}</b>");
+		allMembers.ForEach(member => Log(member));
 	}
 
 	protected static string MemberToString(Type type, MemberInfo member)
@@ -286,6 +299,27 @@ public class Console : MonoBehaviour
 		return output.ToString();
 	}
 
+	protected static string ExtensionToString(Type type, MethodInfo method)
+	{
+		StringBuilder output = new StringBuilder();
+		output.Append($"{type.FullName}.{method.Name}");
+
+		ParameterInfo[] parameters = method.GetParameters();
+		output.Append("(");
+		bool first = true;
+		foreach (ParameterInfo parameterInfo in parameters.Skip(1))
+		{
+			if (first)
+				first = false;
+			else
+				output.Append(", ");
+			output.Append(parameterInfo.ParameterType.Name);
+		}
+		output.Append(")");
+
+		return output.ToString();
+	}
+
 	public static void ScrollToBottom()
 	{
 		instance.LogScroll.verticalNormalizedPosition = 0;
@@ -298,7 +332,7 @@ public class Console : MonoBehaviour
 	
 	public static void ClearLog()
 	{
-		//instance.log.Clear();
+		instance.log.Clear();
 		instance.LogText.text = "";
 	}
 	#endregion
