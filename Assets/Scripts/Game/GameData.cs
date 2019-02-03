@@ -7,6 +7,11 @@ namespace Game
 {
 	public class GameData
 	{
-		public List<Enemy> Enemies;
+		public List<EnemyData> Enemies;
+	}
+
+	public class EnemyData
+	{
+		public float MoveSpeed;
 	}
 }

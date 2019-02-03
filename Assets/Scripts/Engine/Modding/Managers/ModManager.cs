@@ -90,7 +90,7 @@ namespace Modding
 			new ZipModLoader()
 		};
 		
-		protected static IEnumerable<Mod> mods = new List<Mod>();
+		protected static IEnumerable<Mod> mods = Enumerable.Empty<Mod>();
 		protected static Dictionary<(Type type, ResourceFolder folder, string file), ResourceInfo> cachedResources 
 			= new Dictionary<(Type, ResourceFolder, string), ResourceInfo>();
 		protected static Dictionary<ResourceFolder, string> folderToString = new Dictionary<ResourceFolder, string>();
@@ -354,16 +354,19 @@ namespace Modding
 			if (cachedReference != null)
 				return cachedReference;
 
-			string path = GetModdingPath(folder, file);
-			foreach (Mod mod in mods)
+			if (mods.Any())
 			{
-				var (reference, filePath, parser) = mod.Load<T>(path);
-				if (reference != null)
+				string path = GetModdingPath(folder, file);
+				foreach (Mod mod in mods)
 				{
-					ResourceInfo resource = new ResourceInfo(mod, filePath, parser, reference);
-					cachedResources[(typeof(T), folder, file)] = resource;
-					ResourceLoaded?.Invoke(folder, file, resource);
-					return reference;
+					var (reference, filePath, parser) = mod.Load<T>(path);
+					if (reference != null)
+					{
+						ResourceInfo resource = new ResourceInfo(mod, filePath, parser, reference);
+						cachedResources[(typeof(T), folder, file)] = resource;
+						ResourceLoaded?.Invoke(folder, file, resource);
+						return reference;
+					}
 				}
 			}
 
@@ -376,16 +379,19 @@ namespace Modding
 			if (cachedReference != null)
 				return cachedReference;
 
-			string path = GetModdingPath(folder, file);
-			foreach (Mod mod in mods)
+			if (mods.Any())
 			{
-				var (reference, filePath, parser) = await mod.LoadAsync<T>(path);
-				if (reference != null)
+				string path = GetModdingPath(folder, file);
+				foreach (Mod mod in mods)
 				{
-					ResourceInfo resource = new ResourceInfo(mod, filePath, parser, reference);
-					cachedResources[(typeof(T), folder, file)] = resource;
-					ResourceLoaded?.Invoke(folder, file, resource);
-					return reference;
+					var (reference, filePath, parser) = await mod.LoadAsync<T>(path);
+					if (reference != null)
+					{
+						ResourceInfo resource = new ResourceInfo(mod, filePath, parser, reference);
+						cachedResources[(typeof(T), folder, file)] = resource;
+						ResourceLoaded?.Invoke(folder, file, resource);
+						return reference;
+					}
 				}
 			}
 

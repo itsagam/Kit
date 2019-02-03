@@ -234,7 +234,8 @@ public class Console : MonoBehaviour
 	public static void List(Type type)
 	{
 		MemberInfo[] members = type.GetMembers(BindingFlags.Public | BindingFlags.DeclaredOnly | BindingFlags.Static | BindingFlags.Instance);
-		var extensions =  from t in Assembly.GetExecutingAssembly().GetTypes() //from t in AppDomain.CurrentDomain.GetAssemblies().SelectMany(a => a.GetTypes())
+		var extensions =  from t in type.Assembly.GetTypes().Union(Assembly.GetExecutingAssembly().GetTypes())
+						  //from t in AppDomain.CurrentDomain.GetAssemblies().SelectMany(a => a.GetTypes())
 						where t.IsSealed && !t.IsGenericType() && !t.IsNested
 						from method in t.GetMethods(BindingFlags.Static
 							| BindingFlags.Public | BindingFlags.NonPublic)

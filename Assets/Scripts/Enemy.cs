@@ -4,25 +4,24 @@ using System.Collections.Generic;
 using UnityEngine;
 using UniRx;
 using UniRx.Toolkit;
+using Newtonsoft.Json;
 
+[JsonConverter(typeof(JsonPrefabConverter), "Enemies/{Type}")]
+[JsonObject(MemberSerialization.OptIn)]
 public class Enemy: MonoBehaviour
 {
-	public float MoveSpeed;
-	public Vector3 Position;
+	public float MoveSpeed = 10;
 
-	//public FloatReactiveProperty Speed = new FloatReactiveProperty(25.0f);
-
-	//public static float DefaultSpeed = 10;
-	//public float Speed = DefaultSpeed;
-
-	/*
-	public float Speed
+	[JsonProperty]
+	public Vector3 Position
 	{
-		get6324
-
+		get
 		{
-			return 10.0f;
+			return transform.position;
+		}
+		set
+		{
+			transform.position = value;
 		}
 	}
-	*/
 }

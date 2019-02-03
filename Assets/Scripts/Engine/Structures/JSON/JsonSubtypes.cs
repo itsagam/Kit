@@ -10,7 +10,8 @@ using TypeInfo = System.Type;
 using System.Reflection;
 #endif
 
-// https://github.com/manuc66/JsonSubTypes
+//  https://github.com/manuc66/JsonSubTypes
+//  Allows to create instances of subclasses depending on JSON.
 
 //  MIT License
 //  

@@ -10,6 +10,8 @@ using UnityEngine.Profiling;
 using UniRx;
 using Newtonsoft.Json;
 
+// TODO: Jump to correct line when double-click in Console
+
 public class Debugger
 {
 	public const string NullString = "Null";
