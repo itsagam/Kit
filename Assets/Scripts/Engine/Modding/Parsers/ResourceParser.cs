@@ -32,12 +32,12 @@ namespace Modding.Parsers
 			return certainty;
 		}
 
-		public virtual object Write<T>(T data, string path = null)
+		public virtual object Write<T>(T data, string path = null) where T : class
 		{
 			throw new NotImplementedException();
 		}
 
-		public virtual T Read<T>(object data, string path = null)
+		public virtual T Read<T>(object data, string path = null) where T : class
 		{
 			throw new NotImplementedException();
 		}

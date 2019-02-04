@@ -31,9 +31,12 @@ public class ResourceManager
 
 	protected static Dictionary<(Type type, ResourceFolder folder, string file), WeakReference> cachedResources 
 		= new Dictionary<(Type, ResourceFolder, string), WeakReference>();
-	
+
 	#region Loading
-	// The "where" clause hints the return type is a reference type and allows to return null
+	// The "where" clause does three things:
+	// 1) Allows to cast from UnityEngine.Object to T with "obj as T"
+	// 2) Allows to pass T to Resource.Load, otherwise there's an error
+	// 3) Allows to return null
 	public static T Load<T>(ResourceFolder folder, string file, bool modded = DefaultModding, bool merge = false) where T : class
 	{
 #if MODDING
@@ -470,17 +473,17 @@ public class ResourceManager
 	#endregion
 
 	#region Saving/Deleting
-	public static bool Save<T>(ResourceFolder folder, string file, T contents)
+	public static bool Save<T>(ResourceFolder folder, string file, T contents) where T : class
 	{
 		return Save(GetPath(folder, file), contents);
 	}
 
-	public static UniTask<bool> SaveAsync<T>(ResourceFolder folder, string file, T contents)
+	public static UniTask<bool> SaveAsync<T>(ResourceFolder folder, string file, T contents) where T : class
 	{
 		return SaveAsync(GetPath(folder, file), contents);
 	}
 
-	public static bool Save<T>(string fullPath, T contents)
+	public static bool Save<T>(string fullPath, T contents) where T : class
 	{
 		foreach (var (parser, certainty) in RankParsers(fullPath, contents.GetType()))
 		{
@@ -498,7 +501,7 @@ public class ResourceManager
 		return false;
 	}
 
-	public static UniTask<bool> SaveAsync<T>(string fullPath, T contents)
+	public static UniTask<bool> SaveAsync<T>(string fullPath, T contents) where T : class
 	{
 		foreach (var (parser, certainty) in RankParsers(fullPath, contents.GetType()))
 		{

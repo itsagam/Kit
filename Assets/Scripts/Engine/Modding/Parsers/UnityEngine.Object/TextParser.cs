@@ -27,7 +27,7 @@ namespace Modding.Parsers
 		{
 			TextAsset asset = new TextAsset((string) data);
 			asset.name = path;
-			return (T) (object) asset;
+			return asset as T;
 		}
 	}
 }

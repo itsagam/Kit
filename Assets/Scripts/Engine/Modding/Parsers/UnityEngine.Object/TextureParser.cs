@@ -31,7 +31,7 @@ namespace Modding.Parsers
 			texture = new Texture2D(0, 0);
 			texture.LoadImage((byte[]) data);
 			texture.name = path;
-			return (T) (object) texture;
+			return texture as T;
 		}
 	}
 }

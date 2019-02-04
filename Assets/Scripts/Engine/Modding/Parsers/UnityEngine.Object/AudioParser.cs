@@ -36,7 +36,7 @@ namespace Modding.Parsers
 
 		public override T Read<T>(object data, string path)
 		{
-			return (T) (object) WavUtility.ToAudioClip((byte[]) data, 0, path);
+			return WavUtility.ToAudioClip((byte[]) data, 0, path) as T;
 		}
 	}
 }
