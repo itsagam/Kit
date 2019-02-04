@@ -5,5 +5,5 @@ using UnityEngine;
 
 public class MeleeEnemy : Enemy
 {
-	public float FireRange;
+	public float AttackRange = 25;
 }

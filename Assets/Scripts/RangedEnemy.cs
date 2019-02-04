@@ -5,5 +5,5 @@ using UnityEngine;
 
 public class RangedEnemy : Enemy
 {
-	public float FireRange;
+	public float FireRange = 100;
 }

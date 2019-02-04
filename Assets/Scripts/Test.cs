@@ -10,62 +10,17 @@ using Modding.Parsers;
 using UniRx;
 using UniRx.Async;
 using XLua;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-using Game;
-
-// GameState:
-//---------------------------------------
-// JObject and PopulateObject
-//	[Prefab] attribute to tell which prefab to use while instantiating, may use replacements like "{Type}" in the path
-//		Pros: Works with inhereted types, manually work is not needed, properties show in inspector
-//		Cons: Changing Game Data would be harder since properties are duplicated
-
-// JSON
-//		Pros: Works with inhereted types, game state modifications are instant & easy since there's only one copy
-//		Cons: Have to manually write property accessors, properties don't show in inspector
-
-// GameData:
-//---------------------------------------
-// Static-fields (to be modifiable in Lua)
-//		Pros: No extra work required, properties show in inspector
-//		Cons: Can't find a way to work with inhereted types (statically bound), game state still has to be serialized
-
-// Constant values (to be modifiable in Lua)
-//		Pros: Easiest way to develop, properties show in inspector, works with inhereted types
-//		Cons: Have to load prefabs before values can be modified, game state still has to be serialized
 
 [Hotfix]
 public class Test : MonoBehaviour
 {	
 	public GameObject cube;
-	//JObject jState;
-	GameState GameState;
 
 #pragma warning disable CS1998
 	void Start()
 	{
 		//ModdingTest();
 		//await DataManager.LoadData();
-
-		GameState = ResourceManager.Load<GameState>(DataManager.DataFolder, DataManager.GameStateFile);
-		GameState.Enemies.Log(false);
-
-		/*
-		string json = await ResourceManager.ReadTextAsync(ResourceFolder.StreamingAssets, DataManager.GameStateFile);
-		var jSerializer = JsonSerializer.CreateDefault();
-		jState = JObject.Parse(json);
-		foreach (var jEnemy in jState["Enemies"].Children())
-		{
-			var instance = Instantiate(ResourceManager.Load<Enemy>(ResourceFolder.Resources, "Enemies/" + jEnemy["Type"].Value<string>()));
-			using (var jReader = jEnemy.CreateReader())
-				jSerializer.Populate(jReader, instance);
-
-			var serializer = instance.gameObject.AddComponent<Serializer>();
-			serializer.Token = jEnemy;
-			serializer.Object = instance;
-		}
-		*/
 	}
 #pragma warning restore CS1998
 
@@ -76,6 +31,8 @@ public class Test : MonoBehaviour
 
 	public void RunProfile()
 	{
+		var enemy = Instantiate(ResourceManager.Load<Enemy>(ResourceFolder.Resources, "Enemies/SwordEnemy"));
+
 	}
 
 	protected static void ModdingTest()

@@ -9,13 +9,5 @@ namespace Game
 {
 	public class GameState
 	{
-		public List<JObject> Enemies;
-	}
-	
-	[JsonPrefab("Enemies/{Type}")]
-	public class EnemyState
-	{
-		public string Type;
-		public Vector3 Position;
 	}
 }

@@ -9,10 +9,10 @@ using UniRx.Async;
 using Modding;
 using Modding.Parsers;
 
-// Notes: 1)	You have to provide file extension for ResourceFolder other than Resources if it is not loaded
-//				by ModManager because you can't enumerate and match files in Data/Resources/StreamingAssets on 
-//				platforms like Android. If the file is loaded by ModManager it can be loaded without providing 
-//				an extension since mods are always in an accessible folder which we can enumerate.
+// Notes:	You have to provide file extension for ResourceFolder other than Resources if it is not loaded
+//			by ModManager because you can't enumerate and match files in Data/Resources/StreamingAssets on 
+//			platforms like Android. If the file is loaded by ModManager it can be loaded without providing 
+//			an extension since mods are always in an accessible folder which we can enumerate.
 
 public class ResourceManager
 {
