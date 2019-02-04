@@ -6,10 +6,10 @@ using UniRx;
 using UniRx.Toolkit;
 using Newtonsoft.Json;
 
-[JsonConverter(typeof(JsonPrefabConverter), "Enemies/{Type}")]
 [JsonObject(MemberSerialization.OptIn)]
 public class Enemy: MonoBehaviour
 {
+	[JsonProperty]
 	public float MoveSpeed = 10;
 
 	[JsonProperty]

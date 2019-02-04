@@ -17,6 +17,11 @@ public static class EnumerableExtensions
 			action(obj);
 	}
 
+	public static void Log<T>(this IEnumerable<T> enumerable, bool serialize = true)
+	{
+		enumerable.ForEach(o => Debugger.Log(o, serialize));
+	}
+
 	public static int IndexOf<T>(this IEnumerable<T> source, T value)
 	{
 		int index = 0;

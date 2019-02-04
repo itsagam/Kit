@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Collections;
-using System.Collections.Specialized;
 using System.Collections.Generic;
 using System.Text;
 using System.Linq;
@@ -10,15 +9,14 @@ using UnityEngine.Profiling;
 using UniRx;
 using Newtonsoft.Json;
 
-// TODO: Jump to correct line when double-click in Console
-
 public class Debugger
 {
 	public const string NullString = "Null";
 
 	#region Profiling
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
-	protected static Stack<CustomSampler> runningProfiles = new Stack<CustomSampler>();
+	protected static Dictionary<string, CustomSampler> samples = new Dictionary<string, CustomSampler>();
+	protected static Stack<CustomSampler> runningSamples = new Stack<CustomSampler>();
 
 	public static void StartProfile(string name)
 	{
@@ -26,20 +24,23 @@ public class Debugger
 		if (sample == null)
 		{
 			sample = CustomSampler.Create(name);
+			samples.Add(name, sample);
 			LogProfile(sample);
 		}
-		runningProfiles.Push(sample);
+		runningSamples.Push(sample);
 		sample.Begin();
 	}
 
 	public static CustomSampler GetProfile(string name)
 	{
-		return Sampler.Get(name) as CustomSampler;
+		if (samples.TryGetValue(name, out CustomSampler sample))
+			return sample;
+		return null;
 	}
 
 	public static void EndProfile()
 	{
-		runningProfiles.Pop()?.End();
+		runningSamples.Pop()?.End();
 	}
 
 	protected static void LogProfile(CustomSampler sample)
@@ -63,17 +64,38 @@ public class Debugger
 
 	#region Logging
 
-	// Conditionals make these methods calls to be ignored in Release builds
+	// Conditionals make these methods calls be ignored in Release builds
 	[Conditional("UNITY_EDITOR"), Conditional("DEVELOPMENT_BUILD")]
-	public static void Log(string line)
+	public static void Log(string line, LogType type = LogType.Log)
 	{
-		UnityEngine.Debug.Log(line);
+		switch (type)
+		{
+			case LogType.Log:
+				UnityEngine.Debug.Log(line);
+				break;
+
+			case LogType.Warning:
+				UnityEngine.Debug.LogWarning(line);
+				break;
+
+			case LogType.Error:
+				UnityEngine.Debug.LogError(line);
+				break;
+
+			case LogType.Assert:
+				UnityEngine.Debug.LogAssertion(line);
+				break;
+
+			case LogType.Exception:
+				UnityEngine.Debug.LogException(new Exception(line));
+				break;
+		}
 	}
 
 	[Conditional("UNITY_EDITOR"), Conditional("DEVELOPMENT_BUILD")]
-	public static void Log(string type, string line)
+	public static void Log(string category, string line, LogType type = LogType.Log)
 	{
-		Log("[" + type + "] " + line);
+		Log("[" + category + "] " + line, type);
 	}
 
 	[Conditional("UNITY_EDITOR"), Conditional("DEVELOPMENT_BUILD")]
@@ -83,9 +105,9 @@ public class Debugger
 	}
 
 	[Conditional("UNITY_EDITOR"), Conditional("DEVELOPMENT_BUILD")]
-	public static void Log(string type, object obj, bool serialize = true)
+	public static void Log(string category, object obj, bool serialize = true)
 	{
-		Log(type, ObjectToString(obj, serialize));
+		Log(category, ObjectToString(obj, serialize));
 	}
 
 	public static string ObjectToString(object obj, bool serialize, string nullString = NullString)

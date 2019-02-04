@@ -42,7 +42,6 @@ public class Test : MonoBehaviour
 	//JObject jState;
 	GameState GameState;
 
-
 #pragma warning disable CS1998
 	void Start()
 	{
@@ -50,8 +49,7 @@ public class Test : MonoBehaviour
 		//await DataManager.LoadData();
 
 		GameState = ResourceManager.Load<GameState>(DataManager.DataFolder, DataManager.GameStateFile);
-		Debugger.Log(GameState);
-		//GameState.Enemies.ForEach(e => Debugger.Log(e));
+		GameState.Enemies.Log(false);
 
 		/*
 		string json = await ResourceManager.ReadTextAsync(ResourceFolder.StreamingAssets, DataManager.GameStateFile);
@@ -73,24 +71,11 @@ public class Test : MonoBehaviour
 
 	void OnDestroy()
 	{
-		//FindObjectsOfType<Serializer>().ForEach(s => s.Serialize());
-		//Debugger.Log(jState.ToString());
 		//ModManager.UnloadMods();
 	}
 
 	public void RunProfile()
 	{
-		/*
-		Debugger.StartProfile("Resources.Load");
-		for (int i = 0; i <= 100000; i++)
-			Resources.Load<Texture>("Textures/test");
-		Debugger.EndProfile();
-
-		Debugger.StartProfile("ResourceManager.Load");
-		for (int i = 0; i <= 100000; i++)
-			ResourceManager.Load<Texture>(ResourceFolder.Resources, "Textures/test");
-		Debugger.EndProfile();
-		*/
 	}
 
 	protected static void ModdingTest()
