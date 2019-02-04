@@ -29,14 +29,8 @@ public class Test : MonoBehaviour
 		//ModManager.UnloadMods();
 	}
 
-	public static object Load<T>(string file) where T: UnityEngine.Object
-	{
-		return ResourceManager.Load<Texture>(ResourceFolder.Resources, file, true, false);
-	}
-
 	public void RunProfile()
 	{
-		var enemy = Instantiate(ResourceManager.Load<Enemy>(ResourceFolder.Resources, "Enemies/SwordEnemy"));
 	}
 
 	protected static void ModdingTest()

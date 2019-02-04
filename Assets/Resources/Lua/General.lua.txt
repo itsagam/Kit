@@ -1,1 +1,9 @@
 UE = CS.UnityEngine
+
+function resource(path, type)
+	if (type == nil) then
+		return UE.Resources.Load(path)
+	else
+		return UE.Resources.Load(path, typeof(type))
+	end
+end

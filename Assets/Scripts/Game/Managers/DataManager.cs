@@ -22,12 +22,12 @@ namespace Game
 	
 		static DataManager()
 		{
-			//Observable.OnceApplicationQuit().Subscribe(u => SaveGameState());
+			Observable.OnceApplicationQuit().Subscribe(u => SaveGameState());
 		}
 
 		public static async UniTask LoadData()
 		{
-			//GameData = await LoadGameData();
+			GameData = await LoadGameData();
 			GameState = await LoadGameState();
 		}
 
