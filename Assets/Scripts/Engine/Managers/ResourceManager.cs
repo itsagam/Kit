@@ -473,17 +473,17 @@ public class ResourceManager
 	#endregion
 
 	#region Saving/Deleting
-	public static bool Save<T>(ResourceFolder folder, string file, T contents) where T : class
+	public static bool Save(ResourceFolder folder, string file, object contents)
 	{
 		return Save(GetPath(folder, file), contents);
 	}
 
-	public static UniTask<bool> SaveAsync<T>(ResourceFolder folder, string file, T contents) where T : class
+	public static UniTask<bool> SaveAsync(ResourceFolder folder, string file, object contents)
 	{
 		return SaveAsync(GetPath(folder, file), contents);
 	}
 
-	public static bool Save<T>(string fullPath, T contents) where T : class
+	public static bool Save(string fullPath, object contents)
 	{
 		foreach (var (parser, certainty) in RankParsers(fullPath, contents.GetType()))
 		{
@@ -501,7 +501,7 @@ public class ResourceManager
 		return false;
 	}
 
-	public static UniTask<bool> SaveAsync<T>(string fullPath, T contents) where T : class
+	public static UniTask<bool> SaveAsync(string fullPath, object contents)
 	{
 		foreach (var (parser, certainty) in RankParsers(fullPath, contents.GetType()))
 		{

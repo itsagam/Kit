@@ -24,7 +24,7 @@ namespace Modding.Parsers
 			return FromJson<T>((string) data);
 		}
 
-		public override object Write<T>(T data, string path = null)
+		public override object Write(object data, string path = null)
 		{
 			return ToJson(data);
 		}
