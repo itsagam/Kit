@@ -10,8 +10,6 @@ using UniRx;
 using UniRx.Async;
 using XLua;
 
-// UNDONE: Find a way to set default values in MonoBehaviours (LoadMerged with JSON/Lua...)
-
 namespace Modding
 {
     public class ModMetadata

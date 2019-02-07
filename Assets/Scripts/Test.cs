@@ -31,6 +31,17 @@ public class Test : MonoBehaviour
 
 	public void RunProfile()
 	{
+		/*
+		Debugger.StartProfile("ResourceManager.Load");
+		for (int i = 0; i < 100000; i++)
+			ResourceManager.Load<Texture>(ResourceFolder.Resources, "Textures/test");
+		Debugger.EndProfile();
+
+		Debugger.StartProfile("Resources.Load");
+		for (int i = 0; i < 100000; i++)
+			Resources.Load<Texture>("Textures/test");
+		Debugger.EndProfile();
+		*/
 	}
 
 	protected static void ModdingTest()

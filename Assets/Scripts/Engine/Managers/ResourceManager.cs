@@ -25,8 +25,7 @@ public class ResourceManager
 	// Default mode for modding in individual calls
 	public const bool DefaultModding = true;
 
-	public static event Action<ResourceFolder, string, object> ResourceLoaded;
-	public static event Action<ResourceFolder, string, object> ResourceReused;
+	public static event Action<ResourceFolder, string, object, bool> ResourceLoaded;
 	public static event Action<ResourceFolder, string> ResourceUnloaded;
 
 	protected static Dictionary<(Type type, ResourceFolder folder, string file), WeakReference> cachedResources 
@@ -84,7 +83,7 @@ public class ResourceManager
 			object reference = weakReference.Target;
 			if (reference != null)
 			{
-				ResourceReused?.Invoke(folder, file, reference);
+				ResourceLoaded?.Invoke(folder, file, reference, false);
 				return (T) reference;
 			}
 		}
@@ -113,7 +112,7 @@ public class ResourceManager
 		{
 			// Important to use [key], not Add(key) because the latter generates an error if key exists
 			cachedResources[(type, folder, file)] = new WeakReference(reference);
-			ResourceLoaded?.Invoke(folder, file, reference);
+			ResourceLoaded?.Invoke(folder, file, reference, true);
 		}
 		return reference;
 	}
@@ -139,7 +138,7 @@ public class ResourceManager
 		if (reference != null)
 		{
 			cachedResources[(type, folder, file)] = new WeakReference(reference);
-			ResourceLoaded?.Invoke(folder, file, reference);
+			ResourceLoaded?.Invoke(folder, file, reference, true);
 		}
 		return reference;
 	}
@@ -192,7 +191,7 @@ public class ResourceManager
 			}
 		}
 		cachedResources[(typeof(T), folder, file)] = new WeakReference(merged);
-		ResourceLoaded?.Invoke(folder, file, merged);
+		ResourceLoaded?.Invoke(folder, file, merged, true);
 		return merged;
 	}
 
@@ -243,7 +242,7 @@ public class ResourceManager
 			}
 		}
 		cachedResources[(typeof(T), folder, file)] = new WeakReference(merged);
-		ResourceLoaded?.Invoke(folder, file, merged);
+		ResourceLoaded?.Invoke(folder, file, merged, true);
 		return merged;
 	}
 #endif

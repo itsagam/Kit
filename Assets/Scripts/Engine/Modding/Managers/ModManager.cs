@@ -79,8 +79,7 @@ namespace Modding
 #if MODDING
 		public static event Action<Mod> ModLoaded;
 		public static event Action<Mod> ModUnloaded;
-		public static event Action<ResourceFolder, string, ResourceInfo> ResourceLoaded;
-		public static event Action<ResourceFolder, string, ResourceInfo> ResourceReused;
+		public static event Action<ResourceFolder, string, ResourceInfo, bool> ResourceLoaded;
 		public static event Action<ResourceFolder, string, Mod> ResourceUnloaded;
 
 		public static Dictionary<ModType, ModGroup> Groups = new Dictionary<ModType, ModGroup>();
@@ -341,7 +340,7 @@ namespace Modding
 				object reference = resource.Reference.Target;
 				if (reference != null)
 				{
-					ResourceReused?.Invoke(folder, file, resource);
+					ResourceLoaded?.Invoke(folder, file, resource, false);
 					return (T) reference;
 				}
 			}
@@ -364,7 +363,7 @@ namespace Modding
 					{
 						ResourceInfo resource = new ResourceInfo(mod, filePath, parser, reference);
 						cachedResources[(typeof(T), folder, file)] = resource;
-						ResourceLoaded?.Invoke(folder, file, resource);
+						ResourceLoaded?.Invoke(folder, file, resource, true);
 						return reference;
 					}
 				}
@@ -389,7 +388,7 @@ namespace Modding
 					{
 						ResourceInfo resource = new ResourceInfo(mod, filePath, parser, reference);
 						cachedResources[(typeof(T), folder, file)] = resource;
-						ResourceLoaded?.Invoke(folder, file, resource);
+						ResourceLoaded?.Invoke(folder, file, resource, true);
 						return reference;
 					}
 				}
