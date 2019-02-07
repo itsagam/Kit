@@ -14,37 +14,37 @@ public class ShowHideButton : MonoBehaviour, IPointerClickHandler
 
 	public enum ShowHideType
 	{
-		Popup,
+		Window,
 		Name
 	}
 
 	public ShowHideMode Mode;
 	public ShowHideType Type;
-	public Popup Popup;
+	public Window Window;
 	public string Name;
 
 	public void OnPointerClick (PointerEventData eventData)
 	{
 		switch (Type)
 		{
-			case ShowHideType.Popup:
-				if (Popup != null)
+			case ShowHideType.Window:
+				if (Window != null)
 				{
 					switch (Mode)
 					{
 						case ShowHideMode.Show:
-							Popup.Show();
+							Window.Show();
 							break;
 
 						case ShowHideMode.Hide:
-							Popup.Hide();
+							Window.Hide();
 							break;
 
 						case ShowHideMode.Toggle:
-							if (Popup.IsShown())
-								Popup.Hide();
+							if (Window.IsShown())
+								Window.Hide();
 							else
-								Popup.Show();
+								Window.Show();
 							break;
 					}
 				}
@@ -56,20 +56,20 @@ public class ShowHideButton : MonoBehaviour, IPointerClickHandler
 					switch (Mode)
 					{
 						case ShowHideMode.Show:
-							if (!Popup.IsShown(Name))
-								Popup.Show(Name);
+							if (!UIManager.IsShown(Name))
+								UIManager.Show(Name);
 							break;
 
 						case ShowHideMode.Hide:
-							if (Popup.IsShown(Name))
-								Popup.Hide(Name);
+							if (UIManager.IsShown(Name))
+								UIManager.Hide(Name);
 							break;
 
 						case ShowHideMode.Toggle:
-							if (Popup.IsShown(Name))
-								Popup.Hide(Name);
+							if (UIManager.IsShown(Name))
+								UIManager.Hide(Name);
 							else
-								Popup.Show(Name);
+								UIManager.Show(Name);
 							break;
 					}
 				}

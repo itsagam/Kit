@@ -6,7 +6,7 @@ using UnityEngine.EventSystems;
 public class GotoButton : MonoBehaviour, IPointerClickHandler
 {
 	public Wizard Wizard;
-	public Popup Step;
+	public Window Step;
 
 	public void OnPointerClick (PointerEventData eventData)
 	{

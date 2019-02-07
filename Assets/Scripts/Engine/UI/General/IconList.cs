@@ -11,7 +11,7 @@ public class IconList : MonoBehaviour
     public Icon Prefab;
     protected IEnumerable items;
 
-    public virtual void Refresh()
+    public virtual void Reload()
     {
         Clear();
         if (Items != null)
@@ -95,7 +95,7 @@ public class IconList : MonoBehaviour
         set
         {
             items = value;
-            Refresh();
+            Reload();
         }
     }
 }

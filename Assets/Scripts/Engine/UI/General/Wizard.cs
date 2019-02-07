@@ -6,16 +6,16 @@ using UnityEngine;
 using UnityEngine.UI;
 using UniRx;
 
-public class Wizard : Popup
+public class Wizard : Window
 {
-	public Popup Default;
+	public Window Default;
 	public string NextShowAnimation = "NextShow";
 	public string NextHideAnimation = "NextHide";
 	public string PreviousShowAnimation = "PreviousShow";
 	public string PreviousHideAnimation = "PreviousHide";
 
 	public int Index { get; protected set; } = -1;
-	public event Action<int, Popup, int, Popup> OnChange;
+	public event Action<int, Window, int, Window> OnChange;
 
 	protected override void Awake()
 	{
@@ -34,7 +34,7 @@ public class Wizard : Popup
 		if (IsBusy())
 			return false;
 
-		Popup previous = Active;
+		Window previous = Active;
 		if (IsValid(index))
 		{
 			bool isNext = index > Index;
@@ -42,14 +42,14 @@ public class Wizard : Popup
 			if (previous != null)
 			{
 				if (!previous.IsBusy())
-					previous.Hide(null, PopupHideMode.Auto, isNext ? NextHideAnimation : PreviousHideAnimation);
+					previous.Hide(null, WindowHideMode.Auto, isNext ? NextHideAnimation : PreviousHideAnimation);
 				else
 					return false;
 			}
 			else
 				Show();
 			Index = index;
-			Popup next = Active;
+			Window next = Active;
 			next.Show(default, null, previous == null ? null : (isNext ? NextShowAnimation : PreviousShowAnimation));
 			OnChange?.Invoke(previousIndex, previous, Index, next);
 		}
@@ -66,9 +66,9 @@ public class Wizard : Popup
 		return true;
 	}
 
-	public virtual bool GoTo(Popup popup)
+	public virtual bool GoTo(Window window)
 	{
-		int i = IndexOf(popup);
+		int i = IndexOf(window);
 		if (i >= 0)
 			return GoTo(i);
 		return false;
@@ -94,15 +94,15 @@ public class Wizard : Popup
 		return IsValid(Index);
 	}
 
-	public virtual int IndexOf(Popup popup)
+	public virtual int IndexOf(Window window)
 	{
-		Popup found = transform.GetComponentsInChildren<Popup>(true).FirstOrDefault(p => p == popup);
+		Window found = transform.GetComponentsInChildren<Window>(true).FirstOrDefault(p => p == window);
 		if (found != null)
 			return found.transform.GetSiblingIndex();
 		return -1;
 	}
 
-	public virtual Popup this[int index]
+	public virtual Window this[int index]
 	{
 		get
 		{
@@ -110,7 +110,7 @@ public class Wizard : Popup
 			{
 				Transform child = transform.GetChild(index);
 				if (child != null)
-					return child.GetComponent<Popup>();
+					return child.GetComponent<Window>();
 			}
 			return null;
 		}
@@ -124,7 +124,7 @@ public class Wizard : Popup
 		}
 	}
 
-	public virtual Popup Active
+	public virtual Window Active
 	{
 		get
 		{

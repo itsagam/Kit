@@ -10,7 +10,7 @@ public class Icon : MonoBehaviour
 {
     protected object data;
 
-    public virtual void Refresh()
+    public virtual void Reload()
     {
     }
 
@@ -23,7 +23,7 @@ public class Icon : MonoBehaviour
         set
         {
             data = value;
-            Refresh();
+            Reload();
         }
     }
 

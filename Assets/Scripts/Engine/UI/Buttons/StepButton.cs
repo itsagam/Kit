@@ -44,7 +44,7 @@ public class StepButton : MonoBehaviour
 		if (Wizard != null)
 		{
 			Wizard.OnChange += OnChange;
-			Wizard.OnPopupHiding += OnHide;
+			Wizard.OnWindowHiding += OnHide;
 		}
 	}
 
@@ -54,7 +54,7 @@ public class StepButton : MonoBehaviour
 			Button.gameObject.SetActive(false);
 	}
 
-	protected void OnChange(int previousIndex, Popup previous, int nextIndex, Popup next)
+	protected void OnChange(int previousIndex, Window previous, int nextIndex, Window next)
 	{
 		if (Wizard == null)
 			return;

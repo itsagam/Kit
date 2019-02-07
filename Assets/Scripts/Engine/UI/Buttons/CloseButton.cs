@@ -7,6 +7,6 @@ public class CloseButton : MonoBehaviour, IPointerClickHandler
 {
 	public void OnPointerClick (PointerEventData eventData)
 	{
-		Popup.Last?.Hide();
+		UIManager.Last?.Hide();
 	}
 }

@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UniRx;
 
-public class TimedPopup : Popup
+public class TimedWindow : Window
 {
 	public float Time = 3.0f;
 

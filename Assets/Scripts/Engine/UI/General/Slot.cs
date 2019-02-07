@@ -41,7 +41,7 @@ public class Slot: Icon, IDropHandler
 		Data = null;
 	}
 
-	public override void Refresh()
+	public override void Reload()
 	{
 		if (HasIcon)
 		{
