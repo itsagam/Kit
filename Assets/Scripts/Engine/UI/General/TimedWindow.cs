@@ -4,21 +4,20 @@ using System.Collections.Generic;
 using UnityEngine;
 using UniRx;
 
-public class TimedWindow : Window
+public class TimedPopup : Window
 {
 	public float Time = 3.0f;
 
 	protected IDisposable observable;
 
-	public override void Reshow(object data, Action onShown)
+	public override void Reshow(object data)
 	{
-		base.Reshow(data, onShown);
+		base.Reshow(data);
 		QueueHide();
 	}
 
 	protected override void OnShown()
 	{
-		base.OnShown();
 		QueueHide();
 	}
 

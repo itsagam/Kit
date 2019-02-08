@@ -32,7 +32,7 @@ public class Console : MonoBehaviour
 	protected static Console instance = null;
 
 	#region Initialization
-	[RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
+	//[RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
 	public static void Initialize()
 	{
 		if (instance == null)

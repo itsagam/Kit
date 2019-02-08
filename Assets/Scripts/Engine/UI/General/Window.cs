@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using UnityEngine;
 using UniRx;
+using UniRx.Async;
 
 public class Window : MonoBehaviour
 {
@@ -28,21 +29,20 @@ public class Window : MonoBehaviour
         gameObject.SetActive(false);
     }
 
-    public virtual bool Show(object data = null, Action onShown = null, string animation = UIManager.DefaultShowAnimation)
+    public virtual async UniTask Show(object data = null, string animation = UIManager.DefaultShowAnimation)
     {
-        if (IsShown())
-            return false;
+		if (IsShown)
+			return;
 
 		State = WindowState.Showing;
-        Data = data;
-		UIManager.Shown.Add(this);
-		gameObject.SetActive(true);
-
 		OnShowing();
 		OnWindowShowing?.Invoke();
-		//UIManager.OnWindowShowing?.Invoke(this);
+		UIManager.Shown.Add(this);
+		UIManager.InvokeEvent(WindowState.Showing, this);
 
-		bool animated = false;
+		Data = data;
+		gameObject.SetActive(true);
+
 		if (animator != null && animation != null)
         {
 			int animationHash = Animator.StringToHash(animation);
@@ -50,33 +50,30 @@ public class Window : MonoBehaviour
             {
                 animator.Play(animationHash);
                 animator.Update(0);
-				animated = true;
-				Observable.Timer(TimeSpan.FromSeconds(animator.GetCurrentAnimatorStateInfo(0).length)).Subscribe(l => this.onShown(onShown));
+				await Observable.Timer(TimeSpan.FromSeconds(animator.GetCurrentAnimatorStateInfo(0).length));
             }
         }
 		UIManager.Play(transform, ShowSound);
-		if (!animated)
-			this.onShown(onShown);
-        return true;
+
+		onShown();
     }
 
-	public virtual void Reshow(object data = null, Action onShown = null)
+	public virtual void Reshow(object data = null)
 	{
 		Data = data;
 		UIManager.Play(transform, ShowSound);
-		onShown?.Invoke();
 	}
 
-	public virtual bool Hide(Action onHidden = null, WindowHideMode mode = UIManager.DefaultWindowHideMode, string animation = UIManager.DefaultHideAnimation)
+	public virtual async UniTask Hide(WindowHideMode mode = UIManager.DefaultWindowHideMode, string animation = UIManager.DefaultHideAnimation)
     {
-        if (IsHidden())
-            return false;
+        if (IsHidden)
+            return;
 
         State = WindowState.Hiding;
         OnHiding();
 		OnWindowHiding?.Invoke();
-		//UIManager.OnWindowHiding?.Invoke(this);
-		bool animated = false;
+		UIManager.InvokeEvent(WindowState.Hiding, this);
+
 		if (animator != null && animation != null)
         {
             int animationHash = Animator.StringToHash(animation);
@@ -84,42 +81,37 @@ public class Window : MonoBehaviour
             {
                 animator.Play(animationHash);
                 animator.Update(0);
-                animated = true;
-				Observable.Timer(TimeSpan.FromSeconds(animator.GetCurrentAnimatorStateInfo(0).length)).Subscribe(l => this.onHidden(onHidden, mode));
+				await Observable.Timer(TimeSpan.FromSeconds(animator.GetCurrentAnimatorStateInfo(0).length));
             }
         }
 		UIManager.Play(transform, HideSound);
-        if (!animated)
-			this.onHidden(onHidden, mode);
-        return true;
+
+		onHidden(mode);
     }
 
-	private void onShown(Action onShown)
+	private void onShown()
 	{
 		State = WindowState.Shown;
 		OnShown();
-		onShown?.Invoke();
 		OnWindowShown?.Invoke();
-		//UIManager.OnWindowShown?.Invoke(this);
+		UIManager.InvokeEvent(WindowState.Shown, this);
 	}
 
-	private void onHidden(Action onHidden, WindowHideMode mode)
+	private void onHidden(WindowHideMode mode)
 	{
-		data = null;
 		State = WindowState.Hidden;
+		data = null;
 		if (mode == WindowHideMode.Destroy || (mode == WindowHideMode.Auto && isInstance))
-		{
 			Destroy(gameObject);
-		}
 		else
 		{
 			gameObject.SetActive(false);
 			UIManager.Shown.Remove(this);
 		}
+
 		OnHidden();
-		onHidden?.Invoke();
 		OnWindowHidden?.Invoke();
-		//UIManager.OnWindowHidden?.Invoke(this);
+		UIManager.InvokeEvent(WindowState.Hidden, this);
 	}
 
 	public virtual void MarkAsInstance()
@@ -158,20 +150,29 @@ public class Window : MonoBehaviour
 	#endregion
 
 	#region Public functions
-	public virtual bool IsBusy()
+	public virtual bool IsBusy
     {
-		return State == WindowState.Showing || State == WindowState.Hiding;
-    }
+		get
+		{ 
+			return State == WindowState.Showing || State == WindowState.Hiding;
+		}
+	}
 
-	public virtual bool IsShown()
+	public virtual bool IsShown
 	{
-		return State == WindowState.Shown;
+		get
+		{
+			return State == WindowState.Shown;
+		}
     }
 
-    public virtual bool IsHidden()
+    public virtual bool IsHidden
     {
-		return State == WindowState.Hidden;
-    }
+		get
+		{ 
+			return State == WindowState.Hidden;
+		}
+	}
 
 	public virtual object Data
 	{

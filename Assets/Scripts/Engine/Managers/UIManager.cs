@@ -4,14 +4,14 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using UnityEngine.UI;
+using UniRx.Async;
 
 public enum WindowState
 {
-	Shown,
 	Showing,
-	Hidden,
-	Hiding
+	Shown,
+	Hiding,
+	Hidden
 }
 
 public enum WindowConflictMode
@@ -43,12 +43,14 @@ public class UIManager
 	public static event Action<Window> OnWindowHiding;
 	public static event Action<Window> OnWindowHidden;
 
-	public static Window Show(string path,						
-							object data = null,
-							Transform parent = null,
-							Action onShown = null,
-							WindowConflictMode mode = DefaultConflictMode,
-							string animation = DefaultShowAnimation)
+	public static AudioSource Audio;
+
+	public static async UniTask<Window> Show(
+								string path,						
+								object data = null,
+								Transform parent = null,
+								WindowConflictMode mode = DefaultConflictMode,
+								string animation = DefaultShowAnimation)
 	{
 		string name = Path.GetFileName(path);
 		if (mode != WindowConflictMode.ShowNew)
@@ -62,11 +64,11 @@ public class UIManager
 						return null;
 
 					case WindowConflictMode.HidePrevious:
-						previous.Hide();
+						await previous.Hide();
 						break;
 
 					case WindowConflictMode.OverwriteData:
-						previous.Reshow(data, onShown);
+						previous.Reshow(data);
 						return previous;
 				}
 			}
@@ -81,30 +83,53 @@ public class UIManager
 		if (parent != null)
 			instance.transform.SetParent(parent, false);
 
-		instance.Show(data, onShown, animation);
-		instance.MarkAsInstance();
-
+		await instance.Show(data, animation);
+		
 		return instance;
 	}
 
-	public static bool Hide(string name,
-						Action onHidden = null,
+	public static async UniTask<bool> Hide(
+						string name,
 						WindowHideMode mode = DefaultWindowHideMode,
 						string animation = DefaultHideAnimation)
 	{
 		Window instance = Find(name);
 		if (instance != null)
-			return instance.Hide(onHidden, mode, animation);
+		{
+			await instance.Hide(mode, animation);
+			return true;
+		}
 		return false;
+	}
+
+	public static void InvokeEvent(WindowState state, Window window)
+	{
+		switch (state)
+		{
+			case WindowState.Showing:
+				OnWindowShowing?.Invoke(window);
+				break;
+			case WindowState.Shown:
+				OnWindowShown?.Invoke(window);
+				break;
+			case WindowState.Hiding:
+				OnWindowHiding?.Invoke(window);
+				break;
+			case WindowState.Hidden:
+				OnWindowHidden?.Invoke(window);
+				break;
+		}
 	}
 
 	public static void Play(Transform from, AudioClip clip)
 	{
-		Transform root = from.root;
-		AudioSource source = root.GetComponent<AudioSource>();
-		if (source == null)
-			source = root.gameObject.AddComponent<AudioSource>();
-		source.PlayOneShot(clip);
+		if (Audio == null)
+		{
+			GameObject audioGO = new GameObject("UIAudio");
+			Audio = audioGO.AddComponent<AudioSource>();
+			UnityEngine.Object.DontDestroyOnLoad(audioGO);
+		}
+		Audio.PlayOneShot(clip);
 	}
 
 	public static Window Find(string name)

@@ -3,11 +3,10 @@ using System.IO;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using UniRx.Async;
 using Modding.Parsers;
 
 #if MODDING
-
+using UniRx.Async;
 using Modding.Loaders;
 #endif
 

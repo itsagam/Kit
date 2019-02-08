@@ -5,6 +5,7 @@ using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 using UniRx;
+using UniRx.Async;
 
 public class Wizard : Window
 {
@@ -31,7 +32,7 @@ public class Wizard : Window
 		if (index == Index)
 			return false;
 		
-		if (IsBusy())
+		if (IsBusy)
 			return false;
 
 		Window previous = Active;
@@ -41,8 +42,8 @@ public class Wizard : Window
 			int previousIndex = Index;
 			if (previous != null)
 			{
-				if (!previous.IsBusy())
-					previous.Hide(null, WindowHideMode.Auto, isNext ? NextHideAnimation : PreviousHideAnimation);
+				if (!previous.IsBusy)
+					previous.Hide(WindowHideMode.Auto, isNext ? NextHideAnimation : PreviousHideAnimation);
 				else
 					return false;
 			}
@@ -50,12 +51,12 @@ public class Wizard : Window
 				Show();
 			Index = index;
 			Window next = Active;
-			next.Show(default, null, previous == null ? null : (isNext ? NextShowAnimation : PreviousShowAnimation));
+			next.Show(default, previous == null ? null : (isNext ? NextShowAnimation : PreviousShowAnimation));
 			OnChange?.Invoke(previousIndex, previous, Index, next);
 		}
 		else
 		{
-			if (previous != null && !previous.IsBusy())
+			if (previous != null && !previous.IsBusy)
 			{
 				Hide();
 				Index = index;

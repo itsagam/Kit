@@ -41,7 +41,7 @@ public class ShowHideButton : MonoBehaviour, IPointerClickHandler
 							break;
 
 						case ShowHideMode.Toggle:
-							if (Window.IsShown())
+							if (Window.IsShown)
 								Window.Hide();
 							else
 								Window.Show();
