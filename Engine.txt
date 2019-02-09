@@ -12,7 +12,6 @@ Library
 
 	Managers
 	---------------------------------
-		UI Manager
 		Data Manager
 		Audio Manager
 		Effects Manager

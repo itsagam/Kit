@@ -22,7 +22,6 @@ public class Test : MonoBehaviour
 	{
 		//ModdingTest();
 		//await DataManager.LoadData();
-
 	}
 #pragma warning restore CS1998
 
@@ -31,11 +30,8 @@ public class Test : MonoBehaviour
 		//ModManager.UnloadMods();
 	}
 
-	// TODO: Fix async warnings
 	public void Button()
 	{
-		UIManager.ShowWindow("TestWindow", null, Canvas.transform);
-
 		/*
 		Debugger.StartProfile("ResourceManager.Load");
 		for (int i = 0; i < 100000; i++)

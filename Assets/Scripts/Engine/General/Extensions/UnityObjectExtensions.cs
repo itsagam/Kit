@@ -7,6 +7,6 @@ public static class UnityObjectExtensions
 {
 	public static void Destroy(this UnityEngine.Object obj)
 	{
-		UnityEngine.Object.Destroy(obj);
+		GameObject.Destroy(obj);
 	}
 }

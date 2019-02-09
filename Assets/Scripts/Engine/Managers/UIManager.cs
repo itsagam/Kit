@@ -46,18 +46,18 @@ public class UIManager
 
 	protected static AudioSource audio;
 
-	public static UniTask<Window> ShowWindow(
+	public static async UniTask<Window> ShowWindow(
 								string path,
 								object data = null,
 								Transform parent = null,
 								WindowConflictMode mode = DefaultConflictMode,
 								string animation = DefaultShowAnimation)
 	{
-		Window prefab = ResourceManager.Load<Window>(ResourceFolder.Resources, path);
+		Window prefab = await ResourceManager.LoadAsync<Window>(ResourceFolder.Resources, path);
 		if (prefab != null)
-			return ShowWindow(prefab, data, parent, mode, animation);
+			return await ShowWindow(prefab, data, parent, mode, animation);
 		else
-			return UniTask.FromResult<Window>(null);
+			return null;
 	}
 
 	public static async UniTask<Window> ShowWindow(
@@ -90,14 +90,13 @@ public class UIManager
 			}
 		}
 		
-		Window instance = UnityEngine.Object.Instantiate(prefab);
+		Window instance = GameObject.Instantiate(prefab);
 		instance.name = prefab.name;
 		instance.MarkAsInstance();
-		RegisterWindow(instance);
 
 		if (parent == null)
 		{
-			parent = UnityEngine.Object.FindObjectOfType<Canvas>()?.transform;
+			parent = GameObject.FindObjectOfType<Canvas>()?.transform;
 			if (parent == null)
 				parent = CreateCanvas().transform;
 		}
@@ -189,7 +188,8 @@ public class UIManager
 			{
 				GameObject audioGO = new GameObject("UIAudio");
 				audio = audioGO.AddComponent<AudioSource>();
-				UnityEngine.Object.DontDestroyOnLoad(audioGO);
+				audio.spatialBlend = 0;
+				GameObject.DontDestroyOnLoad(audioGO);
 			}
 			return audio;
 		}

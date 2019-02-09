@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UniRx;
+using UniRx.Async;
 
 public class TimedPopup : Window
 {
@@ -20,7 +21,7 @@ public class TimedPopup : Window
 		observable?.Dispose();
 		observable = Observable.Timer(TimeSpan.FromSeconds(Time)).Subscribe(t => {
 			observable = null;
-			Hide();
+			Hide().Forget();
 		});
 	}
 }

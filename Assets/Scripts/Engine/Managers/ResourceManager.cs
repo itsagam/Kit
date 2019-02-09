@@ -317,7 +317,7 @@ public class ResourceManager
 			if (key.file == null || key.folder == ResourceFolder.Resources)
 				Resources.UnloadAsset(unityObject);
 			else
-				UnityEngine.Object.Destroy(unityObject);
+				GameObject.Destroy(unityObject);
 		}
 		
 		// Because of FirstOrDefault, if key is not found "file" will be null
@@ -346,7 +346,7 @@ public class ResourceManager
 				if (folder == ResourceFolder.Resources)
 					Resources.UnloadAsset(unityObject);
 				else
-					UnityEngine.Object.Destroy(unityObject);
+					GameObject.Destroy(unityObject);
 			}
 			cachedResources.Remove(key);
 			ResourceUnloaded?.Invoke(folder, file);

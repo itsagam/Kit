@@ -18,69 +18,68 @@ public class Wizard : Window
 	public int Index { get; protected set; } = -1;
 	public event Action<int, Window, int, Window> OnChange;
 
-	protected override void Awake()
+	protected void Start()
 	{
-		base.Awake();
-		Observable.NextFrame().Subscribe(t => {
-				if (Default != null)
-					GoTo(Default);
-			});
+		if (Default != null)
+			GoTo(Default);
 	}
 
-	public virtual bool GoTo(int index)
-	{
-		if (index == Index)
-			return false;
-		
+	public virtual async UniTask<bool> GoTo(int index)
+	{		
 		if (IsBusy)
 			return false;
 
+		if (index == Index)
+			return true;
+
 		Window previous = Active;
+		if (previous != null && previous.IsBusy)
+			return false;
+
 		if (IsValid(index))
 		{
+			Window next = this[index];
+			if (next == null || next.IsBusy)
+				return false;
+
 			bool isNext = index > Index;
 			int previousIndex = Index;
-			if (previous != null)
-			{
-				if (!previous.IsBusy)
-					previous.Hide(WindowHideMode.Auto, isNext ? NextHideAnimation : PreviousHideAnimation);
-				else
-					return false;
-			}
-			else
-				Show();
 			Index = index;
-			Window next = Active;
-			next.Show(default, previous == null ? null : (isNext ? NextShowAnimation : PreviousShowAnimation));
+
+			UniTask<bool> previousTask;
+			if (previous == null)
+				previousTask = Show();
+			else
+				previousTask = previous.Hide(WindowHideMode.Auto, isNext ? NextHideAnimation : PreviousHideAnimation);
+
+			UniTask<bool> nextTask = next.Show(null, previous == null ? null : (isNext ? NextShowAnimation : PreviousShowAnimation));
+
+			await UniTask.WhenAll(previousTask, nextTask);
+
 			OnChange?.Invoke(previousIndex, previous, Index, next);
 		}
 		else
 		{
-			if (previous != null && !previous.IsBusy)
-			{
-				Hide();
-				Index = index;
-			}
-			else
-				return false;
+			Index = index;
+			await Hide();
 		}
 		return true;
 	}
 
-	public virtual bool GoTo(Window window)
+	public virtual UniTask<bool> GoTo(Window window)
 	{
 		int i = IndexOf(window);
 		if (i >= 0)
 			return GoTo(i);
-		return false;
+		return UniTask.FromResult(false);
 	}
 
-	public virtual bool Next()
+	public virtual UniTask<bool> Next()
 	{
 		return GoTo(Index + 1);
 	}
 
-	public virtual bool Previous()
+	public virtual UniTask<bool> Previous()
 	{
 		return GoTo(Index - 1);
 	}
@@ -88,11 +87,6 @@ public class Wizard : Window
 	public virtual bool IsValid(int index)
 	{
 		return index >= 0 && index < Count;
-	}
-
-	public virtual bool IsValid()
-	{
-		return IsValid(Index);
 	}
 
 	public virtual int IndexOf(Window window)
@@ -108,11 +102,7 @@ public class Wizard : Window
 		get
 		{
 			if (IsValid(index))
-			{
-				Transform child = transform.GetChild(index);
-				if (child != null)
-					return child.GetComponent<Window>();
-			}
+				return transform.GetChild(index)?.GetComponent<Window>();
 			return null;
 		}
 	}

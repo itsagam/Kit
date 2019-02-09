@@ -206,7 +206,7 @@ public class SceneManager
 			onProgress?.Invoke(load.progress);
 			yield return null;
         }
-		onComplete?.Invoke();		
+		onComplete?.Invoke();
 	}
 
 	public static FadeBuilder Fade(float to)

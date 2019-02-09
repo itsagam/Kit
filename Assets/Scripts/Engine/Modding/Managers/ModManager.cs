@@ -674,7 +674,7 @@ namespace Modding
 		protected static void UnloadInternal(object resource)
 		{
 			if (resource is UnityEngine.Object unityObject)
-				UnityEngine.Object.Destroy(unityObject);
+				GameObject.Destroy(unityObject);
 		}
 		#endregion
 

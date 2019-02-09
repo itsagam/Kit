@@ -152,7 +152,7 @@ public class JsonPrefabConverter : JsonConverter
 		if (prefab == null)
 			return null;
 
-		var instance = UnityEngine.Object.Instantiate(prefab);
+		var instance = GameObject.Instantiate(prefab);
 		instance.name = prefab.name;
 		using (var jObjectReader = jObject.CreateReader())
 			serializer.Populate(jObjectReader, instance);
@@ -241,7 +241,7 @@ public class JsonPrefab
 		if (prefab == null)
 			return null;
 
-		var instance = UnityEngine.Object.Instantiate(prefab);
+		var instance = GameObject.Instantiate(prefab);
 		instance.name = prefab.name;
 		using (var jObjectReader = jObject.CreateReader())
 			serializer.Populate(jObjectReader, instance);

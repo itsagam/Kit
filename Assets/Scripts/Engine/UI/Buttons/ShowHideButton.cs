@@ -2,6 +2,8 @@
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
+using UniRx;
+using UniRx.Async;
 
 public class ShowHideButton : MonoBehaviour, IPointerClickHandler
 {
@@ -33,18 +35,18 @@ public class ShowHideButton : MonoBehaviour, IPointerClickHandler
 					switch (Mode)
 					{
 						case ShowHideMode.Show:
-							Window.Show();
+							Window.Show().Forget();
 							break;
 
 						case ShowHideMode.Hide:
-							Window.Hide();
+							Window.Hide().Forget();
 							break;
 
 						case ShowHideMode.Toggle:
 							if (Window.IsShown)
-								Window.Hide();
+								Window.Hide().Forget();
 							else
-								Window.Show();
+								Window.Show().Forget();
 							break;
 					}
 				}
@@ -57,19 +59,19 @@ public class ShowHideButton : MonoBehaviour, IPointerClickHandler
 					{
 						case ShowHideMode.Show:
 							if (!UIManager.IsShown(Name))
-								UIManager.ShowWindow(Name);
+								UIManager.ShowWindow(Name).Forget();
 							break;
 
 						case ShowHideMode.Hide:
 							if (UIManager.IsShown(Name))
-								UIManager.HideWindow(Name);
+								UIManager.HideWindow(Name).Forget();
 							break;
 
 						case ShowHideMode.Toggle:
 							if (UIManager.IsShown(Name))
-								UIManager.HideWindow(Name);
+								UIManager.HideWindow(Name).Forget();
 							else
-								UIManager.ShowWindow(Name);
+								UIManager.ShowWindow(Name).Forget();
 							break;
 					}
 				}
