@@ -4,6 +4,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.UI;
 using UniRx.Async;
 
 public enum WindowState
@@ -33,29 +34,43 @@ public class UIManager
 {
 	public const string DefaultShowAnimation = "Show";
 	public const string DefaultHideAnimation = "Hide";
-	public const WindowConflictMode DefaultConflictMode = WindowConflictMode.HidePrevious;
+	public const WindowConflictMode DefaultConflictMode = WindowConflictMode.ShowNew;
 	public const WindowHideMode DefaultWindowHideMode = WindowHideMode.Auto;
 
-	public static List<Window> Shown = new List<Window>();
+	public static List<Window> Windows = new List<Window>();
 
 	public static event Action<Window> OnWindowShowing;
 	public static event Action<Window> OnWindowShown;
 	public static event Action<Window> OnWindowHiding;
 	public static event Action<Window> OnWindowHidden;
 
-	public static AudioSource Audio;
+	protected static AudioSource audio;
 
-	public static async UniTask<Window> Show(
-								string path,						
+	public static UniTask<Window> ShowWindow(
+								string path,
 								object data = null,
 								Transform parent = null,
 								WindowConflictMode mode = DefaultConflictMode,
 								string animation = DefaultShowAnimation)
 	{
-		string name = Path.GetFileName(path);
+		Window prefab = ResourceManager.Load<Window>(ResourceFolder.Resources, path);
+		if (prefab != null)
+			return ShowWindow(prefab, data, parent, mode, animation);
+		else
+			return UniTask.FromResult<Window>(null);
+	}
+
+	public static async UniTask<Window> ShowWindow(
+							Window prefab,
+							object data = null,
+							Transform parent = null,
+							WindowConflictMode mode = DefaultConflictMode,
+							string animation = DefaultShowAnimation)
+	{
+
 		if (mode != WindowConflictMode.ShowNew)
 		{
-			Window previous = Find(name);
+			Window previous = FindWindow(prefab.name);
 			if (previous != null)
 			{
 				switch (mode)
@@ -64,97 +79,119 @@ public class UIManager
 						return null;
 
 					case WindowConflictMode.HidePrevious:
-						await previous.Hide();
+						if (!await previous.Hide())
+							return null;
 						break;
 
 					case WindowConflictMode.OverwriteData:
-						previous.Reshow(data);
+						previous.Data = data;
 						return previous;
 				}
 			}
 		}
-
-		Window prefab = ResourceManager.Load<Window>(ResourceFolder.Resources, path);
+		
 		Window instance = UnityEngine.Object.Instantiate(prefab);
 		instance.name = prefab.name;
+		instance.MarkAsInstance();
+		RegisterWindow(instance);
 
 		if (parent == null)
+		{
 			parent = UnityEngine.Object.FindObjectOfType<Canvas>()?.transform;
-		if (parent != null)
-			instance.transform.SetParent(parent, false);
+			if (parent == null)
+				parent = CreateCanvas().transform;
+		}
+		instance.transform.SetParent(parent, false);
 
 		await instance.Show(data, animation);
-		
+
 		return instance;
 	}
 
-	public static async UniTask<bool> Hide(
+	public static UniTask<bool> HideWindow(
 						string name,
 						WindowHideMode mode = DefaultWindowHideMode,
 						string animation = DefaultHideAnimation)
 	{
-		Window instance = Find(name);
-		if (instance != null)
-		{
-			await instance.Hide(mode, animation);
-			return true;
-		}
-		return false;
+		return HideWindow(FindWindow(name), mode, animation);
 	}
 
-	public static void InvokeEvent(WindowState state, Window window)
+	public static UniTask<bool> HideWindow(
+					Window window,
+					WindowHideMode mode = DefaultWindowHideMode,
+					string animation = DefaultHideAnimation)
 	{
-		switch (state)
-		{
-			case WindowState.Showing:
-				OnWindowShowing?.Invoke(window);
-				break;
-			case WindowState.Shown:
-				OnWindowShown?.Invoke(window);
-				break;
-			case WindowState.Hiding:
-				OnWindowHiding?.Invoke(window);
-				break;
-			case WindowState.Hidden:
-				OnWindowHidden?.Invoke(window);
-				break;
-		}
+		if (window != null)
+			return window.Hide(mode, animation);	
+		else
+			return UniTask.FromResult(false);
 	}
 
 	public static void Play(Transform from, AudioClip clip)
 	{
-		if (Audio == null)
-		{
-			GameObject audioGO = new GameObject("UIAudio");
-			Audio = audioGO.AddComponent<AudioSource>();
-			UnityEngine.Object.DontDestroyOnLoad(audioGO);
-		}
-		Audio.PlayOneShot(clip);
+		if (clip != null)
+			Audio.PlayOneShot(clip);
 	}
 
-	public static Window Find(string name)
+	public static Window FindWindow(string name)
 	{
-		return Shown.Find(w => w.name == name);
+		return Windows.Find(w => w.name == name);
 	}
 
 	public static bool IsShown(string name)
 	{
-		return Find(name) != null;
+		return FindWindow(name) != null;
 	}
 
-	public static Window First
+	public static void RegisterWindow(Window instance)
+	{
+		instance.OnWindowShowing += () => OnWindowShowing?.Invoke(instance);
+		instance.OnWindowShown += () => OnWindowShown?.Invoke(instance);
+		instance.OnWindowHiding += () => OnWindowHiding?.Invoke(instance);
+		instance.OnWindowHidden += () => OnWindowHidden?.Invoke(instance);
+	}
+
+	protected static Canvas CreateCanvas()
+	{
+		GameObject ui = new GameObject("UI");
+		ui.layer = LayerMask.NameToLayer("UI");
+
+		Canvas canvas = ui.AddComponent<Canvas>();
+		canvas.renderMode = RenderMode.ScreenSpaceOverlay;
+
+		ui.AddComponent<CanvasScaler>();
+		ui.AddComponent<GraphicRaycaster>();
+
+		return canvas;
+	}
+
+	public static Window FirstWindow
 	{
 		get
 		{
-			return Shown.FirstOrDefault();
+			return Windows.FirstOrDefault();
 		}
 	}
 
-	public static Window Last
+	public static Window LastWindow
 	{
 		get
 		{
-			return Shown.LastOrDefault();
+			return Windows.LastOrDefault();
+		}
+	}
+
+	public static AudioSource Audio
+	{
+		get
+		{
+			if (audio == null)
+			{
+				GameObject audioGO = new GameObject("UIAudio");
+				audio = audioGO.AddComponent<AudioSource>();
+				UnityEngine.Object.DontDestroyOnLoad(audioGO);
+			}
+			return audio;
 		}
 	}
 }

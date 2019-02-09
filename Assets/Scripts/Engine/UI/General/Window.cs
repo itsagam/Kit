@@ -27,66 +27,69 @@ public class Window : MonoBehaviour
     {
         animator = GetComponent<Animator>();
         gameObject.SetActive(false);
+		UIManager.RegisterWindow(this);
     }
 
-    public virtual async UniTask Show(object data = null, string animation = UIManager.DefaultShowAnimation)
-    {
+	public virtual async UniTask<bool> Show(object data = null, string animation = UIManager.DefaultShowAnimation)
+	{
+		if (IsBusy)
+			return false;
+
 		if (IsShown)
-			return;
+			return true;
 
 		State = WindowState.Showing;
 		OnShowing();
 		OnWindowShowing?.Invoke();
-		UIManager.Shown.Add(this);
-		UIManager.InvokeEvent(WindowState.Showing, this);
-
+		UIManager.Windows.Add(this);
+		
 		Data = data;
 		gameObject.SetActive(true);
 
 		if (animator != null && animation != null)
-        {
+		{
 			int animationHash = Animator.StringToHash(animation);
-            if (animator.HasState(0, animationHash))
-            {
-                animator.Play(animationHash);
-                animator.Update(0);
+			if (animator.HasState(0, animationHash))
+			{
+				animator.Play(animationHash);
+				//animator.Update(0);
 				await Observable.Timer(TimeSpan.FromSeconds(animator.GetCurrentAnimatorStateInfo(0).length));
-            }
-        }
+			}
+		}
 		UIManager.Play(transform, ShowSound);
 
 		onShown();
-    }
 
-	public virtual void Reshow(object data = null)
-	{
-		Data = data;
-		UIManager.Play(transform, ShowSound);
+		return true;
 	}
 
-	public virtual async UniTask Hide(WindowHideMode mode = UIManager.DefaultWindowHideMode, string animation = UIManager.DefaultHideAnimation)
+	public virtual async UniTask<bool> Hide(WindowHideMode mode = UIManager.DefaultWindowHideMode, string animation = UIManager.DefaultHideAnimation)
     {
+		if (IsBusy)
+			return false;
+
         if (IsHidden)
-            return;
+            return true;
 
         State = WindowState.Hiding;
         OnHiding();
 		OnWindowHiding?.Invoke();
-		UIManager.InvokeEvent(WindowState.Hiding, this);
-
+		
 		if (animator != null && animation != null)
         {
             int animationHash = Animator.StringToHash(animation);
             if (animator.HasState(0, animationHash))
             {
                 animator.Play(animationHash);
-                animator.Update(0);
+                //animator.Update(0);
 				await Observable.Timer(TimeSpan.FromSeconds(animator.GetCurrentAnimatorStateInfo(0).length));
             }
         }
 		UIManager.Play(transform, HideSound);
 
 		onHidden(mode);
+
+		return true;
     }
 
 	private void onShown()
@@ -94,7 +97,6 @@ public class Window : MonoBehaviour
 		State = WindowState.Shown;
 		OnShown();
 		OnWindowShown?.Invoke();
-		UIManager.InvokeEvent(WindowState.Shown, this);
 	}
 
 	private void onHidden(WindowHideMode mode)
@@ -106,12 +108,11 @@ public class Window : MonoBehaviour
 		else
 		{
 			gameObject.SetActive(false);
-			UIManager.Shown.Remove(this);
+			UIManager.Windows.Remove(this);
 		}
 
 		OnHidden();
 		OnWindowHidden?.Invoke();
-		UIManager.InvokeEvent(WindowState.Hidden, this);
 	}
 
 	public virtual void MarkAsInstance()
@@ -121,7 +122,7 @@ public class Window : MonoBehaviour
 
 	protected virtual void OnDestroy()
 	{
-		UIManager.Shown.Remove(this);
+		UIManager.Windows.Remove(this);
 	}
 	#endregion
 

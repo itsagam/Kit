@@ -13,14 +13,16 @@ using XLua;
 
 [Hotfix]
 public class Test : MonoBehaviour
-{	
+{
+	public Canvas Canvas;
 	public GameObject cube;
 
 #pragma warning disable CS1998
-	void Start()
+	async UniTask Start()
 	{
 		//ModdingTest();
 		//await DataManager.LoadData();
+
 	}
 #pragma warning restore CS1998
 
@@ -29,10 +31,10 @@ public class Test : MonoBehaviour
 		//ModManager.UnloadMods();
 	}
 
-	public void RunProfile()
+	// TODO: Fix async warnings
+	public void Button()
 	{
-		UIManager.Show("TestWindow");
-		print("Hello");
+		UIManager.ShowWindow("TestWindow", null, Canvas.transform);
 
 		/*
 		Debugger.StartProfile("ResourceManager.Load");

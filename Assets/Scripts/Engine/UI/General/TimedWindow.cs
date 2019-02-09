@@ -10,12 +10,6 @@ public class TimedPopup : Window
 
 	protected IDisposable observable;
 
-	public override void Reshow(object data)
-	{
-		base.Reshow(data);
-		QueueHide();
-	}
-
 	protected override void OnShown()
 	{
 		QueueHide();
