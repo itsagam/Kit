@@ -20,6 +20,10 @@ public class Stats : Dictionary<string, float>
 		{
 			return GetCurrentValue(name);
 		}
+		set
+		{
+			SetBaseValue(name, value);
+		}
 	}
 
 	public float GetBaseValue(string name)
@@ -27,6 +31,12 @@ public class Stats : Dictionary<string, float>
 		return base[name];
 	}
 
+	public float SetBaseValue(string name, float value)
+	{
+		return base[name] = value;
+	}
+
+	// TODO: Cache values rather than calculate every time
 	public float GetCurrentValue(string name)
 	{
 		float baseValue = base[name];
@@ -34,7 +44,7 @@ public class Stats : Dictionary<string, float>
 		if (Upgradeable != null && Upgradeable.Upgrades != null)
 		{
 			float valueSum = 0, percentSum = 0, multiplierSum = 1;
-			foreach (Upgrade upgrade in Upgradeable.Upgrades)
+			foreach (Upgrade upgrade in Upgradeable.Upgrades.Values)
 			{
 				foreach (Effect effect in upgrade)
 				{
@@ -67,59 +77,71 @@ public class Stats : Dictionary<string, float>
 
 public interface IUpgradeable
 {
-	List<Upgrade> Upgrades { get; }
+	Dictionary<string, Upgrade> Upgrades { get; }
+}
+
+public enum BuffMode
+{
+	Add,
+	Extend,
+	Keep,
+	Replace,
+	Longer,
+	Shorter,
 }
 
 public class Buff : Upgrade
 {
-	public string ID;
 	public float Time;
 	public BuffMode Mode = BuffMode.Extend;
 
 	public Buff()
+		: base()
 	{
 	}
 
-	// TODO: Fix id resolve (Make List<Upgrade> a dictionary?)
 	public Buff(string id, float time, IEnumerable<Effect> effects, BuffMode mode = BuffMode.Extend)
+		: base(id, effects)
 	{
-		ID = id;
 		Time = time;
 		Mode = mode;
-		AddRange(effects);
 	}
 
-	public void AddTo(IUpgradeable upgradeable)
+	public override void AddTo(IUpgradeable upgradeable)
 	{
 		AddTo(upgradeable, Mode);
 	}
 
-	public void AddTo(List<Upgrade> upgrades)
+	public override void AddTo(Dictionary<string, Upgrade> upgrades)
 	{
 		AddTo(upgrades, Mode);
 	}
 
-	public void AddTo(IUpgradeable upgradeable, BuffMode mode)
+	public virtual void AddTo(IUpgradeable upgradeable, BuffMode mode)
 	{
 		AddTo(upgradeable.Upgrades, mode);
 	}
 
-	public void AddTo(List<Upgrade> upgrades, BuffMode mode)
+	public virtual void AddTo(Dictionary<string, Upgrade> upgrades, BuffMode mode)
 	{
 		if (upgrades == null)
 			return;
 
 		Buff previous = null;
 		if (mode != BuffMode.Add)
-			previous = upgrades.OfType<Buff>().FirstOrDefault(b => b.ID == ID);
+		{
+			upgrades.TryGetValue(ID, out Upgrade upgrade);
+			if (upgrade is Buff buff)
+				previous = buff;
+		}
 
 		if (mode == BuffMode.Add || previous == null)
 		{
-			upgrades.Add(this);
+			base.AddTo(upgrades);
 			Observable.Timer(TimeSpan.FromSeconds(Time)).Subscribe(l =>
 			{
 				try {
-					upgrades.Remove(this);
+					base.RemoveFrom(upgrades);
 				}
 				catch {}
 			});
@@ -152,18 +174,46 @@ public class Buff : Upgrade
 	}
 }
 
-public enum BuffMode
-{
-	Add,
-	Extend,
-	Keep,
-	Replace,
-	Longer,
-	Shorter,
-}
-
 public class Upgrade: List<Effect>
 {
+	public string ID;
+
+	public Upgrade()
+	{
+	}
+
+	public Upgrade(string id, IEnumerable<Effect> effects)
+	{
+		ID = id;
+		AddRange(effects);
+	}
+
+	public virtual void AddTo(IUpgradeable upgradeable)
+	{
+		AddTo(upgradeable.Upgrades);
+	}
+
+	public virtual void AddTo(Dictionary<string, Upgrade> upgrades)
+	{
+		upgrades.Add(ID, this);
+	}
+
+	public virtual void RemoveFrom(IUpgradeable upgradeable)
+	{
+		RemoveFrom(upgradeable.Upgrades);
+	}
+
+	public virtual void RemoveFrom(Dictionary<string, Upgrade> upgrades)
+	{
+		upgrades.Remove(ID);
+	}
+}
+
+public enum EffectType
+{
+	Multiplier,
+	Percentage,
+	Value,
 }
 
 public class Effect
@@ -227,11 +277,4 @@ public class Effect
 		}
 		return output;
 	}
-}
-
-public enum EffectType
-{
-	Multiplier,
-	Percentage,
-	Value,
 }

@@ -15,16 +15,13 @@ using XLua;
 public class Test : MonoBehaviour
 {
 	public GameObject cube;
+	public FloatReactiveProperty Health = new FloatReactiveProperty(100);
+	public FloatReactiveProperty Damage = new FloatReactiveProperty(10);
 
 #pragma warning disable CS1998
 	async UniTask Start()
 	{
 		//ModdingTest();
-
-		Upgrade u = new Upgrade();
-		u.Add(new Effect("Health", "+100"));
-		u.Add(new Effect("Damage", "+50%"));
-		u.Log(false);
 	}
 #pragma warning restore CS1998
 
