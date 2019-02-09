@@ -14,14 +14,17 @@ using XLua;
 [Hotfix]
 public class Test : MonoBehaviour
 {
-	public Canvas Canvas;
 	public GameObject cube;
 
 #pragma warning disable CS1998
 	async UniTask Start()
 	{
 		//ModdingTest();
-		//await DataManager.LoadData();
+
+		Upgrade u = new Upgrade();
+		u.Add(new Effect("Health", "+100"));
+		u.Add(new Effect("Damage", "+50%"));
+		u.Log(false);
 	}
 #pragma warning restore CS1998
 
@@ -32,7 +35,11 @@ public class Test : MonoBehaviour
 
 	public void Button()
 	{
-		/*
+
+	}
+
+	protected static void ProfileTest()
+	{
 		Debugger.StartProfile("ResourceManager.Load");
 		for (int i = 0; i < 100000; i++)
 			ResourceManager.Load<Texture>(ResourceFolder.Resources, "Textures/test");
@@ -42,7 +49,6 @@ public class Test : MonoBehaviour
 		for (int i = 0; i < 100000; i++)
 			Resources.Load<Texture>("Textures/test");
 		Debugger.EndProfile();
-		*/
 	}
 
 	protected static void ModdingTest()

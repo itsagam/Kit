@@ -7,12 +7,23 @@ public static class StringExtensions
 {
 	public static string Left(this string str, int count)
 	{
+		if (count > str.Length)
+			return str;
+
 		return str.Substring(0, count);
 	}
 
 	public static string Right(this string str, int count)
 	{
-		return str.Substring(count);
+		if (count > str.Length)
+			return str;
+
+		return str.Substring(str.Length - count);
+	}
+
+	public static string Slice(this string str, int startIndex)
+	{
+		return str.Substring(startIndex);
 	}
 
 	public static string Slice(this string str, int startIndex, int endIndex)

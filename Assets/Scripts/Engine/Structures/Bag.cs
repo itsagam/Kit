@@ -138,14 +138,14 @@ public class Bag<T> : Dictionary<T, int>, IEnumerable
         return bag;
     }
 
-    public IEnumerable<Bunch<T>> AsList()
+    public IEnumerable<Bunch<T>> AsEnumerable()
     {
         return this.Select(kvp => new Bunch<T>(kvp));
     }
 
     public List<Bunch<T>> ToList()
     {
-        return AsList().ToList();
+        return AsEnumerable().ToList();
     }
 }
 

@@ -18,9 +18,9 @@ using Newtonsoft.Json.Linq;
 /// you use the actual MonoBehaviour type in the GameState object. Whenever the Json is
 /// loaded, the converter will instantiate objects and assign them in the GameState. This
 /// way, the MonoBehaviours will be strongly bound to the GameState. The advantage of this
-/// is that you can change MonoBehaviours and they'll automatically be reflected in the
-/// GameState. The disavantage being if MonoBehaviours are destroyed, they'll become null
-/// or inaccesible in the GameState.
+/// is that you can change MonoBehaviours and they'll automatically be reflected. The
+/// disavantage being if MonoBehaviours are destroyed, they'll become null or inaccesible
+/// in the GameState.
 /// 
 /// In the state-object mode, you put JsonPrefab attribute on a separate class denoting a 
 /// MonoBehaviour's state and use that in the GameState. The Json will be loaded normally,
@@ -294,7 +294,7 @@ public class JsonPrefab
 				{
 					string typeProperty = currentPath.Slice(braceOpenIndex + 1, braceEndIndex);
 					string typePropertyValue = jObject[typeProperty].Value<string>();
-					currentPath = currentPath.Left(braceOpenIndex) + typePropertyValue + currentPath.Right(braceEndIndex + 1);
+					currentPath = currentPath.Left(braceOpenIndex) + typePropertyValue + currentPath.Slice(braceEndIndex + 1);
 					startIndex = braceEndIndex + 1;
 				}
 				else
