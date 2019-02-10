@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.IO;
 using UnityEngine;
+using UnityEngine.UI;
 using Modding;
 using Modding.Parsers;
 using UniRx;
@@ -12,16 +13,45 @@ using UniRx.Async;
 using XLua;
 
 [Hotfix]
-public class Test : MonoBehaviour
+public class Test : MonoBehaviour, IUpgradeable
 {
 	public GameObject cube;
-	public FloatReactiveProperty Health = new FloatReactiveProperty(100);
-	public FloatReactiveProperty Damage = new FloatReactiveProperty(10);
+
+	protected ReactiveDictionary<string, Upgrade> upgrades = new ReactiveDictionary<string, Upgrade>();
 
 #pragma warning disable CS1998
 	async UniTask Start()
 	{
 		//ModdingTest();
+
+		Upgrade u1 = new Upgrade();
+		u1.Add(new Effect("Health", "+100"));
+		u1.Add(new Effect("Damage", "+50%"));
+		Upgrades.Add("U1", u1);
+
+		Stats stats = new Stats(this);
+		stats.Add("Health", 100);
+		stats.Add("Damage", 10);
+
+		stats.GetCurrentProperty("Health").SubscribeToText(FindObjectOfType<Text>());
+
+		await Observable.Timer(TimeSpan.FromSeconds(1));
+		stats["Health"] = stats.GetBaseValue("Health") + 1;
+		await Observable.Timer(TimeSpan.FromSeconds(1));
+		stats["Health"] = stats.GetBaseValue("Health") + 1;
+
+		Upgrade u2 = new Upgrade();
+		u2.Add(new Effect("Health", "100"));
+		Upgrades.Add("U2", u2);
+		print(stats["Health"]);
+
+		await Observable.Timer(TimeSpan.FromSeconds(1));
+		stats["Health"] = stats.GetBaseValue("Health") + 1;
+		print(stats["Health"]);
+		await Observable.Timer(TimeSpan.FromSeconds(1));
+		stats["Health"] = stats.GetBaseValue("Health") + 1;
+		await Observable.Timer(TimeSpan.FromSeconds(1));
+		stats["Health"] = stats.GetBaseValue("Health") + 1;
 	}
 #pragma warning restore CS1998
 
@@ -29,6 +59,15 @@ public class Test : MonoBehaviour
 	{
 		//ModManager.UnloadMods();
 	}
+
+	public ReactiveDictionary<string, Upgrade> Upgrades
+	{
+		get
+		{
+			return upgrades;
+		}
+	}
+
 
 	public void Button()
 	{

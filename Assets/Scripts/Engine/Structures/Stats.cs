@@ -5,79 +5,131 @@ using System.Linq;
 using UnityEngine;
 using UniRx;
 
-public class Stats : Dictionary<string, float>
+// TODO: Find a way to not use strings
+public class Stats : Dictionary<string, ReactiveProperty<float>>, IDisposable
 {
 	public IUpgradeable Upgradeable { get; protected set; }
+
+	protected Dictionary<string, ReadOnlyReactiveProperty<float>> currentProperties =
+		new Dictionary<string, ReadOnlyReactiveProperty<float>>();
+
+	protected CompositeDisposable disposables = new CompositeDisposable();
 
 	public Stats(IUpgradeable upgradeable)
 	{
 		Upgradeable = upgradeable;
+		Upgradeable.Upgrades.ObserveCountChanged().Subscribe(i => RecalculateValues()).AddTo(disposables);
 	}
 
-	public new float this[string name]
+	public new float this[string stat]
 	{
 		get
 		{
-			return GetCurrentValue(name);
+			return GetCurrentValue(stat);
 		}
 		set
 		{
-			SetBaseValue(name, value);
+			SetBaseValue(stat, value);
 		}
 	}
 
-	public float GetBaseValue(string name)
+	public void Add(string stat, float value)
 	{
-		return base[name];
+		SetBaseValue(stat, value);
 	}
 
-	public float SetBaseValue(string name, float value)
+	public ReactiveProperty<float> GetBaseProperty(string stat)
 	{
-		return base[name] = value;
+		if (TryGetValue(stat, out var property))
+			return property;
+		return null;
+	}
+
+	public float GetBaseValue(string stat)
+	{
+		return GetBaseProperty(stat).Value;
+	}
+
+	public void SetBaseProperty(string stat, ReactiveProperty<float> value)
+	{
+		base[stat] = value;
+	}
+
+	public void SetBaseValue(string stat, float value)
+	{
+		if (TryGetValue(stat, out var property))
+			property.Value = value;
+		else
+		{
+			var baseProperty = new ReactiveProperty<float>(value).AddTo(disposables);
+			SetBaseProperty(stat, baseProperty);
+		}
 	}
 
 	// TODO: Cache values rather than calculate every time
-	public float GetCurrentValue(string name)
+	public ReadOnlyReactiveProperty<float> GetCurrentProperty(string stat)
 	{
-		float baseValue = base[name];
-		float currentValue = baseValue;
-		if (Upgradeable != null && Upgradeable.Upgrades != null)
+		if (currentProperties.TryGetValue(stat, out var property))
+			return property;
+		
+		var currentProperty = new ReadOnlyReactiveProperty<float>(GetBaseProperty(stat).Select(baseValue => CalculateValue(baseValue, stat)));
+
+		disposables.Add(currentProperty);
+		currentProperties.Add(stat, currentProperty);
+	
+		return currentProperty;
+	}
+
+	public float GetCurrentValue(string stat)
+	{
+		return GetCurrentProperty(stat).Value;
+	}
+
+	protected float CalculateValue(float baseValue, string stat)
+	{
+		var effects = Upgradeable.Upgrades.Values.SelectMany(u => u).Where(e => e.Stat == stat);
+		return CalculateValue(baseValue, effects);
+	}
+
+	protected float CalculateValue(float baseValue, IEnumerable<Effect> effects)
+	{
+		float valueSum = 0, percentSum = 100, multiplierSum = 1;
+		foreach (var effect in effects)
 		{
-			float valueSum = 0, percentSum = 0, multiplierSum = 1;
-			foreach (Upgrade upgrade in Upgradeable.Upgrades.Values)
+			switch (effect.Type)
 			{
-				foreach (Effect effect in upgrade)
-				{
-					if (effect.Stat == name)
-					{
-						switch (effect.Type)
-						{
-							case EffectType.Value:
-								valueSum += effect.Value;
-								break;
+				case EffectType.Value:
+					valueSum += effect.Value;
+					break;
 
-							case EffectType.Percentage:
-								percentSum += effect.Value;
-								break;
+				case EffectType.Percentage:
+					percentSum += effect.Value;
+					break;
 
-							case EffectType.Multiplier:
-								multiplierSum *= effect.Value;
-								break;
-						}
-					}
-				}
-				currentValue += valueSum;
-				currentValue += currentValue * percentSum / 100;
-				currentValue *= multiplierSum;
+				case EffectType.Multiplier:
+					multiplierSum *= effect.Value;
+					break;
 			}
 		}
-		return currentValue;
+		return ((baseValue + valueSum) * percentSum / 100) * multiplierSum;
+	}
+
+	protected void RecalculateValues()
+	{
+		// Setting base-values recalcuates current-values since base-properties are source observables of current-properties
+		foreach (var baseProperty in Values)
+			baseProperty.SetValueAndForceNotify(baseProperty.Value);
+	}
+
+	public void Dispose()
+	{
+		disposables.Dispose();
 	}
 }
 
 public interface IUpgradeable
 {
-	Dictionary<string, Upgrade> Upgrades { get; }
+	ReactiveDictionary<string, Upgrade> Upgrades { get; }
 }
 
 public enum BuffMode
@@ -112,7 +164,7 @@ public class Buff : Upgrade
 		AddTo(upgradeable, Mode);
 	}
 
-	public override void AddTo(Dictionary<string, Upgrade> upgrades)
+	public override void AddTo(ReactiveDictionary<string, Upgrade> upgrades)
 	{
 		AddTo(upgrades, Mode);
 	}
@@ -122,7 +174,7 @@ public class Buff : Upgrade
 		AddTo(upgradeable.Upgrades, mode);
 	}
 
-	public virtual void AddTo(Dictionary<string, Upgrade> upgrades, BuffMode mode)
+	public virtual void AddTo(ReactiveDictionary<string, Upgrade> upgrades, BuffMode mode)
 	{
 		if (upgrades == null)
 			return;
@@ -193,7 +245,7 @@ public class Upgrade: List<Effect>
 		AddTo(upgradeable.Upgrades);
 	}
 
-	public virtual void AddTo(Dictionary<string, Upgrade> upgrades)
+	public virtual void AddTo(ReactiveDictionary<string, Upgrade> upgrades)
 	{
 		upgrades.Add(ID, this);
 	}
@@ -203,7 +255,7 @@ public class Upgrade: List<Effect>
 		RemoveFrom(upgradeable.Upgrades);
 	}
 
-	public virtual void RemoveFrom(Dictionary<string, Upgrade> upgrades)
+	public virtual void RemoveFrom(ReactiveDictionary<string, Upgrade> upgrades)
 	{
 		upgrades.Remove(ID);
 	}
@@ -218,7 +270,6 @@ public enum EffectType
 
 public class Effect
 {
-	// TODO: Find a way to not use strings
 	public string Stat;
 	public EffectType Type;
 	public float Value;
