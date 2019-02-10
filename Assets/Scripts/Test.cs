@@ -41,13 +41,15 @@ public class Test : MonoBehaviour, IUpgradeable
 		stats["Health"] = stats.GetBaseValue("Health") + 1;
 
 		Upgrade u2 = new Upgrade();
-		u2.Add(new Effect("Health", "100"));
+		u2.Add(new Effect("Health", "+100"));
 		Upgrades.Add("U2", u2);
+
+		print(stats["Health"]);
+		print(stats["Health"]);
 		print(stats["Health"]);
 
 		await Observable.Timer(TimeSpan.FromSeconds(1));
 		stats["Health"] = stats.GetBaseValue("Health") + 1;
-		print(stats["Health"]);
 		await Observable.Timer(TimeSpan.FromSeconds(1));
 		stats["Health"] = stats.GetBaseValue("Health") + 1;
 		await Observable.Timer(TimeSpan.FromSeconds(1));

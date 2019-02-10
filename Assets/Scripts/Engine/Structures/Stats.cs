@@ -8,7 +8,7 @@ using UniRx;
 // TODO: Find a way to not use strings
 public class Stats : Dictionary<string, ReactiveProperty<float>>, IDisposable
 {
-	public IUpgradeable Upgradeable { get; protected set; }
+	public ReactiveDictionary<string, Upgrade> Upgrades { get; protected set; }
 
 	protected Dictionary<string, ReadOnlyReactiveProperty<float>> currentProperties =
 		new Dictionary<string, ReadOnlyReactiveProperty<float>>();
@@ -17,8 +17,7 @@ public class Stats : Dictionary<string, ReactiveProperty<float>>, IDisposable
 
 	public Stats(IUpgradeable upgradeable)
 	{
-		Upgradeable = upgradeable;
-		Upgradeable.Upgrades.ObserveCountChanged().Subscribe(i => RecalculateValues()).AddTo(disposables);
+		Upgrades = upgradeable.Upgrades;
 	}
 
 	public new float this[string stat]
@@ -66,13 +65,19 @@ public class Stats : Dictionary<string, ReactiveProperty<float>>, IDisposable
 		}
 	}
 
-	// TODO: Cache values rather than calculate every time
 	public ReadOnlyReactiveProperty<float> GetCurrentProperty(string stat)
 	{
 		if (currentProperties.TryGetValue(stat, out var property))
 			return property;
-		
-		var currentProperty = new ReadOnlyReactiveProperty<float>(GetBaseProperty(stat).Select(baseValue => CalculateValue(baseValue, stat)));
+
+		// We get the last upgrades that were changed and aggregate them, and then we use CombineLatest
+		// to use these aggregates in changing base values
+		var observable = Upgrades.ObserveCountChanged()
+			.Select(c => GetAggregates(stat))
+			.StartWith(GetAggregates(stat))
+			.CombineLatest(GetBaseProperty(stat), (aggregates, baseValue) => CalculateValue(aggregates, baseValue));
+
+		var currentProperty = new ReadOnlyReactiveProperty<float>(observable);
 
 		disposables.Add(currentProperty);
 		currentProperties.Add(stat, currentProperty);
@@ -85,13 +90,13 @@ public class Stats : Dictionary<string, ReactiveProperty<float>>, IDisposable
 		return GetCurrentProperty(stat).Value;
 	}
 
-	protected float CalculateValue(float baseValue, string stat)
+	protected (float, float, float) GetAggregates(string stat)
 	{
-		var effects = Upgradeable.Upgrades.Values.SelectMany(u => u).Where(e => e.Stat == stat);
-		return CalculateValue(baseValue, effects);
+		var effects = Upgrades.Values.SelectMany(u => u).Where(e => e.Stat == stat);
+		return GetAggregates(effects);
 	}
 
-	protected float CalculateValue(float baseValue, IEnumerable<Effect> effects)
+	protected (float, float, float) GetAggregates(IEnumerable<Effect> effects)
 	{
 		float valueSum = 0, percentSum = 100, multiplierSum = 1;
 		foreach (var effect in effects)
@@ -111,14 +116,12 @@ public class Stats : Dictionary<string, ReactiveProperty<float>>, IDisposable
 					break;
 			}
 		}
-		return ((baseValue + valueSum) * percentSum / 100) * multiplierSum;
+		return (valueSum, percentSum, multiplierSum);
 	}
 
-	protected void RecalculateValues()
+	protected float CalculateValue((float value, float percent, float multiplier) aggregates, float baseValue)
 	{
-		// Setting base-values recalcuates current-values since base-properties are source observables of current-properties
-		foreach (var baseProperty in Values)
-			baseProperty.SetValueAndForceNotify(baseProperty.Value);
+		return ((baseValue + aggregates.value) * aggregates.percent / 100) * aggregates.multiplier;
 	}
 
 	public void Dispose()
