@@ -4,8 +4,18 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
+#if UNITY_EDITOR
+using UnityEditor;
+[CustomEditor(typeof(RaycastGraphic), false)]
+public class RaycastGraphicEditor : Editor
+{
+	public override void OnInspectorGUI() { }
+}
+#endif
+
 /// A concrete subclass of the Unity UI `Graphic` class that just skips drawing.
 /// Useful for providing a raycast target without actually drawing anything.
+[HideInInspector]
 public class RaycastGraphic : Graphic
 {
 	public override void SetMaterialDirty() { return; }

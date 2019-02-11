@@ -16,10 +16,17 @@ using XLua;
 public class Test : MonoBehaviour, IUpgradeable
 {
 	public GameObject cube;
+	public Stat Health;
 
 	protected ReactiveDictionary<string, Upgrade> upgrades = new ReactiveDictionary<string, Upgrade>();
 
 #pragma warning disable CS1998
+
+	protected void Awake()
+	{
+		Health.Setup(nameof(Health), this);
+	}
+
 	async UniTask Start()
 	{
 		//ModdingTest();
@@ -29,31 +36,13 @@ public class Test : MonoBehaviour, IUpgradeable
 		u1.Add(new Effect("Damage", "+50%"));
 		Upgrades.Add("U1", u1);
 
-		Stats stats = new Stats(this);
-		stats.Add("Health", 100);
-		stats.Add("Damage", 10);
-
-		stats.GetCurrentProperty("Health").SubscribeToText(FindObjectOfType<Text>());
-
-		await Observable.Timer(TimeSpan.FromSeconds(1));
-		stats["Health"] = stats.GetBaseValue("Health") + 1;
-		await Observable.Timer(TimeSpan.FromSeconds(1));
-		stats["Health"] = stats.GetBaseValue("Health") + 1;
+		print(Health.CurrentValue);
 
 		Upgrade u2 = new Upgrade();
 		u2.Add(new Effect("Health", "+100"));
 		Upgrades.Add("U2", u2);
 
-		print(stats["Health"]);
-		print(stats["Health"]);
-		print(stats["Health"]);
-
-		await Observable.Timer(TimeSpan.FromSeconds(1));
-		stats["Health"] = stats.GetBaseValue("Health") + 1;
-		await Observable.Timer(TimeSpan.FromSeconds(1));
-		stats["Health"] = stats.GetBaseValue("Health") + 1;
-		await Observable.Timer(TimeSpan.FromSeconds(1));
-		stats["Health"] = stats.GetBaseValue("Health") + 1;
+		print(Health.CurrentValue);
 	}
 #pragma warning restore CS1998
 

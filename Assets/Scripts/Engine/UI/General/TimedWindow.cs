@@ -4,9 +4,12 @@ using System.Collections.Generic;
 using UnityEngine;
 using UniRx;
 using UniRx.Async;
+using Sirenix.OdinInspector;
 
-public class TimedPopup : Window
+public class TimedWindow : Window
 {
+	[PropertyOrder(-99)]
+	[MinValue(0)]
 	public float Time = 3.0f;
 
 	protected IDisposable observable;

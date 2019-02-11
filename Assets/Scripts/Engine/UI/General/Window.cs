@@ -1,22 +1,35 @@
-﻿#define CODE_ANALYSIS
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.Events;
 using UniRx;
 using UniRx.Async;
+using Sirenix.OdinInspector;
 
 public class Window : MonoBehaviour
 {
-	public event Action OnWindowShowing;
-	public event Action OnWindowShown;
-	public event Action OnWindowHiding;
-    public event Action OnWindowHidden;
+	[FoldoutGroup("Animations")]
+	public string ShowAnimation = "Show";
+	[FoldoutGroup("Animations")]
+	public string HideAnimation = "Hide";
 
+	[FoldoutGroup("Sounds")]
 	public AudioClip ShowSound;
+	[FoldoutGroup("Sounds")]
 	public AudioClip HideSound;
+
+	[FoldoutGroup("Events")]
+	public UnityEvent OnWindowShowing;
+	[FoldoutGroup("Events")]
+	public UnityEvent OnWindowShown;
+	[FoldoutGroup("Events")]
+	public UnityEvent OnWindowHiding;
+	[FoldoutGroup("Events")]
+	public UnityEvent OnWindowHidden;
+
 	public WindowState State { get; protected set; } = WindowState.Hidden;
 
 	protected Animator animator;
@@ -31,7 +44,12 @@ public class Window : MonoBehaviour
 		UIManager.RegisterWindow(this);
     }
 
-	public virtual async UniTask<bool> Show(object data = null, string animation = UIManager.DefaultShowAnimation)
+	public virtual UniTask<bool> Show(object data = null)
+	{
+		return Show(ShowAnimation, data);
+	}
+
+	public virtual async UniTask<bool> Show(string animation, object data = null)
 	{
 		if (IsBusy)
 			return false;
@@ -41,13 +59,13 @@ public class Window : MonoBehaviour
 
 		State = WindowState.Showing;
 		OnShowing();
-		OnWindowShowing?.Invoke();
+		OnWindowShowing.Invoke();
 		UIManager.Windows.Add(this);
 		
 		Data = data;
 		gameObject.SetActive(true);
 
-		if (animator != null && animation != null)
+		if (animator != null && !animation.IsNullOrEmpty())
 		{
 			int animationHash = Animator.StringToHash(animation);
 			if (animator.HasState(0, animationHash))
@@ -64,7 +82,12 @@ public class Window : MonoBehaviour
 		return true;
 	}
 
-	public virtual async UniTask<bool> Hide(WindowHideMode mode = UIManager.DefaultWindowHideMode, string animation = UIManager.DefaultHideAnimation)
+	public virtual UniTask<bool> Hide(WindowHideMode mode = UIManager.DefaultWindowHideMode)
+	{
+		return Hide(HideAnimation, mode);
+	}
+
+	public virtual async UniTask<bool> Hide(string animation, WindowHideMode mode = UIManager.DefaultWindowHideMode)
     {
 		if (IsBusy)
 			return false;
@@ -74,9 +97,9 @@ public class Window : MonoBehaviour
 
         State = WindowState.Hiding;
         OnHiding();
-		OnWindowHiding?.Invoke();
+		OnWindowHiding.Invoke();
 		
-		if (animator != null && animation != null)
+		if (animator != null && !animation.IsNullOrEmpty())
         {
             int animationHash = Animator.StringToHash(animation);
             if (animator.HasState(0, animationHash))
@@ -97,7 +120,7 @@ public class Window : MonoBehaviour
 	{
 		State = WindowState.Shown;
 		OnShown();
-		OnWindowShown?.Invoke();
+		OnWindowShown.Invoke();
 	}
 
 	private void onHidden(WindowHideMode mode)
@@ -113,7 +136,7 @@ public class Window : MonoBehaviour
 		}
 
 		OnHidden();
-		OnWindowHidden?.Invoke();
+		OnWindowHidden.Invoke();
 	}
 
 	public virtual void MarkAsInstance()

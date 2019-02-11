@@ -4,6 +4,15 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
+#if UNITY_EDITOR
+using UnityEditor;
+using Sirenix.OdinInspector.Editor;
+[CustomEditor(typeof(ContentSizeFitterEx), false)]
+public class ContentSizeFitterExEditor : OdinEditor
+{
+}
+#endif
+
 public class ContentSizeFitterEx : ContentSizeFitter
 {
 	public Vector2 Padding;

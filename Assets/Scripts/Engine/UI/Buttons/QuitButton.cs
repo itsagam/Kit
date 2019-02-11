@@ -4,12 +4,19 @@ using UnityEngine.UI;
 using UnityEngine.Events;
 using UnityEngine.EventSystems;
 using UnityEngine.SceneManagement;
+using Sirenix.OdinInspector;
 
 public class QuitButton : MonoBehaviour, IPointerClickHandler
 {
+	[ToggleGroup("Fade")]
 	public bool Fade = true;
+
+	[ToggleGroup("Fade")]
 	public Color FadeColor = Color.black;
+
+	[ToggleGroup("Fade")]
 	public float FadeTime = 1.0f;
+
 	public UnityEvent OnComplete;
 
 	public void OnPointerClick (PointerEventData eventData)

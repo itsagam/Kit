@@ -7,7 +7,7 @@ using DG.Tweening;
 
 public class MoveRandomly : MonoBehaviour
 {
-    public Transform Bounds;
+    public Transform Area;
     public bool X = true;
     public bool Y = false;
     public bool Z = true;
@@ -16,10 +16,10 @@ public class MoveRandomly : MonoBehaviour
 
     protected void Awake()
     {
-        if (Bounds == null)
+        if (Area == null)
             return;
 		
-        bounds = Bounds.GetBounds();
+        bounds = Area.GetBounds();
         Move();
     }
 

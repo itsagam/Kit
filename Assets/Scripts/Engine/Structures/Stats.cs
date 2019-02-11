@@ -5,6 +5,82 @@ using System.Linq;
 using UnityEngine;
 using UniRx;
 
+[Serializable]
+public class Stat : ReactiveProperty<float>
+{
+	public ReadOnlyReactiveProperty<float> CurrentProperty { get; protected set; }
+
+	protected string statName;
+	protected ReactiveDictionary<string, Upgrade> upgrades;
+
+	public void Setup(string statName, IUpgradeable upgradeable)
+	{
+		this.statName = statName;
+		upgrades = upgradeable.Upgrades;
+
+		var observable = upgrades.ObserveCountChanged()
+			.Select(c => GetAggregates())
+			.StartWith(GetAggregates())
+			.CombineLatest(this, (aggregates, baseValue) => CalculateValue(aggregates, baseValue));
+
+		CurrentProperty = new ReadOnlyReactiveProperty<float>(observable);
+	}
+
+	public float BaseValue
+	{
+		get
+		{
+			return Value;
+		}
+		set
+		{
+			Value = value;
+		}
+	}
+
+	public float CurrentValue
+	{
+		get
+		{
+			return CurrentProperty.Value;
+		}
+	}
+
+	protected (float, float, float) GetAggregates()
+	{
+		var effects = upgrades.Values.SelectMany(u => u).Where(e => e.Stat == statName);
+		return GetAggregates(effects);
+	}
+
+	protected (float, float, float) GetAggregates(IEnumerable<Effect> effects)
+	{
+		float valueSum = 0, percentSum = 100, multiplierSum = 1;
+		foreach (var effect in effects)
+		{
+			switch (effect.Type)
+			{
+				case EffectType.Value:
+					valueSum += effect.Value;
+					break;
+
+				case EffectType.Percentage:
+					percentSum += effect.Value;
+					break;
+
+				case EffectType.Multiplier:
+					multiplierSum *= effect.Value;
+					break;
+			}
+		}
+		return (valueSum, percentSum, multiplierSum);
+	}
+
+	protected float CalculateValue((float value, float percent, float multiplier) aggregates, float baseValue)
+	{
+		return ((baseValue + aggregates.value) * aggregates.percent / 100) * aggregates.multiplier;
+	}
+}
+
 // TODO: Find a way to not use strings
 public class Stats : Dictionary<string, ReactiveProperty<float>>, IDisposable
 {
@@ -167,36 +243,26 @@ public class Buff : Upgrade
 		AddTo(upgradeable, Mode);
 	}
 
-	public override void AddTo(ReactiveDictionary<string, Upgrade> upgrades)
-	{
-		AddTo(upgrades, Mode);
-	}
-
 	public virtual void AddTo(IUpgradeable upgradeable, BuffMode mode)
 	{
-		AddTo(upgradeable.Upgrades, mode);
-	}
-
-	public virtual void AddTo(ReactiveDictionary<string, Upgrade> upgrades, BuffMode mode)
-	{
-		if (upgrades == null)
+		if (upgradeable?.Upgrades == null)
 			return;
 
 		Buff previous = null;
 		if (mode != BuffMode.Add)
 		{
-			upgrades.TryGetValue(ID, out Upgrade upgrade);
+			upgradeable.Upgrades.TryGetValue(ID, out Upgrade upgrade);
 			if (upgrade is Buff buff)
 				previous = buff;
 		}
 
 		if (mode == BuffMode.Add || previous == null)
 		{
-			base.AddTo(upgrades);
+			base.AddTo(upgradeable);
 			Observable.Timer(TimeSpan.FromSeconds(Time)).Subscribe(l =>
 			{
 				try {
-					base.RemoveFrom(upgrades);
+					base.RemoveFrom(upgradeable);
 				}
 				catch {}
 			});
@@ -245,22 +311,12 @@ public class Upgrade: List<Effect>
 
 	public virtual void AddTo(IUpgradeable upgradeable)
 	{
-		AddTo(upgradeable.Upgrades);
-	}
-
-	public virtual void AddTo(ReactiveDictionary<string, Upgrade> upgrades)
-	{
-		upgrades.Add(ID, this);
+		upgradeable.Upgrades.Add(ID, this);
 	}
 
 	public virtual void RemoveFrom(IUpgradeable upgradeable)
 	{
-		RemoveFrom(upgradeable.Upgrades);
-	}
-
-	public virtual void RemoveFrom(ReactiveDictionary<string, Upgrade> upgrades)
-	{
-		upgrades.Remove(ID);
+		upgradeable.Upgrades.Remove(ID);
 	}
 }
 
@@ -311,11 +367,13 @@ public class Effect
 	public override string ToString()
 	{
 		string output = Stat + ": ";
+
+		if (Type != EffectType.Multiplier && Value > 0)
+			output += "+";
+
 		switch (Type)
 		{
 			case EffectType.Value:
-				if (Value > 0)
-					output += "+";
 				output += Value;
 				break;
 
@@ -324,8 +382,6 @@ public class Effect
 				break;
 
 			case EffectType.Percentage:
-				if (Value > 0)
-					output += "+";
 				output += Value + "%";
 				break;
 		}

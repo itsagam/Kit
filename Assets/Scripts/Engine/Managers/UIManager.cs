@@ -32,8 +32,6 @@ public enum WindowHideMode
 
 public class UIManager
 {
-	public const string DefaultShowAnimation = "Show";
-	public const string DefaultHideAnimation = "Hide";
 	public const WindowConflictMode DefaultConflictMode = WindowConflictMode.ShowNew;
 	public const WindowHideMode DefaultWindowHideMode = WindowHideMode.Auto;
 
@@ -50,12 +48,12 @@ public class UIManager
 								string path,
 								object data = null,
 								Transform parent = null,
-								WindowConflictMode mode = DefaultConflictMode,
-								string animation = DefaultShowAnimation)
+								string animation = null,
+								WindowConflictMode mode = DefaultConflictMode)
 	{
 		Window prefab = await ResourceManager.LoadAsync<Window>(ResourceFolder.Resources, path);
 		if (prefab != null)
-			return await ShowWindow(prefab, data, parent, mode, animation);
+			return await ShowWindow(prefab, data, parent, animation, mode);
 		else
 			return null;
 	}
@@ -64,8 +62,8 @@ public class UIManager
 							Window prefab,
 							object data = null,
 							Transform parent = null,
-							WindowConflictMode mode = DefaultConflictMode,
-							string animation = DefaultShowAnimation)
+							string animation = null,
+							WindowConflictMode mode = DefaultConflictMode)
 	{
 
 		if (mode != WindowConflictMode.ShowNew)
@@ -102,26 +100,32 @@ public class UIManager
 		}
 		instance.transform.SetParent(parent, false);
 
-		await instance.Show(data, animation);
+		if (animation == null)
+			await instance.Show(data);
+		else
+			await instance.Show(animation, data);
 
 		return instance;
 	}
 
 	public static UniTask<bool> HideWindow(
 						string name,
-						WindowHideMode mode = DefaultWindowHideMode,
-						string animation = DefaultHideAnimation)
+						string animation = null,
+						WindowHideMode mode = DefaultWindowHideMode)
 	{
-		return HideWindow(FindWindow(name), mode, animation);
+		return HideWindow(FindWindow(name), animation, mode);
 	}
 
 	public static UniTask<bool> HideWindow(
 					Window window,
-					WindowHideMode mode = DefaultWindowHideMode,
-					string animation = DefaultHideAnimation)
+					string animation = null,
+					WindowHideMode mode = DefaultWindowHideMode)
 	{
 		if (window != null)
-			return window.Hide(mode, animation);	
+			if (animation == null)
+				return window.Hide(mode);
+			else
+				return window.Hide(animation, mode);
 		else
 			return UniTask.FromResult(false);
 	}
@@ -144,10 +148,10 @@ public class UIManager
 
 	public static void RegisterWindow(Window instance)
 	{
-		instance.OnWindowShowing += () => OnWindowShowing?.Invoke(instance);
-		instance.OnWindowShown += () => OnWindowShown?.Invoke(instance);
-		instance.OnWindowHiding += () => OnWindowHiding?.Invoke(instance);
-		instance.OnWindowHidden += () => OnWindowHidden?.Invoke(instance);
+		instance.OnWindowHidden.AddListener(() => OnWindowShowing?.Invoke(instance));
+		instance.OnWindowShown.AddListener(() => OnWindowShown?.Invoke(instance));
+		instance.OnWindowShown.AddListener(() => OnWindowHiding?.Invoke(instance));
+		instance.OnWindowShown.AddListener(() => OnWindowHidden?.Invoke(instance));
 	}
 
 	protected static Canvas CreateCanvas()

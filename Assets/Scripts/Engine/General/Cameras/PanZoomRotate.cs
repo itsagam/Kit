@@ -6,27 +6,58 @@ using UnityEngine;
 using TouchScript;
 using TouchScript.Pointers;
 using TouchScript.Gestures;
+using Sirenix.OdinInspector;
 
 [RequireComponent(typeof(Camera))]
 [RequireComponent(typeof(MetaGesture))]
 public class PanZoomRotate : MonoBehaviour
 {
-	public bool Pan = true;
-	public bool Zoom = true;
-	public bool Rotate = false;
 	[Tooltip("Area/bounds to focus on – it can be a transform, a renderer or a collider; will be origin if not provided.")]
 	public Component View;
+
+	[Tooltip("Smoothing to apply while Lerp-ing. Applies to position, rotation and orthographicSize.")]
+	[MinValue(0.0f)]
+	public float Smoothing = 10f;
+
+
+	[ToggleGroup("Pan")]
+	public bool Pan = true;
+
+	[ToggleGroup("Pan")]
+	[Tooltip("Panning speed. Depends on world scale.")]
+	[MinValue(0.0f)]
 	public float PanSpeed = 5.0f;
-	[Tooltip("Order of magnitude zoom level affects panning speed; has to be greater than 1 to be applicable.")]
+
+	[ToggleGroup("Pan")]
+	[Tooltip("Order of magnitude zoom level affects panning speed.")]
+	[MinValue(1.0f)]
 	public float PanZoomFactor = 1.5f;
+
+
+	[ToggleGroup("Zoom")]
+	public bool Zoom = true;
+
+	[ToggleGroup("Zoom")]
+	[Tooltip("Zooming speed. Depends on world scale in perpective mode.")]
+	[MinValue(0.0f)]
 	public float ZoomSpeed = 0.025f;
+
+	[ToggleGroup("Zoom")]
 	[Tooltip("Minimum orthographicSize if camera is orthographic, camera position in forward axis otherwise.")]
 	public float ZoomMin = 1;
+
+	[ToggleGroup("Zoom")]
 	[Tooltip("Maximum orthographicSize if camera is orthographic, camera position in forward axis otherwise.")]
 	public float ZoomMax = 10;
+
+
+	[ToggleGroup("Rotate")]
+	public bool Rotate = false;
+
+	[ToggleGroup("Rotate")]
+	[Tooltip("Rotation speed.")]
+	[MinValue(0.0f)]
 	public float RotateSpeed = 0.5f;
-	[Tooltip("Smoothing to apply while Lerp-ing")]
-	public float Smoothing = 10f;
 
 	protected Camera cameraCached;
 	protected Transform transformCached;

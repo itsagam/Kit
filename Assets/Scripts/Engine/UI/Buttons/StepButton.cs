@@ -2,6 +2,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
+using Sirenix.OdinInspector;
 
 [RequireComponent(typeof(Button))]
 public class StepButton : MonoBehaviour
@@ -20,14 +21,24 @@ public class StepButton : MonoBehaviour
 		Hide
 	}
 
+	[Tooltip("Wizard to move next/previous")]
 	public Wizard Wizard;
-	public Text Text;
-	public StepDirection Direction = StepDirection.Next;
-	public StepMode Mode = StepMode.Nothing;
-	public string Change;
-	public bool Hide = false;
-	public Button Button { get; protected set; }
 
+	[Tooltip("Direction to move")]
+	public StepDirection Direction = StepDirection.Next;
+
+	[Tooltip("What to do when it is no longer possible to use the button")]
+	public StepMode Mode = StepMode.Nothing;
+
+	[Tooltip("Text-field to use when changing text")]
+	[ShowIf("Mode", StepMode.Change)]
+	public Text Text;
+
+	[Tooltip("Text to change to")]
+	[ShowIf("Mode", StepMode.Change)]
+	public string Change;
+
+	public Button Button { get; protected set; }
 	protected string originalText;
 
 	protected void Awake()
@@ -42,26 +53,15 @@ public class StepButton : MonoBehaviour
 			originalText = Text.text;
 
 		if (Wizard != null)
-		{
-			Wizard.OnChange += OnChange;
-			Wizard.OnWindowHiding += OnHide;
-		}
+			Wizard.OnChanging.AddListener(OnChanging);
 	}
 
-	protected void OnHide()
-	{
-		if (Hide || IsEdgeCase)
-			Button.gameObject.SetActive(false);
-	}
-
-	protected void OnChange(int previousIndex, Window previous, int nextIndex, Window next)
+	protected void OnChanging(int previousIndex, Window previous, int nextIndex, Window next)
 	{
 		if (Wizard == null)
 			return;
 		
 		bool isEdgeCase = IsEdgeCase;
-		if (isEdgeCase && !Button.gameObject.activeSelf)
-			Button.gameObject.SetActive(true);
 		if (Mode == StepMode.Change)
 		{
 			if (Text != null && !Change.IsNullOrEmpty())

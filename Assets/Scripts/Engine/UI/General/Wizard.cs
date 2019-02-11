@@ -3,20 +3,32 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.UI;
 using UniRx;
 using UniRx.Async;
+using Sirenix.OdinInspector;
 
 public class Wizard : Window
 {
+	[PropertyOrder(-99)]
 	public Window Default;
+
+	[FoldoutGroup("Animations")]
 	public string NextShowAnimation = "NextShow";
+	[FoldoutGroup("Animations")]
 	public string NextHideAnimation = "NextHide";
+	[FoldoutGroup("Animations")]
 	public string PreviousShowAnimation = "PreviousShow";
+	[FoldoutGroup("Animations")]
 	public string PreviousHideAnimation = "PreviousHide";
 
+	[FoldoutGroup("Events")]
+	public UnityEvent<int, Window, int, Window> OnChanging;
+	[FoldoutGroup("Events")]
+	public UnityEvent<int, Window, int, Window> OnChanged;
+
 	public int Index { get; protected set; } = -1;
-	public event Action<int, Window, int, Window> OnChange;
 
 	protected void Start()
 	{
@@ -50,13 +62,13 @@ public class Wizard : Window
 			if (previous == null)
 				previousTask = Show();
 			else
-				previousTask = previous.Hide(WindowHideMode.Auto, isNext ? NextHideAnimation : PreviousHideAnimation);
+				previousTask = previous.Hide(isNext ? NextHideAnimation : PreviousHideAnimation, WindowHideMode.Auto);
 
 			UniTask<bool> nextTask = next.Show(null, previous == null ? null : (isNext ? NextShowAnimation : PreviousShowAnimation));
 
+			OnChanging?.Invoke(previousIndex, previous, Index, next);
 			await UniTask.WhenAll(previousTask, nextTask);
-
-			OnChange?.Invoke(previousIndex, previous, Index, next);
+			OnChanged?.Invoke(previousIndex, previous, Index, next);
 		}
 		else
 		{

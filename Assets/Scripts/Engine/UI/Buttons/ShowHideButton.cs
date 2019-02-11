@@ -4,6 +4,7 @@ using UnityEngine.UI;
 using UnityEngine.EventSystems;
 using UniRx;
 using UniRx.Async;
+using Sirenix.OdinInspector;
 
 public class ShowHideButton : MonoBehaviour, IPointerClickHandler
 {
@@ -22,7 +23,11 @@ public class ShowHideButton : MonoBehaviour, IPointerClickHandler
 
 	public ShowHideMode Mode;
 	public ShowHideType Type;
+
+	[ShowIf("Type", ShowHideType.Window)]
 	public Window Window;
+
+	[ShowIf("Type", ShowHideType.Name)]
 	public string Name;
 
 	public void OnPointerClick (PointerEventData eventData)
