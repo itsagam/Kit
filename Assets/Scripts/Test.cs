@@ -11,38 +11,71 @@ using Modding.Parsers;
 using UniRx;
 using UniRx.Async;
 using XLua;
+using Sirenix.OdinInspector;
+
+#if UNITY_EDITOR
+using Sirenix.Utilities.Editor;
+using Sirenix.OdinInspector.Editor;
+
+public class StatReactivePropertyDrawer : OdinValueDrawer<StatReactiveProperty>
+{
+	protected override void DrawPropertyLayout(GUIContent label)
+	{
+		Property.Children[0].Draw(label);
+	}
+}
+#endif
+
+public class StatReactiveProperty : ReactiveProperty<float>
+{
+	public StatReactiveProperty()
+		: base()
+	{
+
+	}
+
+	public StatReactiveProperty(float initialValue)
+		: base(initialValue)
+	{
+
+	}
+}
 
 [Hotfix]
-public class Test : MonoBehaviour, IUpgradeable
+public class Test : SerializedMonoBehaviour, IUpgradeable
 {
 	public GameObject cube;
-	public Stat Health;
+	public StatReactiveProperty Float;
+	[DictionaryDrawerSettings(KeyLabel = "Stat", ValueLabel = "Value")]
+	public Dictionary<string, StatReactiveProperty> Dict = new Dictionary<string, StatReactiveProperty>();
+
 
 	protected ReactiveDictionary<string, Upgrade> upgrades = new ReactiveDictionary<string, Upgrade>();
 
 #pragma warning disable CS1998
 
-	protected void Awake()
-	{
-		Health.Setup(nameof(Health), this);
-	}
-
 	async UniTask Start()
 	{
 		//ModdingTest();
 
-		Upgrade u1 = new Upgrade();
-		u1.Add(new Effect("Health", "+100"));
-		u1.Add(new Effect("Damage", "+50%"));
-		Upgrades.Add("U1", u1);
+		/*
+		Upgrade u1 = new Upgrade("u1")
+		{
+			new Effect("Health", "+100"),
+			new Effect("Damage", "+50%")
+		};
+		Upgrades.Add(u1.ID, u1);
 
 		print(Health.CurrentValue);
 
-		Upgrade u2 = new Upgrade();
-		u2.Add(new Effect("Health", "+100"));
-		Upgrades.Add("U2", u2);
+		Upgrade u2 = new Upgrade("u2")
+		{
+			new Effect("Health", "+100")
+		};
+		Upgrades.Add(u2.ID, u2);
 
 		print(Health.CurrentValue);
+		*/
 	}
 #pragma warning restore CS1998
 
