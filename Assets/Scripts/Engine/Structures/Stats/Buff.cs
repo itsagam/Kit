@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UniRx;
 
@@ -15,12 +16,13 @@ public class BuffDrawer : OdinValueDrawer<Buff>
 		SirenixEditorGUI.BeginToolbarBox(label);
 
 		Property.Children["ID"].Draw();
-
-		SirenixEditorGUI.BeginHorizontalPropertyLayout(Property.Children["Time"].Label);
-		Property.Children["Time"].Draw(null);
-		Property.Children["Mode"].Draw(null);
-		SirenixEditorGUI.EndHorizontalPropertyLayout();
-
+		if (! Application.isPlaying)
+		{
+			SirenixEditorGUI.BeginHorizontalPropertyLayout(Property.Children["Time"].Label);
+			Property.Children["Time"].Draw(null);
+			Property.Children["Mode"].Draw(null);
+			SirenixEditorGUI.EndHorizontalPropertyLayout();
+		}
 		Property.Children["Effects"].Draw();
 
 		SirenixEditorGUI.EndToolbarBox();
@@ -30,7 +32,7 @@ public class BuffDrawer : OdinValueDrawer<Buff>
 
 public enum BuffMode
 {
-	Add,
+	Nothing,
 	Extend,
 	Keep,
 	Replace,
@@ -45,59 +47,48 @@ public class Buff : Upgrade
 	public BuffMode Mode = BuffMode.Extend;
 
 	public Buff()
-		: base()
-	{
-	}
-
-	public Buff(string id)
-		: base(id)
 	{
 	}
 
 	public Buff(IEnumerable<Effect> effects, float time, BuffMode mode = BuffMode.Extend)
-		: base(effects)
 	{
+		Effects.AddRange(effects);
+		ID = ToString();
 		Time = time;
 		Mode = mode;
 	}
 
 	public Buff(string id, IEnumerable<Effect> effects, float time, BuffMode mode = BuffMode.Extend)
-		: base(id, effects)
 	{
+		Effects.AddRange(effects);
+		ID = id;
 		Time = time;
 		Mode = mode;
 	}
 
-	public override void AddTo(IUpgradeable upgradeable)
+	public virtual Buff AddTo(IUpgradeable upgradeable)
 	{
-		AddTo(upgradeable, Mode);
+		return AddTo(upgradeable, Mode);
 	}
 
-	public virtual void AddTo(IUpgradeable upgradeable, BuffMode mode)
+	public virtual Buff AddTo(IUpgradeable upgradeable, BuffMode mode)
 	{
-		if (upgradeable?.Upgrades == null)
-			return;
-
 		Buff previous = null;
-		if (mode != BuffMode.Add)
+		if (mode != BuffMode.Nothing)
+			previous = Find(upgradeable, ID) as Buff;
+			
+		if (mode == BuffMode.Nothing || previous == null)
 		{
-			upgradeable.Upgrades.TryGetValue(ID, out Upgrade upgrade);
-			if (upgrade is Buff buff)
-				previous = buff;
-		}
-
-		if (mode == BuffMode.Add || previous == null)
-		{
-			base.AddTo(upgradeable);
+			upgradeable.GetUpgrades().Add(this);
 			Observable.Timer(TimeSpan.FromSeconds(Time)).Subscribe(l =>
 			{
 				try
 				{
-					base.RemoveFrom(upgradeable);
+					upgradeable.GetUpgrades().Remove(this);
 				}
 				catch { }
 			});
-			return;
+			return this;
 		}
 
 		switch (mode)
@@ -123,5 +114,11 @@ public class Buff : Upgrade
 					previous.Time = Time;
 				break;
 		}
+		return this;
+	}
+
+	public virtual bool RemoveFrom(IUpgradeable upgradeable)
+	{
+		return upgradeable.GetUpgrades().Remove(this);
 	}
 }

@@ -12,52 +12,29 @@ using UniRx;
 using UniRx.Async;
 using XLua;
 using Sirenix.OdinInspector;
-
-#if UNITY_EDITOR
-using Sirenix.Utilities.Editor;
-using Sirenix.OdinInspector.Editor;
-
-public class StatReactivePropertyDrawer : OdinValueDrawer<StatReactiveProperty>
-{
-	protected override void DrawPropertyLayout(GUIContent label)
-	{
-		Property.Children[0].Draw(label);
-	}
-}
-#endif
-
-public class StatReactiveProperty : ReactiveProperty<float>
-{
-	public StatReactiveProperty()
-		: base()
-	{
-
-	}
-
-	public StatReactiveProperty(float initialValue)
-		: base(initialValue)
-	{
-
-	}
-}
+using Sirenix.Serialization;
 
 [Hotfix]
 public class Test : SerializedMonoBehaviour, IUpgradeable
 {
 	public GameObject cube;
-	public StatReactiveProperty Float;
-	[DictionaryDrawerSettings(KeyLabel = "Stat", ValueLabel = "Value")]
-	public Dictionary<string, StatReactiveProperty> Dict = new Dictionary<string, StatReactiveProperty>();
+	public StatBaseProperty Float;
+	public StatBaseProperty Hello;
+	public Stats Stats;
+	[HideReferenceObjectPicker]
+	[ListDrawerSettings(CustomAddFunction = "AddUpgrade")]
+	public ReactiveCollection<Upgrade> Upgrades;
 
-
-	protected ReactiveDictionary<string, Upgrade> upgrades = new ReactiveDictionary<string, Upgrade>();
+	protected Upgrade AddUpgrade()
+	{
+		return new Upgrade();
+	}
 
 #pragma warning disable CS1998
 
 	async UniTask Start()
 	{
 		//ModdingTest();
-
 		/*
 		Upgrade u1 = new Upgrade("u1")
 		{
@@ -84,14 +61,10 @@ public class Test : SerializedMonoBehaviour, IUpgradeable
 		//ModManager.UnloadMods();
 	}
 
-	public ReactiveDictionary<string, Upgrade> Upgrades
+	public ReactiveCollection<Upgrade> GetUpgrades()
 	{
-		get
-		{
-			return upgrades;
-		}
+		return Upgrades;
 	}
-
 
 	public void Button()
 	{

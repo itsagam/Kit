@@ -15,6 +15,7 @@ public class QuitButton : MonoBehaviour, IPointerClickHandler
 	public Color FadeColor = Color.black;
 
 	[ToggleGroup("Fade")]
+	[SuffixLabel("seconds", true)]
 	public float FadeTime = 1.0f;
 
 	public UnityEvent OnComplete;

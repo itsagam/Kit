@@ -9,6 +9,7 @@ using Sirenix.OdinInspector;
 public class TimedWindow : Window
 {
 	[PropertyOrder(-99)]
+	[SuffixLabel("seconds", true)]
 	[MinValue(0)]
 	public float Time = 3.0f;
 

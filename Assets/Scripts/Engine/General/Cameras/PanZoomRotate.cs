@@ -13,6 +13,7 @@ using Sirenix.OdinInspector;
 public class PanZoomRotate : MonoBehaviour
 {
 	[Tooltip("Area/bounds to focus on – it can be a transform, a renderer or a collider; will be origin if not provided.")]
+	[SceneObjectsOnly]
 	public Component View;
 
 	[Tooltip("Smoothing to apply while Lerp-ing. Applies to position, rotation and orthographicSize.")]

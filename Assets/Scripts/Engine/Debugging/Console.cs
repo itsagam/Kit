@@ -282,15 +282,7 @@ public class Console : MonoBehaviour
 					MethodInfo method = (MethodInfo) member;
 					ParameterInfo[] parameters = method.GetParameters();
 					output.Append("(");
-					bool first = true;
-					foreach (ParameterInfo parameterInfo in parameters)
-					{
-						if (first)
-							first = false;
-						else
-							output.Append(", ");
-						output.Append(parameterInfo.ParameterType.Name);
-					}
+					parameters.Select(p => p.ParameterType.Name).Join(output);
 					output.Append(")");
 					if (method.IsStatic)
 						output.Append(" [Static]");
@@ -307,15 +299,7 @@ public class Console : MonoBehaviour
 
 		ParameterInfo[] parameters = method.GetParameters();
 		output.Append("(");
-		bool first = true;
-		foreach (ParameterInfo parameterInfo in parameters.Skip(1))
-		{
-			if (first)
-				first = false;
-			else
-				output.Append(", ");
-			output.Append(parameterInfo.ParameterType.Name);
-		}
+		parameters.Select(p => p.ParameterType.Name).Join(output);
 		output.Append(")");
 
 		return output.ToString();

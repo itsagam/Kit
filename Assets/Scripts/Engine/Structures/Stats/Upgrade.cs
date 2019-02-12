@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
+using UniRx;
 
 #if UNITY_EDITOR
 using Sirenix.Utilities.Editor;
@@ -18,31 +20,30 @@ public class UpgradeDrawer : OdinValueDrawer<Upgrade>
 }
 #endif
 
+public interface IUpgradeable
+{
+	ReactiveCollection<Upgrade> GetUpgrades();
+}
+
 [Serializable]
 public class Upgrade
-{	
+{
 	public string ID;
-	public List<Effect> Effects;
+	public List<Effect> Effects = new List<Effect>();
 
 	public Upgrade()
 	{
 	}
 
-	public Upgrade(string id)
-	{
-		ID = id;
-	}
-
-	public Upgrade(IEnumerable<Effect> effects)
-	{
-		Effects.AddRange(effects);
-		ID = ToString();
-	}
-
 	public Upgrade(string id, IEnumerable<Effect> effects)
 	{
-		Effects.AddRange(effects);
 		ID = id;
+		AddEffects(effects);
+	}
+
+	public void AddEffects(IEnumerable<Effect> effects)
+	{
+		Effects.AddRange(effects);
 	}
 
 	public void AddEffect(Effect effect)
@@ -65,14 +66,9 @@ public class Upgrade
 		Effects.Remove(effect);
 	}
 
-	public virtual void AddTo(IUpgradeable upgradeable)
+	public void RemoveEffects(string stat)
 	{
-		upgradeable.Upgrades.Add(ID, this);
-	}
-
-	public virtual void RemoveFrom(IUpgradeable upgradeable)
-	{
-		upgradeable.Upgrades.Remove(ID);
+		Effects.RemoveAll(e => e.Stat == stat);
 	}
 
 	public override string ToString()
@@ -81,5 +77,21 @@ public class Upgrade
 		foreach (var effect in Effects)
 			output += effect.ToString() + "\n";
 		return output;
+	}
+
+	public static Upgrade Find(IUpgradeable upgradeable, string id)
+	{
+		return upgradeable.GetUpgrades().FirstOrDefault(b => b.ID == id);
+	}
+
+	public static bool RemoveFrom(IUpgradeable upgradeable, string id)
+	{
+		Upgrade previous = Find(upgradeable, id);
+		if (previous != null)
+		{
+			upgradeable.GetUpgrades().Remove(previous);
+			return true;
+		}
+		return false;
 	}
 }

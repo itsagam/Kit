@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using UnityEngine;
 
 public static class EnumerableExtensions
@@ -44,5 +45,23 @@ public static class EnumerableExtensions
 			index++;
 		}
 		return -1;
+	}
+
+	public static string Join(this IEnumerable<string> source, string separator = ", ")
+	{
+		return string.Join(separator, source);
+	}
+
+	public static void Join(this IEnumerable<string> source, StringBuilder builder, string separator = ", ")
+	{
+		bool first = true;
+		foreach (string str in source)
+		{
+			if (first)
+				first = false;
+			else
+				builder.Append(separator);
+			builder.Append(str);
+		}
 	}
 }

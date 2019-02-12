@@ -27,7 +27,7 @@ public class StatDrawer : OdinValueDrawer<Stat>
 [Serializable]
 public class Stat : ISerializationCallbackReceiver, IDisposable
 {
-	public StatReactiveProperty Base = new StatReactiveProperty();
+	public StatBaseProperty Base = new StatBaseProperty();
 
 	[SerializeField]
 	protected UnityEngine.Object parent;
@@ -47,7 +47,7 @@ public class Stat : ISerializationCallbackReceiver, IDisposable
 			&& !property.IsNullOrEmpty()
 			&& parent is IUpgradeable upgradeable)
 		{
-			Current = Stats.CreateCurrentProperty(Base, upgradeable.Upgrades, property);
+			Current = Stats.CreateCurrentProperty(Base, upgradeable.GetUpgrades(), property);
 		}
 	}
 
