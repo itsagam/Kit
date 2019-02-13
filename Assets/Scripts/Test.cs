@@ -18,6 +18,9 @@ using Sirenix.Serialization;
 public class Test : SerializedMonoBehaviour, IUpgradeable
 {
 	public GameObject cube;
+	public Buff Buff;
+	
+	[Title("Stats")]
 	public Stat Health;
 	public Stat Damage;
 	public Stat Attack;
@@ -31,40 +34,24 @@ public class Test : SerializedMonoBehaviour, IUpgradeable
 		return new Upgrade();
 	}
 
+	public ReactiveCollection<Upgrade> GetUpgrades()
+	{
+		return Upgrades;
+	}
+
 #pragma warning disable CS1998
 
 	async UniTask Start()
 	{
 		//ModdingTest();
-		/*
-		Upgrade u1 = new Upgrade("u1")
-		{
-			new Effect("Health", "+100"),
-			new Effect("Damage", "+50%")
-		};
-		Upgrades.Add(u1.ID, u1);
-
-		print(Health.CurrentValue);
-
-		Upgrade u2 = new Upgrade("u2")
-		{
-			new Effect("Health", "+100")
-		};
-		Upgrades.Add(u2.ID, u2);
-
-		print(Health.CurrentValue);
-		*/
+		new Buff("DamagePotion", new List<Effect> { new Effect("Health", "+562")}, 15.0f).AddTo(this);
+	
 	}
 #pragma warning restore CS1998
 
 	void OnDestroy()
 	{
 		//ModManager.UnloadMods();
-	}
-
-	public ReactiveCollection<Upgrade> GetUpgrades()
-	{
-		return Upgrades;
 	}
 
 	public void Button()

@@ -5,10 +5,7 @@ using System.Linq;
 using UnityEngine;
 using UniRx;
 
-// TODO: Display current value and applied upgrades in Stat and Stats
-// TODO: Error-checking at proper place in Stat
 // TODO: Check if current values are updated in the editor
-// TODO: Display remaining time in Buff
 
 #if UNITY_EDITOR
 using UnityEditor;
@@ -17,6 +14,7 @@ using Sirenix.Utilities.Editor;
 
 public class StatDrawer : OdinValueDrawer<Stat>
 {
+	public const float FoldoutWidthCorrection = 4;
 	public static GUIStyle CurrentValueStyle = new GUIStyle(SirenixGUIStyles.BoldTitle);
 
 	protected LocalPersistentContext<bool> toggled;
@@ -38,28 +36,32 @@ public class StatDrawer : OdinValueDrawer<Stat>
 	{
 		var stat = ValueEntry.SmartValue;
 		if (StatsDrawer.DrawWarning(Property, stat.Upgradeable))
+		{
+			DrawField(label, stat);
 			return;
+		}
 
 		if (stat.ID.IsNullOrEmpty())
 		{
+			DrawField(label, stat);
 			SirenixEditorGUI.WarningMessageBox("Could not set stat ID. Current values will not be available.");
 			return;
 		}
 
-		var groups = Stats.GetEffectsAndUpgrades(stat.Upgradeable, stat.ID);
 		SirenixEditorGUI.BeginIndentedHorizontal();
+		var groups = Stats.GetEffectsAndUpgrades(stat.Upgradeable, stat.ID);
 		if (groups.Any())
 		{
-			Rect rect = EditorGUILayout.GetControlRect(false, GUILayout.Width(EditorGUIUtility.labelWidth - 4));
+			Rect rect = EditorGUILayout.GetControlRect(false, GUILayout.Width(EditorGUIUtility.labelWidth - FoldoutWidthCorrection));
 			toggled.Value = SirenixEditorGUI.Foldout(rect, toggled.Value, label);
-			stat.BaseValue = SirenixEditorGUI.DynamicPrimitiveField(null, stat.BaseValue);
+			DrawField(null, stat);
 		}
 		else
 		{
-			stat.BaseValue = SirenixEditorGUI.DynamicPrimitiveField(label, stat.BaseValue);
+			DrawField(label, stat);
 		}
 
-		GUILayout.Label(stat.CurrentValue.ToString(), CurrentValueStyle, GUILayout.ExpandWidth(false));
+		GUILayout.Label(Mathf.RoundToInt(stat.CurrentValue).ToString(), CurrentValueStyle, GUILayout.ExpandWidth(false));
 		SirenixEditorGUI.EndIndentedHorizontal();
 
 		if (groups.Any())
@@ -72,6 +74,11 @@ public class StatDrawer : OdinValueDrawer<Stat>
 			}
 			SirenixEditorGUI.EndFadeGroup();
 		}
+	}
+
+	public static void DrawField(GUIContent label, Stat stat)
+	{
+		stat.BaseValue = SirenixEditorGUI.DynamicPrimitiveField(label, stat.BaseValue);
 	}
 }
 #endif

@@ -13,6 +13,8 @@ using Sirenix.Utilities.Editor;
 
 public class StatsDrawer : OdinValueDrawer<Stats>
 {
+	public const float FoldoutGap = 15;
+
 	public static GUIStyle BaseValueStyle = new GUIStyle(SirenixGUIStyles.Label);
 	public static GUIStyle CurrentValueStyle = new GUIStyle(SirenixGUIStyles.BoldTitle)
 	{
@@ -72,10 +74,10 @@ public class StatsDrawer : OdinValueDrawer<Stats>
 				}
 				else
 				{
-					GUILayout.Space(15);
+					GUILayout.Space(FoldoutGap);
 					GUILayout.Label(stat);
 				}
-				GUILayout.Label(stats.GetCurrentValue(stat).ToString(), CurrentValueStyle);
+				GUILayout.Label(Mathf.RoundToInt(stats.GetCurrentValue(stat)).ToString(), CurrentValueStyle);
 
 				SirenixEditorGUI.EndIndentedHorizontal();
 				SirenixEditorGUI.EndBoxHeader();
@@ -99,6 +101,7 @@ public class StatsDrawer : OdinValueDrawer<Stats>
 		}
 		SirenixEditorGUI.EndFadeGroup();
 		SirenixEditorGUI.EndIndentedVertical();
+		EditorUtility.SetDirty(Property.Tree.UnitySerializedObject.targetObject);
 	}
 
 	public static bool DrawWarning(InspectorProperty property, IUpgradeable upgradeable)
@@ -138,7 +141,8 @@ public class StatBasePropertyDrawer : OdinValueDrawer<StatBaseProperty>
 {
 	protected override void DrawPropertyLayout(GUIContent label)
 	{
-		Property.Children[0].Draw(label);
+		var stat = ValueEntry.SmartValue;
+		stat.Value = SirenixEditorGUI.DynamicPrimitiveField(label, stat.Value);
 	}
 }
 #endif

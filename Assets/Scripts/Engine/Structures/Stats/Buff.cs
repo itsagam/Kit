@@ -5,28 +5,48 @@ using System.Linq;
 using UnityEngine;
 using UniRx;
 using Sirenix.OdinInspector;
+using System.Reflection;
 
 #if UNITY_EDITOR
 using UnityEditor;
 using Sirenix.Utilities.Editor;
 using Sirenix.OdinInspector.Editor;
 
+public class BuffProcessor : OdinAttributeProcessor<Buff>
+{
+	public override void ProcessChildMemberAttributes(InspectorProperty parentProperty, MemberInfo member, List<Attribute> attributes)
+	{
+		switch (member.Name)
+		{
+			case "Duration":
+				attributes.Add(new HideInPlayModeAttribute());
+				attributes.Add(new HorizontalGroupAttribute());
+				attributes.Add(new SuffixLabelAttribute("sec", true));
+				break;
+
+			case "Mode":
+				attributes.Add(new HideInPlayModeAttribute());
+				attributes.Add(new HorizontalGroupAttribute(90));
+				attributes.Add(new HideLabelAttribute());
+				break;
+
+			case "Effects":
+				attributes.Add(new PropertyOrderAttribute(99));
+				break;
+		}
+	}
+}
+
 public class BuffDrawer : OdinValueDrawer<Buff>
 {
 	protected override void DrawPropertyLayout(GUIContent label)
 	{
+		var buff = ValueEntry.SmartValue;
+		
 		SirenixEditorGUI.BeginToolbarBox(label);
-
-		Property.Children["ID"].Draw();
-		if (! Application.isPlaying)
-		{
-			SirenixEditorGUI.BeginHorizontalPropertyLayout(Property.Children["Time"].Label);
-			Property.Children["Time"].Draw(null);
-			Property.Children["Mode"].Draw(null);
-			SirenixEditorGUI.EndHorizontalPropertyLayout();
-		}
-		Property.Children["Effects"].Draw();
-
+		if (Application.isPlaying && buff.TimeLeft > 0)
+			EditorGUILayout.LabelField("Time", string.Format("{0:0.##}s", buff.TimeLeft));
+		CallNextDrawer(null);
 		SirenixEditorGUI.EndToolbarBox();
 	}
 }
@@ -45,8 +65,10 @@ public enum BuffMode
 [Serializable]
 public class Buff : Upgrade
 {
-	public float Time;
+	public float Duration;
 	public BuffMode Mode = BuffMode.Extend;
+
+	public float TimeLeft { get; protected set; } = -1;
 
 	public Buff()
 	{
@@ -56,7 +78,7 @@ public class Buff : Upgrade
 	{
 		Effects.AddRange(effects);
 		ID = ToString();
-		Time = time;
+		Duration = time;
 		Mode = mode;
 	}
 
@@ -64,7 +86,7 @@ public class Buff : Upgrade
 	{
 		Effects.AddRange(effects);
 		ID = id;
-		Time = time;
+		Duration = time;
 		Mode = mode;
 	}
 
@@ -82,14 +104,17 @@ public class Buff : Upgrade
 		if (mode == BuffMode.Nothing || previous == null)
 		{
 			upgradeable.GetUpgrades().Add(this);
-			Observable.Timer(TimeSpan.FromSeconds(Time)).Subscribe(l =>
-			{
-				try
-				{
-					upgradeable.GetUpgrades().Remove(this);
+			float end = Time.time + Duration;
+			Observable.EveryUpdate().Select(l => end - Time.time).TakeWhile(t => t > 0).Subscribe(
+				time => TimeLeft = time,
+				() => {
+					try
+					{
+						upgradeable.GetUpgrades().Remove(this);
+					}
+					catch {}
 				}
-				catch { }
-			});
+			);
 			return this;
 		}
 
@@ -99,21 +124,21 @@ public class Buff : Upgrade
 				break;
 
 			case BuffMode.Replace:
-				previous.Time = Time;
+				previous.Duration = Duration;
 				break;
 
 			case BuffMode.Extend:
-				previous.Time += Time;
+				previous.Duration += Duration;
 				break;
 
 			case BuffMode.Longer:
-				if (previous.Time < Time)
-					previous.Time = Time;
+				if (previous.Duration < Duration)
+					previous.Duration = Duration;
 				break;
 
 			case BuffMode.Shorter:
-				if (previous.Time > Time)
-					previous.Time = Time;
+				if (previous.Duration > Duration)
+					previous.Duration = Duration;
 				break;
 		}
 		return this;

@@ -185,7 +185,7 @@ MonoBehaviour:
       Data: 2|StatBaseProperty, Assembly-CSharp
     - Name: value
       Entry: 4
-      Data: 100
+      Data: 106.1
     - Name: 
       Entry: 8
       Data: 
@@ -203,7 +203,7 @@ MonoBehaviour:
       Data: 3|StatBaseProperty, Assembly-CSharp
     - Name: value
       Entry: 4
-      Data: 15
+      Data: 189.9
     - Name: 
       Entry: 8
       Data: 
@@ -221,7 +221,7 @@ MonoBehaviour:
       Data: 4|StatBaseProperty, Assembly-CSharp
     - Name: value
       Entry: 4
-      Data: 907.8
+      Data: 812.7
     - Name: 
       Entry: 8
       Data: 
@@ -263,7 +263,7 @@ MonoBehaviour:
       Data: 0
     - Name: Value
       Entry: 4
-      Data: 100
+      Data: 787
     - Name: 
       Entry: 8
       Data: 
@@ -349,14 +349,19 @@ MonoBehaviour:
       Entry: 8
       Data: 
   cube: {fileID: 0}
+  Buff:
+    ID: 
+    Effects: []
+    Duration: 0
+    Mode: 1
   Health:
     ID: Health
     Base:
-      value: 413.6
+      value: 87.3
   Damage:
     ID: Damage
     Base:
-      value: 453.2
+      value: 1
   Attack:
     ID: Attack
     Base:
