@@ -221,7 +221,7 @@ MonoBehaviour:
       Data: 4|StatBaseProperty, Assembly-CSharp
     - Name: value
       Entry: 4
-      Data: 10
+      Data: 907.8
     - Name: 
       Entry: 8
       Data: 
@@ -239,7 +239,7 @@ MonoBehaviour:
       Data: 5|UniRx.ReactiveCollection`1[[Upgrade, Assembly-CSharp]], UniRx
     - Name: 
       Entry: 12
-      Data: 3
+      Data: 2
     - Name: 
       Entry: 7
       Data: 6|Upgrade, Assembly-CSharp
@@ -343,37 +343,24 @@ MonoBehaviour:
       Entry: 8
       Data: 
     - Name: 
-      Entry: 7
-      Data: 10|Upgrade, Assembly-CSharp
-    - Name: ID
-      Entry: 1
-      Data: Nothing
-    - Name: Effects
-      Entry: 7
-      Data: 11|System.Collections.Generic.List`1[[Effect, Assembly-CSharp]], mscorlib
-    - Name: 
-      Entry: 12
-      Data: 0
-    - Name: 
-      Entry: 13
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
       Entry: 13
       Data: 
     - Name: 
       Entry: 8
       Data: 
   cube: {fileID: 0}
-  Float:
-    value: 4234
-  Hello:
-    value: 0
+  Health:
+    ID: Health
+    Base:
+      value: 413.6
+  Damage:
+    ID: Damage
+    Base:
+      value: 453.2
+  Attack:
+    ID: Attack
+    Base:
+      value: 525
 --- !u!20 &225321743
 Camera:
   m_ObjectHideFlags: 0

@@ -4,8 +4,10 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UniRx;
+using Sirenix.OdinInspector;
 
 #if UNITY_EDITOR
+using UnityEditor;
 using Sirenix.Utilities.Editor;
 using Sirenix.OdinInspector.Editor;
 

@@ -18,8 +18,9 @@ using Sirenix.Serialization;
 public class Test : SerializedMonoBehaviour, IUpgradeable
 {
 	public GameObject cube;
-	public StatBaseProperty Float;
-	public StatBaseProperty Hello;
+	public Stat Health;
+	public Stat Damage;
+	public Stat Attack;
 	public Stats Stats;
 	[HideReferenceObjectPicker]
 	[ListDrawerSettings(CustomAddFunction = "AddUpgrade")]

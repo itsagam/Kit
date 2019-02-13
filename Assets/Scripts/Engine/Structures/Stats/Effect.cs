@@ -9,21 +9,21 @@ using Sirenix.OdinInspector.Editor;
 
 public class EffectDrawer : OdinValueDrawer<Effect>
 {
+	public const float EffectWidth = 120;
+
 	protected override void DrawPropertyLayout(GUIContent label)
 	{
-		SirenixEditorGUI.BeginHorizontalPropertyLayout(label);
+		SirenixEditorGUI.BeginIndentedHorizontal();
 		Effect effect = ValueEntry.SmartValue;
-
-		effect.Stat = SirenixEditorGUI.DynamicPrimitiveField(null, effect.Stat, GUILayout.MaxWidth(140));
-
-		string input = SirenixEditorGUI.DynamicPrimitiveField(null, Effect.Convert(effect));
+		effect.Stat = SirenixEditorGUI.DynamicPrimitiveField(label, effect.Stat);
+		string input = SirenixEditorGUI.DynamicPrimitiveField(null, Effect.Convert(effect), GUILayout.MaxWidth(EffectWidth));
 		try {
 			(effect.Type, effect.Value) = Effect.Parse(input);
 		}
 		catch {}
 
 		ValueEntry.SmartValue = effect;
-		SirenixEditorGUI.EndHorizontalPropertyLayout();
+		SirenixEditorGUI.EndIndentedHorizontal();
 	}
 }
 #endif

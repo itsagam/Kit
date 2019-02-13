@@ -5,12 +5,6 @@ using System.Linq;
 using UnityEngine;
 using UniRx;
 using Sirenix.OdinInspector;
-using Sirenix.Serialization;
-
-// TODO: Display current value and applied upgrades in Stat and Stats
-// TODO: Make UpgradeList drawer
-// TODO: Find a way to not use strings
-// TODO: Display remaining time in Buff
 
 #if UNITY_EDITOR
 using UnityEditor;
@@ -19,25 +13,20 @@ using Sirenix.Utilities.Editor;
 
 public class StatsDrawer : OdinValueDrawer<Stats>
 {
-	public static GUIStyle BaseValueStyle;
-	public static GUIStyle CurrentValueStyle;
-	public static GUIStyle EffectsStyle;
+	public static GUIStyle BaseValueStyle = new GUIStyle(SirenixGUIStyles.Label);
+	public static GUIStyle CurrentValueStyle = new GUIStyle(SirenixGUIStyles.BoldTitle)
+	{
+		alignment = TextAnchor.MiddleRight
+	};
+	public static GUIStyle EffectsStyle = new GUIStyle(SirenixGUIStyles.Label)
+	{
+	};
 
 	protected LocalPersistentContext<bool> toggled;
 
 	protected override void Initialize()
 	{
 		base.Initialize();
-		CurrentValueStyle = new GUIStyle(EditorStyles.whiteLabel)
-		{
-			alignment = TextAnchor.MiddleRight
-		};
-		BaseValueStyle = new GUIStyle(EditorStyles.label)
-		{
-		};
-		EffectsStyle = new GUIStyle(EditorStyles.label)
-		{
-		};
 		toggled = this.GetPersistentValue("Toggled", false);
 		Property.Info.GetEditableAttributesList().Add(new DictionaryDrawerSettings
 		{
@@ -54,11 +43,8 @@ public class StatsDrawer : OdinValueDrawer<Stats>
 		CallNextDrawer(label);
 
 		var stats = ValueEntry.SmartValue;
-		if (stats.Upgradeable == null)
-		{
-			SirenixEditorGUI.WarningMessageBox($"The parent type {Property.ParentType} doesn't implement IUpgradeable. Current values cannot be displayed.");
+		if (DrawWarning(Property, stats.Upgradeable))
 			return;
-		}
 
 		// Current header
 		SirenixEditorGUI.BeginIndentedVertical(SirenixGUIStyles.PropertyPadding);
@@ -72,12 +58,7 @@ public class StatsDrawer : OdinValueDrawer<Stats>
 			foreach (var kvp in stats)
 			{
 				var stat = kvp.Key;
-				float baseValue = kvp.Value.Value;
-				float currentValue = stats.GetCurrentValue(stat);
-
-				var groups = stats.Upgradeable.GetUpgrades()
-								.Select(u => (upgrade: u, effects: u.Effects.Where(e => e.Stat == stat)))
-								.Where(g => g.effects.Any());
+				var groups = Stats.GetEffectsAndUpgrades(stats.Upgradeable, stat);
 
 				// Stat header
 				SirenixEditorGUI.BeginBox();
@@ -94,7 +75,7 @@ public class StatsDrawer : OdinValueDrawer<Stats>
 					GUILayout.Space(15);
 					GUILayout.Label(stat);
 				}
-				GUILayout.Label(currentValue.ToString(), CurrentValueStyle);
+				GUILayout.Label(stats.GetCurrentValue(stat).ToString(), CurrentValueStyle);
 
 				SirenixEditorGUI.EndIndentedHorizontal();
 				SirenixEditorGUI.EndBoxHeader();
@@ -105,19 +86,9 @@ public class StatsDrawer : OdinValueDrawer<Stats>
 					if (SirenixEditorGUI.BeginFadeGroup(isExpanded, isExpanded.Value))
 					{
 						GUIHelper.PushIndentLevel(1);
-						SirenixEditorGUI.BeginHorizontalPropertyLayout(new GUIContent("Base"));
-						GUILayout.Label(baseValue.ToString(), BaseValueStyle);
-						SirenixEditorGUI.EndHorizontalPropertyLayout();
-						
-						SirenixEditorGUI.DrawThickHorizontalSeparator(2, 2);
-
-						foreach (var (upgrade, effects) in groups)
-						{
-							string effectString = effects.Select(e => Effect.Convert(e)).Join();
-							SirenixEditorGUI.BeginHorizontalPropertyLayout(new GUIContent(upgrade.ID));
-							GUILayout.Label(effectString, EffectsStyle);
-							SirenixEditorGUI.EndHorizontalPropertyLayout();
-						}
+						EditorGUILayout.LabelField("Base", kvp.Value.Value.ToString(), BaseValueStyle);
+						SirenixEditorGUI.DrawThickHorizontalSeparator(1, 1);
+						DrawEffects(groups);
 						GUIHelper.PopIndentLevel();
 					}
 					SirenixEditorGUI.EndFadeGroup();
@@ -128,6 +99,30 @@ public class StatsDrawer : OdinValueDrawer<Stats>
 		}
 		SirenixEditorGUI.EndFadeGroup();
 		SirenixEditorGUI.EndIndentedVertical();
+	}
+
+	public static bool DrawWarning(InspectorProperty property, IUpgradeable upgradeable)
+	{
+		if (upgradeable == null)
+		{
+			SirenixEditorGUI.WarningMessageBox($"The parent type {property.ParentType} doesn't implement IUpgradeable. Current values will not be available.");
+			return true;
+		}
+		if (upgradeable.GetUpgrades() == null)
+		{
+			SirenixEditorGUI.WarningMessageBox("Trying to fetch upgrades returned null. Current values will not be available.");
+			return true;
+		}
+		return false;
+	}
+
+	public static void DrawEffects(IEnumerable<(Upgrade, IEnumerable<Effect>)> groups)
+	{
+		foreach (var (upgrade, effects) in groups)
+		{
+			string effectString = effects.Select(e => Effect.Convert(e)).Join();
+			EditorGUILayout.LabelField(upgrade.ID, effectString, EffectsStyle);
+		}
 	}
 }
 
@@ -214,7 +209,7 @@ public class Stats : Dictionary<string, StatBaseProperty>, IDisposable
 		if (currentProperties.TryGetValue(stat, out var property))
 			return property;
 
-		var currentProperty = CreateCurrentProperty(GetBaseProperty(stat), Upgradeable.GetUpgrades(), stat);
+		var currentProperty = CreateCurrentProperty(GetBaseProperty(stat), Upgradeable, stat);
 
 		disposables.Add(currentProperty);
 		currentProperties.Add(stat, currentProperty);
@@ -234,27 +229,30 @@ public class Stats : Dictionary<string, StatBaseProperty>, IDisposable
 
 	public static ReadOnlyReactiveProperty<float> CreateCurrentProperty(
 			ReactiveProperty<float> baseProperty,
-			ReactiveCollection<Upgrade> upgrades,
+			IUpgradeable upgradeable,
 			string stat)
 	{
 		// We get the last upgrades that were changed and aggregate them, and then we use CombineLatest
 		// to use these aggregates in changing base values
-		var observable = upgrades.ObserveCountChanged()
-			.Select(c => GetAggregates(upgrades, stat))
-			.StartWith(GetAggregates(upgrades, stat))
+		var observable = upgradeable.GetUpgrades().ObserveCountChanged()
+			.Select(c => GetAggregates(GetEffects(upgradeable, stat)))
+			.StartWith(GetAggregates(GetEffects(upgradeable, stat)))
 			.CombineLatest(baseProperty, (aggregates, baseValue) => CalculateValue(aggregates, baseValue));
 
 		return new ReadOnlyReactiveProperty<float>(observable);
 	}
 
-	public static IEnumerable<Effect> GetMatchingEffects(ReactiveCollection<Upgrade> upgrades, string stat)
+	public static IEnumerable<Effect> GetEffects(IUpgradeable upgradeable, string stat)
 	{
-		return upgrades.SelectMany(u => u.Effects).Where(e => e.Stat == stat);
+		return upgradeable.GetUpgrades().Where(u => u != null).SelectMany(u => u.Effects).Where(e => e.Stat == stat);
 	}
 
-	public static (float, float, float) GetAggregates(ReactiveCollection<Upgrade> upgrades, string stat)
+	public static IEnumerable<(Upgrade, IEnumerable<Effect>)> GetEffectsAndUpgrades(IUpgradeable upgradeable, string stat)
 	{
-		return GetAggregates(GetMatchingEffects(upgrades, stat));
+		return upgradeable.GetUpgrades()
+			.Where(u => u != null)
+			.Select(u => (upgrade: u, effects: u.Effects.Where(e => e.Stat == stat)))
+			.Where(g => g.effects.Any());
 	}
 
 	public static (float, float, float) GetAggregates(IEnumerable<Effect> effects)
