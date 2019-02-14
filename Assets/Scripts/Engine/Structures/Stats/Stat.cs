@@ -6,8 +6,6 @@ using UnityEngine;
 using UniRx;
 using Sirenix.OdinInspector;
 
-// TODO: Remove StatBaseProperty
-
 #if UNITY_EDITOR
 using UnityEditor;
 using Sirenix.OdinInspector.Editor;
@@ -36,12 +34,18 @@ public class StatDrawer : OdinValueDrawer<Stat>
 	{
 		base.Initialize();
 		toggled = this.GetPersistentValue("Toggled", false);
-
-		TrySetup();
-		ValueEntry.OnValueChanged += i => TrySetup();
+		SetupInstance();
 	}
 
-	protected void TrySetup()
+	protected void SetupInstance()
+	{
+		if (ValueEntry.SmartValue == null)
+			Property.Tree.DelayActionUntilRepaint(() => ValueEntry.SmartValue = new Stat());
+		SetupValues();
+		ValueEntry.OnValueChanged += i => SetupValues();
+	}
+
+	protected void SetupValues()
 	{
 		var stat = ValueEntry.SmartValue;
 		if (stat != null)

@@ -16,6 +16,11 @@ public class StatsProcessor : OdinAttributeProcessor<Stats>
 	public override void ProcessSelfAttributes(InspectorProperty property, List<Attribute> attributes)
 	{
 		attributes.Add(new HideReferenceObjectPickerAttribute());
+		property.Info.GetEditableAttributesList().Add(new DictionaryDrawerSettings
+		{
+			KeyLabel = "Stat Name",
+			ValueLabel = "Base Value"
+		});	
 	}
 }
 
@@ -37,17 +42,22 @@ public class StatsDrawer : OdinValueDrawer<Stats>
 	{
 		base.Initialize();
 		toggled = this.GetPersistentValue("Toggled", false);
-		Property.Info.GetEditableAttributesList().Add(
-		new DictionaryDrawerSettings
-		{
-			KeyLabel = "Stat Name",
-			ValueLabel = "Base Value"
-		});
-		TrySetup();
-		ValueEntry.OnValueChanged += i => TrySetup();
+		SetupInstance();
 	}
 
-	protected void TrySetup()
+	protected void SetupInstance()
+	{
+		// If a value is reference type and isn't assigned, Odin doesn't create a new instance like Unity and we
+		// have to pick it manually. Setting it immediately messes up the painting, so we delay it until that.
+		if (ValueEntry.SmartValue == null)
+			Property.Tree.DelayActionUntilRepaint(() => ValueEntry.SmartValue = new Stats());
+		// Try to setup values required by the instance
+		SetupValues();
+		// We have to setup the instance whenever it's changed/set in the inspector
+		ValueEntry.OnValueChanged += i => SetupValues();
+	}
+
+	protected void SetupValues()
 	{
 		var stats = ValueEntry.SmartValue;
 		if (stats != null && stats.Upgradeable == null)

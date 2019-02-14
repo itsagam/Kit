@@ -5,22 +5,22 @@ using System.Linq;
 using System.Text;
 using System.IO;
 using UnityEngine;
-using UnityEngine.UI;
 using Modding;
 using Modding.Parsers;
 using UniRx;
 using UniRx.Async;
-using XLua;
 using Sirenix.OdinInspector;
-using Sirenix.Serialization;
 
-[Hotfix]
 public class Test : SerializedMonoBehaviour, IUpgradeable
 {
 	public GameObject cube;
 
-	public Stat Stat;
+	public Stat Health;
+	public Stat Defense;
+	public Stat Attack;
 
+	public Stats Stats;
+	
 	[HideReferenceObjectPicker]
 	[ListDrawerSettings(CustomAddFunction = "AddUpgrade")]
 	public ReactiveCollection<Upgrade> Upgrades;
@@ -37,15 +37,15 @@ public class Test : SerializedMonoBehaviour, IUpgradeable
 
 	void Awake()
 	{
-		//Debug.Log(Health.CurrentValue);
+		var buff = new Buff("HealthPotion", 15.0f).AddTo(this);
+		buff.AddEffect("Health", "+50");
+		Debug.Log(Health.CurrentValue);
 	}
 
 #pragma warning disable CS1998
 	async UniTask Start()
 	{
 		//ModdingTest();
-		var buff = new Buff("DamagePotion", 15.0f).AddTo(this);
-		buff.AddEffect("Health", "+50");
 	}
 #pragma warning restore CS1998
 

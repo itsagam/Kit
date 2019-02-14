@@ -176,14 +176,14 @@ MonoBehaviour:
       Data: 1|StatBaseProperty, Assembly-CSharp
     - Name: value
       Entry: 4
-      Data: 1235
+      Data: 100
     - Name: 
       Entry: 8
       Data: 
     - Name: 
       Entry: 8
       Data: 
-    - Name: S
+    - Name: Defense
       Entry: 7
       Data: 2|Stat, Assembly-CSharp
     - Name: Upgradeable
@@ -191,34 +191,128 @@ MonoBehaviour:
       Data: 0
     - Name: ID
       Entry: 1
-      Data: S
+      Data: Defense
     - Name: Base
       Entry: 7
       Data: 3|StatBaseProperty, Assembly-CSharp
     - Name: value
       Entry: 4
-      Data: 0
+      Data: 15
     - Name: 
       Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: Attack
+      Entry: 7
+      Data: 4|Stat, Assembly-CSharp
+    - Name: Upgradeable
+      Entry: 10
+      Data: 0
+    - Name: ID
+      Entry: 1
+      Data: Attack
+    - Name: Base
+      Entry: 7
+      Data: 5|StatBaseProperty, Assembly-CSharp
+    - Name: value
+      Entry: 4
+      Data: 10
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: Stats
+      Entry: 7
+      Data: 6|Stats, Assembly-CSharp
+    - Name: comparer
+      Entry: 7
+      Data: 7|System.Collections.Generic.GenericEqualityComparer`1[[System.String,
+        mscorlib]], mscorlib
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 12
+      Data: 3
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: 
+      Entry: 1
+      Data: Health
+    - Name: 
+      Entry: 7
+      Data: 8|StatBaseProperty, Assembly-CSharp
+    - Name: value
+      Entry: 4
+      Data: 100
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: 
+      Entry: 1
+      Data: Defense
+    - Name: 
+      Entry: 7
+      Data: 9|StatBaseProperty, Assembly-CSharp
+    - Name: value
+      Entry: 4
+      Data: 15
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: 
+      Entry: 1
+      Data: Attack
+    - Name: 
+      Entry: 7
+      Data: 10|StatBaseProperty, Assembly-CSharp
+    - Name: value
+      Entry: 4
+      Data: 10
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 13
       Data: 
     - Name: 
       Entry: 8
       Data: 
     - Name: Upgrades
       Entry: 7
-      Data: 4|UniRx.ReactiveCollection`1[[Upgrade, Assembly-CSharp]], UniRx
+      Data: 11|UniRx.ReactiveCollection`1[[Upgrade, Assembly-CSharp]], UniRx
     - Name: 
       Entry: 12
       Data: 2
     - Name: 
       Entry: 7
-      Data: 5|Upgrade, Assembly-CSharp
+      Data: 12|Upgrade, Assembly-CSharp
     - Name: ID
       Entry: 1
       Data: DoubleTake
     - Name: Effects
       Entry: 7
-      Data: 6|System.Collections.Generic.List`1[[Effect, Assembly-CSharp]], mscorlib
+      Data: 13|System.Collections.Generic.List`1[[Effect, Assembly-CSharp]], mscorlib
     - Name: 
       Entry: 12
       Data: 2
@@ -242,7 +336,7 @@ MonoBehaviour:
       Data: Effect, Assembly-CSharp
     - Name: Stat
       Entry: 1
-      Data: Damage
+      Data: Attack
     - Name: Type
       Entry: 3
       Data: 2
@@ -263,13 +357,13 @@ MonoBehaviour:
       Data: 
     - Name: 
       Entry: 7
-      Data: 7|Upgrade, Assembly-CSharp
+      Data: 14|Upgrade, Assembly-CSharp
     - Name: ID
       Entry: 1
       Data: ExtraDamage
     - Name: Effects
       Entry: 7
-      Data: 8|System.Collections.Generic.List`1[[Effect, Assembly-CSharp]], mscorlib
+      Data: 15|System.Collections.Generic.List`1[[Effect, Assembly-CSharp]], mscorlib
     - Name: 
       Entry: 12
       Data: 2
@@ -278,7 +372,7 @@ MonoBehaviour:
       Data: Effect, Assembly-CSharp
     - Name: Stat
       Entry: 1
-      Data: Damage
+      Data: Attack
     - Name: Type
       Entry: 3
       Data: 1
@@ -293,7 +387,7 @@ MonoBehaviour:
       Data: Effect, Assembly-CSharp
     - Name: Stat
       Entry: 1
-      Data: Damage
+      Data: Attack
     - Name: Type
       Entry: 3
       Data: 2
