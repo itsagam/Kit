@@ -19,11 +19,8 @@ public class Test : SerializedMonoBehaviour, IUpgradeable
 {
 	public GameObject cube;
 	
-	[Title("Stats")]
 	public Stat Health;
-	public Stat Damage;
-	public Stat Attack;
-	public Stats Stats;
+
 	[HideReferenceObjectPicker]
 	[ListDrawerSettings(CustomAddFunction = "AddUpgrade")]
 	public ReactiveCollection<Upgrade> Upgrades;
@@ -38,13 +35,16 @@ public class Test : SerializedMonoBehaviour, IUpgradeable
 		return Upgrades;
 	}
 
-#pragma warning disable CS1998
+	void Awake()
+	{
+		Debug.Log(Health.CurrentValue);
+	}
 
+#pragma warning disable CS1998
 	async UniTask Start()
 	{
 		//ModdingTest();
 		//new Buff("DamagePotion", new List<Effect> { new Effect("Health", "+562")}, 15.0f).AddTo(this);
-		//Debug.Log(Health.CurrentValue);
 	}
 #pragma warning restore CS1998
 

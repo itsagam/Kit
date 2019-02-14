@@ -161,94 +161,42 @@ MonoBehaviour:
     PrefabModificationsReferencedUnityObjects: []
     PrefabModifications: []
     SerializationNodes:
-    - Name: Stats
+    - Name: aaa
       Entry: 7
-      Data: 0|Stats, Assembly-CSharp
-    - Name: comparer
-      Entry: 7
-      Data: 1|System.Collections.Generic.GenericEqualityComparer`1[[System.String,
-        mscorlib]], mscorlib
-    - Name: 
-      Entry: 8
+      Data: 0|Stat, Assembly-CSharp
+    - Name: Upgradeable
+      Entry: 6
       Data: 
-    - Name: 
-      Entry: 12
-      Data: 3
-    - Name: 
-      Entry: 7
+    - Name: ID
+      Entry: 6
       Data: 
-    - Name: 
-      Entry: 1
-      Data: Health
-    - Name: 
+    - Name: Base
       Entry: 7
-      Data: 2|StatBaseProperty, Assembly-CSharp
+      Data: 1|StatBaseProperty, Assembly-CSharp
     - Name: value
       Entry: 4
-      Data: 106.1
+      Data: 123
     - Name: 
       Entry: 8
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: 
-    - Name: 
-      Entry: 1
-      Data: Damage
-    - Name: 
-      Entry: 7
-      Data: 3|StatBaseProperty, Assembly-CSharp
-    - Name: value
-      Entry: 4
-      Data: 189.9
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: 
-    - Name: 
-      Entry: 1
-      Data: Attack
-    - Name: 
-      Entry: 7
-      Data: 4|StatBaseProperty, Assembly-CSharp
-    - Name: value
-      Entry: 4
-      Data: 812.7
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 13
       Data: 
     - Name: 
       Entry: 8
       Data: 
     - Name: Upgrades
       Entry: 7
-      Data: 5|UniRx.ReactiveCollection`1[[Upgrade, Assembly-CSharp]], UniRx
+      Data: 2|UniRx.ReactiveCollection`1[[Upgrade, Assembly-CSharp]], UniRx
     - Name: 
       Entry: 12
       Data: 2
     - Name: 
       Entry: 7
-      Data: 6|Upgrade, Assembly-CSharp
+      Data: 3|Upgrade, Assembly-CSharp
     - Name: ID
       Entry: 1
       Data: DoubleTake
     - Name: Effects
       Entry: 7
-      Data: 7|System.Collections.Generic.List`1[[Effect, Assembly-CSharp]], mscorlib
+      Data: 4|System.Collections.Generic.List`1[[Effect, Assembly-CSharp]], mscorlib
     - Name: 
       Entry: 12
       Data: 2
@@ -263,7 +211,7 @@ MonoBehaviour:
       Data: 0
     - Name: Value
       Entry: 4
-      Data: 787
+      Data: 100
     - Name: 
       Entry: 8
       Data: 
@@ -293,13 +241,13 @@ MonoBehaviour:
       Data: 
     - Name: 
       Entry: 7
-      Data: 8|Upgrade, Assembly-CSharp
+      Data: 5|Upgrade, Assembly-CSharp
     - Name: ID
       Entry: 1
       Data: ExtraDamage
     - Name: Effects
       Entry: 7
-      Data: 9|System.Collections.Generic.List`1[[Effect, Assembly-CSharp]], mscorlib
+      Data: 6|System.Collections.Generic.List`1[[Effect, Assembly-CSharp]], mscorlib
     - Name: 
       Entry: 12
       Data: 2
@@ -349,23 +297,6 @@ MonoBehaviour:
       Entry: 8
       Data: 
   cube: {fileID: 0}
-  Buff:
-    ID: 
-    Effects: []
-    Duration: 0
-    Mode: 1
-  Health:
-    ID: Health
-    Base:
-      value: 87.3
-  Damage:
-    ID: Damage
-    Base:
-      value: 1
-  Attack:
-    ID: Attack
-    Base:
-      value: 525
 --- !u!20 &225321743
 Camera:
   m_ObjectHideFlags: 0

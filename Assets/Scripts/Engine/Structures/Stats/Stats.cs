@@ -22,7 +22,6 @@ public class StatsProcessor : OdinAttributeProcessor<Stats>
 public class StatsDrawer : OdinValueDrawer<Stats>
 {
 	public const float FoldoutGap = 15;
-
 	public static GUIStyle BaseValueStyle = new GUIStyle(SirenixGUIStyles.Label);
 	public static GUIStyle CurrentValueStyle = new GUIStyle(SirenixGUIStyles.BoldTitle)
 	{
