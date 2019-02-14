@@ -44,8 +44,8 @@ public class Test : SerializedMonoBehaviour, IUpgradeable
 	async UniTask Start()
 	{
 		//ModdingTest();
-		new Buff("DamagePotion", new List<Effect> { new Effect("Health", "+562")}, 15.0f).AddTo(this);
-	
+		//new Buff("DamagePotion", new List<Effect> { new Effect("Health", "+562")}, 15.0f).AddTo(this);
+		Debug.Log(Health.CurrentValue);
 	}
 #pragma warning restore CS1998
 

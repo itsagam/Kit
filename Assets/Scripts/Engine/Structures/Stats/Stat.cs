@@ -5,7 +5,7 @@ using System.Linq;
 using UnityEngine;
 using UniRx;
 
-// TODO: Check if current values are updated in the editor
+// TODO: Setup Current Value at currect time
 
 #if UNITY_EDITOR
 using UnityEditor;
@@ -30,6 +30,9 @@ public class StatDrawer : OdinValueDrawer<Stat>
 
 		if (stat.ID.IsNullOrEmpty())
 			stat.ID = Property.Name;
+
+		if (stat.Upgradeable != null && !stat.ID.IsNullOrEmpty())
+			stat.Setup();
 	}
 
 	protected override void DrawPropertyLayout(GUIContent label)
@@ -49,6 +52,7 @@ public class StatDrawer : OdinValueDrawer<Stat>
 		}
 
 		SirenixEditorGUI.BeginIndentedHorizontal();
+		var currentValue = Stats.CalculateValue(Stats.GetAggregates(stat.Upgradeable, stat.ID), stat.BaseValue);
 		var groups = Stats.GetEffectsAndUpgrades(stat.Upgradeable, stat.ID);
 		if (groups.Any())
 		{
@@ -60,8 +64,8 @@ public class StatDrawer : OdinValueDrawer<Stat>
 		{
 			DrawField(label, stat);
 		}
-
-		GUILayout.Label(Mathf.RoundToInt(stat.CurrentValue).ToString(), CurrentValueStyle, GUILayout.ExpandWidth(false));
+		
+		GUILayout.Label(Mathf.RoundToInt(currentValue).ToString(), CurrentValueStyle, GUILayout.ExpandWidth(false));
 		SirenixEditorGUI.EndIndentedHorizontal();
 
 		if (groups.Any())
@@ -76,9 +80,9 @@ public class StatDrawer : OdinValueDrawer<Stat>
 		}
 	}
 
-	public static void DrawField(GUIContent label, Stat stat)
+	protected void DrawField(GUIContent label, Stat stat)
 	{
-		stat.BaseValue = SirenixEditorGUI.DynamicPrimitiveField(label, stat.BaseValue);
+		Property.Children["Base"].Draw(label);
 	}
 }
 #endif
@@ -100,18 +104,21 @@ public class Stat : IDisposable
 	{
 		Upgradeable = upgradeable;
 		ID = id;
+		Setup();
+	}
+
+	public void Setup()
+	{
+		if (current != null)
+			return;
+
+		current = Stats.CreateCurrentProperty(Base, Upgradeable, ID);
 	}
 
 	public ReadOnlyReactiveProperty<float> Current
 	{
 		get
 		{
-			if (current == null
-				&& Upgradeable?.GetUpgrades() != null
-				&& !ID.IsNullOrEmpty())
-			{
-				current = Stats.CreateCurrentProperty(Base, Upgradeable, ID);
-			}
 			return current;
 		}
 	}

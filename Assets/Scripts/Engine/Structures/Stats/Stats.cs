@@ -60,6 +60,8 @@ public class StatsDrawer : OdinValueDrawer<Stats>
 			foreach (var kvp in stats)
 			{
 				var stat = kvp.Key;
+				var baseValue = kvp.Value.Value;
+				var currentValue = Stats.CalculateValue(Stats.GetAggregates(stats.Upgradeable, stat), baseValue);
 				var groups = Stats.GetEffectsAndUpgrades(stats.Upgradeable, stat);
 
 				// Stat header
@@ -77,7 +79,8 @@ public class StatsDrawer : OdinValueDrawer<Stats>
 					GUILayout.Space(FoldoutGap);
 					GUILayout.Label(stat);
 				}
-				GUILayout.Label(Mathf.RoundToInt(stats.GetCurrentValue(stat)).ToString(), CurrentValueStyle);
+
+				GUILayout.Label(Mathf.RoundToInt(currentValue).ToString(), CurrentValueStyle);
 
 				SirenixEditorGUI.EndIndentedHorizontal();
 				SirenixEditorGUI.EndBoxHeader();
@@ -88,7 +91,7 @@ public class StatsDrawer : OdinValueDrawer<Stats>
 					if (SirenixEditorGUI.BeginFadeGroup(isExpanded, isExpanded.Value))
 					{
 						GUIHelper.PushIndentLevel(1);
-						EditorGUILayout.LabelField("Base", kvp.Value.Value.ToString(), BaseValueStyle);
+						EditorGUILayout.LabelField("Base", baseValue.ToString(), BaseValueStyle);
 						SirenixEditorGUI.DrawThickHorizontalSeparator(1, 1);
 						DrawEffects(groups);
 						GUIHelper.PopIndentLevel();
@@ -101,7 +104,6 @@ public class StatsDrawer : OdinValueDrawer<Stats>
 		}
 		SirenixEditorGUI.EndFadeGroup();
 		SirenixEditorGUI.EndIndentedVertical();
-		EditorUtility.SetDirty(Property.Tree.UnitySerializedObject.targetObject);
 	}
 
 	public static bool DrawWarning(InspectorProperty property, IUpgradeable upgradeable)
@@ -239,16 +241,11 @@ public class Stats : Dictionary<string, StatBaseProperty>, IDisposable
 		// We get the last upgrades that were changed and aggregate them, and then we use CombineLatest
 		// to use these aggregates in changing base values
 		var observable = upgradeable.GetUpgrades().ObserveCountChanged()
-			.Select(c => GetAggregates(GetEffects(upgradeable, stat)))
-			.StartWith(GetAggregates(GetEffects(upgradeable, stat)))
+			.Select(c => GetAggregates(upgradeable, stat))
+			.StartWith(GetAggregates(upgradeable, stat))
 			.CombineLatest(baseProperty, (aggregates, baseValue) => CalculateValue(aggregates, baseValue));
 
 		return new ReadOnlyReactiveProperty<float>(observable);
-	}
-
-	public static IEnumerable<Effect> GetEffects(IUpgradeable upgradeable, string stat)
-	{
-		return upgradeable.GetUpgrades().Where(u => u != null).SelectMany(u => u.Effects).Where(e => e.Stat == stat);
 	}
 
 	public static IEnumerable<(Upgrade, IEnumerable<Effect>)> GetEffectsAndUpgrades(IUpgradeable upgradeable, string stat)
@@ -257,6 +254,16 @@ public class Stats : Dictionary<string, StatBaseProperty>, IDisposable
 			.Where(u => u != null)
 			.Select(u => (upgrade: u, effects: u.Effects.Where(e => e.Stat == stat)))
 			.Where(g => g.effects.Any());
+	}
+
+	public static IEnumerable<Effect> GetEffects(IUpgradeable upgradeable, string stat)
+	{
+		return upgradeable.GetUpgrades().Where(u => u != null).SelectMany(u => u.Effects).Where(e => e.Stat == stat);
+	}
+
+	public static (float, float, float) GetAggregates(IUpgradeable upgradeable, string stat)
+	{
+		return GetAggregates(GetEffects(upgradeable, stat));
 	}
 
 	public static (float, float, float) GetAggregates(IEnumerable<Effect> effects)
