@@ -35,9 +35,14 @@ public class Upgrade
 	{
 	}
 
-	public Upgrade(string id, IEnumerable<Effect> effects)
+	public Upgrade(string id)
 	{
 		ID = id;
+	}
+
+	public Upgrade(string id, IEnumerable<Effect> effects)
+		: this(id)
+	{
 		AddEffects(effects);
 	}
 

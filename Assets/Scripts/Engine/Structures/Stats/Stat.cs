@@ -125,7 +125,7 @@ public class Stat : IDisposable
 		get
 		{
 			if (current == null)
-					current = Stats.CreateCurrentProperty(Base, Upgradeable, ID);
+				current = Stats.CreateCurrentProperty(Base, Upgradeable, ID);
 			return current;
 		}
 	}

@@ -41,13 +41,18 @@ public class BuffDrawer : OdinValueDrawer<Buff>
 {
 	protected override void DrawPropertyLayout(GUIContent label)
 	{
+		EditorUtility.SetDirty(Property.Tree.UnitySerializedObject.targetObject);
+
 		var buff = ValueEntry.SmartValue;
-		
 		SirenixEditorGUI.BeginToolbarBox(label);
 		if (Application.isPlaying && buff.TimeLeft > 0)
+		{
+			GUIHelper.PushGUIEnabled(false);
 			EditorGUILayout.LabelField("Time", string.Format("{0:0.##}s", buff.TimeLeft));
+			GUIHelper.PopGUIEnabled();
+		}
 		CallNextDrawer(null);
-		SirenixEditorGUI.EndToolbarBox();
+		SirenixEditorGUI.EndToolbarBox();	
 	}
 }
 #endif
@@ -76,18 +81,23 @@ public class Buff : Upgrade
 
 	public Buff(IEnumerable<Effect> effects, float time, BuffMode mode = BuffMode.Extend)
 	{
-		Effects.AddRange(effects);
+		AddEffects(effects);
 		ID = ToString();
 		Duration = time;
 		Mode = mode;
 	}
 
-	public Buff(string id, IEnumerable<Effect> effects, float time, BuffMode mode = BuffMode.Extend)
+	public Buff(string id, float time, BuffMode mode = BuffMode.Extend)
 	{
-		Effects.AddRange(effects);
 		ID = id;
 		Duration = time;
 		Mode = mode;
+	}
+
+	public Buff(string id, IEnumerable<Effect> effects, float time, BuffMode mode = BuffMode.Extend)
+		: this(id, time, mode)
+	{
+		AddEffects(effects);
 	}
 
 	public virtual Buff AddTo(IUpgradeable upgradeable)
