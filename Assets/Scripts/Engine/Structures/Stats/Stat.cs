@@ -25,14 +25,17 @@ public class StatDrawer : OdinValueDrawer<Stat>
 		toggled = this.GetPersistentValue("Toggled", false);
 
 		var stat = ValueEntry.SmartValue;
-		if (stat.Upgradeable == null)
-			stat.Upgradeable = Property.Tree.UnitySerializedObject.targetObject as IUpgradeable;
+		if (stat != null)
+		{
+			if (stat.Upgradeable == null)
+				stat.Upgradeable = Property.Tree.UnitySerializedObject.targetObject as IUpgradeable;
 
-		if (stat.ID.IsNullOrEmpty())
-			stat.ID = Property.Name;
+			if (stat.ID.IsNullOrEmpty())
+				stat.ID = Property.Name;
 
-		if (stat.Upgradeable != null && !stat.ID.IsNullOrEmpty())
-			stat.Setup();
+			if (stat.Upgradeable != null && !stat.ID.IsNullOrEmpty())
+				stat.Setup();
+		}
 	}
 
 	protected override void DrawPropertyLayout(GUIContent label)

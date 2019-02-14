@@ -18,7 +18,6 @@ using Sirenix.Serialization;
 public class Test : SerializedMonoBehaviour, IUpgradeable
 {
 	public GameObject cube;
-	public Buff Buff;
 	
 	[Title("Stats")]
 	public Stat Health;
@@ -45,7 +44,7 @@ public class Test : SerializedMonoBehaviour, IUpgradeable
 	{
 		//ModdingTest();
 		//new Buff("DamagePotion", new List<Effect> { new Effect("Health", "+562")}, 15.0f).AddTo(this);
-		Debug.Log(Health.CurrentValue);
+		//Debug.Log(Health.CurrentValue);
 	}
 #pragma warning restore CS1998
 

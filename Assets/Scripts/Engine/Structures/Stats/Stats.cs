@@ -11,6 +11,14 @@ using UnityEditor;
 using Sirenix.OdinInspector.Editor;
 using Sirenix.Utilities.Editor;
 
+public class StatsProcessor : OdinAttributeProcessor<Stats>
+{
+	public override void ProcessSelfAttributes(InspectorProperty property, List<Attribute> attributes)
+	{
+		attributes.Add(new HideReferenceObjectPickerAttribute());
+	}
+}
+
 public class StatsDrawer : OdinValueDrawer<Stats>
 {
 	public const float FoldoutGap = 15;
@@ -36,7 +44,7 @@ public class StatsDrawer : OdinValueDrawer<Stats>
 			ValueLabel = "Base Value"
 		});
 		var stats = ValueEntry.SmartValue;
-		if (stats.Upgradeable == null)
+		if (stats != null && stats.Upgradeable == null)
 			stats.Upgradeable = Property.Tree.UnitySerializedObject.targetObject as IUpgradeable;
 	}
 
