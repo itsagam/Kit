@@ -155,27 +155,49 @@ MonoBehaviour:
   serializationData:
     SerializedFormat: 2
     SerializedBytes: 
-    ReferencedUnityObjects: []
+    ReferencedUnityObjects:
+    - {fileID: 225321742}
     SerializedBytesString: 
     Prefab: {fileID: 0}
     PrefabModificationsReferencedUnityObjects: []
     PrefabModifications: []
     SerializationNodes:
-    - Name: aaa
+    - Name: Health
       Entry: 7
       Data: 0|Stat, Assembly-CSharp
     - Name: Upgradeable
-      Entry: 6
-      Data: 
+      Entry: 10
+      Data: 0
     - Name: ID
-      Entry: 6
-      Data: 
+      Entry: 1
+      Data: Health
     - Name: Base
       Entry: 7
       Data: 1|StatBaseProperty, Assembly-CSharp
     - Name: value
       Entry: 4
-      Data: 123
+      Data: 1235
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: S
+      Entry: 7
+      Data: 2|Stat, Assembly-CSharp
+    - Name: Upgradeable
+      Entry: 10
+      Data: 0
+    - Name: ID
+      Entry: 1
+      Data: S
+    - Name: Base
+      Entry: 7
+      Data: 3|StatBaseProperty, Assembly-CSharp
+    - Name: value
+      Entry: 4
+      Data: 0
     - Name: 
       Entry: 8
       Data: 
@@ -184,19 +206,19 @@ MonoBehaviour:
       Data: 
     - Name: Upgrades
       Entry: 7
-      Data: 2|UniRx.ReactiveCollection`1[[Upgrade, Assembly-CSharp]], UniRx
+      Data: 4|UniRx.ReactiveCollection`1[[Upgrade, Assembly-CSharp]], UniRx
     - Name: 
       Entry: 12
       Data: 2
     - Name: 
       Entry: 7
-      Data: 3|Upgrade, Assembly-CSharp
+      Data: 5|Upgrade, Assembly-CSharp
     - Name: ID
       Entry: 1
       Data: DoubleTake
     - Name: Effects
       Entry: 7
-      Data: 4|System.Collections.Generic.List`1[[Effect, Assembly-CSharp]], mscorlib
+      Data: 6|System.Collections.Generic.List`1[[Effect, Assembly-CSharp]], mscorlib
     - Name: 
       Entry: 12
       Data: 2
@@ -241,13 +263,13 @@ MonoBehaviour:
       Data: 
     - Name: 
       Entry: 7
-      Data: 5|Upgrade, Assembly-CSharp
+      Data: 7|Upgrade, Assembly-CSharp
     - Name: ID
       Entry: 1
       Data: ExtraDamage
     - Name: Effects
       Entry: 7
-      Data: 6|System.Collections.Generic.List`1[[Effect, Assembly-CSharp]], mscorlib
+      Data: 8|System.Collections.Generic.List`1[[Effect, Assembly-CSharp]], mscorlib
     - Name: 
       Entry: 12
       Data: 2

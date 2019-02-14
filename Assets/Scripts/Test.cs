@@ -18,8 +18,8 @@ using Sirenix.Serialization;
 public class Test : SerializedMonoBehaviour, IUpgradeable
 {
 	public GameObject cube;
-	
-	public Stat Health;
+
+	public Stat Stat;
 
 	[HideReferenceObjectPicker]
 	[ListDrawerSettings(CustomAddFunction = "AddUpgrade")]
@@ -37,7 +37,7 @@ public class Test : SerializedMonoBehaviour, IUpgradeable
 
 	void Awake()
 	{
-		Debug.Log(Health.CurrentValue);
+		//Debug.Log(Health.CurrentValue);
 	}
 
 #pragma warning disable CS1998

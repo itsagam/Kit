@@ -37,11 +37,18 @@ public class StatsDrawer : OdinValueDrawer<Stats>
 	{
 		base.Initialize();
 		toggled = this.GetPersistentValue("Toggled", false);
-		Property.Info.GetEditableAttributesList().Add(new DictionaryDrawerSettings
+		Property.Info.GetEditableAttributesList().Add(
+		new DictionaryDrawerSettings
 		{
 			KeyLabel = "Stat Name",
 			ValueLabel = "Base Value"
 		});
+		TrySetup();
+		ValueEntry.OnValueChanged += i => TrySetup();
+	}
+
+	protected void TrySetup()
+	{
 		var stats = ValueEntry.SmartValue;
 		if (stats != null && stats.Upgradeable == null)
 			stats.Upgradeable = Property.Tree.UnitySerializedObject.targetObject as IUpgradeable;

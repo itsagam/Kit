@@ -6,7 +6,7 @@ using UnityEngine;
 using UniRx;
 using Sirenix.OdinInspector;
 
-// TODO: Fix Reference picker showing up in empty Stat/Stats (also doesn't trigger Initialize code)
+// TODO: Remove StatBaseProperty
 
 #if UNITY_EDITOR
 using UnityEditor;
@@ -37,6 +37,12 @@ public class StatDrawer : OdinValueDrawer<Stat>
 		base.Initialize();
 		toggled = this.GetPersistentValue("Toggled", false);
 
+		TrySetup();
+		ValueEntry.OnValueChanged += i => TrySetup();
+	}
+
+	protected void TrySetup()
+	{
 		var stat = ValueEntry.SmartValue;
 		if (stat != null)
 		{
@@ -66,7 +72,6 @@ public class StatDrawer : OdinValueDrawer<Stat>
 		}
 
 		SirenixEditorGUI.BeginIndentedHorizontal();
-		var currentValue = Stats.CalculateValue(Stats.GetAggregates(stat.Upgradeable, stat.ID), stat.BaseValue);
 		var groups = Stats.GetEffectsAndUpgrades(stat.Upgradeable, stat.ID);
 		if (groups.Any())
 		{
@@ -79,9 +84,8 @@ public class StatDrawer : OdinValueDrawer<Stat>
 			DrawField(label);
 		}
 
-		GUIHelper.PushGUIEnabled(true);
+		var currentValue = Stats.CalculateValue(Stats.GetAggregates(stat.Upgradeable, stat.ID), stat.BaseValue);
 		GUI.Label(GUILayoutUtility.GetLastRect(), Mathf.RoundToInt(currentValue).ToString(), CurrentValueStyle);
-		GUIHelper.PopGUIEnabled();
 		SirenixEditorGUI.EndIndentedHorizontal();
 		if (groups.Any())
 		{
