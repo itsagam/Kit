@@ -16,20 +16,14 @@ Library
 		Audio Manager
 		Effects Manager
 		Input Manager
-
-	Containers
-	---------------------------------
-		Inventory
-		Stats/Upgrades
-
+		
 	Utilities
 	---------------------------------
 		Pooler
 
 Specific
 -----------------------------------------
+	Inventory -> Inventroy system with a grid, support for multiple objects within a tile, an object taking multiple tiles and nested inventories
 	Grid System -> A generic grid system with 2D, Isometric, and 3D modes.
 	Weapon/Projectile System -> A projectile system with a variety of projectile behaviours and support for beams.
 	Card System -> A card system with a support of all functions on a deck of playing cards
-	Formation/Steering -> A formation and steering system for vehicles.
-

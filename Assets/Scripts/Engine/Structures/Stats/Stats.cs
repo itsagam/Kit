@@ -47,8 +47,8 @@ public class StatsDrawer : OdinValueDrawer<Stats>
 
 	protected void SetupInstance()
 	{
-		// If a value is reference type and isn't assigned, Odin doesn't create a new instance like Unity and we
-		// have to pick it manually. Setting it immediately messes up the painting, so we delay it until that.
+		// If a value is reference type and isn't assigned, Odin doesn't create a new instance like Unity and we have
+		// to pick it manually every time. Setting it immediately messes up rendering, so we delay it until that.
 		if (ValueEntry.SmartValue == null)
 			Property.Tree.DelayActionUntilRepaint(() => ValueEntry.SmartValue = new Stats());
 		// Try to setup values required by the instance
@@ -85,7 +85,7 @@ public class StatsDrawer : OdinValueDrawer<Stats>
 			{
 				var stat = kvp.Key;
 				var baseValue = kvp.Value.Value;
-				var currentValue = Stats.CalculateValue(Stats.GetAggregates(stats.Upgradeable, stat), baseValue);
+				var currentValue = Stats.CalculateValue(stats.Upgradeable, stat, baseValue);
 				var groups = Stats.GetEffectsAndUpgrades(stats.Upgradeable, stat);
 
 				// Stat header
@@ -272,6 +272,16 @@ public class Stats : Dictionary<string, StatBaseProperty>, IDisposable
 		return new ReadOnlyReactiveProperty<float>(observable);
 	}
 
+	public static (float, float, float) GetAggregates(IUpgradeable upgradeable, string stat)
+	{
+		return GetAggregates(GetEffects(upgradeable, stat));
+	}
+
+	public static float CalculateValue(IUpgradeable upgradeable, string stat, float baseValue)
+	{
+		return CalculateValue(GetAggregates(upgradeable, stat), baseValue);
+	}
+
 	public static IEnumerable<(Upgrade, IEnumerable<Effect>)> GetEffectsAndUpgrades(IUpgradeable upgradeable, string stat)
 	{
 		return upgradeable.GetUpgrades()
@@ -283,11 +293,6 @@ public class Stats : Dictionary<string, StatBaseProperty>, IDisposable
 	public static IEnumerable<Effect> GetEffects(IUpgradeable upgradeable, string stat)
 	{
 		return upgradeable.GetUpgrades().Where(u => u != null).SelectMany(u => u.Effects).Where(e => e.Stat == stat);
-	}
-
-	public static (float, float, float) GetAggregates(IUpgradeable upgradeable, string stat)
-	{
-		return GetAggregates(GetEffects(upgradeable, stat));
 	}
 
 	public static (float, float, float) GetAggregates(IEnumerable<Effect> effects)

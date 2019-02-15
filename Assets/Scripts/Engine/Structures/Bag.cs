@@ -5,7 +5,7 @@ using System.Linq;
 using UnityEngine;
 
 [Serializable]
-public class Bag<T> : Dictionary<T, int>, IEnumerable
+public class Bag<T> : Dictionary<T, int>
 {
     public event Action<T, int> OnChanged;
 
@@ -155,7 +155,7 @@ public struct Bunch<T>
 	public T Unit;
 	public int Amount;
 
-	public Bunch(T type) : this(type, 0)
+	public Bunch(T unit) : this(unit, 0)
 	{
 	}
 

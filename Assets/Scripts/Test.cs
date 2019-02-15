@@ -2,127 +2,33 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.IO;
 using UnityEngine;
-using Modding;
-using Modding.Parsers;
 using UniRx;
 using UniRx.Async;
-using Sirenix.OdinInspector;
 
-public class Test : SerializedMonoBehaviour, IUpgradeable
+public class Test : MonoBehaviour
 {
-	public GameObject cube;
+	public Transform Cube;
 
-	public Stat Health;
-	public Stat Defense;
-	public Stat Attack;
-
-	public Stats Stats;
-	
-	[HideReferenceObjectPicker]
-	[ListDrawerSettings(CustomAddFunction = "AddUpgrade")]
-	public ReactiveCollection<Upgrade> Upgrades;
-
-	protected Upgrade AddUpgrade()
-	{
-		return new Upgrade();
-	}
-
-	public ReactiveCollection<Upgrade> GetUpgrades()
-	{
-		return Upgrades;
-	}
-
-	void Awake()
-	{
-		var buff = new Buff("HealthPotion", 15.0f).AddTo(this);
-		buff.AddEffect("Health", "+50");
-		Debug.Log(Health.CurrentValue);
-	}
-
-#pragma warning disable CS1998
 	async UniTask Start()
 	{
-		//ModdingTest();
-	}
-#pragma warning restore CS1998
+		Component instance1 = Pooler.Spawn(Cube);
+		Component instance2 = Pooler.Spawn(Cube);
+		Component instance3 = Pooler.Spawn(Cube);
+		await Observable.Timer(TimeSpan.FromSeconds(3));
+		Pooler.Despawn(instance1);
+		await Observable.Timer(TimeSpan.FromSeconds(3));
+		Component instance4 = Pooler.Spawn(Cube);
+		Debug.Log(instance1 == instance4);
 
-	void OnDestroy()
-	{
-		//ModManager.UnloadMods();
+		foreach(var instance in Pooler.GetPool(Cube))
+		{
+			print(instance);
+		}
 	}
 
 	public void Button()
 	{
 
-	}
-
-	protected static void ProfileTest()
-	{
-		Debugger.StartProfile("ResourceManager.Load");
-		for (int i = 0; i < 100000; i++)
-			ResourceManager.Load<Texture>(ResourceFolder.Resources, "Textures/test");
-		Debugger.EndProfile();
-
-		Debugger.StartProfile("Resources.Load");
-		for (int i = 0; i < 100000; i++)
-			Resources.Load<Texture>("Textures/test");
-		Debugger.EndProfile();
-	}
-
-	protected static void ModdingTest()
-	{
-		ModManager.LoadMods();
-		ModManager.ExecuteScripts();
-		foreach (Mod mod in ModManager.Mods)
-			print(mod.Group.Name + ": " + mod.Metadata.Name);
-
-		//ResourceManager.ResourceLoaded += ResourceLoaded;
-		//ResourceManager.ResourceReused += ResourceReused;
-		//ResourceManager.ResourceUnloaded += ResourceUnloaded;
-
-		//ModManager.ResourceLoaded += ModManager_ResourceLoaded;
-		//ModManager.ResourceReused += ModManager_ResourceReused;
-		//ModManager.ResourceUnloaded += ModManager_ResourceUnloaded;
-		//Debugger.Log(ResourceManager.Load<GameData>(ResourceFolder.StreamingAssets, @"Data/Test.json", false), true);
-
-		//Texture tex = ResourceManager.Load<Texture>(ResourceFolder.Resources, @"Textures/Test", true);
-		//cube.GetComponent<MeshRenderer>().material.mainTexture = tex;
-
-		//AudioClip clip = ResourceManager.Load<AudioClip>(ResourceFolder.Resources, @"Textures/Test", true);
-		//GetComponent<AudioSource>().clip = clip;
-		//GetComponent<AudioSource>().Play();
-	}
-
-	private static void ResourceReused(ResourceFolder folder, string file, object obj)
-	{
-		Debug.Log($"File \"{file}\" reused.");
-	}
-
-	private static void ResourceLoaded(ResourceFolder folder, string file, object obj)
-	{
-		Debug.Log($"File \"{file}\" loaded.");
-	}
-
-	private static void ResourceUnloaded(ResourceFolder folder, string file)
-	{
-		Debug.Log($"File \"{file}\" unloaded.");
-	}
-
-	private static void ModManager_ResourceUnloaded(ResourceFolder folder, string file, Mod mod)
-	{
-		Debug.Log($"File \"{file}\" unloaded from \"{mod.Path}\"");
-	}
-
-	private static void ModManager_ResourceReused(ResourceFolder folder, string file, ResourceInfo info)
-	{
-		Debug.Log($"File \"{file}\" resused from \"{info.Mod.Path}\"");
-	}
-
-	private static void ModManager_ResourceLoaded(ResourceFolder folder, string file, ResourceInfo info)
-	{
-		Debug.Log($"File \"{file}\" loaded from \"{info.Mod.Path}\"");
 	}
 }

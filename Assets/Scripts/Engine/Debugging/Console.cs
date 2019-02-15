@@ -19,9 +19,9 @@ public class Console : MonoBehaviour
 	public ScrollRect LogScroll;
 	public Text LogText;
 	public InputFieldEx CommandInput;
-	public ContentSizeFitter CommandInputFitter;
 
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
+	public const bool Enabled = true;
 	public const string Prefab = "Console/Console";
 	public const int Length = 10000;
 	public const string LogColor = "#7EF9FF";
@@ -32,24 +32,23 @@ public class Console : MonoBehaviour
 	protected static Console instance = null;
 
 	#region Initialization
-	//[RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
+	[RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
 	public static void Initialize()
 	{
-		if (instance == null)
+		if (Enabled && instance == null)
 		{
 			Console prefab = Resources.Load<Console>(Prefab);
 			instance = Instantiate(prefab);
 			instance.name = prefab.name;
 		}
-
-		if (EventSystem.current == null)
-			new GameObject("EventSystem", typeof(EventSystem), typeof(StandaloneInputModule));
 	}
 
 	protected void Awake()
 	{
 		instance = this;
-		
+		if (EventSystem.current == null)
+			new GameObject("EventSystem", typeof(EventSystem), typeof(StandaloneInputModule));
+
 		RegisterLogging();
 		RegisterInput();
 		InitializeUI();

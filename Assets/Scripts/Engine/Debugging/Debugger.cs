@@ -63,7 +63,6 @@ public class Debugger
 	#endregion
 
 	#region Logging
-
 	// Conditionals make these methods calls be ignored in Release builds
 	[Conditional("UNITY_EDITOR"), Conditional("DEVELOPMENT_BUILD")]
 	public static void Log(string line, LogType type = LogType.Log)

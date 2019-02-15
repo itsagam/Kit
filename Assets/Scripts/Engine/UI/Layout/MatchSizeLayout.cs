@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 // Give Element the size of this transform whenever it's resized
-public class MatchLayoutSize : MonoBehaviour
+public class MatchSizeLayout : MonoBehaviour
 {
 	public RectTransform Element;
 	public Vector2 Padding;

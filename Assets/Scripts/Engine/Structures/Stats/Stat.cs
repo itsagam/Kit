@@ -88,7 +88,7 @@ public class StatDrawer : OdinValueDrawer<Stat>
 			DrawField(label);
 		}
 
-		var currentValue = Stats.CalculateValue(Stats.GetAggregates(stat.Upgradeable, stat.ID), stat.BaseValue);
+		var currentValue = Stats.CalculateValue(stat.Upgradeable, stat.ID, stat.BaseValue);
 		GUI.Label(GUILayoutUtility.GetLastRect(), Mathf.RoundToInt(currentValue).ToString(), CurrentValueStyle);
 		SirenixEditorGUI.EndIndentedHorizontal();
 		if (groups.Any())
