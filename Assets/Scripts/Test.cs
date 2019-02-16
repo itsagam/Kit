@@ -12,24 +12,17 @@ public class Test : MonoBehaviour
 
 	protected void Awake()
 	{
+		Pooler.Instantiate(Cube);
+		Pooler.Destroy(Cube);
+
+		Pooler.Spawn(Cube);
+		Pooler.Despawn(Cube);
 	}
 
-	/*
-	async UniTask Start()
-	{
-		Component instance1 = Pooler.Spawn(Cube);
-		Component instance2 = Pooler.Spawn(Cube);
-		Component instance3 = Pooler.Spawn(Cube);
+	//async UniTask Start()
+	//{
 
-		await Observable.Timer(TimeSpan.FromSeconds(3));
-		Pooler.Despawn(instance1);
-
-		await Observable.Timer(TimeSpan.FromSeconds(3));
-		Component instance4 = Pooler.Spawn(Cube);
-
-		Debug.Log(instance1 == instance4);
-	}
-	*/
+	//}
 
 	public void Button()
 	{

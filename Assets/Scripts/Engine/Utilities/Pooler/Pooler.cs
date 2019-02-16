@@ -7,16 +7,25 @@ using UnityEngine;
 //		 You can keep track of all instances of a type if you use PoolGroup but they are more complicated
 //		 Preloading would also not be as easy without PoolGroup as you would have to create Pools in the scene for every prefab
 // TODO: Manage and return as T
+// TODO: Decide on Spawn/Despawn or Instantiate/Destroy names
 // TODO: Make work with Particle Systems, UIs and AudioSources
-// TODO: Allow to cull instances (remove and destroy objects if there are too many pooled instances
-//		-- can happen if too many objects are spawned and despawned during gameplay spikes)
-// TODO: Allow to limit instances (return null in Spawn when limit is reached) (limitAmount)
-// TODO: Allow to limit instances by despawning first-created object and re-using it (limitFIFO)
+// TODO: Make stable
+// TODO: Make fault-tolarent
 
 public class Pooler
 {
 	protected static Dictionary<string, Pool> poolsByName = new Dictionary<string, Pool>();
 	protected static Dictionary<Component, Pool> poolsByPrefab = new Dictionary<Component, Pool>();
+
+	public static void Instantiate(Component prefab)
+	{
+
+	}
+
+	public static void Destroy(Component prefab)
+	{
+
+	}
 
 	public static Pool CreatePool(Component prefab)
 	{

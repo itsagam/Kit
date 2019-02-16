@@ -15,29 +15,38 @@ public interface IPooled
 
 public enum PoolMessageMode
 {
+	None,
 	Interface,
 	SendMessage,
 	BroadcastMessage
 }
 
+public enum PoolLimitMode
+{
+	StopSpawning,
+	DespawnFirst,
+	DestroyAfterUse,
+}
+
 public class Pool : MonoBehaviour, IEnumerable<Component>
 {
+	public const int UnlimitedMaxPreloadAmount = 250;
+
 	public const string SpawnedMessage = "OnSpawned";
 	public const string DespawnedMessage = "OnDespawned";
 
 	public Component Prefab;
-	public PoolMessageMode MessageMode = PoolMessageMode.Interface;
+	public PoolMessageMode Message = PoolMessageMode.None;
 
 	[ToggleGroup("Preload")]
 	public bool Preload = false;
 
 	[ToggleGroup("Preload")]
 	[LabelText("Amount")]
-	[MinValue(1)]
+	[PropertyRange(0, "MaxPreloadAmount")]
 	public int PreloadAmount = 5;
 
 	[ToggleGroup("Preload")]
-	[HideIf("PreloadAmount")]
 	[LabelText("Delay")]
 	[SuffixLabel("seconds", true)]
 	[MinValue(0)]
@@ -49,10 +58,25 @@ public class Pool : MonoBehaviour, IEnumerable<Component>
 	[MinValue(0)]
 	public float PreloadTime = 1.0f;
 
+	[ToggleGroup("Limit")]
+	[OnValueChanged("ClampPreloadAmount")]
+	public bool Limit = true;
+
+	[ToggleGroup("Limit")]
+	[LabelText("Mode")]
+	public PoolLimitMode LimitMode = PoolLimitMode.DestroyAfterUse;
+	
+	[ToggleGroup("Limit")]
+	[LabelText("Amount")]
+	[MinValue(0)]
+	[OnValueChanged("ClampPreloadAmount")]
+	public int LimitAmount = 50;
+
 	public bool Organize = true;
 	public bool Persistent = false;
 
-	protected List<Component> instances = new List<Component>();
+	protected LinkedList<Component> availableInstances = new LinkedList<Component>();
+	protected LinkedList<Component> usedInstances = new LinkedList<Component>();
 
 	protected void Awake()
 	{
@@ -97,22 +121,103 @@ public class Pool : MonoBehaviour, IEnumerable<Component>
 	public Component Spawn()
 	{
 		Component instance;
-		int index = instances.FindIndex(c => c != null);
-		if (index >= 0)
+		if (availableInstances.Count > 0)
 		{
-			instance = instances[index];
+			instance = availableInstances.First.Value;
 			instance.gameObject.SetActive(true);
-			instances.RemoveAt(index);
+			availableInstances.RemoveFirst();
 		}
 		else
 		{
-			instance = Instantiate(Prefab);
+			if (Limit && Overlimit)
+			{
+				switch (LimitMode)
+				{
+					case PoolLimitMode.StopSpawning:
+						return null;
+
+					case PoolLimitMode.DespawnFirst:
+						instance = usedInstances.First.Value;
+						usedInstances.RemoveFirst();
+						usedInstances.AddLast(instance);
+						SendDespawnedMessage(instance);
+						SendSpawnedMessage(instance);
+						return instance;
+				}				
+			}
+
+			instance = GameObject.Instantiate(Prefab);
 			instance.name = name;
 			if (Organize)
-				instance.transform.SetParent(transform);	
+				instance.transform.SetParent(transform);
 		}
+		usedInstances.AddLast(instance);
+		SendSpawnedMessage(instance);
+		return instance;
+	}
 
-		switch (MessageMode)
+	public Component Spawn(Transform parent, bool worldPositionStays = false)
+	{
+		var instance = Spawn();
+		if (instance != null)
+			instance.transform.SetParent(parent, worldPositionStays);
+		return instance;
+	}
+
+	public Component Spawn(Vector3 position)
+	{
+		var instance = Spawn();
+		if (instance != null)
+			instance.transform.position = position;
+		return instance;
+	}
+
+	public Component Spawn(Vector3 position, Quaternion rotation)
+	{
+		var instance = Spawn();
+		if (instance != null)
+		{
+			var trans = instance.transform;
+			trans.position = position;
+			trans.rotation = rotation;
+		}
+		return instance;
+	}
+
+	public Component Spawn(Vector3 position, Quaternion rotation, Transform parent)
+	{
+		var instance = Spawn();
+		if (instance != null)
+		{
+			var trans = instance.transform;
+			trans.parent = parent;
+			trans.position = position;
+			trans.rotation = rotation;
+		}
+		return instance;
+	}
+
+	public T Spawn<T>() where T: Component
+	{
+		return (T) Spawn();
+	}
+
+	public void Despawn(Component instance)
+	{
+		usedInstances.Remove(instance);
+		if (Limit && Overlimit && LimitMode == PoolLimitMode.DestroyAfterUse)
+		{
+			GameObject.Destroy(instance.gameObject);
+			return;
+		}
+		availableInstances.AddLast(instance);
+		instance.gameObject.SetActive(false);
+		SendDespawnedMessage(instance);
+	}
+
+	protected void SendSpawnedMessage(Component instance)
+	{
+		switch (Message)
 		{
 			case PoolMessageMode.Interface:
 				if (instance is IPooled pooled)
@@ -127,51 +232,11 @@ public class Pool : MonoBehaviour, IEnumerable<Component>
 				instance.gameObject.BroadcastMessage(SpawnedMessage, SendMessageOptions.DontRequireReceiver);
 				break;
 		}
-	
-		return instance;
 	}
 
-	public Component Spawn(Transform parent, bool worldPositionStays = false)
+	protected void SendDespawnedMessage(Component instance)
 	{
-		var instance = Spawn();
-		instance.transform.SetParent(parent, worldPositionStays);
-		return instance;
-	}
-
-	public Component Spawn(Vector3 position)
-	{
-		var instance = Spawn();
-		instance.transform.position = position;
-		return instance;
-	}
-
-	public Component Spawn(Vector3 position, Quaternion rotation)
-	{
-		var instance = Spawn();
-		var trans = instance.transform;
-		trans.position = position;
-		trans.rotation = rotation;
-		return instance;
-	}
-
-	public Component Spawn(Vector3 position, Quaternion rotation, Transform parent)
-	{
-		var instance = Spawn();
-		var trans = instance.transform;
-		trans.parent = parent;
-		trans.position = position;
-		trans.rotation = rotation;
-		return instance;
-	}
-
-	public T Spawn<T>() where T: Component
-	{
-		return (T) Spawn();
-	}
-
-	public void Despawn(Component instance)
-	{
-		switch (MessageMode)
+		switch (Message)
 		{
 			case PoolMessageMode.Interface:
 				if (instance is IPooled pooled)
@@ -186,17 +251,59 @@ public class Pool : MonoBehaviour, IEnumerable<Component>
 				instance.gameObject.BroadcastMessage(DespawnedMessage, SendMessageOptions.DontRequireReceiver);
 				break;
 		}
-		instance.gameObject.SetActive(false);
-		instances.Add(instance);
+	}
+
+	public bool Overlimit
+	{
+		get
+		{
+			return usedInstances.Count >= LimitAmount;
+		}
+	}
+
+	[PropertySpace]
+
+	[ShowInInspector]
+	[EnableGUI]
+	public LinkedList<Component> Available
+	{
+		get
+		{
+			return availableInstances;
+		}
+	}
+
+	[ShowInInspector]
+	[EnableGUI]
+	public LinkedList<Component> Used
+	{
+		get
+		{
+			return usedInstances;
+		}
+	}
+
+	public void ClampPreloadAmount()
+	{
+		if (PreloadAmount > MaxPreloadAmount)
+			PreloadAmount = MaxPreloadAmount;
+	}
+
+	public int MaxPreloadAmount
+	{
+		get
+		{
+			return Limit ? LimitAmount : UnlimitedMaxPreloadAmount;
+		}
 	}
 
 	public IEnumerator<Component> GetEnumerator()
 	{
-		return instances.GetEnumerator();
+		return usedInstances.GetEnumerator();
 	}
 
 	IEnumerator IEnumerable.GetEnumerator()
 	{
-		return instances.GetEnumerator();
+		return usedInstances.GetEnumerator();
 	}
 }

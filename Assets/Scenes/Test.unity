@@ -200,11 +200,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Prefab: {fileID: 953567221}
-  MessageMode: 0
+  Message: 0
   Preload: 1
   PreloadAmount: 5
   PreloadDelay: 0
   PreloadTime: 1
+  Limit: 1
+  LimitMode: 2
+  LimitAmount: 50
   Organize: 1
   Persistent: 0
 --- !u!1 &225321740
