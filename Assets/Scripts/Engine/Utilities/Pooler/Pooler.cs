@@ -3,29 +3,18 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-// TOOD: Send Spawn/Despawn messages to instances
-// TODO: Manage parent and don't reparent
-// TODO: Match scale option if don't reparent
-// TODO: Don't Destroy On Load pool
-// TODO: Allow to give starting position, rotation, scale
-// TODO: Allow to preload instances (with a preload delay and preload time)
+// TODO: Decide between Pooler -> Pool or Pooler -> PoolGroup -> Pool
+//		 You can keep track of all instances of a type if you use PoolGroup but they are more complicated
+//		 Preloading would also not be as easy without PoolGroup as you would have to create Pools in the scene for every prefab
+// TODO: Manage and return as T
 // TODO: Make work with Particle Systems, UIs and AudioSources
 // TODO: Allow to cull instances (remove and destroy objects if there are too many pooled instances
 //		-- can happen if too many objects are spawned and despawned during gameplay spikes)
 // TODO: Allow to limit instances (return null in Spawn when limit is reached) (limitAmount)
 // TODO: Allow to limit instances by despawning first-created object and re-using it (limitFIFO)
 
-public interface IPooled
-{
-	void OnSpawned();
-	void OnDespawned();
-}
-
 public class Pooler
 {
-	public const string SpawnedMethod = "OnSpawned";
-	public const string DespawnedMethod = "OnDespawned";
-
 	protected static Dictionary<string, Pool> poolsByName = new Dictionary<string, Pool>();
 	protected static Dictionary<Component, Pool> poolsByPrefab = new Dictionary<Component, Pool>();
 
