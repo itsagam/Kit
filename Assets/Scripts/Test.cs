@@ -8,21 +8,12 @@ using UniRx.Async;
 
 public class Test : MonoBehaviour
 {
-	public Transform Cube;
+	public Parent Cube;
 
 	protected void Awake()
 	{
-		Pooler.Instantiate(Cube);
-		Pooler.Destroy(Cube);
 
-		Pooler.Spawn(Cube);
-		Pooler.Despawn(Cube);
 	}
-
-	//async UniTask Start()
-	//{
-
-	//}
 
 	public void Button()
 	{

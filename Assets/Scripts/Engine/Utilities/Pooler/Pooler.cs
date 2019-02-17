@@ -6,10 +6,8 @@ using UnityEngine;
 // TODO: Decide between Pooler -> Pool or Pooler -> PoolGroup -> Pool
 //		 You can keep track of all instances of a type if you use PoolGroup but they are more complicated
 //		 Preloading would also not be as easy without PoolGroup as you would have to create Pools in the scene for every prefab
-// TODO: Manage and return as T
-// TODO: Decide on Spawn/Despawn or Instantiate/Destroy names
 // TODO: Make work with Particle Systems, UIs and AudioSources
-// TODO: Make stable
+// TODO: Make stable (can't assign individual scripts as prefab...)
 // TODO: Make fault-tolarent
 
 public class Pooler
@@ -17,14 +15,20 @@ public class Pooler
 	protected static Dictionary<string, Pool> poolsByName = new Dictionary<string, Pool>();
 	protected static Dictionary<Component, Pool> poolsByPrefab = new Dictionary<Component, Pool>();
 
-	public static void Instantiate(Component prefab)
+	#region Pool Management
+	public static void CachePool(Pool pool)
 	{
+		if (pool.Prefab == null)
+			return;
 
+		poolsByPrefab[pool.Prefab] = pool;
+		poolsByName[pool.name] = pool;
 	}
 
-	public static void Destroy(Component prefab)
+	public static void UncachePool(Pool pool)
 	{
-
+		poolsByPrefab.Remove(pool.Prefab);
+		poolsByName.Remove(pool.name);
 	}
 
 	public static Pool CreatePool(Component prefab)
@@ -95,66 +99,134 @@ public class Pooler
 		}
 		return false;
 	}
+	#endregion
 
-	public static Component Spawn(string name)
+	#region Instantiate/Destroy
+	public static Component Instantiate(string name)
 	{
-		return GetPool(name)?.Spawn();
+		return GetPool(name)?.Instantiate();
 	}
 
-	public static Component Spawn(Component prefab)
+	public static Component Instantiate(string name, Transform parent, bool worldPositionStays = false)
 	{
-		return GetOrCreatePool(prefab).Spawn();
+		return GetPool(name)?.Instantiate(parent, worldPositionStays);
 	}
 
-	public static T Spawn<T>(string name) where T : Component
+	public static Component Instantiate(string name, Vector3 position)
 	{
-		return GetPool(name)?.Spawn<T>();
+		return GetPool(name)?.Instantiate(position);
 	}
 
-	public static T Spawn<T>(Component prefab) where T : Component
+	public static Component Instantiate(string name, Vector3 position, Quaternion rotation)
 	{
-		return GetOrCreatePool(prefab).Spawn<T>();
+		return GetPool(name)?.Instantiate(position, rotation);
 	}
 
-	public static bool Despawn(Component instance)
+	public static Component Instantiate(string name, Vector3 position, Quaternion rotation, Transform parent)
 	{
-		return Despawn(instance.name, instance);
+		return GetPool(name)?.Instantiate(position, rotation, parent);
 	}
 
-	public static bool Despawn(string name, Component instance)
+	public static Component Instantiate(Component prefab) 
+	{
+		return GetOrCreatePool(prefab).Instantiate();
+	}
+
+	public static Component Instantiate(Component prefab, Transform parent, bool worldPositionStays = false)
+	{
+		return GetOrCreatePool(prefab).Instantiate(parent, worldPositionStays);
+	}
+
+	public static Component Instantiate(Component prefab, Vector3 position)
+	{
+		return GetOrCreatePool(prefab).Instantiate(position);
+	}
+
+	public static Component Instantiate(Component prefab, Vector3 position, Quaternion rotation)
+	{
+		return GetOrCreatePool(prefab).Instantiate(position, rotation);
+	}
+
+	public static Component Instantiate(Component prefab, Vector3 position, Quaternion rotation, Transform parent)
+	{
+		return GetOrCreatePool(prefab).Instantiate(position, rotation, parent);
+	}
+
+	public static T Instantiate<T>(string name) where T : Component
+	{
+		return GetPool(name)?.Instantiate<T>();
+	}
+
+	public static T Instantiate<T>(string name, Transform parent, bool worldPositionStays = false) where T : Component
+	{
+		return GetPool(name)?.Instantiate<T>(parent, worldPositionStays);
+	}
+
+	public static T Instantiate<T>(string name, Vector3 position) where T : Component
+	{
+		return GetPool(name)?.Instantiate<T>(position);
+	}
+
+	public static T Instantiate<T>(string name, Vector3 position, Quaternion rotation) where T : Component
+	{
+		return GetPool(name)?.Instantiate<T>(position, rotation);
+	}
+
+	public static T Instantiate<T>(string name, Vector3 position, Quaternion rotation, Transform parent) where T : Component
+	{
+		return GetPool(name)?.Instantiate<T>(position, rotation, parent);
+	}
+
+	public static T Instantiate<T>(T prefab) where T : Component
+	{
+		return GetOrCreatePool(prefab).Instantiate<T>();
+	}
+
+	public static T Instantiate<T>(T prefab, Transform parent, bool worldPositionStays = false) where T : Component
+	{
+		return GetOrCreatePool(prefab).Instantiate<T>(parent, worldPositionStays);
+	}
+
+	public static T Instantiate<T>(T prefab, Vector3 position) where T : Component
+	{
+		return GetOrCreatePool(prefab).Instantiate<T>(position);
+	}
+
+	public static T Instantiate<T>(T prefab, Vector3 position, Quaternion rotation) where T : Component
+	{
+		return GetOrCreatePool(prefab).Instantiate<T>(position, rotation);
+	}
+
+	public static T Instantiate<T>(T prefab, Vector3 position, Quaternion rotation, Transform parent) where T : Component
+	{
+		return GetOrCreatePool(prefab).Instantiate<T>(position, rotation, parent);
+	}
+
+	public static bool Destroy(Component instance)
+	{
+		return Destroy(instance.name, instance);
+	}
+
+	public static bool Destroy(string name, Component instance)
 	{
 		Pool pool = GetPool(name);
 		if (pool != null)
 		{
-			pool.Despawn(instance);
+			pool.Destroy(instance);
 			return true;
 		}
 		return false;
 	}
 
-	public static bool Despawn(Component prefab, Component instance)
+	public static bool Destroy(Component prefab, Component instance)
 	{
 		Pool pool = GetPool(prefab);
 		if (pool != null)
 		{
-			pool.Despawn(instance);
+			pool.Destroy(instance);
 			return true;
 		}
 		return false;
 	}
-
-	public static void CachePool(Pool pool)
-	{
-		if (pool.Prefab == null)
-			return;
-
-		poolsByPrefab[pool.Prefab] = pool;
-		poolsByName[pool.name] = pool;
-	}
-
-	public static void UncachePool(Pool pool)
-	{
-		poolsByPrefab.Remove(pool.Prefab);
-		poolsByName.Remove(pool.name);
-	}
+	#endregion
 }

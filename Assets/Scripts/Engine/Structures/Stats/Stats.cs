@@ -264,7 +264,8 @@ public class Stats : Dictionary<string, StatBaseProperty>, IDisposable
 	{
 		// We get the last upgrades that were changed and aggregate them, and then we use CombineLatest
 		// to use these aggregates in changing base values
-		var observable = upgradeable.GetUpgrades().ObserveCountChanged()
+		var observable = upgradeable.GetUpgrades()
+			.ObserveCountChanged()
 			.Select(c => GetAggregates(upgradeable, stat))
 			.StartWith(GetAggregates(upgradeable, stat))
 			.CombineLatest(baseProperty, (aggregates, baseValue) => CalculateValue(aggregates, baseValue));

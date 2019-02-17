@@ -9,8 +9,8 @@ using Sirenix.OdinInspector;
 
 public interface IPooled
 {
-	void OnSpawned();
-	void OnDespawned();
+	void AwakeFromPool();
+	void OnDestroyIntoPool();
 }
 
 public enum PoolMessageMode
@@ -23,8 +23,8 @@ public enum PoolMessageMode
 
 public enum PoolLimitMode
 {
-	StopSpawning,
-	DespawnFirst,
+	StopGiving,
+	ReuseFirst,
 	DestroyAfterUse,
 }
 
@@ -32,11 +32,18 @@ public class Pool : MonoBehaviour, IEnumerable<Component>
 {
 	public const int UnlimitedMaxPreloadAmount = 250;
 
-	public const string SpawnedMessage = "OnSpawned";
-	public const string DespawnedMessage = "OnDespawned";
+	public const string InstantiateMessage = "AwakeFromPool";
+	public const string DestroyMessage = "OnDestroyIntoPool";
 
+	protected LinkedList<Component> availableInstances = new LinkedList<Component>();
+	protected LinkedList<Component> usedInstances = new LinkedList<Component>();
+
+	#region Properties
+	[Required]
 	public Component Prefab;
-	public PoolMessageMode Message = PoolMessageMode.None;
+
+	[LabelText("Message")]
+	public PoolMessageMode MessageMode = PoolMessageMode.None;
 
 	[ToggleGroup("Preload")]
 	public bool Preload = false;
@@ -74,10 +81,9 @@ public class Pool : MonoBehaviour, IEnumerable<Component>
 
 	public bool Organize = true;
 	public bool Persistent = false;
+	#endregion
 
-	protected LinkedList<Component> availableInstances = new LinkedList<Component>();
-	protected LinkedList<Component> usedInstances = new LinkedList<Component>();
-
+	#region Initialization
 	protected void Awake()
 	{
 		Pooler.CachePool(this);
@@ -95,7 +101,7 @@ public class Pool : MonoBehaviour, IEnumerable<Component>
 	{
 		Pooler.UncachePool(this);
 	}
-
+	
 	protected async UniTask PreloadInstances()
 	{
 		if (PreloadDelay > 0)
@@ -112,15 +118,17 @@ public class Pool : MonoBehaviour, IEnumerable<Component>
 
 			int runningCount = (int) runningAmount;
 			for (int i = 0; i < runningCount; i++)
-				Spawn();
+				Instantiate();
 
 			amount -= runningCount;
 		}
 	}
+	#endregion
 
-	public Component Spawn()
+	#region Instantiate/Destroy
+	public Component Instantiate()
 	{
-		Component instance;
+		Component instance = null;
 		if (availableInstances.Count > 0)
 		{
 			instance = availableInstances.First.Value;
@@ -133,15 +141,15 @@ public class Pool : MonoBehaviour, IEnumerable<Component>
 			{
 				switch (LimitMode)
 				{
-					case PoolLimitMode.StopSpawning:
+					case PoolLimitMode.StopGiving:
 						return null;
 
-					case PoolLimitMode.DespawnFirst:
+					case PoolLimitMode.ReuseFirst:
 						instance = usedInstances.First.Value;
 						usedInstances.RemoveFirst();
 						usedInstances.AddLast(instance);
-						SendDespawnedMessage(instance);
-						SendSpawnedMessage(instance);
+						SendDestroyMessage(instance);
+						SendInstantiateMessage(instance);
 						return instance;
 				}				
 			}
@@ -152,29 +160,29 @@ public class Pool : MonoBehaviour, IEnumerable<Component>
 				instance.transform.SetParent(transform);
 		}
 		usedInstances.AddLast(instance);
-		SendSpawnedMessage(instance);
+		SendInstantiateMessage(instance);
 		return instance;
 	}
 
-	public Component Spawn(Transform parent, bool worldPositionStays = false)
+	public Component Instantiate(Transform parent, bool worldPositionStays = false)
 	{
-		var instance = Spawn();
+		var instance = Instantiate();
 		if (instance != null)
 			instance.transform.SetParent(parent, worldPositionStays);
 		return instance;
 	}
 
-	public Component Spawn(Vector3 position)
+	public Component Instantiate(Vector3 position)
 	{
-		var instance = Spawn();
+		var instance = Instantiate();
 		if (instance != null)
 			instance.transform.position = position;
 		return instance;
 	}
 
-	public Component Spawn(Vector3 position, Quaternion rotation)
+	public Component Instantiate(Vector3 position, Quaternion rotation)
 	{
-		var instance = Spawn();
+		var instance = Instantiate();
 		if (instance != null)
 		{
 			var trans = instance.transform;
@@ -184,9 +192,9 @@ public class Pool : MonoBehaviour, IEnumerable<Component>
 		return instance;
 	}
 
-	public Component Spawn(Vector3 position, Quaternion rotation, Transform parent)
+	public Component Instantiate(Vector3 position, Quaternion rotation, Transform parent)
 	{
-		var instance = Spawn();
+		var instance = Instantiate();
 		if (instance != null)
 		{
 			var trans = instance.transform;
@@ -197,12 +205,32 @@ public class Pool : MonoBehaviour, IEnumerable<Component>
 		return instance;
 	}
 
-	public T Spawn<T>() where T: Component
+	public T Instantiate<T>() where T: Component
 	{
-		return (T) Spawn();
+		return (T) Instantiate();
 	}
 
-	public void Despawn(Component instance)
+	public T Instantiate<T>(Transform parent, bool worldPositionStays = false) where T : Component
+	{
+		return (T) Instantiate(parent, worldPositionStays);
+	}
+
+	public T Instantiate<T>(Vector3 position) where T : Component
+	{
+		return (T) Instantiate(position);
+	}
+
+	public T Instantiate<T>(Vector3 position, Quaternion rotation) where T : Component
+	{
+		return (T) Instantiate(position, rotation);
+	}
+
+	public T Instantiate<T>(Vector3 position, Quaternion rotation, Transform parent) where T : Component
+	{
+		return (T) Instantiate(position, rotation, parent);
+	}
+
+	public void Destroy(Component instance)
 	{
 		usedInstances.Remove(instance);
 		if (Limit && Overlimit && LimitMode == PoolLimitMode.DestroyAfterUse)
@@ -212,45 +240,57 @@ public class Pool : MonoBehaviour, IEnumerable<Component>
 		}
 		availableInstances.AddLast(instance);
 		instance.gameObject.SetActive(false);
-		SendDespawnedMessage(instance);
+		SendDestroyMessage(instance);
 	}
+	#endregion
 
-	protected void SendSpawnedMessage(Component instance)
+	#region Helper methods
+	protected void SendInstantiateMessage(Component instance)
 	{
-		switch (Message)
+		switch (MessageMode)
 		{
 			case PoolMessageMode.Interface:
 				if (instance is IPooled pooled)
-					pooled.OnSpawned();
+					pooled.AwakeFromPool();
 				break;
 
 			case PoolMessageMode.SendMessage:
-				instance.gameObject.SendMessage(SpawnedMessage, SendMessageOptions.DontRequireReceiver);
+				instance.gameObject.SendMessage(InstantiateMessage, SendMessageOptions.DontRequireReceiver);
 				break;
 
 			case PoolMessageMode.BroadcastMessage:
-				instance.gameObject.BroadcastMessage(SpawnedMessage, SendMessageOptions.DontRequireReceiver);
+				instance.gameObject.BroadcastMessage(InstantiateMessage, SendMessageOptions.DontRequireReceiver);
 				break;
 		}
 	}
 
-	protected void SendDespawnedMessage(Component instance)
+	protected void SendDestroyMessage(Component instance)
 	{
-		switch (Message)
+		switch (MessageMode)
 		{
 			case PoolMessageMode.Interface:
 				if (instance is IPooled pooled)
-					pooled.OnDespawned();
+					pooled.OnDestroyIntoPool();
 				break;
 
 			case PoolMessageMode.SendMessage:
-				instance.gameObject.SendMessage(DespawnedMessage, SendMessageOptions.DontRequireReceiver);
+				instance.gameObject.SendMessage(DestroyMessage, SendMessageOptions.DontRequireReceiver);
 				break;
 
 			case PoolMessageMode.BroadcastMessage:
-				instance.gameObject.BroadcastMessage(DespawnedMessage, SendMessageOptions.DontRequireReceiver);
+				instance.gameObject.BroadcastMessage(DestroyMessage, SendMessageOptions.DontRequireReceiver);
 				break;
 		}
+	}
+
+	public IEnumerator<Component> GetEnumerator()
+	{
+		return availableInstances.GetEnumerator();
+	}
+
+	IEnumerator IEnumerable.GetEnumerator()
+	{
+		return availableInstances.GetEnumerator();
 	}
 
 	public bool Overlimit
@@ -261,6 +301,22 @@ public class Pool : MonoBehaviour, IEnumerable<Component>
 		}
 	}
 
+	protected void ClampPreloadAmount()
+	{
+		if (PreloadAmount > MaxPreloadAmount)
+			PreloadAmount = MaxPreloadAmount;
+	}
+
+	protected int MaxPreloadAmount
+	{
+		get
+		{
+			return Limit ? LimitAmount : UnlimitedMaxPreloadAmount;
+		}
+	}
+	#endregion
+
+	#region Public fields
 	[PropertySpace]
 
 	[ShowInInspector]
@@ -282,28 +338,5 @@ public class Pool : MonoBehaviour, IEnumerable<Component>
 			return usedInstances;
 		}
 	}
-
-	public void ClampPreloadAmount()
-	{
-		if (PreloadAmount > MaxPreloadAmount)
-			PreloadAmount = MaxPreloadAmount;
-	}
-
-	public int MaxPreloadAmount
-	{
-		get
-		{
-			return Limit ? LimitAmount : UnlimitedMaxPreloadAmount;
-		}
-	}
-
-	public IEnumerator<Component> GetEnumerator()
-	{
-		return usedInstances.GetEnumerator();
-	}
-
-	IEnumerator IEnumerable.GetEnumerator()
-	{
-		return usedInstances.GetEnumerator();
-	}
+	#endregion
 }
