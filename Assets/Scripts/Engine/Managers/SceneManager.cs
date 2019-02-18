@@ -16,7 +16,7 @@ public enum FadeMode
     FadeOutIn
 }
 
-public class SceneManager
+public static class SceneManager
 {
 	public static event Action<string> OnSceneChanging;
 	public static event Action<string> OnSceneChanged;
@@ -30,7 +30,7 @@ public class SceneManager
 	public static float DefaultFadeTime = 1.0f;
 	public static Color DefaultFadeColor = Color.black;
 
-	protected static Image fadeImage;
+	private static Image fadeImage;
 
 	public class FadeBuilder
 	{
@@ -189,7 +189,7 @@ public class SceneManager
 		return LoadScene(ActiveScene);
 	}
 
-	protected static void LoadSceneInternal(string name, bool additive, Action<float> onProgress, Action onComplete)
+	private static void LoadSceneInternal(string name, bool additive, Action<float> onProgress, Action onComplete)
 	{
 		AsyncOperation load = UnityEngine.SceneManagement.SceneManager.LoadSceneAsync(name, additive ? LoadSceneMode.Additive : LoadSceneMode.Single);
 		MainThreadDispatcher.StartUpdateMicroCoroutine(LoadSceneProgress(load, onProgress, () => {
@@ -199,7 +199,7 @@ public class SceneManager
 		}));
 	}
 
-	protected static IEnumerator LoadSceneProgress(AsyncOperation load, Action<float> onProgress, Action onComplete)
+	private static IEnumerator LoadSceneProgress(AsyncOperation load, Action<float> onProgress, Action onComplete)
     {
 		while (!load.isDone)
         {
@@ -232,7 +232,7 @@ public class SceneManager
 		});
 	}
 
-	protected static Image GetFadeImage()
+	private static Image GetFadeImage()
     {
 		GameObject gameObject = new GameObject(typeof(SceneManager).Name);
         Canvas canvas = gameObject.AddComponent<Canvas>();

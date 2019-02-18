@@ -67,7 +67,7 @@ namespace Modding
 	}
 	#endif
 
-	public class ModManager
+	public static class ModManager
 	{
 		public static List<ResourceParser> Parsers = new List<ResourceParser>() {
 			new JSONParser(),
@@ -89,10 +89,10 @@ namespace Modding
 			new ZipModLoader()
 		};
 		
-		protected static IEnumerable<Mod> mods = Enumerable.Empty<Mod>();
-		protected static Dictionary<(Type type, ResourceFolder folder, string file), ResourceInfo> cachedResources 
+		private static IEnumerable<Mod> mods = Enumerable.Empty<Mod>();
+		private static Dictionary<(Type type, ResourceFolder folder, string file), ResourceInfo> cachedResources 
 			= new Dictionary<(Type, ResourceFolder, string), ResourceInfo>();
-		protected static Dictionary<ResourceFolder, string> folderToString = new Dictionary<ResourceFolder, string>();
+		private static Dictionary<ResourceFolder, string> folderToString = new Dictionary<ResourceFolder, string>();
 
 		#region Initialization
 		static ModManager()
@@ -101,7 +101,7 @@ namespace Modding
 			CacheFolderNames();
 		}
 
-		protected static void AddDefaultGroups()
+		private static void AddDefaultGroups()
         {
 			// The order in which groups are added is taken into account in mod order and cannot be changed by any means
 			string writeableFolder = GetWriteableFolder();
@@ -109,7 +109,7 @@ namespace Modding
 			AddGroup(new ModGroup(ModType.Mod, writeableFolder + "Mods/", true, true));
 		}
 
-		protected static string GetWriteableFolder()
+		private static string GetWriteableFolder()
 		{
 			string folder = null;
 			switch (Application.platform)
@@ -217,7 +217,7 @@ namespace Modding
 			}
 		}
 
-		protected static void RefreshModList()
+		private static void RefreshModList()
 		{
 			mods = Groups.SelectMany(kvp => kvp.Value.Mods);
 		}
@@ -327,13 +327,13 @@ namespace Modding
 
 		#region Resource-loading
 		// The "+" operator and Path.Combine are really costly and have a huge perfomance impact, thus this
-		protected static void CacheFolderNames()
+		private static void CacheFolderNames()
 		{
 			foreach (ResourceFolder value in Enum.GetValues(typeof(ResourceFolder)))
 				folderToString[value] = Enum.GetName(typeof(ResourceFolder), value) + "/";
 		}
 
-		protected static T LoadCached<T>(ResourceFolder folder, string file) where T : class
+		private static T LoadCached<T>(ResourceFolder folder, string file) where T : class
 		{
 			if (cachedResources.TryGetValue((typeof(T), folder, file), out ResourceInfo resource))
 			{
@@ -671,7 +671,7 @@ namespace Modding
 			return false;
 		}
 
-		protected static void UnloadInternal(object resource)
+		private static void UnloadInternal(object resource)
 		{
 			if (resource is UnityEngine.Object unityObject)
 				GameObject.Destroy(unityObject);

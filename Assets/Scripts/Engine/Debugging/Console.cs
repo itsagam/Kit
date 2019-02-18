@@ -21,7 +21,7 @@ public class Console : MonoBehaviour
 	public InputFieldEx CommandInput;
 
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
-	public const bool Enabled = true;
+	public const bool Enabled = false;
 	public const string Prefab = "Console/Console";
 	public const int Length = 10000;
 	public const string LogColor = "#7EF9FF";
@@ -29,7 +29,7 @@ public class Console : MonoBehaviour
 	public const string NullString = "nil";
 	public static int Depth = 2;
 
-	protected static Console instance = null;
+	private static Console instance = null;
 
 	#region Initialization
 	[RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
@@ -143,8 +143,8 @@ public class Console : MonoBehaviour
 	#endregion
 
 	#region Log
-	protected StringBuilder log = new StringBuilder(Length);
-	protected static string LogEnd = Environment.NewLine;
+	public static StringBuilder LogBuilder = new StringBuilder(Length);
+	private static string logEnd = Environment.NewLine;
 
 	public void RegisterLogging()
 	{
@@ -168,12 +168,12 @@ public class Console : MonoBehaviour
 
 	public static void Log(string line)
 	{
-		var log = instance.log;
+		var log = LogBuilder;
 		int newLength = log.Length + line.Length;
 		if (newLength > Length)
 		{
 			int removeLength = newLength - Length;
-			removeLength = log.IndexOf(LogEnd, removeLength) + LogEnd.Length;
+			removeLength = log.IndexOf(logEnd, removeLength) + logEnd.Length;
 			log.Remove(0, removeLength);
 		}
 		log.AppendLine(line);
@@ -187,7 +187,7 @@ public class Console : MonoBehaviour
 		return output.ToString();
 	}
 
-	protected static void ObjectOrTableToString(StringBuilder output, object obj, int depth, List<object> traversed)
+	private static void ObjectOrTableToString(StringBuilder output, object obj, int depth, List<object> traversed)
 	{
 		if (obj is LuaTable table)
 		{
@@ -209,7 +209,7 @@ public class Console : MonoBehaviour
 			Debugger.ObjectToString(output, obj, false, NullString);
 	}
 
-	protected static void CyclicObjectOrTableToString(StringBuilder output, object obj, int depth, List<object> traversed)
+	private static void CyclicObjectOrTableToString(StringBuilder output, object obj, int depth, List<object> traversed)
 	{
 		if (obj is LuaTable)
 		{
@@ -250,7 +250,7 @@ public class Console : MonoBehaviour
 		allMembers.ForEach(member => Log(member));
 	}
 
-	protected static string MemberToString(Type type, MemberInfo member)
+	private static string MemberToString(Type type, MemberInfo member)
 	{
 		StringBuilder output = new StringBuilder();
 		output.Append($"{type.FullName}.{member.Name}");
@@ -291,7 +291,7 @@ public class Console : MonoBehaviour
 		return output.ToString();
 	}
 
-	protected static string ExtensionToString(Type type, MethodInfo method)
+	private static string ExtensionToString(Type type, MethodInfo method)
 	{
 		StringBuilder output = new StringBuilder();
 		output.Append($"{type.FullName}.{method.Name}");
@@ -316,7 +316,7 @@ public class Console : MonoBehaviour
 	
 	public static void ClearLog()
 	{
-		instance.log.Clear();
+		LogBuilder.Clear();
 		instance.LogText.text = "";
 	}
 	#endregion

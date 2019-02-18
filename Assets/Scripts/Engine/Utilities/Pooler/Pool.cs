@@ -40,6 +40,7 @@ public class Pool : MonoBehaviour, IEnumerable<Component>
 
 	#region Properties
 	[Required]
+	[OnValueChanged("ResetName")]
 	public Component Prefab;
 
 	[LabelText("Message")]
@@ -81,6 +82,9 @@ public class Pool : MonoBehaviour, IEnumerable<Component>
 
 	public bool Organize = true;
 	public bool Persistent = false;
+
+	[HideInInspector]
+	public PoolGroup Group;
 	#endregion
 
 	#region Initialization
@@ -99,6 +103,8 @@ public class Pool : MonoBehaviour, IEnumerable<Component>
 
 	protected void OnDestroy()
 	{
+		if (Group != null)
+			Group.Pools.Remove(this);
 		Pooler.UncachePool(this);
 	}
 	
@@ -285,20 +291,26 @@ public class Pool : MonoBehaviour, IEnumerable<Component>
 
 	public IEnumerator<Component> GetEnumerator()
 	{
-		return availableInstances.GetEnumerator();
+		return usedInstances.GetEnumerator();
 	}
 
 	IEnumerator IEnumerable.GetEnumerator()
 	{
-		return availableInstances.GetEnumerator();
+		return usedInstances.GetEnumerator();
 	}
 
-	public bool Overlimit
+	protected bool Overlimit
 	{
 		get
 		{
-			return usedInstances.Count >= LimitAmount;
+			return UsedCount >= LimitAmount;
 		}
+	}
+
+	protected void ResetName()
+	{
+		if (Prefab != null)
+			name = Prefab.name;
 	}
 
 	protected void ClampPreloadAmount()
@@ -321,6 +333,7 @@ public class Pool : MonoBehaviour, IEnumerable<Component>
 
 	[ShowInInspector]
 	[EnableGUI]
+	[HideInInlineEditors]
 	public LinkedList<Component> Available
 	{
 		get
@@ -329,13 +342,30 @@ public class Pool : MonoBehaviour, IEnumerable<Component>
 		}
 	}
 
+	public int AvailableCount
+	{
+		get
+		{
+			return availableInstances.Count;
+		}
+	}
+
 	[ShowInInspector]
 	[EnableGUI]
+	[HideInInlineEditors]
 	public LinkedList<Component> Used
 	{
 		get
 		{
 			return usedInstances;
+		}
+	}
+
+	public int UsedCount
+	{
+		get
+		{
+			return usedInstances.Count;
 		}
 	}
 	#endregion

@@ -139,7 +139,7 @@ namespace Modding
 			return default;
 		}
 
-		protected static IEnumerable<(string filePath, ResourceParser parser, float certainty)> RankParsers(IEnumerable<string> matchingFiles, Type type)
+		protected IEnumerable<(string filePath, ResourceParser parser, float certainty)> RankParsers(IEnumerable<string> matchingFiles, Type type)
 		{
 			return matchingFiles.SelectMany(filePath => ModManager.Parsers.Select(parser => (filePath, parser, certainty: parser.CanOperate(filePath, type))))
 								.Where(d => d.certainty > 0)

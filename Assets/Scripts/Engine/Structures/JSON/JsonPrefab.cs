@@ -173,9 +173,9 @@ public class JsonPrefabConverter : JsonConverter
 	public override bool CanWrite => false;
 }
 
-public class JsonPrefab
+public static class JsonPrefab
 {
-	protected static JsonSerializer serializer = JsonSerializer.CreateDefault();
+	private static JsonSerializer serializer = JsonSerializer.CreateDefault();
 
 	public static List<T> Instantiate<T>(IEnumerable stateObjects, bool saveOnDestroy = true) where T : MonoBehaviour
 	{
@@ -233,7 +233,7 @@ public class JsonPrefab
 		return instance;
 	}
 
-	protected static T Instantiate<T>(string path, JObject jObject) where T : MonoBehaviour
+	private static T Instantiate<T>(string path, JObject jObject) where T : MonoBehaviour
 	{
 		string currentPath = ReplaceValues(path, jObject);
 

@@ -14,7 +14,7 @@ using Modding.Parsers;
 //			platforms like Android. If the file is loaded by ModManager it can be loaded without providing 
 //			an extension since mods are always in an accessible folder which we can enumerate.
 
-public class ResourceManager
+public static class ResourceManager
 {
 	public static Dictionary<ResourceFolder, string> Paths = new Dictionary<ResourceFolder, string>
 	{   { ResourceFolder.Data, Application.dataPath + "/"},
@@ -28,7 +28,7 @@ public class ResourceManager
 	public static event Action<ResourceFolder, string, object, bool> ResourceLoaded;
 	public static event Action<ResourceFolder, string> ResourceUnloaded;
 
-	protected static Dictionary<(Type type, ResourceFolder folder, string file), WeakReference> cachedResources 
+	private static Dictionary<(Type type, ResourceFolder folder, string file), WeakReference> cachedResources 
 		= new Dictionary<(Type, ResourceFolder, string), WeakReference>();
 
 	#region Loading
@@ -76,7 +76,7 @@ public class ResourceManager
 		return await LoadUnmoddedAsync<T>(folder, file);
 	}
 
-	protected static T LoadCached<T>(ResourceFolder folder, string file) where T : class
+	private static T LoadCached<T>(ResourceFolder folder, string file) where T : class
 	{
 		if (cachedResources.TryGetValue((typeof(T), folder, file), out WeakReference weakReference))
 		{
@@ -464,7 +464,7 @@ public class ResourceManager
 			return request.downloadHandler.data;
 	}
 
-	protected static UnityWebRequestAsyncOperation WebAsync(string filePath)
+	private static UnityWebRequestAsyncOperation WebAsync(string filePath)
 	{
 		UnityWebRequest request = UnityWebRequest.Get(LocalToURLPath(filePath));
 		return request.SendWebRequest();
@@ -631,7 +631,7 @@ public class ResourceManager
 	#endregion
 
 	#region Other
-	protected static IEnumerable<(ResourceParser parser, float certainty)> RankParsers(string fullPath, Type type)
+	private static IEnumerable<(ResourceParser parser, float certainty)> RankParsers(string fullPath, Type type)
 	{
 		return ModManager.Parsers.Select(parser => (parser, certainty: parser.CanOperate(fullPath, type)))
 			.Where(d => d.certainty > 0)

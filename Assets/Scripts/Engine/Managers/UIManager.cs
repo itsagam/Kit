@@ -30,7 +30,7 @@ public enum WindowHideMode
 	Destroy
 }
 
-public class UIManager
+public static class UIManager
 {
 	public const WindowConflictMode DefaultConflictMode = WindowConflictMode.ShowNew;
 	public const WindowHideMode DefaultWindowHideMode = WindowHideMode.Auto;
@@ -42,7 +42,7 @@ public class UIManager
 	public static event Action<Window> OnWindowHiding;
 	public static event Action<Window> OnWindowHidden;
 
-	protected static AudioSource audio;
+	private static AudioSource audio;
 
 	public static async UniTask<Window> ShowWindow(
 								string path,
@@ -154,7 +154,7 @@ public class UIManager
 		instance.OnWindowShown.AddListener(() => OnWindowHidden?.Invoke(instance));
 	}
 
-	protected static Canvas CreateCanvas()
+	private static Canvas CreateCanvas()
 	{
 		GameObject ui = new GameObject("UI");
 		ui.layer = LayerMask.NameToLayer("UI");

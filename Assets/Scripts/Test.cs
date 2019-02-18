@@ -8,25 +8,28 @@ using UniRx.Async;
 
 public class Test : MonoBehaviour
 {
-	public Parent Cube;
+	public Parent Parent;
+	public Child Child;
 
 	protected void Awake()
 	{
-
+		//Pooler.Instantiate("Effects", Parent, Vector3.one, Quaternion.identity);
+		//Pooler.Instantiate("Effects", Parent, Vector3.one, Quaternion.identity);
+		//Pooler.Instantiate("Effects", Parent, Vector3.one, Quaternion.identity);
+		//Pooler.Instantiate("Effects", Child, Vector3.one, Quaternion.identity);
+		//Pooler.Instantiate("Effects", Child, Vector3.one, Quaternion.identity);
 	}
 
 	public void Button()
 	{
-		Debugger.StartProfile(".transform");
-		for (int i = 0; i < 10000; i++)
-			Cube.transform.position = Vector3.one;
-		Debugger.EndProfile();
+		Pooler.DestroyPool(Parent);
+		//Debugger.StartProfile("Class");
+		//for (int i = 0; i < 1000000; i++)
+		//Debugger.EndProfile();
 
-		Transform t = Cube.transform;
-
-		Debugger.StartProfile("Cached");
-		for (int i = 0; i < 10000; i++)
-			t.position = Vector3.one;
-		Debugger.EndProfile();
+		
+		//Debugger.StartProfile("Int");
+		//for (int i = 0; i < 1000000; i++)
+		//Debugger.EndProfile();
 	}
 }

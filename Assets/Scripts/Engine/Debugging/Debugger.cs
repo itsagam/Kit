@@ -9,14 +9,14 @@ using UnityEngine.Profiling;
 using UniRx;
 using Newtonsoft.Json;
 
-public class Debugger
+public static class Debugger
 {
 	public const string NullString = "Null";
 
 	#region Profiling
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
-	protected static Dictionary<string, CustomSampler> samples = new Dictionary<string, CustomSampler>();
-	protected static Stack<CustomSampler> runningSamples = new Stack<CustomSampler>();
+	private static Dictionary<string, CustomSampler> samples = new Dictionary<string, CustomSampler>();
+	private static Stack<CustomSampler> runningSamples = new Stack<CustomSampler>();
 
 	public static void StartProfile(string name)
 	{
@@ -43,7 +43,7 @@ public class Debugger
 		runningSamples.Pop()?.End();
 	}
 
-	protected static void LogProfile(CustomSampler sample)
+	private static void LogProfile(CustomSampler sample)
 	{
 		Recorder recorder = sample.GetRecorder();
 		recorder.enabled = true;
@@ -53,7 +53,7 @@ public class Debugger
 		});
 	}
 
-	protected static string ConvertTime(long time)
+	private static string ConvertTime(long time)
 	{
 		if (time < 0)
 			return null;
