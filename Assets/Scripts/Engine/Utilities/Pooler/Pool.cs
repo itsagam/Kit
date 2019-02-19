@@ -39,8 +39,8 @@ public class Pool : MonoBehaviour, IEnumerable<Component>
 	protected LinkedList<Component> usedInstances = new LinkedList<Component>();
 
 	#region Properties
-	[HideInInlineEditors]
 	[ReadOnly]
+	[HideInInlineEditors]
 	[ShowIf("ShowGroup")]
 	public PoolGroup Group;
 
@@ -367,8 +367,8 @@ public class Pool : MonoBehaviour, IEnumerable<Component>
 	#region Public fields
 	[PropertySpace]
 
-	[ShowInInspector]
 	[EnableGUI]
+	[ShowInInspector]
 	[HideInInlineEditors]
 	public LinkedList<Component> Available
 	{
@@ -386,8 +386,8 @@ public class Pool : MonoBehaviour, IEnumerable<Component>
 		}
 	}
 
-	[ShowInInspector]
 	[EnableGUI]
+	[ShowInInspector]
 	[HideInInlineEditors]
 	public LinkedList<Component> Used
 	{

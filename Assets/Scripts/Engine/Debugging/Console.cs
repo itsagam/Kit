@@ -13,23 +13,20 @@ using TouchScript.Gestures;
 using UniRx;
 using XLua;
 
-public class Console : MonoBehaviour
+public static class Console
 {
-	public Animator Animator;
-	public ScrollRect LogScroll;
-	public Text LogText;
-	public InputFieldEx CommandInput;
-
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
-	public const bool Enabled = false;
-	public const string Prefab = "Console/Console";
-	public const int Length = 10000;
-	public const string LogColor = "#7EF9FF";
-	public const string CommandPrefix = "> ";
-	public const string NullString = "nil";
+	public static bool Enabled = false;
+	public static int Length = 10000;
 	public static int Depth = 2;
+	private const string Prefab = "Console/Console";
+	private const string LogColor = "#7EF9FF";
+	private const string CommandPrefix = "> ";
+	private const string NullString = "nil";
+	private const float GCInterval = 1.0f;
 
-	private static Console instance = null;
+	private static ConsoleUI instance = null;
+	private static CompositeDisposable disposables = new CompositeDisposable();
 
 	#region Initialization
 	[RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
@@ -37,26 +34,25 @@ public class Console : MonoBehaviour
 	{
 		if (Enabled && instance == null)
 		{
-			Console prefab = Resources.Load<Console>(Prefab);
-			instance = Instantiate(prefab);
-			instance.name = prefab.name;
+			CreateUI();
+			InitializeUI();
+			RegisterLogging();
+			RegisterInput();
+			InitializeScripting();
 		}
 	}
 
-	protected void Awake()
+	private static void CreateUI()
 	{
-		instance = this;
+		ConsoleUI prefab = Resources.Load<ConsoleUI>(Prefab);
+		instance = GameObject.Instantiate(prefab);
+		instance.name = prefab.name;
+		GameObject.DontDestroyOnLoad(instance.gameObject);
 		if (EventSystem.current == null)
 			new GameObject("EventSystem", typeof(EventSystem), typeof(StandaloneInputModule));
-
-		RegisterLogging();
-		RegisterInput();
-		InitializeUI();
-		InitializeScripting();
-		DontDestroyOnLoad(gameObject);
 	}
 
-	protected void RegisterInput()
+	private static void RegisterInput()
 	{
 		if (!(Application.isMobilePlatform || Application.isConsolePlatform))
 		{
@@ -64,10 +60,12 @@ public class Console : MonoBehaviour
 				.EveryUpdate()
 				.Where(l => Input.GetKeyDown(KeyCode.BackQuote))
 				.Subscribe(l => Toggle())
-				.AddTo(this);
+				.AddTo(disposables);
 		}
 		else
 		{
+			var gameObject = instance.gameObject;
+
 			var layer = gameObject.AddComponent<FullscreenLayer>();
 			layer.Type = FullscreenLayer.LayerType.Global;
 
@@ -82,7 +80,7 @@ public class Console : MonoBehaviour
 		}
 
 		EventModifiers disregard = EventModifiers.FunctionKey | EventModifiers.Numeric | EventModifiers.CapsLock;
-		var input = CommandInput;
+		var input = instance.CommandInput;
 		input.AddKeyHandler(KeyCode.BackQuote,	() =>	{},											EventModifiers.None,	disregard);
 		input.AddKeyHandler(KeyCode.Return,				Submit,										EventModifiers.None,	disregard);
 		input.AddKeyHandler(KeyCode.Return,		() =>	input.SendKeyEvent(KeyCode.Return,'\n'),	EventModifiers.Shift,	disregard);
@@ -96,10 +94,10 @@ public class Console : MonoBehaviour
 	#endregion
 
 	#region Console
-	protected void InitializeUI()
+	private static void InitializeUI()
 	{
-		LogText.text = "";
-		CommandInput.text = "";
+		instance.LogText.text = "";
+		instance.CommandInput.text = "";
 	}
 
 	public static void Show()
@@ -146,12 +144,12 @@ public class Console : MonoBehaviour
 	public static StringBuilder LogBuilder = new StringBuilder(Length);
 	private static string logEnd = Environment.NewLine;
 
-	public static void RegisterLogging()
+	private static void RegisterLogging()
 	{
 		Application.logMessageReceived += OnLog;
 	}
 
-	public static void UnregisterLogging()
+	private static void UnregisterLogging()
 	{
 		Application.logMessageReceived -= OnLog;
 	}
@@ -322,9 +320,9 @@ public class Console : MonoBehaviour
 	#endregion
 
 	#region Command
-	protected void Submit()
+	private static void Submit()
 	{
-		string command = CommandInput.text;
+		string command = instance.CommandInput.text;
 		if (command != "")
 		{
 			Log(FormatCommand(command));
@@ -335,7 +333,7 @@ public class Console : MonoBehaviour
 		}
 	}
 
-	protected string FormatCommand(string command)
+	private static string FormatCommand(string command)
 	{
 		string[] lines = command.Split('\n');
 		lines[0] = CommandPrefix + lines[0];
@@ -352,18 +350,14 @@ public class Console : MonoBehaviour
 	#endregion
 
 	#region Execution
-	protected LuaEnv scriptEnv;
+	private static LuaEnv scriptEnv;
 
-	protected void InitializeScripting()
+	private static void InitializeScripting()
 	{
 		scriptEnv = new LuaEnv();	
 		scriptEnv.DoString("require 'Lua/General'");
 		scriptEnv.DoString("require 'Lua/Console'");
-	}
-
-	protected void Update()
-	{
-		scriptEnv.Tick();
+		Observable.Timer(TimeSpan.FromSeconds(GCInterval)).Subscribe(l => scriptEnv.Tick()).AddTo(disposables);
 	}
 
 	public static void Execute(string command)
@@ -387,37 +381,38 @@ public class Console : MonoBehaviour
 
 		void ExecuteLocal(string commandActual)
 		{
-			object[] results = instance.scriptEnv.DoString(commandActual);
+			object[] results = scriptEnv.DoString(commandActual);
 			results?.ForEach(result => Log(result));
 		}
 	}
 	#endregion
 
 	#region History
-	protected List<string> history = new List<string>();
-	protected int currentCommandIndex = 0;
+	private static List<string> history = new List<string>();
+	private static int currentCommandIndex = 0;
 
-	protected void AddToHistory(string command)
+	private static void AddToHistory(string command)
 	{
 		history.Add(command);
 		currentCommandIndex = history.Count;
 	}
 
-	protected void SelectPreviousCommand()
+	private static void SelectPreviousCommand()
 	{
 		SelectCommand(currentCommandIndex - 1);
 	}
 
-	protected void SelectNextCommand()
+	private static void SelectNextCommand()
 	{
 		SelectCommand(currentCommandIndex + 1);
 	}
 
-	protected void SelectCommand(int index)
-	{	
+	private static void SelectCommand(int index)
+	{
+		var input = instance.CommandInput;
 		if (index >= history.Count)
 		{
-			CommandInput.text = "";
+			input.text = "";
 			currentCommandIndex = history.Count;
 		}
 		else if (index < 0)
@@ -425,23 +420,26 @@ public class Console : MonoBehaviour
 		}
 		else
 		{
-			CommandInput.text = history[index];
+			input.text = history[index];
 			currentCommandIndex = index;
 		}
-		CommandInput.MoveTextEnd(false);
+		input.MoveTextEnd(false);
 	}
 
 	public static void ClearHistory()
 	{
-		instance.history.Clear();
+		history.Clear();
 	}
 	#endregion
 
 	#region Destruction
-	protected void OnDestroy()
+	public static void Destroy()
 	{
+		disposables.Dispose();
 		scriptEnv.Dispose();
 		UnregisterLogging();
+		instance.gameObject.Destroy();
+		instance = null;
 	}
 	#endregion
 

@@ -9,8 +9,8 @@ using Sirenix.OdinInspector;
 public class PoolGroup : MonoBehaviour, IEnumerable<Component>
 {
 	#region Properties
-	[OnValueChanged("ResetMessageMode")]
 	[LabelText("Message")]
+	[OnValueChanged("ResetMessageMode")]
 	public PoolMessageMode MessageMode = PoolMessageMode.None;
 
 	[OnValueChanged("ResetOrganize")]

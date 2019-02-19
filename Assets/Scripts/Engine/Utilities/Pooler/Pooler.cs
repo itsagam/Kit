@@ -26,7 +26,7 @@ public static class Pooler
 
 	public static PoolGroup CreateGroup(string name)
 	{
-		GameObject groupGO = new GameObject(name);
+		GameObject groupGO = new GameObject(name, typeof(PoolGroup));
 		return groupGO.AddComponent<PoolGroup>();
 	}
 

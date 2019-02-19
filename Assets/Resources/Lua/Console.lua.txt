@@ -12,14 +12,6 @@ function list(object)
 	end
 end
 
-function depth(count)
-	if (count == nil) then
-		return CS.Console.Depth
-	else
-		CS.Console.Depth = count
-	end
-end
-
 function clear()
 	CS.Console.ClearLog()
 end
@@ -46,7 +38,7 @@ function gos(tag)
 	end
 end
 
-function create(name, ...)
+function newGO(name, ...)
 	local go = UE.GameObject(name)
 	for k, v in pairs({...}) do
 		go:AddComponent(typeof(v))

@@ -13,7 +13,6 @@ public class Test : MonoBehaviour
 
 	protected void Awake()
 	{
-
 		/*
 		var group = Pooler.CreateGroup("Effects");
 		group.Organize = false;
