@@ -22,10 +22,12 @@ public class PoolGroup : MonoBehaviour, IEnumerable<Component>
 	[PropertySpace]
 
 	[SceneObjectsOnly]
-	[InlineEditor(InlineEditorModes.GUIOnly)]
+	[InlineEditor]
 	[ListDrawerSettings(CustomAddFunction = "AddPool", CustomRemoveElementFunction = "DestroyPool")]
 	public List<Pool> Pools = new List<Pool>();
 	#endregion
+
+	public bool IsDestroying { get; protected set; }
 
 	#region Initialization
 	protected void Awake()
@@ -37,6 +39,7 @@ public class PoolGroup : MonoBehaviour, IEnumerable<Component>
 
 	protected void OnDestroy()
 	{
+		IsDestroying = true;
 		Pooler.UncacheGroup(this);
 	}
 	#endregion
@@ -45,8 +48,9 @@ public class PoolGroup : MonoBehaviour, IEnumerable<Component>
 	public void AddPool(Pool pool)
 	{
 		Pools.Add(pool);
-		pool.Group = this;
 		pool.transform.parent = transform;
+
+		pool.Group = this;
 		pool.MessageMode = MessageMode;
 		pool.Organize = Organize;
 		pool.Persistent = false;
@@ -78,6 +82,7 @@ public class PoolGroup : MonoBehaviour, IEnumerable<Component>
 	#endregion
 
 	#region Editor functionality
+	#if UNITY_EDITOR
 	private void AddPool()
 	{
 		string name = "Pool " + (transform.childCount + 1);
@@ -111,6 +116,7 @@ public class PoolGroup : MonoBehaviour, IEnumerable<Component>
 			return transform.parent == null;
 		}
 	}
+	#endif
 	#endregion
 
 	#region Public fields

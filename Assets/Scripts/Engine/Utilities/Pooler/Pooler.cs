@@ -4,12 +4,10 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-// TODO: Make stable (can't assign individual scripts as prefab, external destroyed instances...)
-// TODO: Make work with Particle Systems, UIs and AudioSources
-
 public static class Pooler
 {
 	private static Dictionary<string, PoolGroup> poolGroupsByName = new Dictionary<string, PoolGroup>();
+
 	private static Dictionary<string, Pool> poolsByName = new Dictionary<string, Pool>();
 	private static Dictionary<Component, Pool> poolsByPrefab = new Dictionary<Component, Pool>();
 
@@ -26,7 +24,7 @@ public static class Pooler
 
 	public static PoolGroup CreateGroup(string name)
 	{
-		GameObject groupGO = new GameObject(name, typeof(PoolGroup));
+		GameObject groupGO = new GameObject(name);
 		return groupGO.AddComponent<PoolGroup>();
 	}
 
@@ -108,6 +106,11 @@ public static class Pooler
 		pool.Prefab = prefab;
 		poolsByPrefab.Add(prefab, pool);
 		return pool;
+	}
+
+	public static bool ContainsPool(string name)
+	{
+		return poolsByName.ContainsKey(name);
 	}
 
 	public static bool ContainsPool(Component prefab)
@@ -330,9 +333,9 @@ public static class Pooler
 		return false;
 	}
 
-	public static bool DestroyAllInGroup(string group)
+	public static bool DestroyAllInGroup(string name)
 	{
-		PoolGroup groupInstance = GetGroup(group);
+		PoolGroup groupInstance = GetGroup(name);
 		if (groupInstance != null)
 		{
 			foreach (Pool pool in groupInstance.Pools)

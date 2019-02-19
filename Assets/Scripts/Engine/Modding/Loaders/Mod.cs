@@ -276,7 +276,7 @@ namespace Modding
 					scriptDisposables.Dispose();
 					scriptDisposables = null;
 				}				
-				// HACK: Have to Dispose the environment the next frame as functions may hold references to prevent disposal
+				// UNDONE: Have to Dispose the environment the next frame as functions may hold references to prevent disposal
 				Observable.NextFrame().Subscribe(u =>
 				{
 					scriptEnv.Dispose();

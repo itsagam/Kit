@@ -45,6 +45,7 @@ public class Pool : MonoBehaviour, IEnumerable<Component>
 	public PoolGroup Group;
 
 	[Required]
+	[ValueDropdown("GetComponents", AppendNextDrawer = true)]
 	[OnValueChanged("ResetName")]
 	public Component Prefab;
 
@@ -94,26 +95,26 @@ public class Pool : MonoBehaviour, IEnumerable<Component>
 	public bool Persistent = false;
 	#endregion
 
+	public bool IsDestroying { get; protected set; }
 	protected Transform transformCached;
 
 	#region Initialization
 	protected void Awake()
 	{
 		Pooler.CachePool(this);
+
 		transformCached = transform;
 		if (Persistent && transformCached.parent == null)
 			DontDestroyOnLoad(gameObject);
-	}
 
-	protected void Start()
-	{
 		if (Preload)
 			PreloadInstances().Forget();
 	}
 
 	protected void OnDestroy()
 	{
-		if (Group != null)
+		IsDestroying = true;
+		if (Group != null && !Group.IsDestroying)
 			Group.Pools.Remove(this);
 		Pooler.UncachePool(this);
 	}
@@ -122,6 +123,12 @@ public class Pool : MonoBehaviour, IEnumerable<Component>
 	{
 		if (PreloadDelay > 0)
 			await Observable.Timer(TimeSpan.FromSeconds(PreloadDelay));
+
+		if (PreloadTime <= 0)
+		{
+			PreloadInstances(PreloadAmount);
+			return;
+		}
 
 		int amount = PreloadAmount;
 		float preloadFrames = PreloadTime / Time.fixedUnscaledDeltaTime;
@@ -133,15 +140,38 @@ public class Pool : MonoBehaviour, IEnumerable<Component>
 			await Observable.EveryUpdate().TakeWhile(l => runningAmount < 1).Do(l => runningAmount += amountPerFrame);
 
 			int runningCount = (int) runningAmount;
-			for (int i = 0; i < runningCount; i++)
-				Instantiate();
-
+			PreloadInstances(runningCount);
 			amount -= runningCount;
+		}
+	}
+
+	protected void PreloadInstances(int count)
+	{
+		for (int i = 0; i < count; i++)
+		{
+			var instance = CreateInstance();
+			instance.gameObject.SetActive(false);
+			availableInstances.AddLast(instance);
 		}
 	}
 	#endregion
 
 	#region Instantiate/Destroy
+	protected Component CreateInstance()
+	{
+		Component instance = GameObject.Instantiate(Prefab);
+		instance.name = name;
+
+		var poolInstance = instance.gameObject.AddComponent<PoolInstance>();
+		poolInstance.Pool = this;
+		poolInstance.Component = instance;
+
+		if (Organize)
+			instance.transform.SetParent(transformCached);
+
+		return instance;
+	}
+
 	public Component Instantiate()
 	{
 		Component instance = null;
@@ -170,12 +200,7 @@ public class Pool : MonoBehaviour, IEnumerable<Component>
 				}				
 			}
 
-			instance = GameObject.Instantiate(Prefab);
-			instance.name = name;
-			var poolInstance = instance.gameObject.AddComponent<PoolInstance>();
-			poolInstance.Pool = this;
-			if (Organize)
-				instance.transform.SetParent(transformCached);
+			instance = CreateInstance();
 		}
 		usedInstances.AddLast(instance);
 		SendInstantiateMessage(instance);
@@ -327,6 +352,15 @@ public class Pool : MonoBehaviour, IEnumerable<Component>
 	#endregion
 
 	#region Editor functionality
+	#if UNITY_EDITOR
+	private IEnumerable<Component> GetComponents()
+	{
+		if (Prefab == null)
+			return Enumerable.Empty<Component>();
+
+		return Prefab.gameObject.GetComponents<Component>();
+	}
+
 	private void ResetName()
 	{
 		if (Prefab != null)
@@ -362,6 +396,7 @@ public class Pool : MonoBehaviour, IEnumerable<Component>
 			return Limit ? LimitAmount : UnlimitedMaxPreloadAmount;
 		}
 	}
+	#endif
 	#endregion
 
 	#region Public fields

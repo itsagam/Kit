@@ -5,22 +5,33 @@ Engine
 		- Configs
 		- Mods
 		- Patches
-	Reactive
 
 Library
 -----------------------------------------
-
 	Managers
-	---------------------------------
+	-------------------------------------
 		Data Manager
 		Audio Manager
 		Effects Manager
 		Input Manager
-		
-	Utilities
-	---------------------------------
-		Pooler
 
+	UI
+	-------------------------------------
+		Splash
+		Menu
+		Settings
+		Mods
+		
+	Social/Networking
+	-------------------------------------
+		Profile
+		Friends
+		Analytics
+		Ads
+		Leaderboards
+		Achievements
+		Localisation
+		
 Specific
 -----------------------------------------
 	Inventory -> Inventroy system with a grid, support for multiple objects within a tile, an object taking multiple tiles and nested inventories
