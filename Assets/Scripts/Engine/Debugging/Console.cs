@@ -146,17 +146,17 @@ public class Console : MonoBehaviour
 	public static StringBuilder LogBuilder = new StringBuilder(Length);
 	private static string logEnd = Environment.NewLine;
 
-	public void RegisterLogging()
+	public static void RegisterLogging()
 	{
 		Application.logMessageReceived += OnLog;
 	}
 
-	public void UnregisterLogging()
+	public static void UnregisterLogging()
 	{
 		Application.logMessageReceived -= OnLog;
 	}
 
-	protected void OnLog(string message, string stackTrace, LogType type)
+	private static void OnLog(string message, string stackTrace, LogType type)
 	{
 		Log($"<color={LogColor}>{message}</color>");
 	}
@@ -180,7 +180,7 @@ public class Console : MonoBehaviour
 		instance.LogText.text = log.ToString();
 	}
 
-	public static string ObjectOrTableToString(object obj)
+	private static string ObjectOrTableToString(object obj)
 	{
 		StringBuilder output = new StringBuilder();
 		ObjectOrTableToString(output, obj, Depth, new List<object>());

@@ -6,7 +6,7 @@ using UnityEngine;
 using UnityEngine.UI;
 
 [RequireComponent(typeof(Toggle))]
-public class ParentToggleGroup : MonoBehaviour
+public class ToggleGroupFromParent : MonoBehaviour
 {
 	protected void Awake()
 	{

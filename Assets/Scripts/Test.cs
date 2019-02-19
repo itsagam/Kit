@@ -13,16 +13,22 @@ public class Test : MonoBehaviour
 
 	protected void Awake()
 	{
-		//Pooler.Instantiate("Effects", Parent, Vector3.one, Quaternion.identity);
-		//Pooler.Instantiate("Effects", Parent, Vector3.one, Quaternion.identity);
-		//Pooler.Instantiate("Effects", Parent, Vector3.one, Quaternion.identity);
-		//Pooler.Instantiate("Effects", Child, Vector3.one, Quaternion.identity);
-		//Pooler.Instantiate("Effects", Child, Vector3.one, Quaternion.identity);
+
+		/*
+		var group = Pooler.CreateGroup("Effects");
+		group.Organize = false;
+		group.Persistent = true;
+
+		var parent1 = Pooler.Instantiate("Effects", Parent, Vector3.one, Quaternion.identity);
+		var parent2 = Pooler.Instantiate("Effects", Parent, Vector3.one, Quaternion.identity);
+		var parent3 = Pooler.Instantiate("Effects", Parent, Vector3.one, Quaternion.identity);
+		var child1 = Pooler.Instantiate("Effects", Child, Vector3.one, Quaternion.identity);
+		var child2 = Pooler.Instantiate("Effects", Child, Vector3.one, Quaternion.identity);
+		*/
 	}
 
 	public void Button()
 	{
-		Pooler.DestroyPool(Parent);
 		//Debugger.StartProfile("Class");
 		//for (int i = 0; i < 1000000; i++)
 		//Debugger.EndProfile();

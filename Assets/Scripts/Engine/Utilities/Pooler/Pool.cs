@@ -28,21 +28,27 @@ public enum PoolLimitMode
 	DestroyAfterUse,
 }
 
+[AddComponentMenu("Pooling/Pool")]
 public class Pool : MonoBehaviour, IEnumerable<Component>
 {
-	public const int UnlimitedMaxPreloadAmount = 250;
-
 	public const string InstantiateMessage = "AwakeFromPool";
 	public const string DestroyMessage = "OnDestroyIntoPool";
+	private const int UnlimitedMaxPreloadAmount = 250;
 
 	protected LinkedList<Component> availableInstances = new LinkedList<Component>();
 	protected LinkedList<Component> usedInstances = new LinkedList<Component>();
 
 	#region Properties
+	[HideInInlineEditors]
+	[ReadOnly]
+	[ShowIf("ShowGroup")]
+	public PoolGroup Group;
+
 	[Required]
 	[OnValueChanged("ResetName")]
 	public Component Prefab;
 
+	[HideInInlineEditors]
 	[LabelText("Message")]
 	public PoolMessageMode MessageMode = PoolMessageMode.None;
 
@@ -80,18 +86,22 @@ public class Pool : MonoBehaviour, IEnumerable<Component>
 	[OnValueChanged("ClampPreloadAmount")]
 	public int LimitAmount = 50;
 
+	[HideInInlineEditors]
 	public bool Organize = true;
+	
+	[HideInInlineEditors]
+	[ShowIf("ShowPersistent")]
 	public bool Persistent = false;
-
-	[HideInInspector]
-	public PoolGroup Group;
 	#endregion
+
+	protected Transform transformCached;
 
 	#region Initialization
 	protected void Awake()
 	{
 		Pooler.CachePool(this);
-		if (Persistent)
+		transformCached = transform;
+		if (Persistent && transformCached.parent == null)
 			DontDestroyOnLoad(gameObject);
 	}
 
@@ -162,8 +172,10 @@ public class Pool : MonoBehaviour, IEnumerable<Component>
 
 			instance = GameObject.Instantiate(Prefab);
 			instance.name = name;
+			var poolInstance = instance.gameObject.AddComponent<PoolInstance>();
+			poolInstance.Pool = this;
 			if (Organize)
-				instance.transform.SetParent(transform);
+				instance.transform.SetParent(transformCached);
 		}
 		usedInstances.AddLast(instance);
 		SendInstantiateMessage(instance);
@@ -248,6 +260,12 @@ public class Pool : MonoBehaviour, IEnumerable<Component>
 		instance.gameObject.SetActive(false);
 		SendDestroyMessage(instance);
 	}
+
+	public void DestroyAll()
+	{
+		foreach (var instance in usedInstances.Reverse())
+			Destroy(instance);
+	}
 	#endregion
 
 	#region Helper methods
@@ -306,20 +324,38 @@ public class Pool : MonoBehaviour, IEnumerable<Component>
 			return UsedCount >= LimitAmount;
 		}
 	}
+	#endregion
 
-	protected void ResetName()
+	#region Editor functionality
+	private void ResetName()
 	{
 		if (Prefab != null)
 			name = Prefab.name;
 	}
 
-	protected void ClampPreloadAmount()
+	private void ClampPreloadAmount()
 	{
 		if (PreloadAmount > MaxPreloadAmount)
 			PreloadAmount = MaxPreloadAmount;
 	}
 
-	protected int MaxPreloadAmount
+	private bool ShowGroup
+	{
+		get
+		{
+			return Group != null;
+		}
+	}
+
+	private bool ShowPersistent
+	{
+		get
+		{
+			return transform.parent == null;
+		}
+	}
+
+	private int MaxPreloadAmount
 	{
 		get
 		{

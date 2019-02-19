@@ -5,33 +5,51 @@ using System.Linq;
 using UnityEngine;
 using Sirenix.OdinInspector;
 
+[AddComponentMenu("Pooling/PoolGroup")]
 public class PoolGroup : MonoBehaviour, IEnumerable<Component>
 {
+	#region Properties
+	[OnValueChanged("ResetMessageMode")]
+	[LabelText("Message")]
+	public PoolMessageMode MessageMode = PoolMessageMode.None;
+
+	[OnValueChanged("ResetOrganize")]
 	public bool Organize = true;
+
+	[ShowIf("ShowPersistent")]
+	public bool Persistent = false;
 
 	[PropertySpace]
 
-	[InlineEditor]
 	[SceneObjectsOnly]
+	[InlineEditor(InlineEditorModes.GUIOnly)]
 	[ListDrawerSettings(CustomAddFunction = "AddPool", CustomRemoveElementFunction = "DestroyPool")]
 	public List<Pool> Pools = new List<Pool>();
+	#endregion
 
+	#region Initialization
 	protected void Awake()
 	{
-		Pooler.CachePoolGroup(this);
+		Pooler.CacheGroup(this);
+		if (Persistent && transform.parent == null)
+			DontDestroyOnLoad(gameObject);
 	}
 
 	protected void OnDestroy()
 	{
-		Pooler.UncachePoolGroup(this);
+		Pooler.UncacheGroup(this);
 	}
+	#endregion
 
+	#region Pool management
 	public void AddPool(Pool pool)
 	{
 		Pools.Add(pool);
 		pool.Group = this;
-		if (Organize)
-			pool.transform.parent = transform;
+		pool.transform.parent = transform;
+		pool.MessageMode = MessageMode;
+		pool.Organize = Organize;
+		pool.Persistent = false;
 	}
 
 	public bool ContainsPool(Pool pool)
@@ -42,11 +60,60 @@ public class PoolGroup : MonoBehaviour, IEnumerable<Component>
 	public bool RemovePool(Pool pool)
 	{
 		pool.Group = null;
-		if (Organize)
-			pool.transform.parent = null;
+		pool.transform.parent = null;
 		return Pools.Remove(pool);
 	}
+	#endregion
 
+	#region Helper methods
+	IEnumerator IEnumerable.GetEnumerator()
+	{
+		return Used.GetEnumerator();
+	}
+
+	public IEnumerator<Component> GetEnumerator()
+	{
+		return Used.GetEnumerator();
+	}
+	#endregion
+
+	#region Editor functionality
+	private void AddPool()
+	{
+		string name = "Pool " + (transform.childCount + 1);
+		GameObject poolGO = new GameObject(name);
+		Pool pool = poolGO.AddComponent<Pool>();
+		AddPool(pool);
+	}
+
+	private void DestroyPool(Pool pool)
+	{
+		RemovePool(pool);
+		DestroyImmediate(pool.gameObject);
+	}
+
+	private void ResetMessageMode()
+	{
+		foreach (Pool pool in Pools)
+			pool.MessageMode = MessageMode;
+	}
+
+	private void ResetOrganize()
+	{
+		foreach (Pool pool in Pools)
+			pool.Organize = Organize;
+	}
+
+	private bool ShowPersistent
+	{
+		get
+		{
+			return transform.parent == null;
+		}
+	}
+	#endregion
+
+	#region Public fields
 	public IEnumerable<Component> Available
 	{
 		get
@@ -78,28 +145,5 @@ public class PoolGroup : MonoBehaviour, IEnumerable<Component>
 			return Pools.Sum(p => p.Used.Count);
 		}
 	}
-
-	protected void AddPool()
-	{
-		string name = "Pool " + (transform.childCount + 1);
-		GameObject poolGO = new GameObject(name);
-		Pool pool = poolGO.AddComponent<Pool>();
-		AddPool(pool);
-	}
-
-	protected void DestroyPool(Pool pool)
-	{
-		RemovePool(pool);
-		DestroyImmediate(pool.gameObject);
-	}
-
-	IEnumerator IEnumerable.GetEnumerator()
-	{
-		return Used.GetEnumerator();
-	}
-
-	public IEnumerator<Component> GetEnumerator()
-	{
-		return Used.GetEnumerator();
-	}
+	#endregion
 }
