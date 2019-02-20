@@ -33,6 +33,10 @@ public class PoolGroup : MonoBehaviour, IEnumerable<Component>
 	protected void Awake()
 	{
 		Pooler.CacheGroup(this);
+	}
+
+	protected void Start()
+	{
 		if (Persistent && transform.parent == null)
 			DontDestroyOnLoad(gameObject);
 	}

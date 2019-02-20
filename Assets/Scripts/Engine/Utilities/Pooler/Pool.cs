@@ -102,13 +102,16 @@ public class Pool : MonoBehaviour, IEnumerable<Component>
 	protected void Awake()
 	{
 		Pooler.CachePool(this);
-
 		transformCached = transform;
-		if (Persistent && transformCached.parent == null)
-			DontDestroyOnLoad(gameObject);
 
 		if (Preload)
 			PreloadInstances().Forget();
+	}
+
+	protected void Start()
+	{
+		if (Persistent && transformCached.parent == null)
+			DontDestroyOnLoad(gameObject);
 	}
 
 	protected void OnDestroy()
@@ -119,7 +122,7 @@ public class Pool : MonoBehaviour, IEnumerable<Component>
 		Pooler.UncachePool(this);
 	}
 	
-	protected async UniTask PreloadInstances()
+	public async UniTask PreloadInstances()
 	{
 		if (PreloadDelay > 0)
 			await Observable.Timer(TimeSpan.FromSeconds(PreloadDelay));

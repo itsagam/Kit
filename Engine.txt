@@ -1,39 +1,30 @@
 Engine
-----------------------------------------
+-----------------------------------------------------------------------------
 	Scriptable/Moddable
 		- Console
 		- Configs
 		- Mods
 		- Patches
+	Localization
 
 Library
------------------------------------------
+-----------------------------------------------------------------------------
 	Managers
-	-------------------------------------
+	-------------------------------------------------------------------------
 		Data Manager
 		Audio Manager
 		Effects Manager
 		Input Manager
 
 	UI
-	-------------------------------------
+	-------------------------------------------------------------------------
 		Splash
 		Menu
 		Settings
 		Mods
 		
-	Social/Networking
-	-------------------------------------
-		Profile
-		Friends
-		Analytics
-		Ads
-		Leaderboards
-		Achievements
-		Localisation
-		
 Specific
------------------------------------------
+-------------------------------------------------------------------------
 	Inventory -> Inventroy system with a grid, support for multiple objects within a tile, an object taking multiple tiles and nested inventories
 	Grid System -> A generic grid system with 2D, Isometric, and 3D modes.
 	Weapon/Projectile System -> A projectile system with a variety of projectile behaviours and support for beams.
