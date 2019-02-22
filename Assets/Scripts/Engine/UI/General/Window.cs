@@ -75,7 +75,7 @@ public class Window : MonoBehaviour
 				await Observable.Timer(TimeSpan.FromSeconds(animator.GetCurrentAnimatorStateInfo(0).length));
 			}
 		}
-		UIManager.Play(transform, ShowSound);
+		AudioManager.PlayUIEffect(ShowSound);
 
 		onShown();
 
@@ -109,7 +109,7 @@ public class Window : MonoBehaviour
 				await Observable.Timer(TimeSpan.FromSeconds(animator.GetCurrentAnimatorStateInfo(0).length));
             }
         }
-		UIManager.Play(transform, HideSound);
+		AudioManager.PlayUIEffect(HideSound);
 
 		onHidden(mode);
 

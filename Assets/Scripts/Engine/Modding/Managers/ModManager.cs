@@ -82,14 +82,14 @@ namespace Modding
 		public static event Action<ResourceFolder, string, ResourceInfo, bool> ResourceLoaded;
 		public static event Action<ResourceFolder, string, Mod> ResourceUnloaded;
 
-		public static Dictionary<ModType, ModGroup> Groups = new Dictionary<ModType, ModGroup>();
+		public static Dictionary<ModType, ModGroup> Groups = new Dictionary<ModType, ModGroup>();	
 		public static List<ModLoader> Loaders = new List<ModLoader>() {
 			//UNDONE: new AssetBundleLoader(),
 			new DirectModLoader(),
 			new ZipModLoader()
 		};
-		
-		private static IEnumerable<Mod> mods = Enumerable.Empty<Mod>();
+		public static IEnumerable<Mod> Mods { get; private set; } = Enumerable.Empty<Mod>();
+
 		private static Dictionary<(Type type, ResourceFolder folder, string file), ResourceInfo> cachedResources 
 			= new Dictionary<(Type, ResourceFolder, string), ResourceInfo>();
 		private static Dictionary<ResourceFolder, string> folderToString = new Dictionary<ResourceFolder, string>();
@@ -201,7 +201,7 @@ namespace Modding
 
 		public static void ExecuteScripts()
 		{
-			foreach (Mod mod in mods)
+			foreach (Mod mod in Mods)
 			{
 				mod.ExecuteScripts();
 				ModLoaded?.Invoke(mod);
@@ -210,7 +210,7 @@ namespace Modding
 
 		public static async UniTask ExecuteScriptsAsync()
 		{
-			foreach (Mod mod in mods)
+			foreach (Mod mod in Mods)
 			{
 				await mod.ExecuteScriptsAsync();
 				ModLoaded?.Invoke(mod);
@@ -219,7 +219,7 @@ namespace Modding
 
 		private static void RefreshModList()
 		{
-			mods = Groups.SelectMany(kvp => kvp.Value.Mods);
+			Mods = Groups.SelectMany(kvp => kvp.Value.Mods);
 		}
 		#endregion
 
@@ -353,10 +353,10 @@ namespace Modding
 			if (cachedReference != null)
 				return cachedReference;
 
-			if (mods.Any())
+			if (Mods.Any())
 			{
 				string path = GetModdingPath(folder, file);
-				foreach (Mod mod in mods)
+				foreach (Mod mod in Mods)
 				{
 					var (reference, filePath, parser) = mod.Load<T>(path);
 					if (reference != null)
@@ -378,10 +378,10 @@ namespace Modding
 			if (cachedReference != null)
 				return cachedReference;
 
-			if (mods.Any())
+			if (Mods.Any())
 			{
 				string path = GetModdingPath(folder, file);
-				foreach (Mod mod in mods)
+				foreach (Mod mod in Mods)
 				{
 					var (reference, filePath, parser) = await mod.LoadAsync<T>(path);
 					if (reference != null)
@@ -405,7 +405,7 @@ namespace Modding
 		public static List<T> LoadAll<T>(string path) where T : class
 		{
 			List<T> all = new List<T>();
-			foreach (Mod mod in mods)
+			foreach (Mod mod in Mods)
 			{
 				var (reference, filePath, parser) = mod.Load<T>(path);
 				all.Add(reference);
@@ -421,7 +421,7 @@ namespace Modding
 		public static async UniTask<List<T>> LoadAllAsync<T>(string path) where T : class
 		{
 			List<T> all = new List<T>();
-			foreach (Mod mod in mods)
+			foreach (Mod mod in Mods)
 			{
 				var (reference, filePath, parser) = await mod.LoadAsync<T>(path);
 				all.Add(reference);
@@ -450,7 +450,7 @@ namespace Modding
 
 		public static string ReadText(string path)
 		{
-			foreach (Mod mod in mods)
+			foreach (Mod mod in Mods)
 			{
 				try
 				{
@@ -470,7 +470,7 @@ namespace Modding
 
 		public static async UniTask<string> ReadTextAsync(string path)
 		{
-			foreach (Mod mod in mods)
+			foreach (Mod mod in Mods)
 			{
 				try
 				{
@@ -491,7 +491,7 @@ namespace Modding
 		public static List<string> ReadTextAll(string path)
 		{
 			List<string> all = new List<string>();
-			foreach (Mod mod in mods)
+			foreach (Mod mod in Mods)
 			{
 				try
 				{
@@ -512,7 +512,7 @@ namespace Modding
 		public static async UniTask<List<string>> ReadTextAllAsync(string path)
 		{
 			List<string> all = new List<string>();
-			foreach (Mod mod in mods)
+			foreach (Mod mod in Mods)
 			{
 				try
 				{
@@ -532,7 +532,7 @@ namespace Modding
 
 		public static byte[] ReadBytes(string path)
 		{
-			foreach (Mod mod in mods)
+			foreach (Mod mod in Mods)
 			{
 				try
 				{
@@ -552,7 +552,7 @@ namespace Modding
 
 		public static async UniTask<byte[]> ReadBytesAsync(string path)
 		{
-			foreach (Mod mod in mods)
+			foreach (Mod mod in Mods)
 			{
 				try
 				{
@@ -573,7 +573,7 @@ namespace Modding
 		public static List<byte[]> ReadBytesAll(string path)
 		{
 			List<byte[]> all = new List<byte[]>();
-			foreach (Mod mod in mods)
+			foreach (Mod mod in Mods)
 			{
 				try
 				{
@@ -594,7 +594,7 @@ namespace Modding
 		public static async UniTask<List<byte[]>> ReadBytesAllAsync(string path)
 		{
 			List<byte[]> all = new List<byte[]>();
-			foreach (Mod mod in mods)
+			foreach (Mod mod in Mods)
 			{
 				try
 				{
@@ -611,7 +611,7 @@ namespace Modding
 		#region Unloading
 		public static void UnloadMods(bool destroyLoaded = false)
 		{
-			foreach (Mod mod in mods.Reverse())
+			foreach (Mod mod in Mods.Reverse())
 				UnloadMod(mod);
 		}
 
@@ -698,7 +698,7 @@ namespace Modding
 
 		public static int GetActualModOrder(Mod mod)
 		{
-			return mods.IndexOf(mod);
+			return Mods.IndexOf(mod);
 		}
 
 		public static string GetModdingPath(ResourceFolder folder)
@@ -714,14 +714,6 @@ namespace Modding
 		public static void ClearCache()
 		{
 			cachedResources.Clear();
-		}
-
-		public static IEnumerable<Mod> Mods
-		{
-			get
-			{
-				return mods;
-			}
 		}
 		#endregion
 #endif

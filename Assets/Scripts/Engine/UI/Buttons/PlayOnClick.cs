@@ -11,6 +11,6 @@ public class PlayOnClick : MonoBehaviour, IPointerDownHandler
 	{
 		Button button = GetComponent<Button>();
 		if (button == null || button.IsInteractable())
-			UIManager.Play(button.transform, Audio);
+			AudioManager.PlayUIEffect(Audio);
 	}
 }

@@ -16,17 +16,17 @@ using Modding.Parsers;
 
 public static class ResourceManager
 {
-	public static Dictionary<ResourceFolder, string> Paths = new Dictionary<ResourceFolder, string>
+	public static readonly Dictionary<ResourceFolder, string> Paths = new Dictionary<ResourceFolder, string>
 	{   { ResourceFolder.Data, Application.dataPath + "/"},
 		{ ResourceFolder.StreamingAssets, Application.streamingAssetsPath + "/"},
 		{ ResourceFolder.PersistentData, Application.persistentDataPath + "/"},
 		{ ResourceFolder.Resources, Application.dataPath + "/Resources/"} };
 
-	// Default mode for modding in individual calls
-	public const bool DefaultModding = true;
-
 	public static event Action<ResourceFolder, string, object, bool> ResourceLoaded;
 	public static event Action<ResourceFolder, string> ResourceUnloaded;
+
+	// Default mode for modding in individual calls
+	private const bool DefaultModding = true;
 
 	private static Dictionary<(Type type, ResourceFolder folder, string file), WeakReference> cachedResources 
 		= new Dictionary<(Type, ResourceFolder, string), WeakReference>();

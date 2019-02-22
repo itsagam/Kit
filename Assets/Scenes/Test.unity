@@ -152,7 +152,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a9741d94d97fe8d4baba072d570b3019, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Effect: {fileID: 5205901710540828293, guid: 1e7cc8bc566ec9945974ae6c94bc46c8, type: 3}
+  Music: {fileID: 8300000, guid: e834e4ed3d5a9cb40961459640e1d85c, type: 3}
+  Clip: {fileID: 8300000, guid: ecccbf04608eb214ebb86f2db0cbf93d, type: 3}
 --- !u!20 &225321743
 Camera:
   m_ObjectHideFlags: 0

@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UniRx;
 
-public class EffectsManager : MonoBehaviour
+public static class EffectsManager
 {
 	public const string GroupName = "Effects";
 

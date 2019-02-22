@@ -130,12 +130,6 @@ public static class UIManager
 			return UniTask.FromResult(false);
 	}
 
-	public static void Play(Transform from, AudioClip clip)
-	{
-		if (clip != null)
-			Audio.PlayOneShot(clip);
-	}
-
 	public static Window FindWindow(string name)
 	{
 		return Windows.Find(w => w.name == name);
@@ -181,21 +175,6 @@ public static class UIManager
 		get
 		{
 			return Windows.LastOrDefault();
-		}
-	}
-
-	public static AudioSource Audio
-	{
-		get
-		{
-			if (audio == null)
-			{
-				GameObject audioGO = new GameObject("UIAudio");
-				audio = audioGO.AddComponent<AudioSource>();
-				audio.spatialBlend = 0;
-				GameObject.DontDestroyOnLoad(audioGO);
-			}
-			return audio;
 		}
 	}
 }

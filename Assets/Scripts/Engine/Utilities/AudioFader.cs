@@ -5,10 +5,11 @@ using System.Linq;
 using UnityEngine;
 using DG.Tweening;
 
+[RequireComponent(typeof(AudioSource))]
 public class AudioFader : MonoBehaviour
 {
     public AudioSource Audio;
-    public float Speed = 0.75f;
+    public float Speed = 0.5f;
     public bool FadeOnSceneChange = true;
     public bool FadeWithScreen = false;
     public bool IsBusy { get; protected set; }
@@ -18,10 +19,9 @@ public class AudioFader : MonoBehaviour
 
     protected void Awake()
     {
-        if (Audio == null)
-            Audio = GetComponent<AudioSource>();
+		Audio = GetComponent<AudioSource>();
         lastVolume = Audio.volume;
-        if (Audio.playOnAwake)
+        if (Audio.clip != null && Audio.playOnAwake)
             ChangeFromTo(0, lastVolume);
     }
 
@@ -59,7 +59,33 @@ public class AudioFader : MonoBehaviour
 			Play();
     }
 
-    public void Play()
+	public void Play(AudioClip clip)
+	{
+		if (clip == null)
+			return;
+
+		if (Audio.isPlaying)
+		{
+			if (IsBusy)
+				Audio.DOKill(false);
+			else
+				lastVolume = Audio.volume;
+
+			ChangeTo(0, () =>
+			{
+				Audio.clip = clip;
+				Audio.Play();
+				ChangeTo(lastVolume);
+			});
+		}
+		else
+		{
+			Audio.clip = clip;
+			Play();
+		}
+	}
+
+	public void Play()
     {
         lastPlaying = true;
 		if (Audio.isPlaying)
@@ -114,28 +140,6 @@ public class AudioFader : MonoBehaviour
             Audio.Stop();
     }
 
-    public void Change(AudioClip clip)
-    {
-		if (clip == null)
-			return;
-		
-        if (Audio.isPlaying)
-        {
-			if (IsBusy)
-				Audio.DOKill(false);
-			else
-				lastVolume = Audio.volume;
-			
-            ChangeTo(0, () => {
-                    Audio.clip = clip;
-                    Audio.Play();
-                    ChangeTo(lastVolume);
-                    });
-        }
-        else
-            Audio.clip = clip;
-    }
-
     protected Tweener ChangeFromTo(float from, float to, Action onComplete = null)
     {
         Audio.volume = from;
@@ -164,7 +168,10 @@ public class AudioFader : MonoBehaviour
         }
         set
         {
-            Change(value);
+			if (Audio.isPlaying)
+				Play(value);
+			else
+				Audio.clip = value;
         }
     }
 
@@ -192,7 +199,7 @@ public class AudioFader : MonoBehaviour
             if (value)
                 Play();
             else
-                Stop();
+                Pause();
         }
     }
 }
