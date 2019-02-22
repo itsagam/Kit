@@ -8,9 +8,9 @@ using UniRx.Async;
 
 public class Test : MonoBehaviour
 {
-	protected void Awake()
+	protected void Start()
 	{
-
+		
 	}
 
 	public void Button()

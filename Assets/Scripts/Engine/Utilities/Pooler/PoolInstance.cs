@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Sirenix.OdinInspector;
 
 // Component added to all instances so we can track the pool they came from
 // Used in Pooler.Destroy to de-activate instances without providing pool
@@ -20,4 +21,26 @@ public class PoolInstance : MonoBehaviour
 				Pool.Available.Remove(Component);
 		}
 	}
+
+#if UNITY_EDITOR
+	[PropertySpace]
+
+	[Button(ButtonSizes.Large)]
+	[ShowIf("ShowButton")]
+	[LabelText("Move To Pool")]
+	private void Destroy()
+	{
+		Pool.Destroy(Component);
+	}
+
+	private bool ShowButton
+	{
+		get
+		{
+			return Pool != null && 
+				Component != null &&
+				Pool.Used.Contains(Component);
+		}
+	}
+#endif
 }

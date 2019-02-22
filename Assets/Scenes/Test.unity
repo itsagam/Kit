@@ -152,8 +152,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a9741d94d97fe8d4baba072d570b3019, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Parent: {fileID: 7780900079402804766, guid: a7411b7bef321294ca65a4b3424b28f9, type: 3}
-  Child: {fileID: 3775608925184487396, guid: 7f91c1c836533024bb9ea1b1cd6e4359, type: 3}
+  Effect: {fileID: 5205901710540828293, guid: 1e7cc8bc566ec9945974ae6c94bc46c8, type: 3}
 --- !u!20 &225321743
 Camera:
   m_ObjectHideFlags: 0

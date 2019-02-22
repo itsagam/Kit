@@ -151,6 +151,17 @@ public static class Pooler
 		return pool;
 	}
 
+	public static Pool GetOrCreatePool(PoolGroup group, Component prefab)
+	{
+		Pool pool = GetPool(prefab);
+		if (pool == null)
+		{
+			pool = CreatePool(prefab);
+			group.AddPool(pool);
+		}
+		return pool;
+	}
+
 	public static bool DestroyPool(string name)
 	{
 		Pool pool = GetPool(name);
@@ -195,6 +206,11 @@ public static class Pooler
 		return GetPool(name)?.Instantiate(position, rotation);
 	}
 
+	public static Component Instantiate(string name, Vector3 position, Transform parent)
+	{
+		return GetPool(name)?.Instantiate(position, parent);
+	}
+
 	public static Component Instantiate(string name, Vector3 position, Quaternion rotation, Transform parent)
 	{
 		return GetPool(name)?.Instantiate(position, rotation, parent);
@@ -218,6 +234,11 @@ public static class Pooler
 	public static T Instantiate<T>(string name, Vector3 position, Quaternion rotation) where T : Component
 	{
 		return GetPool(name)?.Instantiate<T>(position, rotation);
+	}
+
+	public static T Instantiate<T>(string name, Vector3 position, Transform parent) where T : Component
+	{
+		return GetPool(name)?.Instantiate<T>(position, parent);
 	}
 
 	public static T Instantiate<T>(string name, Vector3 position, Quaternion rotation, Transform parent) where T : Component
@@ -245,6 +266,11 @@ public static class Pooler
 		return GetOrCreatePool(prefab).Instantiate(position, rotation);
 	}
 
+	public static Component Instantiate(Component prefab, Vector3 position, Transform parent)
+	{
+		return GetOrCreatePool(prefab).Instantiate(position, parent);
+	}
+
 	public static Component Instantiate(Component prefab, Vector3 position, Quaternion rotation, Transform parent)
 	{
 		return GetOrCreatePool(prefab).Instantiate(position, rotation, parent);
@@ -268,6 +294,11 @@ public static class Pooler
 	public static T Instantiate<T>(T prefab, Vector3 position, Quaternion rotation) where T : Component
 	{
 		return GetOrCreatePool(prefab).Instantiate<T>(position, rotation);
+	}
+
+	public static T Instantiate<T>(T prefab, Vector3 position, Transform parent) where T : Component
+	{
+		return GetOrCreatePool(prefab).Instantiate<T>(position, parent);
 	}
 
 	public static T Instantiate<T>(T prefab, Vector3 position, Quaternion rotation, Transform parent) where T : Component
@@ -295,7 +326,42 @@ public static class Pooler
 		return GetOrCreatePool(group, prefab).Instantiate<T>(position, rotation);
 	}
 
+	public static T Instantiate<T>(string group, T prefab, Vector3 position,  Transform parent) where T : Component
+	{
+		return GetOrCreatePool(group, prefab).Instantiate<T>(position, parent);
+	}
+
 	public static T Instantiate<T>(string group, T prefab, Vector3 position, Quaternion rotation, Transform parent) where T : Component
+	{
+		return GetOrCreatePool(group, prefab).Instantiate<T>(position, rotation, parent);
+	}
+
+	public static T Instantiate<T>(PoolGroup group, T prefab) where T : Component
+	{
+		return GetOrCreatePool(group, prefab).Instantiate<T>();
+	}
+
+	public static T Instantiate<T>(PoolGroup group, T prefab, Transform parent, bool worldPositionStays = false) where T : Component
+	{
+		return GetOrCreatePool(group, prefab).Instantiate<T>(parent, worldPositionStays);
+	}
+
+	public static T Instantiate<T>(PoolGroup group, T prefab, Vector3 position) where T : Component
+	{
+		return GetOrCreatePool(group, prefab).Instantiate<T>(position);
+	}
+
+	public static T Instantiate<T>(PoolGroup group, T prefab, Vector3 position, Quaternion rotation) where T : Component
+	{
+		return GetOrCreatePool(group, prefab).Instantiate<T>(position, rotation);
+	}
+
+	public static T Instantiate<T>(PoolGroup group, T prefab, Vector3 position, Transform parent) where T : Component
+	{
+		return GetOrCreatePool(group, prefab).Instantiate<T>(position, parent);
+	}
+
+	public static T Instantiate<T>(PoolGroup group, T prefab, Vector3 position, Quaternion rotation, Transform parent) where T : Component
 	{
 		return GetOrCreatePool(group, prefab).Instantiate<T>(position, rotation, parent);
 	}

@@ -45,10 +45,10 @@ public class BuffDrawer : OdinValueDrawer<Buff>
 
 		var buff = ValueEntry.SmartValue;
 		SirenixEditorGUI.BeginToolbarBox(label);
-		if (Application.isPlaying && buff.TimeLeft > 0)
+		if (Application.isPlaying && buff.TimeLeft.Value > 0)
 		{
 			GUIHelper.PushGUIEnabled(false);
-			EditorGUILayout.LabelField("Time", string.Format("{0:0.##}s", buff.TimeLeft));
+			EditorGUILayout.LabelField("Time", string.Format("{0:0.##}s", buff.TimeLeft.Value));
 			GUIHelper.PopGUIEnabled();
 		}
 		CallNextDrawer(null);
@@ -73,7 +73,7 @@ public class Buff : Upgrade
 	public float Duration;
 	public BuffMode Mode = BuffMode.Extend;
 
-	public float TimeLeft { get; protected set; } = -1;
+	public ReactiveProperty<float> TimeLeft { get; protected set; } = new ReactiveProperty<float>(-1);
 
 	public Buff()
 	{
@@ -116,7 +116,7 @@ public class Buff : Upgrade
 			upgradeable.GetUpgrades().Add(this);
 			float end = Time.time + Duration;
 			Observable.EveryUpdate().Select(l => end - Time.time).TakeWhile(t => t > 0).Subscribe(
-				time => TimeLeft = time,
+				time => TimeLeft.Value = time,
 				() => {
 					try
 					{

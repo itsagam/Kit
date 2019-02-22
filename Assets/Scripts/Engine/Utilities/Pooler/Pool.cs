@@ -238,6 +238,18 @@ public class Pool : MonoBehaviour, IEnumerable<Component>
 		return instance;
 	}
 
+	public Component Instantiate(Vector3 position, Transform parent)
+	{
+		var instance = Instantiate();
+		if (instance != null)
+		{
+			var trans = instance.transform;
+			trans.parent = parent;
+			trans.position = position;
+		}
+		return instance;
+	}
+
 	public Component Instantiate(Vector3 position, Quaternion rotation, Transform parent)
 	{
 		var instance = Instantiate();
@@ -269,6 +281,11 @@ public class Pool : MonoBehaviour, IEnumerable<Component>
 	public T Instantiate<T>(Vector3 position, Quaternion rotation) where T : Component
 	{
 		return (T) Instantiate(position, rotation);
+	}
+
+	public T Instantiate<T>(Vector3 position, Transform parent) where T : Component
+	{
+		return (T) Instantiate(position, parent);
 	}
 
 	public T Instantiate<T>(Vector3 position, Quaternion rotation, Transform parent) where T : Component

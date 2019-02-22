@@ -13,7 +13,6 @@ Library
 	-------------------------------------------------------------------------
 		Data Manager
 		Audio Manager
-		Effects Manager
 		Input Manager
 
 	UI

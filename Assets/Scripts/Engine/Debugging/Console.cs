@@ -13,9 +13,9 @@ using TouchScript.Gestures;
 using UniRx;
 using XLua;
 
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
 public static class Console
 {
-#if UNITY_EDITOR || DEVELOPMENT_BUILD
 	public static bool Enabled = false;
 	public static int Length = 10000;
 	public static int Depth = 2;
@@ -442,6 +442,5 @@ public static class Console
 		instance = null;
 	}
 	#endregion
-
-#endif
 }
+#endif
