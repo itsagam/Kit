@@ -191,9 +191,9 @@ public static class Pooler
 		return GetPool(name)?.Instantiate();
 	}
 
-	public static Component Instantiate(string name, Transform parent, bool worldPositionStays = false)
+	public static Component Instantiate(string name, Transform parent, bool worldSpace = false)
 	{
-		return GetPool(name)?.Instantiate(parent, worldPositionStays);
+		return GetPool(name)?.Instantiate(parent, worldSpace);
 	}
 
 	public static Component Instantiate(string name, Vector3 position)
@@ -221,9 +221,9 @@ public static class Pooler
 		return GetPool(name)?.Instantiate<T>();
 	}
 
-	public static T Instantiate<T>(string name, Transform parent, bool worldPositionStays = false) where T : Component
+	public static T Instantiate<T>(string name, Transform parent, bool worldSpace = false) where T : Component
 	{
-		return GetPool(name)?.Instantiate<T>(parent, worldPositionStays);
+		return GetPool(name)?.Instantiate<T>(parent, worldSpace);
 	}
 
 	public static T Instantiate<T>(string name, Vector3 position) where T : Component
@@ -251,9 +251,9 @@ public static class Pooler
 		return GetOrCreatePool(prefab).Instantiate();
 	}
 
-	public static Component Instantiate(Component prefab, Transform parent, bool worldPositionStays = false)
+	public static Component Instantiate(Component prefab, Transform parent, bool worldSpace = false)
 	{
-		return GetOrCreatePool(prefab).Instantiate(parent, worldPositionStays);
+		return GetOrCreatePool(prefab).Instantiate(parent, worldSpace);
 	}
 
 	public static Component Instantiate(Component prefab, Vector3 position)
@@ -281,9 +281,9 @@ public static class Pooler
 		return GetOrCreatePool(prefab).Instantiate<T>();
 	}
 
-	public static T Instantiate<T>(T prefab, Transform parent, bool worldPositionStays = false) where T : Component
+	public static T Instantiate<T>(T prefab, Transform parent, bool worldSpace = false) where T : Component
 	{
-		return GetOrCreatePool(prefab).Instantiate<T>(parent, worldPositionStays);
+		return GetOrCreatePool(prefab).Instantiate<T>(parent, worldSpace);
 	}
 
 	public static T Instantiate<T>(T prefab, Vector3 position) where T : Component
@@ -311,9 +311,9 @@ public static class Pooler
 		return GetOrCreatePool(group, prefab).Instantiate<T>();
 	}
 
-	public static T Instantiate<T>(string group, T prefab, Transform parent, bool worldPositionStays = false) where T : Component
+	public static T Instantiate<T>(string group, T prefab, Transform parent, bool worldSpace = false) where T : Component
 	{
-		return GetOrCreatePool(group, prefab).Instantiate<T>(parent, worldPositionStays);
+		return GetOrCreatePool(group, prefab).Instantiate<T>(parent, worldSpace);
 	}
 
 	public static T Instantiate<T>(string group, T prefab, Vector3 position) where T : Component
@@ -341,9 +341,9 @@ public static class Pooler
 		return GetOrCreatePool(group, prefab).Instantiate<T>();
 	}
 
-	public static T Instantiate<T>(PoolGroup group, T prefab, Transform parent, bool worldPositionStays = false) where T : Component
+	public static T Instantiate<T>(PoolGroup group, T prefab, Transform parent, bool worldSpace = false) where T : Component
 	{
-		return GetOrCreatePool(group, prefab).Instantiate<T>(parent, worldPositionStays);
+		return GetOrCreatePool(group, prefab).Instantiate<T>(parent, worldSpace);
 	}
 
 	public static T Instantiate<T>(PoolGroup group, T prefab, Vector3 position) where T : Component
@@ -368,11 +368,14 @@ public static class Pooler
 
 	public static bool Destroy(Component instance)
 	{
-		PoolInstance poolInstance = instance.GetComponent<PoolInstance>();
-		if (poolInstance?.Pool != null)
+		if (instance != null)
 		{
-			poolInstance.Pool.Destroy(instance);
-			return true;
+			PoolInstance poolInstance = instance.GetComponent<PoolInstance>();
+			if (poolInstance?.Pool != null)
+			{
+				poolInstance.Pool.Destroy(instance);
+				return true;
+			}
 		}
 		return false;
 	}
@@ -401,10 +404,10 @@ public static class Pooler
 
 	public static bool DestroyAllInGroup(string name)
 	{
-		PoolGroup groupInstance = GetGroup(name);
-		if (groupInstance != null)
+		PoolGroup group = GetGroup(name);
+		if (group != null)
 		{
-			foreach (Pool pool in groupInstance.Pools)
+			foreach (Pool pool in group.Pools)
 				pool.DestroyAll();
 			return true;
 		}

@@ -2,19 +2,17 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
-// TODO: Combine PlayDedicated and CreateAudioSource
-// TODO: Pool AudioSources
+using UniRx;
 
 public static class AudioManager
 {
 	private static GameObject audioGameObject;
 	private static Transform audioTransform;
-	private static Dictionary<string, AudioSource> audioSources = new Dictionary<string, AudioSource>();
+	private static Dictionary<string, AudioSource> groupSources = new Dictionary<string, AudioSource>();
 
-	public const string Background = "Background";
-	public const string SoundEffect = "SoundEffect";
-	public const string UI = "UI";
+	public const string BackgroundGroup = "Background";
+	public const string SoundEffectGroup = "SoundEffect";
+	public const string UIGroup = "UI";
 
 	public static AudioFader BackgroundManager { get; private set; }
 
@@ -23,6 +21,7 @@ public static class AudioManager
 		Initialize();
 	}
 
+	#region Group management
 	public static void Initialize()
 	{
 		if (audioGameObject != null)
@@ -31,113 +30,61 @@ public static class AudioManager
 		audioGameObject = new GameObject("Audio");
 		audioTransform = audioGameObject.transform;
 
-		AudioSource bgSource = CreateAudioSource(Background, true);
+		AudioSource bgSource = CreateGroup(BackgroundGroup);
 		BackgroundManager = bgSource.gameObject.AddComponent<AudioFader>();
 
-		CreateAudioSource(SoundEffect, true);
-		CreateAudioSource(UI, true);
+		CreateGroup(SoundEffectGroup);
+		CreateGroup(UIGroup);
 
 		GameObject.DontDestroyOnLoad(audioGameObject);
 	}
 
-	public static AudioSource CreateAudioSource(string name, bool is2D = false)
+	public static AudioSource CreateGroup(string name)
 	{
 		GameObject gameObject = new GameObject(name);
 		AudioSource source = gameObject.AddComponent<AudioSource>();
 		source.transform.parent = audioTransform;
-		if (is2D)
-			source.spatialBlend = 0;
-		audioSources.Add(name, source);
+		groupSources.Add(name, source);
 		return source;
 	}
 
-	public static AudioSource GetAudioSource(string name)
+	public static AudioSource GetGroupSource(string name)
 	{
-		if (audioSources.TryGetValue(name, out AudioSource source))
+		if (groupSources.TryGetValue(name, out AudioSource source))
 			return source;
 		return null;
 	}
 
-	public static AudioSource GetOrCreateAudioSource(string name)
+	public static AudioSource GetOrCreateGroup(string name)
 	{
-		if (audioSources.TryGetValue(name, out AudioSource source))
+		if (groupSources.TryGetValue(name, out AudioSource source))
 			return source;
-		return CreateAudioSource(name);
+		return CreateGroup(name);
 	}
 
-	public static bool RemoveAudioSource(string name)
+	public static bool RemoveGroup(string name)
 	{
-		var source = GetAudioSource(name);
+		var source = GetGroupSource(name);
 		if (source != null)
 		{
-			audioSources.Remove(name);
+			groupSources.Remove(name);
 			source.Destroy();
 			return true;
 		}
 		return false;
 	}
 
-	public static IEnumerable<AudioSource> GetAllAudioSources()
+	public static IEnumerable<AudioSource> GetAllGroupSources()
 	{
-		return audioSources.Values;
+		return groupSources.Values;
 	}
+	#endregion
 
-	public static AudioSource Play(AudioClip clip, bool loop = false, bool is2D = true)
-	{
-		if (clip == null)
-			return null;
-
-		return PlayDedicated(clip, loop, is2D);
-	}
-
-	public static AudioSource Play(AudioClip clip, Vector3 position, bool loop = false, bool is2D = false)
-	{
-		if (clip == null)
-			return null;
-
-		var source = PlayDedicated(clip, loop, is2D);
-		source.transform.position = position;
-		return source;
-	}
-
-	public static AudioSource Play(AudioClip clip, Transform parent, bool loop = false, bool is2D = false)
-	{
-		if (clip == null)
-			return null;
-
-		var source = PlayDedicated(clip, loop, is2D);
-		source.transform.parent = parent;
-		return source;
-	}
-
-	public static AudioSource Play(AudioClip clip, Transform parent, Vector3 position, bool loop = false, bool is2D = false)
-	{
-		if (clip == null)
-			return null;
-
-		var source = PlayDedicated(clip, loop, is2D);
-		var transform = source.transform;
-		transform.parent = parent;
-		transform.position = position;
-		return source;
-	}
-
-	private static AudioSource PlayDedicated(AudioClip clip, bool loop, bool is2D)
-	{
-		GameObject gameObject = new GameObject(clip.name);
-		AudioSource source = gameObject.AddComponent<AudioSource>();
-		source.clip = clip;
-		source.loop = loop;
-		if (is2D)
-			source.spatialBlend = 0;
-		source.Play();
-		return source;
-	}
-
+	#region Group playback
 	public static void Play(string group, AudioClip clip)
 	{
 		if (clip != null)
-			GetOrCreateAudioSource(group).PlayOneShot(clip);
+			GetOrCreateGroup(group).PlayOneShot(clip);
 	}
 
 	public static void PlayBackgroundMusic(AudioClip clip)
@@ -162,7 +109,7 @@ public static class AudioManager
 
 	public static void PlaySoundEffect(AudioClip clip)
 	{
-		Play(SoundEffect, clip);
+		Play(SoundEffectGroup, clip);
 	}
 
 	public static void PlaySoundEffect(AudioClip[] clips)
@@ -176,14 +123,139 @@ public static class AudioManager
 
 	public static void PlayUIEffect(AudioClip clip)
 	{
-		Play(UI, clip);
+		Play(UIGroup, clip);
+	}
+	#endregion
+
+	#region AudioSource (Pooled) playback
+	public static AudioSource Play(AudioSource prefab)
+	{
+		if (prefab == null)
+			return null;
+
+		var source = Pooler.Instantiate(prefab);
+		QueueForDestroy(source);
+		return source;
 	}
 
+	public static AudioSource Play(AudioSource prefab, Transform parent, bool worldSpace = false)
+	{
+		if (prefab == null)
+			return null;
+
+		var source = Pooler.Instantiate(prefab, parent, worldSpace);
+		QueueForDestroy(source);
+		return source;
+	}
+
+	public static AudioSource Play(AudioSource prefab, Vector3 position)
+	{
+		if (prefab == null)
+			return null;
+
+		var source = Pooler.Instantiate(prefab, position);
+		QueueForDestroy(source);
+		return source;
+	}
+
+	public static AudioSource Play(AudioSource prefab, Transform parent, Vector3 position)
+	{
+		if (prefab == null)
+			return null;
+
+		var source = Pooler.Instantiate(prefab);
+		var transform = source.transform;
+		transform.parent = parent;
+		transform.localPosition = position;
+		QueueForDestroy(source);
+		return source;
+	}
+
+	private static void QueueForDestroy(AudioSource source)
+	{
+		if (!source.loop)
+		{
+			Observable.Timer(TimeSpan.FromSeconds(source.clip.length)).Subscribe(l =>
+			{
+				Pooler.Destroy(source);
+			});
+		}
+	}
+	#endregion
+
+	#region AudioClip (Unpooled) playback
+	public static AudioSource Play(AudioClip clip, bool loop = false, bool is3D = false)
+	{
+		if (clip == null)
+			return null;
+
+		return PlayDedicated(clip, loop, is3D);
+	}
+
+	public static AudioSource Play(AudioClip clip, Vector3 position, bool loop = false, bool is3D = true)
+	{
+		if (clip == null)
+			return null;
+
+		var source = PlayDedicated(clip, loop, is3D);
+		source.transform.position = position;
+		return source;
+	}
+
+	public static AudioSource Play(AudioClip clip, Transform parent, bool loop = false, bool is3D = true)
+	{
+		if (clip == null)
+			return null;
+
+		var source = PlayDedicated(clip, loop, is3D);
+		source.transform.parent = parent;
+		return source;
+	}
+
+	public static AudioSource Play(AudioClip clip, Transform parent, Vector3 position, bool loop = false, bool is3D = true)
+	{
+		if (clip == null)
+			return null;
+
+		var source = PlayDedicated(clip, loop, is3D);
+		var transform = source.transform;
+		transform.parent = parent;
+		transform.localPosition = position;
+		return source;
+	}
+
+	private static AudioSource PlayDedicated(AudioClip clip, bool loop, bool is3D)
+	{
+		GameObject gameObject = new GameObject(clip.name);
+		AudioSource source = gameObject.AddComponent<AudioSource>();
+		source.clip = clip;
+		source.loop = loop;
+
+		if (is3D)
+			source.spatialBlend = 1;
+
+		source.Play();
+
+		if (!loop)
+		{
+			Observable.Timer(TimeSpan.FromSeconds(clip.length))
+			.Subscribe(l =>
+			{
+				if (gameObject != null)
+					gameObject.Destroy();
+			});
+		}
+
+		return source;
+	}
+	#endregion
+
+	#region Public fields
 	public static AudioSource BackgroundSource
 	{
 		get
 		{
-			return GetAudioSource(Background);
+			return GetGroupSource(BackgroundGroup);
 		}
 	}
 
@@ -211,7 +283,7 @@ public static class AudioManager
 	{
 		get
 		{
-			return GetAudioSource(SoundEffect);
+			return GetGroupSource(SoundEffectGroup);
 		}
 	}
 
@@ -219,7 +291,8 @@ public static class AudioManager
 	{
 		get
 		{
-			return GetAudioSource(UI);
+			return GetGroupSource(UIGroup);
 		}
 	}
+	#endregion
 }

@@ -154,6 +154,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Music: {fileID: 8300000, guid: e834e4ed3d5a9cb40961459640e1d85c, type: 3}
   Clip: {fileID: 8300000, guid: ecccbf04608eb214ebb86f2db0cbf93d, type: 3}
+  ClipSource: {fileID: 6221109413585296246, guid: 7cea96cae0f74474dac28a3e0478f9f5,
+    type: 3}
 --- !u!20 &225321743
 Camera:
   m_ObjectHideFlags: 0

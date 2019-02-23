@@ -6,39 +6,61 @@ using UniRx;
 
 public static class EffectsManager
 {
-	public const string GroupName = "Effects";
+	public const string Group = "Effects";
 
 	public static ParticleSystem Spawn(ParticleSystem prefab, Vector3 position)
 	{
-		var particleSystem = Pooler.Instantiate(GroupName, prefab, position);
+		if (prefab == null)
+			return null;
+
+		var particleSystem = Pooler.Instantiate(Group, prefab, position);
 		QueueForDestroy(particleSystem);
 		return particleSystem;
 	}
 
 	public static ParticleSystem Spawn(ParticleSystem prefab, Vector3 position, Quaternion rotation)
 	{
-		var particleSystem = Pooler.Instantiate(GroupName, prefab, position, rotation);
+		if (prefab == null)
+			return null;
+
+		var particleSystem = Pooler.Instantiate(Group, prefab, position, rotation);
 		QueueForDestroy(particleSystem);
 		return particleSystem;
 	}
 
-	public static ParticleSystem Spawn(ParticleSystem prefab, Transform parent, bool worldPositionStays = false)
+	public static ParticleSystem Spawn(ParticleSystem prefab, Transform parent, bool worldSpace = false)
 	{
-		var particleSystem = Pooler.Instantiate(GroupName, prefab, parent, worldPositionStays);
+		if (prefab == null)
+			return null;
+
+		var particleSystem = Pooler.Instantiate(Group, prefab, parent, worldSpace);
 		QueueForDestroy(particleSystem);
 		return particleSystem;
 	}
 
-	public static ParticleSystem Spawn(ParticleSystem prefab, Vector3 position, Transform parent)
+	public static ParticleSystem Spawn(ParticleSystem prefab, Transform parent, Vector3 position)
 	{
-		var particleSystem = Pooler.Instantiate(GroupName, prefab, position, parent);
+		if (prefab == null)
+			return null;
+
+		var particleSystem = Pooler.Instantiate(Group, prefab);
+		var transform = particleSystem.transform;
+		transform.parent = parent;
+		transform.localPosition = position;
 		QueueForDestroy(particleSystem);
 		return particleSystem;
 	}
 
-	public static ParticleSystem Spawn(ParticleSystem prefab, Vector3 position, Quaternion rotation, Transform parent)
+	public static ParticleSystem Spawn(ParticleSystem prefab, Transform parent, Vector3 position, Quaternion rotation)
 	{
-		var particleSystem = Pooler.Instantiate(GroupName, prefab, position, rotation, parent);
+		if (prefab == null)
+			return null;
+
+		var particleSystem = Pooler.Instantiate(Group, prefab);
+		var transform = particleSystem.transform;
+		transform.parent = parent;
+		transform.localPosition = position;
+		transform.localRotation = rotation;
 		QueueForDestroy(particleSystem);
 		return particleSystem;
 	}
@@ -60,7 +82,7 @@ public static class EffectsManager
 
 	public static bool DespawnAll()
 	{
-		return Pooler.DestroyAllInGroup(GroupName);
+		return Pooler.DestroyAllInGroup(Group);
 	}
 
 	private static void QueueForDestroy(ParticleSystem system)

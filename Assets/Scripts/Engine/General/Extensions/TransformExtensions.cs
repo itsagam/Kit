@@ -1,7 +1,7 @@
 ﻿using System;
 using UnityEngine;
 
-public static class TransformHelper
+public static class TransformExtensions
 {
 	public static Bounds GetBounds(this Transform transform)
 	{

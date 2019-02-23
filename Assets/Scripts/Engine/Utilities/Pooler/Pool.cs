@@ -210,11 +210,11 @@ public class Pool : MonoBehaviour, IEnumerable<Component>
 		return instance;
 	}
 
-	public Component Instantiate(Transform parent, bool worldPositionStays = false)
+	public Component Instantiate(Transform parent, bool worldSpace = false)
 	{
 		var instance = Instantiate();
 		if (instance != null)
-			instance.transform.SetParent(parent, worldPositionStays);
+			instance.transform.SetParent(parent, worldSpace);
 		return instance;
 	}
 
@@ -268,9 +268,9 @@ public class Pool : MonoBehaviour, IEnumerable<Component>
 		return (T) Instantiate();
 	}
 
-	public T Instantiate<T>(Transform parent, bool worldPositionStays = false) where T : Component
+	public T Instantiate<T>(Transform parent, bool worldSpace = false) where T : Component
 	{
-		return (T) Instantiate(parent, worldPositionStays);
+		return (T) Instantiate(parent, worldSpace);
 	}
 
 	public T Instantiate<T>(Vector3 position) where T : Component

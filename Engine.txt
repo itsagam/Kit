@@ -12,7 +12,6 @@ Library
 	Managers
 	-------------------------------------------------------------------------
 		Data Manager
-		Audio Manager
 		Input Manager
 
 	UI
