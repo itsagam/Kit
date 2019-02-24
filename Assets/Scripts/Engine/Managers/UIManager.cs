@@ -42,7 +42,7 @@ public static class UIManager
 	public static event Action<Window> OnWindowHiding;
 	public static event Action<Window> OnWindowHidden;
 
-	private static AudioSource audio;
+	private static Canvas lastCanvas = null;
 
 	public static async UniTask<Window> ShowWindow(
 								string path,
@@ -94,9 +94,13 @@ public static class UIManager
 
 		if (parent == null)
 		{
-			parent = GameObject.FindObjectOfType<Canvas>()?.transform;
-			if (parent == null)
-				parent = CreateCanvas().transform;
+			if (lastCanvas == null)
+			{
+				lastCanvas = GameObject.FindObjectOfType<Canvas>();
+				if (lastCanvas == null)
+					lastCanvas = CreateCanvas();
+			}
+			parent = lastCanvas.transform;
 		}
 		instance.transform.SetParent(parent, false);
 

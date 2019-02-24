@@ -65,6 +65,7 @@ public class Window : MonoBehaviour
 		Data = data;
 		gameObject.SetActive(true);
 
+		AudioManager.PlayUIEffect(ShowSound);
 		if (animator != null && !animation.IsNullOrEmpty())
 		{
 			int animationHash = Animator.StringToHash(animation);
@@ -75,7 +76,6 @@ public class Window : MonoBehaviour
 				await Observable.Timer(TimeSpan.FromSeconds(animator.GetCurrentAnimatorStateInfo(0).length));
 			}
 		}
-		AudioManager.PlayUIEffect(ShowSound);
 
 		onShown();
 
@@ -98,7 +98,8 @@ public class Window : MonoBehaviour
         State = WindowState.Hiding;
         OnHiding();
 		OnWindowHiding.Invoke();
-		
+
+		AudioManager.PlayUIEffect(HideSound);
 		if (animator != null && !animation.IsNullOrEmpty())
         {
             int animationHash = Animator.StringToHash(animation);
@@ -109,7 +110,6 @@ public class Window : MonoBehaviour
 				await Observable.Timer(TimeSpan.FromSeconds(animator.GetCurrentAnimatorStateInfo(0).length));
             }
         }
-		AudioManager.PlayUIEffect(HideSound);
 
 		onHidden(mode);
 

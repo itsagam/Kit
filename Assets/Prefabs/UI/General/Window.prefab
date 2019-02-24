@@ -74,7 +74,7 @@ MonoBehaviour:
     m_MaxSize: 95
     m_Alignment: 3
     m_AlignByGeometry: 0
-    m_RichText: 1
+    m_RichText: 0
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
@@ -264,7 +264,7 @@ MonoBehaviour:
     m_MaxSize: 114
     m_Alignment: 3
     m_AlignByGeometry: 0
-    m_RichText: 1
+    m_RichText: 0
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
@@ -514,6 +514,7 @@ GameObject:
   - component: {fileID: 1428585214089333711}
   - component: {fileID: 1428585214089333710}
   - component: {fileID: 1428585214089333712}
+  - component: {fileID: 950685624961749352}
   m_Layer: 5
   m_Name: Close
   m_TagString: Untagged
@@ -619,3 +620,15 @@ MonoBehaviour:
       m_Calls: []
     m_TypeName: UnityEngine.UI.Button+ButtonClickedEvent, UnityEngine.UI, Version=1.0.0.0,
       Culture=neutral, PublicKeyToken=null
+--- !u!114 &950685624961749352
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1428585214089333708}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 768d9a18e50d1a544bc87eff68d57c07, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 

@@ -18,7 +18,7 @@ public class IconList : MonoBehaviour
         {
             foreach (object item in Items)
             {
-                Icon icon = Instantiate(Prefab) as Icon;
+                Icon icon = Instantiate(Prefab);
                 icon.transform.SetParent(transform, false);
                 icon.Data = item;
             }
