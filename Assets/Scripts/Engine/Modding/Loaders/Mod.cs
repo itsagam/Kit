@@ -148,7 +148,7 @@ namespace Modding
 
 		protected virtual IEnumerable<string> SetupScripting()
 		{
-			if (Metadata?.Scripts == null)
+			if (Metadata.Scripts == null || Metadata.Scripts.Count == 0)
 				return null;
 
 			var validScripts = Metadata.Scripts.Where(s => !s.IsNullOrEmpty() && Exists(s));

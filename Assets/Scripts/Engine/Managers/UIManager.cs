@@ -139,9 +139,19 @@ public static class UIManager
 		return Windows.Find(w => w.name == name);
 	}
 
+	public static T FindWindow<T>() where T: Window
+	{
+		return Windows.OfType<T>().FirstOrDefault();
+	}
+
 	public static bool IsShown(string name)
 	{
 		return FindWindow(name) != null;
+	}
+
+	public static bool IsShown<T>() where T: Window
+	{
+		return FindWindow<T>() != null;
 	}
 
 	public static void RegisterWindow(Window instance)

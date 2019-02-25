@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using Modding;
+using DG.Tweening;
 
 public class ModIcon : Icon
 {
@@ -15,22 +16,57 @@ public class ModIcon : Icon
 	public Button MoveUpButton;
 	public Button MoveDownButton;
 
-	protected void Start()
+	public Color EnabledColor;
+	public Color DisabledColor;
+	public float RecolorTime = 0.35f;
+
+	protected ModWindow window;
+
+	protected void Awake()
 	{
-		MoveUpButton.onClick.AddListener(() => ModManager.MoveModUp(Mod));
-		MoveDownButton.onClick.AddListener(() => ModManager.MoveModDown(Mod));
-		EnableToggle.onValueChanged.AddListener((value) => ModManager.ToggleMod(Mod, value));
+		window = UIManager.FindWindow<ModWindow>();
+
+		EnableToggle.onValueChanged.AddListener(Toggle);
+		MoveUpButton.onClick.AddListener(MoveUp);
+		MoveDownButton.onClick.AddListener(MoveDown);
 	}
 
 	public override void Reload()
 	{
 		EnableToggle.isOn = ModManager.IsModEnabled(Mod);
 
+		var list = ModManager.GetModsByGroup(ModType.Mod);
+		if (list[0] == Mod)
+			MoveUpButton.SetInteractableImmediate(false);
+
+		if (list[list.Count - 1] == Mod)
+			MoveDownButton.SetInteractableImmediate(false);
+
 		var metadata = Mod.Metadata;
 		NameText.text = metadata.Name;
 		VersionText.text = metadata.Version;
 		AuthorText.text = metadata.Author;
 		DescriptionText.text = metadata.Description;
+
+		NameText.color = EnableToggle.isOn ? EnabledColor : DisabledColor;
+	}
+
+	protected void MoveUp()
+	{
+		ModManager.MoveModUp(Mod);
+		window.Reload();
+	}
+
+	protected void MoveDown()
+	{
+		ModManager.MoveModDown(Mod);
+		window.Reload();
+	}
+
+	protected void Toggle(bool value)
+	{
+		ModManager.ToggleMod(Mod, value);
+		NameText.DOColor(value ? EnabledColor : DisabledColor, RecolorTime);
 	}
 
 	public Mod Mod

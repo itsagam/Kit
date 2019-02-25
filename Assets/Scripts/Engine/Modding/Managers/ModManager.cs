@@ -152,6 +152,7 @@ namespace Modding
 						{
 							mod.Group = group;
 							group.Mods.Add(mod);
+							ModLoaded?.Invoke(mod);
 							break;
 						}
 					}
@@ -182,8 +183,8 @@ namespace Modding
 						if (mod != null)
 						{
 							mod.Group = group;
-							if (IsModEnabled(mod))
-								group.Mods.Add(mod);
+							group.Mods.Add(mod);
+							ModLoaded?.Invoke(mod);
 							break;
 						}
 					}
@@ -201,19 +202,13 @@ namespace Modding
 		public static void ExecuteScripts()
 		{
 			foreach (Mod mod in EnabledMods)
-			{
 				mod.ExecuteScripts();
-				ModLoaded?.Invoke(mod);
-			}
 		}
 
 		public static async UniTask ExecuteScriptsAsync()
 		{
 			foreach (Mod mod in EnabledMods)
-			{
 				await mod.ExecuteScriptsAsync();
-				ModLoaded?.Invoke(mod);
-			}
 		}
 
 		private static void RefreshModList()
