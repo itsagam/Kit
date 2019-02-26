@@ -19,4 +19,24 @@ public static class TransformExtensions
 		transform.localRotation = from.transform.localRotation;
 		transform.localScale = from.transform.localScale;
 	}
+
+	public static bool IsFirstSibling(this Transform transform)
+	{
+		return transform.GetSiblingIndex() == 0;
+	}
+
+	public static bool IsLastSibling(this Transform transform)
+	{
+		return transform.GetSiblingIndex() == transform.parent.childCount - 1;
+	}
+
+	public static Transform GetFirstChild(this Transform transform)
+	{
+		return transform.GetChild(0);
+	}
+
+	public static Transform GetLastChild(this Transform transform)
+	{
+		return transform.GetChild(transform.childCount - 1);
+	}
 }	

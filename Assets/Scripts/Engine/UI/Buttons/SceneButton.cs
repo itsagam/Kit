@@ -25,7 +25,6 @@ public class SceneButton : MonoBehaviour, IPointerClickHandler
 	[SuffixLabel("seconds", true)]
 	public float FadeTime = 1.0f;
 
-
 	[FoldoutGroup("Events")]
 	public UnityEvent OnProgress;
 

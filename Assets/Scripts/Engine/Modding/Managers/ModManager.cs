@@ -161,7 +161,7 @@ namespace Modding
 
 			LoadModOrder();
 			SaveModOrder();
-			RefreshModList();
+			RefreshEnabledMods();
 
 			if (executeScripts)
 				ExecuteScripts();
@@ -193,7 +193,7 @@ namespace Modding
 
 			LoadModOrder();
 			SaveModOrder();
-			RefreshModList();
+			RefreshEnabledMods();
 
 			if (executeScripts)
 				ExecuteScripts();
@@ -211,7 +211,7 @@ namespace Modding
 				await mod.ExecuteScriptsAsync();
 		}
 
-		private static void RefreshModList()
+		private static void RefreshEnabledMods()
 		{
 			EnabledMods = Groups.SelectMany(kvp => kvp.Value.Mods).Where(m => IsModEnabled(m));
 		}
@@ -237,7 +237,9 @@ namespace Modding
 		{
 			if (!mod.Group.Deactivateable)
 				return;
+
 			PlayerPrefs.SetInt($"{mod.Group.Name}/{mod.Metadata.Name}.Enabled", value ? 1 : 0);
+			RefreshEnabledMods();
 		}
 
 		public static bool IsModEnabled(Mod mod)
@@ -287,7 +289,8 @@ namespace Modding
 
 			mod.Group.Mods.Remove(mod);
 			mod.Group.Mods.Insert(index, mod);
-			RefreshModList();
+			SaveModOrder();
+			RefreshEnabledMods();
 		}
 
 		// UNDONE: Make a "Mods" UI, allowing to change mod order and displaying mod information

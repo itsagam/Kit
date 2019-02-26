@@ -169,7 +169,7 @@ public class Window : MonoBehaviour
 
     }
 
-    public virtual void Reload()
+    public virtual void Refresh()
     {
     }
 	#endregion
@@ -208,7 +208,7 @@ public class Window : MonoBehaviour
 		set
 		{
 			data = value;
-			Reload();
+			Refresh();
 		}
 	}
 	#endregion

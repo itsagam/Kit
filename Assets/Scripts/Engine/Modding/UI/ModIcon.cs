@@ -3,37 +3,36 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UniRx;
 using Modding;
 using DG.Tweening;
 
 public class ModIcon : Icon
 {
+	public ToggleButton EnableToggle;
+
 	public Text NameText;
 	public Text VersionText;
 	public Text AuthorText;
 	public Text DescriptionText;
-	public Toggle EnableToggle;
 	public Button MoveUpButton;
 	public Button MoveDownButton;
 
 	public Color EnabledColor;
 	public Color DisabledColor;
 	public float RecolorTime = 0.35f;
-
-	protected ModWindow window;
+	public float ReorderTime = 0.35f;
 
 	protected void Awake()
 	{
-		window = UIManager.FindWindow<ModWindow>();
-
-		EnableToggle.onValueChanged.AddListener(Toggle);
+		EnableToggle.OnValueChanged.AddListener(Toggle);
 		MoveUpButton.onClick.AddListener(MoveUp);
 		MoveDownButton.onClick.AddListener(MoveDown);
 	}
 
-	public override void Reload()
+	public override void Refresh()
 	{
-		EnableToggle.isOn = ModManager.IsModEnabled(Mod);
+		EnableToggle.IsOn = ModManager.IsModEnabled(Mod);
 
 		var list = ModManager.GetModsByGroup(ModType.Mod);
 		if (list[0] == Mod)
@@ -44,23 +43,44 @@ public class ModIcon : Icon
 
 		var metadata = Mod.Metadata;
 		NameText.text = metadata.Name;
+		NameText.color = EnableToggle.IsOn ? EnabledColor : DisabledColor;
 		VersionText.text = metadata.Version;
 		AuthorText.text = metadata.Author;
 		DescriptionText.text = metadata.Description;
-
-		NameText.color = EnableToggle.isOn ? EnabledColor : DisabledColor;
 	}
 
 	protected void MoveUp()
 	{
 		ModManager.MoveModUp(Mod);
-		window.Reload();
+		Move(transform.GetSiblingIndex() - 1);
 	}
 
 	protected void MoveDown()
 	{
 		ModManager.MoveModDown(Mod);
-		window.Reload();
+		Move(transform.GetSiblingIndex() + 1);
+	}
+
+	protected void Move(int toIndex)
+	{
+		Transform toTransform = transform.parent.GetChild(toIndex);
+		int index = transform.GetSiblingIndex();
+
+		transform.SetSiblingIndex(toIndex);
+		Sequence sequence = DOTween.Sequence();
+		sequence.Insert(0, transform.DOMove(toTransform.position, ReorderTime));
+		sequence.Insert(0, toTransform.DOMove(transform.position, ReorderTime));
+		sequence.InsertCallback(ReorderTime / 2.0f, () =>
+		{
+			RefreshInteractable();
+			toTransform.GetComponent<ModIcon>().RefreshInteractable();
+		});
+	}
+
+	public void RefreshInteractable()
+	{
+		MoveUpButton.SetInteractableImmediate(!transform.IsFirstSibling());
+		MoveDownButton.SetInteractableImmediate(!transform.IsLastSibling());
 	}
 
 	protected void Toggle(bool value)

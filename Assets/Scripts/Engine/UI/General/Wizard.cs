@@ -24,9 +24,14 @@ public class Wizard : Window
 	public string PreviousHideAnimation = "PreviousHide";
 
 	[FoldoutGroup("Events")]
-	public UnityEvent<int, Window, int, Window> OnChanging;
+	public ChangeEvent OnChanging;
 	[FoldoutGroup("Events")]
-	public UnityEvent<int, Window, int, Window> OnChanged;
+	public ChangeEvent OnChanged;
+
+	[Serializable]
+	public class ChangeEvent : UnityEvent<int, Window, int, Window>
+	{
+	}
 
 	public int Index { get; protected set; } = -1;
 
