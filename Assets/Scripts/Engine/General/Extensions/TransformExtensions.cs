@@ -13,13 +13,6 @@ public static class TransformExtensions
 		return result;
 	}
 
-	public static void CopyLocal(this Transform transform, Transform from)
-	{
-		transform.localPosition = from.transform.localPosition;
-		transform.localRotation = from.transform.localRotation;
-		transform.localScale = from.transform.localScale;
-	}
-
 	public static bool IsFirstSibling(this Transform transform)
 	{
 		return transform.GetSiblingIndex() == 0;

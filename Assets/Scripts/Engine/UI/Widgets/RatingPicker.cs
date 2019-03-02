@@ -9,72 +9,81 @@ using UniRx;
 using UniRx.Triggers;
 using Sirenix.OdinInspector;
 
+[RequireComponent(typeof(HorizontalLayoutGroup))]
 public class RatingPicker : MonoBehaviour
 {
-	[Range(1, 10)]
-	public int MaxRating = 5;
-
-	public bool AllowHalf = true;
-	public bool IsReadonly = false;
-
-	[FoldoutGroup("Sprites")]
-	public Sprite ZeroSprite;
-
-	[FoldoutGroup("Sprites")]
-	[ShowIf("AllowHalf")]
-	public Sprite HalfSprite;
-
-	[FoldoutGroup("Sprites")]
-	public Sprite OneSprite;
-
-	[FoldoutGroup("Appearance")]
-	public Color HighlightedColor = new Color(0.9f, 0.9f, 0.9f, 1);
-
-	[FoldoutGroup("Appearance")]
-	public Color PressedColor = new Color(0.75f, 0.75f, 0.75f, 1);
-
-	[FoldoutGroup("Appearance")]
-	public float Spacing = 10;
-
-	protected HorizontalLayoutGroup layout;
 	protected Button[] buttons;
+
+	[SerializeField]
+	[HideInInspector]
+	protected int maxRating = 5;
 
 	[SerializeField]
 	[HideInInspector]
 	protected float rating = 0;
 
-	protected void Awake()
-	{
-		SetupLayout();
-		SpawnButtons();
-		SetRating(rating);
-	}
+	[SerializeField]
+	[HideInInspector]
+	protected bool allowHalf = true;
 
-	protected void SetupLayout()
+	[SerializeField]
+	[HideInInspector]
+	protected bool isReadonly = false;
+
+	[SerializeField]
+	[HideInInspector]
+	protected Sprite zeroSprite;
+
+	[SerializeField]
+	[HideInInspector]
+	protected Sprite halfSprite;
+
+	[SerializeField]
+	[HideInInspector]
+	protected Sprite oneSprite;
+
+	[SerializeField]
+	[HideInInspector]
+	protected Color highlightedColor = new Color(0.9f, 0.9f, 0.9f, 1);
+
+	[SerializeField]
+	[HideInInspector]
+	protected Color pressedColor = new Color(0.75f, 0.75f, 0.75f, 1);
+
+	protected void Start()
 	{
-		layout = gameObject.AddComponent<HorizontalLayoutGroup>();
-		layout.spacing = Spacing;
+		if (buttons == null)
+		{
+			SpawnButtons();
+			RefreshRating();
+		}
 	}
 
 	protected void SpawnButtons()
 	{
-		buttons = new Button[MaxRating];
-		for (int i = 0; i < MaxRating; i++)
+		buttons = new Button[maxRating];
+		for (int i = 0; i < maxRating; i++)
 			SpawnButton(i);
+	}
+
+	protected void DestroyButtons()
+	{
+		Transform transform = this.transform;
+		for (int i = transform.childCount - 1; i >= 0; i--)
+			transform.GetChild(i).gameObject.Destroy();
 	}
 
 	protected void SpawnButton(int index)
 	{
 		GameObject spriteGO = new GameObject("Button " + (index + 1), typeof(Image));
 		Button button = spriteGO.AddComponent<Button>();
-		button.image.sprite = ZeroSprite;
 		button.transform.SetParent(transform, false);
-		button.interactable = !IsReadonly;
+		button.interactable = !isReadonly;
 		
 		var colors = button.colors;
 		colors.disabledColor = colors.normalColor;
-		colors.highlightedColor = HighlightedColor;
-		colors.pressedColor = PressedColor;
+		colors.highlightedColor = highlightedColor;
+		colors.pressedColor = pressedColor;
 		button.colors = colors;
 
 		button.OnPointerUpAsObservable().Subscribe(OnClick);
@@ -84,12 +93,12 @@ public class RatingPicker : MonoBehaviour
 
 	protected void OnClick(PointerEventData data)
 	{
-		if (IsReadonly)
+		if (isReadonly)
 			return;
 
 		RectTransform rect = (RectTransform) data.selectedObject.transform;
 		int index = rect.GetSiblingIndex();
-		if (AllowHalf)
+		if (allowHalf)
 		{
 			if (!RectTransformUtility.ScreenPointToLocalPointInRectangle(rect, data.pressPosition, data.pressEventCamera, out Vector2 point))
 				return;
@@ -105,34 +114,62 @@ public class RatingPicker : MonoBehaviour
 
 	protected void SetRating(float newRating)
 	{
-		if (newRating < 0 || newRating > MaxRating)
-			return;
+		newRating = Mathf.Clamp(newRating, 0, maxRating);
 
 		int intPart = (int) newRating;
 		float decimalPart = newRating % 1;
-		bool half = AllowHalf ? decimalPart >= 0.5f : false;
+		bool half = allowHalf ? decimalPart >= 0.5f : false;
 
 		if (half)
 			rating = intPart + 0.5f;
 		else
 			rating = intPart;
 
-		if (!Application.isPlaying)
-			return;
-			
-		for (int i = 0; i < intPart; i++)
-			buttons[i].image.sprite = OneSprite;
-
-		if (intPart < MaxRating)
+		if (buttons != null && buttons.Length > 0)
 		{
-			buttons[intPart].image.sprite = half ? HalfSprite : ZeroSprite;
-			for (int i = intPart + 1; i < MaxRating; i++)
-				buttons[i].image.sprite = ZeroSprite;
+			for (int i = 0; i < intPart; i++)
+				buttons[i].image.sprite = oneSprite;
+
+			if (intPart < maxRating)
+			{
+				buttons[intPart].image.sprite = half ? halfSprite : zeroSprite;
+				for (int i = intPart + 1; i < maxRating; i++)
+					buttons[i].image.sprite = zeroSprite;
+			}
+		}
+	}
+
+	protected void RefreshRating()
+	{
+		SetRating(rating);
+	}
+
+	protected float GetMaxRatingAsFloat()
+	{
+		return maxRating;
+	}
+
+	[ShowInInspector]
+	[PropertyRange(1, 10)]
+	public int MaxRating
+	{
+		get
+		{
+			return maxRating;
+		}
+		set
+		{
+			maxRating = value;
+			if (Application.isPlaying)
+			{
+				DestroyButtons();
+				SpawnButtons();
+			}
+			RefreshRating();
 		}
 	}
 
 	[ShowInInspector]
-	[PropertyOrder(-1)]
 	[PropertyRange(0, "GetMaxRatingAsFloat")]
 	public float Rating
 	{
@@ -146,10 +183,127 @@ public class RatingPicker : MonoBehaviour
 		}
 	}
 
-#if UNITY_EDITOR
-	protected float GetMaxRatingAsFloat()
+	[ShowInInspector]
+	public bool AllowHalf
 	{
-		return MaxRating;
+		get
+		{
+			return allowHalf;
+		}
+		set
+		{
+			allowHalf = value;
+			RefreshRating();
+		}
 	}
-#endif
+
+	[ShowInInspector]
+	public bool IsReadonly
+	{
+		get
+		{
+			return isReadonly;
+		}
+		set
+		{
+			isReadonly = value;
+			if (buttons != null)
+			{
+				foreach (Button button in buttons)
+					button.interactable = !value;
+			}
+		}
+	}
+
+	[ShowInInspector]
+	[FoldoutGroup("Sprites")]
+	public Sprite ZeroSprite
+	{
+		get
+		{
+			return zeroSprite;
+		}
+		set
+		{
+			zeroSprite = value;
+			RefreshRating();
+		}
+	}
+
+	[ShowInInspector]
+	[ShowIf("allowHalf")]
+	[FoldoutGroup("Sprites")]
+	public Sprite HalfSprite
+	{
+		get
+		{
+			return halfSprite;
+		}
+		set
+		{
+			halfSprite = value;
+			RefreshRating();
+		}
+	}
+
+	[ShowInInspector]
+	[FoldoutGroup("Sprites")]
+	public Sprite OneSprite
+	{
+		get
+		{
+			return oneSprite;
+		}
+		set
+		{
+			oneSprite = value;
+			RefreshRating();
+		}
+	}
+
+	[ShowInInspector]
+	[FoldoutGroup("Appearance")]
+	public Color HighlightedColor
+	{
+		get
+		{
+			return highlightedColor;
+		}
+		set
+		{
+			highlightedColor = value;
+			if (buttons != null)
+			{
+				foreach (Button button in buttons)
+				{
+					var colors = button.colors;
+					colors.highlightedColor = value;
+					button.colors = colors;
+				}
+			}
+		}
+	}
+
+	[ShowInInspector]
+	[FoldoutGroup("Appearance")]
+	public Color PressedColor
+	{
+		get
+		{
+			return pressedColor;
+		}
+		set
+		{
+			pressedColor = value;
+			if (buttons != null)
+			{
+				foreach (Button button in buttons)
+				{
+					var colors = button.colors;
+					colors.pressedColor = value;
+					button.colors = colors;
+				}
+			}
+		}
+	}
 }
