@@ -2,33 +2,46 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
+using UniRx;
+using UniRx.Triggers;
 using Sirenix.OdinInspector;
 
 public class RatingPicker : MonoBehaviour
 {
 	[Range(1, 10)]
-	public int MaxRating = 5;	
+	public int MaxRating = 5;
+
 	public bool AllowHalf = true;
 	public bool IsReadonly = false;
 
 	[FoldoutGroup("Sprites")]
 	public Sprite ZeroSprite;
+
 	[FoldoutGroup("Sprites")]
 	[ShowIf("AllowHalf")]
 	public Sprite HalfSprite;
+
 	[FoldoutGroup("Sprites")]
 	public Sprite OneSprite;
 
 	[FoldoutGroup("Appearance")]
 	public Color HighlightedColor = new Color(0.9f, 0.9f, 0.9f, 1);
+
 	[FoldoutGroup("Appearance")]
 	public Color PressedColor = new Color(0.75f, 0.75f, 0.75f, 1);
+
 	[FoldoutGroup("Appearance")]
 	public float Spacing = 10;
 
 	protected HorizontalLayoutGroup layout;
 	protected Button[] buttons;
+
+	[SerializeField]
+	[HideInInspector]
+	protected float rating = 0;
 
 	protected void Awake()
 	{
@@ -63,31 +76,65 @@ public class RatingPicker : MonoBehaviour
 		colors.highlightedColor = HighlightedColor;
 		colors.pressedColor = PressedColor;
 		button.colors = colors;
-		button.onClick.AddListener(() => SetRating(index + 1));
+
+		button.OnPointerUpAsObservable().Subscribe(OnClick);
 
 		buttons[index] = button;
 	}
 
-	protected void SetRating(int newRating)
+	protected void OnClick(PointerEventData data)
 	{
-		for (int i = 0; i < newRating; i++)
+		if (IsReadonly)
+			return;
+
+		RectTransform rect = (RectTransform) data.selectedObject.transform;
+		int index = rect.GetSiblingIndex();
+		if (AllowHalf)
+		{
+			if (!RectTransformUtility.ScreenPointToLocalPointInRectangle(rect, data.pressPosition, data.pressEventCamera, out Vector2 point))
+				return;
+
+			float decimalPart = point.x < 0 ? 0.5f : 1.0f;
+			SetRating(index + decimalPart);
+		}
+		else
+		{
+			SetRating(index + 1);
+		}
+	}
+
+	protected void SetRating(float newRating)
+	{
+		if (newRating < 0 || newRating > MaxRating)
+			return;
+
+		int intPart = (int) newRating;
+		float decimalPart = newRating % 1;
+		bool half = AllowHalf ? decimalPart >= 0.5f : false;
+
+		if (half)
+			rating = intPart + 0.5f;
+		else
+			rating = intPart;
+
+		if (!Application.isPlaying)
+			return;
+			
+		for (int i = 0; i < intPart; i++)
 			buttons[i].image.sprite = OneSprite;
 
-		for (int i = newRating; i < MaxRating; i++)
-			buttons[i].image.sprite = ZeroSprite;
-
-		rating = newRating;
+		if (intPart < MaxRating)
+		{
+			buttons[intPart].image.sprite = half ? HalfSprite : ZeroSprite;
+			for (int i = intPart + 1; i < MaxRating; i++)
+				buttons[i].image.sprite = ZeroSprite;
+		}
 	}
-	
-	[SerializeField]
-	[HideInPlayMode]
-	[PropertyRange(0, "MaxRating")]
-	protected int rating;
 
 	[ShowInInspector]
-	[HideInEditorMode]
-	[PropertyRange(0, "MaxRating")]
-	public int Rating
+	[PropertyOrder(-1)]
+	[PropertyRange(0, "GetMaxRatingAsFloat")]
+	public float Rating
 	{
 		get
 		{
@@ -98,4 +145,11 @@ public class RatingPicker : MonoBehaviour
 			SetRating(value);
 		}
 	}
+
+#if UNITY_EDITOR
+	protected float GetMaxRatingAsFloat()
+	{
+		return MaxRating;
+	}
+#endif
 }
