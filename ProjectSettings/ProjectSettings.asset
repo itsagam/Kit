@@ -679,7 +679,7 @@ PlayerSettings:
   webGLLinkerTarget: 1
   webGLThreadsSupport: 0
   scriptingDefineSymbols:
-    1: MODDING;ODIN_INSPECTOR
+    1: ODIN_INSPECTOR;MODDING
   platformArchitecture: {}
   scriptingBackend: {}
   il2cppCompilerConfiguration: {}

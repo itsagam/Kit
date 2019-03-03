@@ -23,6 +23,7 @@ public class ModIcon : Icon
 	public float RecolorTime = 0.35f;
 	public float ReorderTime = 0.35f;
 
+#if MODDING
 	protected void Awake()
 	{
 		EnableToggle.OnValueChanged.AddListener(Toggle);
@@ -75,6 +76,7 @@ public class ModIcon : Icon
 			RefreshInteractable();
 			toTransform.GetComponent<ModIcon>().RefreshInteractable();
 		});
+		SetDirty();
 	}
 
 	public void RefreshInteractable()
@@ -87,6 +89,12 @@ public class ModIcon : Icon
 	{
 		ModManager.ToggleMod(Mod, value);
 		NameText.DOColor(value ? EnabledColor : DisabledColor, RecolorTime);
+		SetDirty();
+	}
+
+	protected void SetDirty()
+	{
+		UIManager.FindWindow<ModWindow>().IsDirty = true;
 	}
 
 	public Mod Mod
@@ -96,4 +104,5 @@ public class ModIcon : Icon
 			return (Mod) Data;
 		}
 	}
+#endif
 }

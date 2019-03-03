@@ -293,7 +293,6 @@ namespace Modding
 			RefreshEnabledMods();
 		}
 
-		// UNDONE: Make a "Mods" UI, allowing to change mod order and displaying mod information
 		public static void LoadModOrder()
 		{
 			foreach (var kvp in Groups)

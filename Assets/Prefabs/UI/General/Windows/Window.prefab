@@ -390,7 +390,7 @@ GameObject:
   - component: {fileID: 1428585213892880823}
   - component: {fileID: 1428585213892880825}
   m_Layer: 5
-  m_Name: Line
+  m_Name: Separator
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -692,7 +692,7 @@ PrefabInstance:
     - target: {fileID: 5303799349640292956, guid: 75b4423754ab1c440997aba56a371bd6,
         type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: -16
+      value: -20
       objectReference: {fileID: 0}
     - target: {fileID: 5303799349640292956, guid: 75b4423754ab1c440997aba56a371bd6,
         type: 3}
