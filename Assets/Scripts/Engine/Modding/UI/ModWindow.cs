@@ -8,9 +8,6 @@ using Modding;
 // TODO: Add "Apply Changes" button
 // TODO: Show "Changes will be reflected in the next boot-up"
 
-// TODO: Organize, trim and optimize Clean UI asset
-// TODO: Make prefabs for UI elements
-
 public class ModWindow : Window
 {
 	public IconList ModList;

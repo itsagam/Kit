@@ -1,0 +1,128 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!687078895 &4343727234628468602
+SpriteAtlas:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: Steam_Controller_Atlas
+  m_EditorData:
+    serializedVersion: 2
+    textureSettings:
+      serializedVersion: 2
+      anisoLevel: 1
+      compressionQuality: 50
+      maxTextureSize: 2048
+      textureCompression: 0
+      filterMode: 1
+      generateMipMaps: 0
+      readable: 0
+      crunchedCompression: 0
+      sRGB: 1
+    platformSettings:
+    - serializedVersion: 2
+      m_BuildTarget: DefaultTexturePlatform
+      m_MaxTextureSize: 2048
+      m_ResizeAlgorithm: 0
+      m_TextureFormat: -1
+      m_TextureCompression: 1
+      m_CompressionQuality: 100
+      m_CrunchedCompression: 1
+      m_AllowsAlphaSplitting: 0
+      m_Overridden: 0
+      m_AndroidETC2FallbackOverride: 0
+    packingSettings:
+      serializedVersion: 2
+      padding: 4
+      blockOffset: 1
+      allowAlphaSplitting: 0
+      enableRotation: 0
+      enableTightPacking: 0
+    variantMultiplier: 1
+    packables:
+    - {fileID: 2800000, guid: a4de5b30166afa345b0e7e75536ca875, type: 3}
+    - {fileID: 2800000, guid: 23fe6d872f218c44ea4bee38230a6aaf, type: 3}
+    - {fileID: 2800000, guid: 81cced55e73f85b4fbdb163734870973, type: 3}
+    - {fileID: 2800000, guid: 0aaf898ec4788324288395348825601b, type: 3}
+    - {fileID: 2800000, guid: e0347cfd5a1e1fb4ca1eea7e31bac904, type: 3}
+    - {fileID: 2800000, guid: 8771180c300392746b3435dd4715c581, type: 3}
+    - {fileID: 2800000, guid: bb9168602573e6540a83c40450e1a55f, type: 3}
+    - {fileID: 2800000, guid: dd34d8bc6a46f324f8b7039590216b62, type: 3}
+    - {fileID: 2800000, guid: 3576ba55b01a5e647b6f7d28d47e70e9, type: 3}
+    - {fileID: 2800000, guid: 797d7fccf4297da478cfdd1a5e18c25f, type: 3}
+    - {fileID: 2800000, guid: 897b571c1071dc541accd3e03ff1eab4, type: 3}
+    - {fileID: 2800000, guid: f58272a98bd65bc4bad6958d53677a2d, type: 3}
+    - {fileID: 2800000, guid: 81f6b916e60815643bc9c3105c4254ed, type: 3}
+    - {fileID: 2800000, guid: 884f803490f2da848822244d41d7577e, type: 3}
+    - {fileID: 2800000, guid: 9afd269ab84a3554b9434715a8efe2b6, type: 3}
+    - {fileID: 2800000, guid: 7ff2b1fdf78c601438030698fed6fbe4, type: 3}
+    - {fileID: 2800000, guid: 9d680b536cc62bd46b0f9a71ba9bf7b2, type: 3}
+    - {fileID: 2800000, guid: a04182fdddd3f2d4dad036a1664441f1, type: 3}
+    - {fileID: 2800000, guid: 0c1a35084f24570498bde89808dde088, type: 3}
+    - {fileID: 2800000, guid: 728258f406e7d204ea6eead8109f0488, type: 3}
+    - {fileID: 2800000, guid: 84a30aec5bca7f449b253de9cd3c2f56, type: 3}
+    - {fileID: 2800000, guid: 60a025ce955343c4cbea04272834673e, type: 3}
+    - {fileID: 2800000, guid: 1f8178c1c6539cb41a1ef4d767d4359d, type: 3}
+    - {fileID: 2800000, guid: bad105058a6d1ee4db3a2814e396239e, type: 3}
+    - {fileID: 2800000, guid: 3849c7fc28ec20f4d97f6ebeccfa302e, type: 3}
+    - {fileID: 2800000, guid: d8c7412747865cf4ea68cac0311ec627, type: 3}
+    totalSpriteSurfaceArea: 106496
+    bindAsDefault: 1
+  m_MasterAtlas: {fileID: 0}
+  m_PackedSprites:
+  - {fileID: 21300000, guid: a4de5b30166afa345b0e7e75536ca875, type: 3}
+  - {fileID: 21300000, guid: bb9168602573e6540a83c40450e1a55f, type: 3}
+  - {fileID: 21300000, guid: 1f8178c1c6539cb41a1ef4d767d4359d, type: 3}
+  - {fileID: 21300000, guid: 9d680b536cc62bd46b0f9a71ba9bf7b2, type: 3}
+  - {fileID: 21300000, guid: 884f803490f2da848822244d41d7577e, type: 3}
+  - {fileID: 21300000, guid: 728258f406e7d204ea6eead8109f0488, type: 3}
+  - {fileID: 21300000, guid: bad105058a6d1ee4db3a2814e396239e, type: 3}
+  - {fileID: 21300000, guid: 3576ba55b01a5e647b6f7d28d47e70e9, type: 3}
+  - {fileID: 21300000, guid: 81cced55e73f85b4fbdb163734870973, type: 3}
+  - {fileID: 21300000, guid: 81f6b916e60815643bc9c3105c4254ed, type: 3}
+  - {fileID: 21300000, guid: d8c7412747865cf4ea68cac0311ec627, type: 3}
+  - {fileID: 21300000, guid: 23fe6d872f218c44ea4bee38230a6aaf, type: 3}
+  - {fileID: 21300000, guid: 0c1a35084f24570498bde89808dde088, type: 3}
+  - {fileID: 21300000, guid: f58272a98bd65bc4bad6958d53677a2d, type: 3}
+  - {fileID: 21300000, guid: 9afd269ab84a3554b9434715a8efe2b6, type: 3}
+  - {fileID: 21300000, guid: 8771180c300392746b3435dd4715c581, type: 3}
+  - {fileID: 21300000, guid: 897b571c1071dc541accd3e03ff1eab4, type: 3}
+  - {fileID: 21300000, guid: dd34d8bc6a46f324f8b7039590216b62, type: 3}
+  - {fileID: 21300000, guid: 797d7fccf4297da478cfdd1a5e18c25f, type: 3}
+  - {fileID: 21300000, guid: 84a30aec5bca7f449b253de9cd3c2f56, type: 3}
+  - {fileID: 21300000, guid: 3849c7fc28ec20f4d97f6ebeccfa302e, type: 3}
+  - {fileID: 21300000, guid: 7ff2b1fdf78c601438030698fed6fbe4, type: 3}
+  - {fileID: 21300000, guid: a04182fdddd3f2d4dad036a1664441f1, type: 3}
+  - {fileID: 21300000, guid: e0347cfd5a1e1fb4ca1eea7e31bac904, type: 3}
+  - {fileID: 21300000, guid: 0aaf898ec4788324288395348825601b, type: 3}
+  - {fileID: 21300000, guid: 60a025ce955343c4cbea04272834673e, type: 3}
+  m_PackedSpriteNamesToIndex:
+  - A-Button-Green
+  - Circle-Border-Dark
+  - X-Button-Blue
+  - RG-Button-Dark
+  - Movement-Icon-Dark
+  - RT-Button-Dark
+  - X-Button-Blue-Dark
+  - LB-Button-Dark
+  - Arrow-Left-Button-Dark
+  - LT-Button-Dark
+  - Y-Button-Yellow-Dark
+  - A-Button-Green-Dark
+  - RP-Button-Dark
+  - LP-Button-Dark
+  - None-Button-Dark
+  - B-Button-Red-Dark
+  - LG-Button-Dark
+  - Down-Button-Dark
+  - Left-Button-Dark
+  - Steam-Controller-Icon-Dark
+  - Y-Button-Yellow
+  - RB-Button-Dark
+  - Right-Button-Dark
+  - B-Button-Red
+  - Arrow-Right-Button-Dark
+  - Up-Button-Dark
+  m_Tag: Steam_Controller_Atlas
+  m_IsVariant: 0

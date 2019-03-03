@@ -1,0 +1,113 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!687078895 &4343727234628468602
+SpriteAtlas:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: XboxOne_Controller_Atlas
+  m_EditorData:
+    serializedVersion: 2
+    textureSettings:
+      serializedVersion: 2
+      anisoLevel: 1
+      compressionQuality: 50
+      maxTextureSize: 2048
+      textureCompression: 0
+      filterMode: 1
+      generateMipMaps: 0
+      readable: 0
+      crunchedCompression: 0
+      sRGB: 1
+    platformSettings:
+    - serializedVersion: 2
+      m_BuildTarget: DefaultTexturePlatform
+      m_MaxTextureSize: 2048
+      m_ResizeAlgorithm: 0
+      m_TextureFormat: -1
+      m_TextureCompression: 1
+      m_CompressionQuality: 100
+      m_CrunchedCompression: 1
+      m_AllowsAlphaSplitting: 0
+      m_Overridden: 0
+      m_AndroidETC2FallbackOverride: 0
+    packingSettings:
+      serializedVersion: 2
+      padding: 4
+      blockOffset: 1
+      allowAlphaSplitting: 0
+      enableRotation: 0
+      enableTightPacking: 0
+    variantMultiplier: 1
+    packables:
+    - {fileID: 2800000, guid: f32f3f65992c75043995b7c2ae1a8777, type: 3}
+    - {fileID: 2800000, guid: 2a89d8af5579a5647abe966d4d6eed95, type: 3}
+    - {fileID: 2800000, guid: 7a3e56b482ccd634abf86996c71f4086, type: 3}
+    - {fileID: 2800000, guid: 9a1666c030035cb4d968258ec442a2ec, type: 3}
+    - {fileID: 2800000, guid: a1782e02d04520448abb5954fffc789a, type: 3}
+    - {fileID: 2800000, guid: f0377e3025d59a445a6e960eee5864ef, type: 3}
+    - {fileID: 2800000, guid: 10998793df561774f91757b54499d6c5, type: 3}
+    - {fileID: 2800000, guid: d57a0382571b48b4a94319e804fef61a, type: 3}
+    - {fileID: 2800000, guid: 2bc651d90e02c2a43b7d1e26e48f8c72, type: 3}
+    - {fileID: 2800000, guid: e8cae05fd9aa448489cd76369924c402, type: 3}
+    - {fileID: 2800000, guid: 644fb8142b3048146ab0b3f8c68232aa, type: 3}
+    - {fileID: 2800000, guid: 7f10a3177d21c814d91ccd6ad982eeb2, type: 3}
+    - {fileID: 2800000, guid: 1f1c9bbd916a7244f97cab43409ddc2e, type: 3}
+    - {fileID: 2800000, guid: 951916f06dab30748862ec897a14dc85, type: 3}
+    - {fileID: 2800000, guid: 70f395019ec89c84b86e4ef78274d9e8, type: 3}
+    - {fileID: 2800000, guid: 75cb3df288c06e24090f3077de548850, type: 3}
+    - {fileID: 2800000, guid: b19767d12cc1a6546aa27a518a688575, type: 3}
+    - {fileID: 2800000, guid: 1b3a4a67a856ea044a619269e9d2f382, type: 3}
+    - {fileID: 2800000, guid: f4d20fd5541d9004d9877488b90d22c6, type: 3}
+    - {fileID: 2800000, guid: 395e1cf6dbff521438f45a4fe3c38e1c, type: 3}
+    - {fileID: 2800000, guid: bc282a25f9db902459758768e095bf79, type: 3}
+    totalSpriteSurfaceArea: 86016
+    bindAsDefault: 1
+  m_MasterAtlas: {fileID: 0}
+  m_PackedSprites:
+  - {fileID: 21300000, guid: f0377e3025d59a445a6e960eee5864ef, type: 3}
+  - {fileID: 21300000, guid: 9a1666c030035cb4d968258ec442a2ec, type: 3}
+  - {fileID: 21300000, guid: 951916f06dab30748862ec897a14dc85, type: 3}
+  - {fileID: 21300000, guid: 70f395019ec89c84b86e4ef78274d9e8, type: 3}
+  - {fileID: 21300000, guid: b19767d12cc1a6546aa27a518a688575, type: 3}
+  - {fileID: 21300000, guid: a1782e02d04520448abb5954fffc789a, type: 3}
+  - {fileID: 21300000, guid: d57a0382571b48b4a94319e804fef61a, type: 3}
+  - {fileID: 21300000, guid: 75cb3df288c06e24090f3077de548850, type: 3}
+  - {fileID: 21300000, guid: 10998793df561774f91757b54499d6c5, type: 3}
+  - {fileID: 21300000, guid: 644fb8142b3048146ab0b3f8c68232aa, type: 3}
+  - {fileID: 21300000, guid: 7a3e56b482ccd634abf86996c71f4086, type: 3}
+  - {fileID: 21300000, guid: bc282a25f9db902459758768e095bf79, type: 3}
+  - {fileID: 21300000, guid: f32f3f65992c75043995b7c2ae1a8777, type: 3}
+  - {fileID: 21300000, guid: f4d20fd5541d9004d9877488b90d22c6, type: 3}
+  - {fileID: 21300000, guid: 395e1cf6dbff521438f45a4fe3c38e1c, type: 3}
+  - {fileID: 21300000, guid: 7f10a3177d21c814d91ccd6ad982eeb2, type: 3}
+  - {fileID: 21300000, guid: 1b3a4a67a856ea044a619269e9d2f382, type: 3}
+  - {fileID: 21300000, guid: 2bc651d90e02c2a43b7d1e26e48f8c72, type: 3}
+  - {fileID: 21300000, guid: 1f1c9bbd916a7244f97cab43409ddc2e, type: 3}
+  - {fileID: 21300000, guid: e8cae05fd9aa448489cd76369924c402, type: 3}
+  - {fileID: 21300000, guid: 2a89d8af5579a5647abe966d4d6eed95, type: 3}
+  m_PackedSpriteNamesToIndex:
+  - Arrow-Right-Button-Dark
+  - Arrow-Left-Button-Dark
+  - R-Button-Dark
+  - RB-Button-Dark
+  - Start-Button-Dark
+  - Arrow-None-Dark
+  - B-Button-Dark
+  - RT-Button-Dark
+  - Arrow-Up-Button-Dark
+  - LB-Button-Dark
+  - Arrow-Down-Button-Dark
+  - Y-Button-Dark
+  - A-Button-Dark
+  - XBox-Filled-Icon-Dark
+  - XBoxOne-Icon-Dark
+  - LT-Button-Dark
+  - X-Button-Dark
+  - Back-Button-Dark
+  - Menu-Button-Dark
+  - L-Button-Dark
+  - AddressBar-Button-Dark
+  m_Tag: XboxOne_Controller_Atlas
+  m_IsVariant: 0

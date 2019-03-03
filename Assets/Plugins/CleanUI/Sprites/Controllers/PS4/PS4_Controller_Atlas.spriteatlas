@@ -1,0 +1,104 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!687078895 &4343727234628468602
+SpriteAtlas:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: PS4_Controller_Atlas
+  m_EditorData:
+    serializedVersion: 2
+    textureSettings:
+      serializedVersion: 2
+      anisoLevel: 1
+      compressionQuality: 50
+      maxTextureSize: 2048
+      textureCompression: 0
+      filterMode: 1
+      generateMipMaps: 0
+      readable: 0
+      crunchedCompression: 0
+      sRGB: 1
+    platformSettings:
+    - serializedVersion: 2
+      m_BuildTarget: DefaultTexturePlatform
+      m_MaxTextureSize: 2048
+      m_ResizeAlgorithm: 0
+      m_TextureFormat: -1
+      m_TextureCompression: 1
+      m_CompressionQuality: 100
+      m_CrunchedCompression: 1
+      m_AllowsAlphaSplitting: 0
+      m_Overridden: 0
+      m_AndroidETC2FallbackOverride: 0
+    packingSettings:
+      serializedVersion: 2
+      padding: 4
+      blockOffset: 1
+      allowAlphaSplitting: 0
+      enableRotation: 0
+      enableTightPacking: 0
+    variantMultiplier: 1
+    packables:
+    - {fileID: 2800000, guid: bfd5ec967262a4e4e89df5d9d208d7e7, type: 3}
+    - {fileID: 2800000, guid: 5bf0103dded46ff48a71e22e4ec40fe5, type: 3}
+    - {fileID: 2800000, guid: 7f3ed640485a0b141b8d1eb9f3eeb6a2, type: 3}
+    - {fileID: 2800000, guid: 406a0dc1cc18791458874715275a44b9, type: 3}
+    - {fileID: 2800000, guid: 80f12f32c40be76439b53607a0756a04, type: 3}
+    - {fileID: 2800000, guid: a8b2507d704c1934dbc75a12126a2682, type: 3}
+    - {fileID: 2800000, guid: 0b579a2b89080e34997b1f413ace316e, type: 3}
+    - {fileID: 2800000, guid: 5a630b657ceb427418539857087a2b79, type: 3}
+    - {fileID: 2800000, guid: 6db9a379b03d4214ea01306e58c6e90d, type: 3}
+    - {fileID: 2800000, guid: 638f4327aed846b4db718bbadde210f8, type: 3}
+    - {fileID: 2800000, guid: 0c83328af2c798a45a2de82fe7ceacff, type: 3}
+    - {fileID: 2800000, guid: 06303b390cef4834d9235fb3f258ca6b, type: 3}
+    - {fileID: 2800000, guid: d1163a583460a6e4a80a7488713db252, type: 3}
+    - {fileID: 2800000, guid: c2ae278f4942b2740bed5dd7cdc7bcdf, type: 3}
+    - {fileID: 2800000, guid: cb32a64d185b11a4792406297e393ca8, type: 3}
+    - {fileID: 2800000, guid: f66c451b33b21cc46adec6f126c9131e, type: 3}
+    - {fileID: 2800000, guid: ff13564d505bae04c9fd43d738801aee, type: 3}
+    - {fileID: 2800000, guid: 499001ab30c6a5d41b428e85ef754cc6, type: 3}
+    totalSpriteSurfaceArea: 73728
+    bindAsDefault: 1
+  m_MasterAtlas: {fileID: 0}
+  m_PackedSprites:
+  - {fileID: 21300000, guid: 7f3ed640485a0b141b8d1eb9f3eeb6a2, type: 3}
+  - {fileID: 21300000, guid: 406a0dc1cc18791458874715275a44b9, type: 3}
+  - {fileID: 21300000, guid: 80f12f32c40be76439b53607a0756a04, type: 3}
+  - {fileID: 21300000, guid: 5a630b657ceb427418539857087a2b79, type: 3}
+  - {fileID: 21300000, guid: bfd5ec967262a4e4e89df5d9d208d7e7, type: 3}
+  - {fileID: 21300000, guid: 638f4327aed846b4db718bbadde210f8, type: 3}
+  - {fileID: 21300000, guid: d1163a583460a6e4a80a7488713db252, type: 3}
+  - {fileID: 21300000, guid: 06303b390cef4834d9235fb3f258ca6b, type: 3}
+  - {fileID: 21300000, guid: 6db9a379b03d4214ea01306e58c6e90d, type: 3}
+  - {fileID: 21300000, guid: 0c83328af2c798a45a2de82fe7ceacff, type: 3}
+  - {fileID: 21300000, guid: f66c451b33b21cc46adec6f126c9131e, type: 3}
+  - {fileID: 21300000, guid: 0b579a2b89080e34997b1f413ace316e, type: 3}
+  - {fileID: 21300000, guid: 499001ab30c6a5d41b428e85ef754cc6, type: 3}
+  - {fileID: 21300000, guid: 5bf0103dded46ff48a71e22e4ec40fe5, type: 3}
+  - {fileID: 21300000, guid: ff13564d505bae04c9fd43d738801aee, type: 3}
+  - {fileID: 21300000, guid: cb32a64d185b11a4792406297e393ca8, type: 3}
+  - {fileID: 21300000, guid: a8b2507d704c1934dbc75a12126a2682, type: 3}
+  - {fileID: 21300000, guid: c2ae278f4942b2740bed5dd7cdc7bcdf, type: 3}
+  m_PackedSpriteNamesToIndex:
+  - Arrow-Down-Button-Dark
+  - Arrow-Left-Button-Dark
+  - Arrow-Right-Button-Dark
+  - L1-Button-Dark
+  - A-Button-Dark
+  - Options-Button-Dark
+  - R1-Button-Dark
+  - PS4-Icon-Dark
+  - L2-Button-Dark
+  - PS4-Filled-Icon-Dark
+  - Touchpad-Dark-Dark
+  - B-Button-Dark
+  - Y-Button-Dark
+  - Arrow-Button-Dark
+  - X-Button-Dark
+  - Share-Button-Dark
+  - Arrow-Up-Button-Dark
+  - R2-Button-Dark
+  m_Tag: PS4_Controller_Atlas
+  m_IsVariant: 0
