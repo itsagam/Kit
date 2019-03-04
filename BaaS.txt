@@ -18,7 +18,7 @@ Solutions
 		Cons: API is limited, depends on third-party integrations like Photon
 
 	- GameSparks: Free for just 10 concurrent players, 10 requests/s & 10 MB storage (https://www.gamesparks.com/pricing/)
-		Pros: Server-side coding, multiplier support, quite stable
+		Pros: Server-side coding, multiplayer support, quite stable
 		Cons: High pricing with no Free tier
 
 	- Herioc Labs/Nakama: Free and open-source (https://heroiclabs.com/managed-cloud/)

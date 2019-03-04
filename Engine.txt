@@ -1,10 +1,6 @@
 Engine
 -----------------------------------------------------------------------------
 	Scriptable/Moddable
-		- Console
-		- Configs
-		- Mods
-		- Patches
 	Localization
 
 Library
@@ -19,4 +15,3 @@ Library
 		Splash
 		Menu
 		Settings
-		Mods

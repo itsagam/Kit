@@ -59,9 +59,6 @@ public class MessageWindow : Window
 
 	public override void Refresh()
 	{
-		if (data is string message)
-			data = new MessageInfo() { Message = message };
-
 		RefreshIcon();
 		RefreshTexts();
 		RefreshButtons();
@@ -152,6 +149,22 @@ public class MessageWindow : Window
 		get
 		{
 			return (MessageInfo) Data;
+		}
+	}
+
+	public override object Data
+	{
+		get
+		{
+			return data;
+		}
+		set
+		{
+			if (value is string message)
+				data = new MessageInfo() { Message = message };
+			else
+				data = value;
+			Refresh();
 		}
 	}
 }
