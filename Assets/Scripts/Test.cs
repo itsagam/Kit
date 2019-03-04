@@ -6,6 +6,7 @@ using UnityEngine;
 using UniRx;
 using UniRx.Async;
 using Modding;
+using XLua;
 
 public class Test : MonoBehaviour
 {
@@ -15,20 +16,5 @@ public class Test : MonoBehaviour
 
 	public void Button()
 	{
-		/*
-		Debugger.StartProfile("transform");
-		for (int i = 0; i < 10000; i++)
-		{
-		}
-
-		Debugger.EndProfile();
-
-		
-		Debugger.StartProfile("field");
-		for (int i = 0; i < 10000; i++)
-		{
-		}
-		Debugger.EndProfile();
-		*/
 	}
 }
