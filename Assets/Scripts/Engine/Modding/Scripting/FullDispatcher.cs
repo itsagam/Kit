@@ -6,28 +6,12 @@ using XLua;
 
 namespace Modding
 {
-	public class ModDispatcher : MonoBehaviour
+	public class FullDispatcher : SimpleDispatcher
 	{
-		protected static Transform parent = null;
-
 		protected LuaEnv scriptEnv;
 		protected event Action updateEvent;
 		protected event Action fixedUpdateEvent;
 		protected event Action lateUpdateEvent;
-
-		protected void CreateParent()
-		{
-			GameObject parentGO = new GameObject("Mods");
-			GameObject.DontDestroyOnLoad(parentGO);
-			parent = parentGO.transform;
-		}
-
-		protected void Awake()
-		{
-			if (parent == null)
-				CreateParent();
-			transform.parent = parent;
-		}
 
 		public void Hook(LuaEnv env)
 		{
@@ -93,51 +77,11 @@ namespace Modding
 			}
 		}
 
-		protected void ExecuteSafe(Action action)
-		{
-			try
-			{
-				action();
-			}
-			catch (Exception e)
-			{
-				Debugger.Log("ModManager", $"{name} – {e.Message}");
-			}
-		}
-
-		protected IEnumerator ExecuteSafe(IEnumerator enumerator)
-		{
-			while (true)
-			{
-				try
-				{
-					if (enumerator.MoveNext() == false)
-						yield break;
-				}
-				catch (Exception e)
-				{
-					Debugger.Log("ModManager", $"{name} – {e.Message}");
-					yield break;
-				}
-				yield return enumerator.Current;
-			}
-		}
-
-		public void StartCoroutineSafe(IEnumerator enumerator)
-		{
-			StartCoroutine(ExecuteSafe(enumerator));
-		}
-
-		protected void OnDestroy()
-		{
-			Stop();
-		}
-
-		public void Stop()
+		public override void Stop()
 		{
 			if (scriptEnv != null)
 			{
-				var destroyAction = scriptEnv.Global.Get<Action>("destroy");
+				var destroyAction = scriptEnv.Global.Get<Action>("onDestroy");
 				if (destroyAction != null)
 					ExecuteSafe(destroyAction);
 

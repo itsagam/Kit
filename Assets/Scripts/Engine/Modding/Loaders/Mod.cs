@@ -18,9 +18,16 @@ namespace Modding
         public string Author;
 		public string Description;
         public string Version;
-		public bool Persistent;
+		public ModPersistence Persistence;
 		public List<string> Scripts;
     }
+
+	public enum ModPersistence
+	{
+		None,
+		Simple,
+		Full
+	}
 
 	public abstract class Mod
 	{
@@ -41,7 +48,7 @@ namespace Modding
 		public abstract UniTask<byte[]> ReadBytesAsync(string path);
 
 		public LuaEnv ScriptEnv { get; protected set; }
-		public ModDispatcher ScriptDispatcher { get; protected set; }
+		public SimpleDispatcher ScriptDispatcher { get; protected set; }
 
 		#region Initialization
 		public virtual bool Load()
@@ -168,8 +175,7 @@ namespace Modding
 			if (scripts == null)
 				return;
 
-			if (Metadata.Persistent)
-				CreateDispatcher();
+			CreateDispatcher();
 
 			foreach (string scriptFile in scripts)
 			{
@@ -177,10 +183,7 @@ namespace Modding
 				ExecuteSafe(() => ScriptEnv.DoString(script, scriptFile));
 			}
 
-			if (Metadata.Persistent)
-				ScriptDispatcher.Hook(ScriptEnv);
-			else
-				DisposeScripting();
+			HookOrDispose();
 		}
 
 		public virtual async UniTask ExecuteScriptsAsync()
@@ -188,9 +191,8 @@ namespace Modding
 			var scripts = SetupScripting();
 			if (scripts == null)
 				return;
-
-			if (Metadata.Persistent)
-				CreateDispatcher();
+	
+			CreateDispatcher();
 	
 			foreach (string scriptFile in scripts)
 			{
@@ -198,16 +200,37 @@ namespace Modding
 				ExecuteSafe(() => ScriptEnv.DoString(script, scriptFile));
 			}
 
-			if (Metadata.Persistent)
-				ScriptDispatcher.Hook(ScriptEnv);
-			else
-				DisposeScripting();
+			HookOrDispose();
 		}
 
 		protected void CreateDispatcher()
 		{
-			ScriptDispatcher = new GameObject(Metadata.Name).AddComponent<ModDispatcher>();
-			ScriptDispatcher.StartCoroutine(TickCoroutine());
+			if (Metadata.Persistence != ModPersistence.None)
+			{
+				GameObject gameObject = new GameObject(Metadata.Name);
+				if (Metadata.Persistence == ModPersistence.Simple)
+					ScriptDispatcher = gameObject.AddComponent<SimpleDispatcher>();
+				else
+					ScriptDispatcher = gameObject.AddComponent<FullDispatcher>();
+				ScriptDispatcher.StartCoroutine(TickCoroutine());
+			}
+		}
+
+		protected void HookOrDispose()
+		{
+			switch (Metadata.Persistence)
+			{
+				case ModPersistence.None:
+					DisposeScripting();
+					break;
+
+				case ModPersistence.Simple:
+					break;
+
+				case ModPersistence.Full:
+					((FullDispatcher) ScriptDispatcher).Hook(ScriptEnv);
+					break;
+			}
 		}
 
 		protected IEnumerator TickCoroutine()
