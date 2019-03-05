@@ -40,6 +40,8 @@ Features
 	
 	Game State
 
+	Localization
+
 	Analytics
 		- Unity: https://docs.unity3d.com/Packages/com.unity.analytics@3.2/index.html
 	

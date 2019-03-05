@@ -27,7 +27,7 @@ namespace Modding.Loaders
 			try
 			{
 				ZipMod mod = new ZipMod(path);
-				if (mod.LoadMetadata())
+				if (mod.Load())
 					return mod;
 			}
 			catch (Exception)
@@ -50,7 +50,7 @@ namespace Modding.Loaders
 			try
 			{
 				ZipMod mod = new ZipMod(path);
-				if (await mod.LoadMetadataAsync())
+				if (await mod.LoadAsync())
 					return mod;
 			}
 			catch (Exception)

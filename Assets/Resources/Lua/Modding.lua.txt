@@ -47,7 +47,7 @@ end
 
 -- Coroutines
 function startCoroutine(...)
-   self:StartCoroutine(util.cs_generator(...))
+   self:StartCoroutineSafe(util.cs_generator(...))
 end
 
 yield = coroutine.yield

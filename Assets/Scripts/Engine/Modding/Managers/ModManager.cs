@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using Modding.Parsers;
+using UniRx;
 
 #if MODDING
 using UniRx.Async;
@@ -99,6 +100,7 @@ namespace Modding
 		{
 			AddDefaultGroups();
 			CacheFolderNames();
+			Observable.OnceApplicationQuit().Subscribe(u => UnloadMods());
 		}
 
 		private static void AddDefaultGroups()
@@ -293,7 +295,7 @@ namespace Modding
 			RefreshEnabledMods();
 		}
 
-		public static void LoadModOrder()
+		private static void LoadModOrder()
 		{
 			foreach (var kvp in Groups)
 			{
@@ -310,7 +312,7 @@ namespace Modding
 			}
 		}
 
-		public static void SaveModOrder()
+		private static void SaveModOrder()
 		{
 			foreach (ModGroup group in Groups.Values)
 			{
@@ -610,15 +612,15 @@ namespace Modding
 		#endregion
 
 		#region Unloading
-		public static void UnloadMods(bool destroyLoaded = false)
+		public static void UnloadMods(bool withResources = false)
 		{
 			foreach (Mod mod in EnabledMods.Reverse())
-				UnloadMod(mod);
+				UnloadMod(mod, withResources);
 		}
 
-		public static void UnloadMod(Mod mod, bool destroyLoaded = true)
+		public static void UnloadMod(Mod mod, bool withResources = true)
 		{
-			if (destroyLoaded)
+			if (withResources)
 				UnloadAll(mod);
 			mod.Unload();
 			mod.Group.Mods.Remove(mod);

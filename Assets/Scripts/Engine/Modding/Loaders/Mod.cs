@@ -26,13 +26,6 @@ namespace Modding
 	{
 		public const string MetadataFile = "Metadata.json";
 		public const float GCInterval = 1.0f;
-		public static Dictionary<string, Func<IObservable<long>>> UpdateDelegates = new Dictionary<string, Func<IObservable<long>>>
-			{
-				{ "update", Observable.EveryUpdate },
-				{ "fixedUpdate", Observable.EveryFixedUpdate },
-				{ "lateUpdate", Observable.EveryLateUpdate },
-				{ "endOfFrame", Observable.EveryEndOfFrame }
-			};
 
 		public string Path { get;  protected set; }
 		public ModMetadata Metadata { get; protected set; }
@@ -46,10 +39,22 @@ namespace Modding
 		public abstract byte[] ReadBytes(string path);
 		public abstract UniTask<byte[]> ReadBytesAsync(string path);
 
-		protected LuaEnv scriptEnv;
-		protected CompositeDisposable scriptDisposables;
+		protected static Dictionary<string, Func<Action, IEnumerator>> UpdateCoroutines = new Dictionary<string, Func<Action, IEnumerator>>
+		{
+			{"update", ExecuteInUpdate},
+			{"fixedUpate", ExecuteInFixedUpdate },
+			{"endOfFrame", ExecuteInEndOfFrame }
+		};
 
-		public virtual bool LoadMetadata()
+		protected static YieldInstruction TickYield = new WaitForSeconds(GCInterval);
+		protected static YieldInstruction FixedUpdateYield = new WaitForFixedUpdate();
+		protected static YieldInstruction EndOfFrameYield = new WaitForEndOfFrame();
+		
+		protected LuaEnv scriptEnv;
+		protected ModDispatcher scriptDispatcher;
+
+		#region Initialization
+		public virtual bool Load()
 		{
 			string metadataText = ReadText(MetadataFile);
 			if (metadataText != null)
@@ -60,7 +65,7 @@ namespace Modding
 			return false;
 		}
 
-		public virtual async UniTask<bool> LoadMetadataAsync()
+		public virtual async UniTask<bool> LoadAsync()
 		{
 			string metadataText = await ReadTextAsync(MetadataFile);
 			if (metadataText != null)
@@ -70,7 +75,9 @@ namespace Modding
 			}
 			return false;
 		}
+		#endregion
 
+		#region Resources
 		public virtual (T reference, string filePath, ResourceParser parser) Load<T>(string path) where T : class
 		{
 			IEnumerable<string> matchingFiles = FindFiles(path);
@@ -145,8 +152,10 @@ namespace Modding
 								.Where(d => d.certainty > 0)
 								.OrderByDescending(d => d.certainty);
 		}
+		#endregion
 
-		protected virtual IEnumerable<string> SetupScripting()
+		#region Scripting
+		protected IEnumerable<string> SetupScripting()
 		{
 			if (Metadata.Scripts == null || Metadata.Scripts.Count == 0)
 				return null;
@@ -160,8 +169,6 @@ namespace Modding
 			scriptEnv.DoString("require 'Lua/General'");
 			scriptEnv.DoString("require 'Lua/Modding'");
 
-			scriptDisposables = new CompositeDisposable();
-			
 			return validScripts;
 		}
 
@@ -203,35 +210,83 @@ namespace Modding
 				DisposeScripting();
 		}
 
-		protected virtual void HookMethods()
+		protected void HookMethods()
 		{
-			Observable.Interval(TimeSpan.FromSeconds(GCInterval)).Subscribe(l => scriptEnv.Tick()).AddTo(scriptDisposables);
-
+			scriptDispatcher = new GameObject(Metadata.Name).AddComponent<ModDispatcher>();
+			StartCoroutine(TickCoroutine());
+	
 			Action awake = scriptEnv.Global.Get<Action>("awake");
 			if (awake != null)
 				ExecuteSafe(awake);
 
 			Action start = scriptEnv.Global.Get<Action>("start");
 			if (start != null)
-				Observable.NextFrame().Subscribe(u => ExecuteSafe(start));
+				StartCoroutine(ExecuteInNextFrame(() => ExecuteSafe(start)));
 
-			foreach (var kvp in UpdateDelegates)
+			foreach (var kvp in UpdateCoroutines)
 			{
 				Action action = scriptEnv.Global.Get<Action>(kvp.Key);
 				if (action != null)
-					kvp.Value().Subscribe(l => ExecuteSafe(action)).AddTo(scriptDisposables);
+					StartCoroutine(kvp.Value(() => ExecuteSafe(action)));
+			}
+		}
+
+		protected void StartCoroutine(IEnumerator enumerator)
+		{
+			scriptDispatcher.StartCoroutine(enumerator);
+		}
+
+		public void StartCoroutineSafe(IEnumerator enumerator)
+		{
+			StartCoroutine(ExecuteSafe(enumerator));
+		}
+
+		protected IEnumerator TickCoroutine()
+		{
+			while (true)
+			{
+				yield return TickYield;
+				scriptEnv.Tick();
 			}
 		}
 
 		public void Schedule(string type, Action action)
 		{
-			if (UpdateDelegates.TryGetValue(type, out var function))
-				function().Subscribe(l => ExecuteSafe(action)).AddTo(scriptDisposables);
+			if (UpdateCoroutines.TryGetValue(type, out var coroutine))
+				StartCoroutine(coroutine(() => ExecuteSafe(action)));
 		}
 
-		public void StartCoroutine(IEnumerator enumerator)
+		protected static IEnumerator ExecuteInNextFrame(Action action)
 		{
-			MainThreadDispatcher.StartCoroutine(ExecuteSafe(enumerator));
+			yield return null;
+			action();
+		}
+
+		protected static IEnumerator ExecuteInUpdate(Action action)
+		{
+			while (true)
+			{
+				yield return null;
+				action();
+			}
+		}
+
+		protected static IEnumerator ExecuteInFixedUpdate(Action action)
+		{
+			while (true)
+			{
+				yield return FixedUpdateYield;
+				action();
+			}
+		}
+
+		protected static IEnumerator ExecuteInEndOfFrame(Action action)
+		{
+			while (true)
+			{
+				yield return EndOfFrameYield;
+				action();
+			}
 		}
 
 		protected IEnumerator ExecuteSafe(IEnumerator enumerator)
@@ -270,25 +325,30 @@ namespace Modding
 		{
 			if (scriptEnv != null)
 			{
-				scriptEnv.Global.Get<Action>("destroy")?.Invoke();
-				if (scriptDisposables != null)
-				{
-					scriptDisposables.Dispose();
-					scriptDisposables = null;
-				}				
+				DisposeActions();
+
 				// UNDONE: Have to Dispose the environment the next frame as functions may hold references to prevent disposal
-				Observable.NextFrame().Subscribe(u =>
-				{
-					scriptEnv.Dispose();
-					scriptEnv = null;
-				});
+				scriptEnv.Dispose();
+				scriptEnv = null;
 			}
 		}
+		
+		// A separate function is not just for organization, it is required so that references to actions can be garbage-collected
+		// before Dispose is called on scripting environment
+		protected void DisposeActions()
+		{
+			scriptEnv.Global.Get<Action>("destroy")?.Invoke();
+			scriptDispatcher.Destroy();
+		}
 
+		#endregion
+
+		#region Destruction
 		public virtual void Unload()
 		{
 			DisposeScripting();
 		}
+		#endregion
 	}
 }
 #endif
