@@ -411,7 +411,8 @@ namespace Modding
 			foreach (Mod mod in EnabledMods)
 			{
 				var (reference, filePath, parser) = mod.Load<T>(path);
-				all.Add(reference);
+				if (reference != null)
+					all.Add(reference);
 			}
 			return all;
 		}
@@ -427,7 +428,8 @@ namespace Modding
 			foreach (Mod mod in EnabledMods)
 			{
 				var (reference, filePath, parser) = await mod.LoadAsync<T>(path);
-				all.Add(reference);
+				if (reference != null)
+					all.Add(reference);
 			}
 			return all;
 		}

@@ -26,6 +26,7 @@ namespace Modding
 	{
 		public const string MetadataFile = "Metadata.json";
 		public const float GCInterval = 1.0f;
+		protected static YieldInstruction GCYield = new WaitForSeconds(GCInterval);
 
 		public string Path { get;  protected set; }
 		public ModMetadata Metadata { get; protected set; }
@@ -39,19 +40,8 @@ namespace Modding
 		public abstract byte[] ReadBytes(string path);
 		public abstract UniTask<byte[]> ReadBytesAsync(string path);
 
-		protected static Dictionary<string, Func<Action, IEnumerator>> UpdateCoroutines = new Dictionary<string, Func<Action, IEnumerator>>
-		{
-			{"update", ExecuteInUpdate},
-			{"fixedUpate", ExecuteInFixedUpdate },
-			{"endOfFrame", ExecuteInEndOfFrame }
-		};
-
-		protected static YieldInstruction TickYield = new WaitForSeconds(GCInterval);
-		protected static YieldInstruction FixedUpdateYield = new WaitForFixedUpdate();
-		protected static YieldInstruction EndOfFrameYield = new WaitForEndOfFrame();
-		
-		protected LuaEnv scriptEnv;
-		protected ModDispatcher scriptDispatcher;
+		public LuaEnv ScriptEnv { get; protected set; }
+		public ModDispatcher ScriptDispatcher { get; protected set; }
 
 		#region Initialization
 		public virtual bool Load()
@@ -164,10 +154,10 @@ namespace Modding
 			if (!validScripts.Any())
 				return null;
 
-			scriptEnv = new LuaEnv();
-			scriptEnv.Global.Set("self", this);
-			scriptEnv.DoString("require 'Lua/General'");
-			scriptEnv.DoString("require 'Lua/Modding'");
+			ScriptEnv = new LuaEnv();
+			ScriptEnv.Global.Set("self", this);
+			ScriptEnv.DoString("require 'Lua/General'");
+			ScriptEnv.DoString("require 'Lua/Modding'");
 
 			return validScripts;
 		}
@@ -178,13 +168,19 @@ namespace Modding
 			if (scripts == null)
 				return;
 
+			if (Metadata.Persistent)
+				CreateDispatcher();
+
 			foreach (string scriptFile in scripts)
 			{
 				var script = ReadBytes(scriptFile);
-				ExecuteSafe(() => scriptEnv.DoString(script, scriptFile));
+				ExecuteSafe(() => ScriptEnv.DoString(script, scriptFile));
 			}
 
-			HookOrDispose();
+			if (Metadata.Persistent)
+				ScriptDispatcher.Hook(ScriptEnv);
+			else
+				DisposeScripting();
 		}
 
 		public virtual async UniTask ExecuteScriptsAsync()
@@ -193,119 +189,33 @@ namespace Modding
 			if (scripts == null)
 				return;
 
+			if (Metadata.Persistent)
+				CreateDispatcher();
+	
 			foreach (string scriptFile in scripts)
 			{
 				var script = await ReadBytesAsync(scriptFile);
-				ExecuteSafe(() => scriptEnv.DoString(script, scriptFile));
+				ExecuteSafe(() => ScriptEnv.DoString(script, scriptFile));
 			}
 
-			HookOrDispose();
-		}
-
-		protected void HookOrDispose()
-		{
 			if (Metadata.Persistent)
-				HookMethods();
+				ScriptDispatcher.Hook(ScriptEnv);
 			else
 				DisposeScripting();
 		}
 
-		protected void HookMethods()
+		protected void CreateDispatcher()
 		{
-			scriptDispatcher = new GameObject(Metadata.Name).AddComponent<ModDispatcher>();
-			StartCoroutine(TickCoroutine());
-	
-			Action awake = scriptEnv.Global.Get<Action>("awake");
-			if (awake != null)
-				ExecuteSafe(awake);
-
-			Action start = scriptEnv.Global.Get<Action>("start");
-			if (start != null)
-				StartCoroutine(ExecuteInNextFrame(() => ExecuteSafe(start)));
-
-			foreach (var kvp in UpdateCoroutines)
-			{
-				Action action = scriptEnv.Global.Get<Action>(kvp.Key);
-				if (action != null)
-					StartCoroutine(kvp.Value(() => ExecuteSafe(action)));
-			}
-		}
-
-		protected void StartCoroutine(IEnumerator enumerator)
-		{
-			scriptDispatcher.StartCoroutine(enumerator);
-		}
-
-		public void StartCoroutineSafe(IEnumerator enumerator)
-		{
-			StartCoroutine(ExecuteSafe(enumerator));
+			ScriptDispatcher = new GameObject(Metadata.Name).AddComponent<ModDispatcher>();
+			ScriptDispatcher.StartCoroutine(TickCoroutine());
 		}
 
 		protected IEnumerator TickCoroutine()
 		{
 			while (true)
 			{
-				yield return TickYield;
-				scriptEnv.Tick();
-			}
-		}
-
-		public void Schedule(string type, Action action)
-		{
-			if (UpdateCoroutines.TryGetValue(type, out var coroutine))
-				StartCoroutine(coroutine(() => ExecuteSafe(action)));
-		}
-
-		protected static IEnumerator ExecuteInNextFrame(Action action)
-		{
-			yield return null;
-			action();
-		}
-
-		protected static IEnumerator ExecuteInUpdate(Action action)
-		{
-			while (true)
-			{
-				yield return null;
-				action();
-			}
-		}
-
-		protected static IEnumerator ExecuteInFixedUpdate(Action action)
-		{
-			while (true)
-			{
-				yield return FixedUpdateYield;
-				action();
-			}
-		}
-
-		protected static IEnumerator ExecuteInEndOfFrame(Action action)
-		{
-			while (true)
-			{
-				yield return EndOfFrameYield;
-				action();
-			}
-		}
-
-		protected IEnumerator ExecuteSafe(IEnumerator enumerator)
-		{
-			while (true)
-			{
-				object current;
-				try
-				{
-					if (enumerator.MoveNext() == false)
-						break;
-					current = enumerator.Current;
-				}
-				catch (Exception e)
-				{
-					Debugger.Log("ModManager", $"{Metadata.Name} – {e.Message}");
-					yield break;
-				}
-				yield return current;
+				yield return GCYield;
+				ScriptEnv.Tick();
 			}
 		}
 
@@ -318,29 +228,24 @@ namespace Modding
 			catch (Exception e)
 			{
 				Debugger.Log("ModManager", $"{Metadata.Name} – {e.Message}");
-			}	
+			}
 		}
 
 		protected void DisposeScripting()
 		{
-			if (scriptEnv != null)
+			if (ScriptEnv != null)
 			{
-				DisposeActions();
+				if (ScriptDispatcher != null)
+				{
+					ScriptDispatcher.Stop();
+					ScriptDispatcher.gameObject.Destroy();
+					ScriptDispatcher = null;
+				}
 
-				// UNDONE: Have to Dispose the environment the next frame as functions may hold references to prevent disposal
-				scriptEnv.Dispose();
-				scriptEnv = null;
+				ScriptEnv.Dispose();
+				ScriptEnv = null;
 			}
 		}
-		
-		// A separate function is not just for organization, it is required so that references to actions can be garbage-collected
-		// before Dispose is called on scripting environment
-		protected void DisposeActions()
-		{
-			scriptEnv.Global.Get<Action>("destroy")?.Invoke();
-			scriptDispatcher.Destroy();
-		}
-
 		#endregion
 
 		#region Destruction

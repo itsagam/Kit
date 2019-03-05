@@ -103,7 +103,6 @@ namespace Modding.Loaders
 					string relativeDir = System.IO.Path.GetDirectoryName(path);
 					if (matching.Any())
 						return matching.Select(p => relativeDir + "/" + System.IO.Path.GetFileName(p));
-						//return matching.Select(p => path + System.IO.Path.GetExtension(p));
 				}
 			}
 

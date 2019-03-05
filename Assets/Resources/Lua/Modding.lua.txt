@@ -25,29 +25,47 @@ function dofile(file)
 	return assert(loadfile(file))()
 end
 
--- Scheduling
-function schedule(type, action)
-	self:Schedule(type, action)
-end
-
 -- Injection
-function inject(type, method, fast, code)
+function inject(type, method, extend, code)
 	if code == nil then
-	 	code = fast
-	 	fast = false
+	 	code = extend
+	 	extend = true
 	end
-	-- "xlua.hotfix" is faster but doesn't allow calling the original function from the injected method,
-	-- "util.hotfix_ex" does – provide a way for both using a "fast" toggle, defaulting to false	
-	if fast == true then
-		xlua.hotfix(type, method, code)
+	-- "xlua.hotfix" is faster but doesn't allow calling the original function from injected method,
+	-- "util.hotfix_ex" does – provide a way for doing both using a "extend" toggle, defaulting to true	
+	if extend == true then
+		util.hotfix_ex(type, method, code)	
 	else
-		util.hotfix_ex(type, method, code)
+		xlua.hotfix(type, method, code)
 	end
 end
 
 -- Coroutines
 function startCoroutine(...)
-   self:StartCoroutineSafe(util.cs_generator(...))
+   self.ScriptDispatcher:StartCoroutineSafe(util.cs_generator(...))
 end
 
 yield = coroutine.yield
+
+-- Scheduling
+function schedule(type, action)
+	self.ScriptDispatcher:Schedule(type, action)
+end
+
+function invoke(time, action)
+	startCoroutine(function()
+		yield(UE.WaitForSeconds(time))
+		action()
+	end)
+end
+
+function invokeRepeating(time, interval, action)
+	startCoroutine(function()
+		yield(UE.WaitForSeconds(time))
+		while true do
+			action()
+			yield(UE.WaitForSeconds(interval))
+		end
+		action()
+	end)
+end
