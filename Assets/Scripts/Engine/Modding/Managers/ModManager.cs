@@ -85,7 +85,6 @@ namespace Modding
 
 		public static Dictionary<ModType, ModGroup> Groups = new Dictionary<ModType, ModGroup>();	
 		public static List<ModLoader> Loaders = new List<ModLoader>() {
-			//UNDONE: new AssetBundleLoader(),
 			new DirectModLoader(),
 			new ZipModLoader()
 		};

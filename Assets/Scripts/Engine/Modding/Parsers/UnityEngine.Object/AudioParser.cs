@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace Modding.Parsers
 {
-	// UNDONE: Use UnityWebRequest to decode audio data
+	// Use UnityWebRequest to decode audio data
 	// Solutions:	Derive DownloadHandlerAudioClip and override GetData method
 	//				(https://github.com/Unity-Technologies/UnityCsReference/blob/master/Modules/UnityWebRequestAudio/Public/DownloadHandlerAudio.bindings.cs)
 	//				Derive WWW, change to a custom Web Request and use GetAudioClip() to decode

@@ -1,6 +1,9 @@
 Engine
 -----------------------------------------------------------------------------
 	Scriptable/Moddable
+		- Use UnityWebRequest to decode audio data
+		- Create AssetBundlerLoader
+		- Cannot execute ResourceManager.Load from mods because of generics
 
 Library
 -----------------------------------------------------------------------------

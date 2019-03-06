@@ -7,6 +7,7 @@ using UniRx;
 using UniRx.Async;
 using Modding;
 using XLua;
+using Cards;
 
 public class Test : MonoBehaviour
 {

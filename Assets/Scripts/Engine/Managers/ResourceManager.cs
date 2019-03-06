@@ -36,7 +36,6 @@ public static class ResourceManager
 	// 1) Allows to cast from UnityEngine.Object to T with "obj as T"
 	// 2) Allows to pass T to Resource.Load, otherwise there's an error
 	// 3) Allows to return null
-	// UNDONE: Cannot execute ResourceManager.Load from mods because of generics
 	public static T Load<T>(ResourceFolder folder, string file, bool modded = DefaultModding, bool merge = false) where T : class
 	{
 #if MODDING
