@@ -1,4 +1,5 @@
-﻿using System;
+﻿#if MODDING
+using System;
 using System.Reflection;
 using System.Collections;
 using System.Collections.Generic;
@@ -78,3 +79,4 @@ namespace Modding
 		//[DoNotGen]
 	}
 }
+#endif

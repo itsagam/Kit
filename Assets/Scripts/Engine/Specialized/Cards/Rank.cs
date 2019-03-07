@@ -21,14 +21,4 @@ namespace Cards
 		Three = 3,
 		Two = 2
 	}
-
-	public class RankComparer : IComparer<Card>
-	{
-		public int Compare(Card card1, Card card2)
-		{
-			int value1 = ((int) card1.Rank) * 100 + ((int) card1.Suit);
-			int value2 = ((int) card2.Rank) * 100 + ((int) card2.Suit);
-			return value1 - value2;
-		}
-	}
 }

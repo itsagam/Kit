@@ -7,13 +7,11 @@ using UniRx;
 using UniRx.Async;
 using Modding;
 using XLua;
-using Cards;
 
 public class Test : MonoBehaviour
 {
 	protected void Awake()
 	{
-		new CardSet().Fill().Shuffle().SortByRank().Log();
 	}
 
 	protected void Start()

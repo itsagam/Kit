@@ -14,7 +14,7 @@ namespace Modding.Parsers
 	//				(https://github.com/Unity-Technologies/UnityCsReference/blob/master/Modules/UnityWebRequest/Public/UnityWebRequest.bindings.cs)
 	// Problems:	DownloadHandlerAudioClip is sealed, so you can't derive from it
 	//				WWW._uwr is private so you cannot change to a custom web request with custom download handler
-	//				All data downloaing and posting is done internally from C++ and passed to DownloadHandler.ReceiveData which is protected
+	//				All data downloading and posting is done internally from C++ and passed to DownloadHandler.ReceiveData which is protected
 
 	public class AudioParser : ResourceParser
 	{
