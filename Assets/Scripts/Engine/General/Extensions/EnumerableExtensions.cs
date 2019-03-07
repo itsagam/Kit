@@ -18,7 +18,7 @@ public static class EnumerableExtensions
 			action(obj);
 	}
 
-	public static void Log<T>(this IEnumerable<T> enumerable, bool serialize = true)
+	public static void Log<T>(this IEnumerable<T> enumerable, bool serialize = false)
 	{
 		enumerable.ForEach(o => Debugger.Log(o, serialize));
 	}

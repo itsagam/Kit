@@ -13,6 +13,7 @@ public class Test : MonoBehaviour
 {
 	protected void Awake()
 	{
+		new CardSet().Fill().Shuffle().SortByRank().Log();
 	}
 
 	protected void Start()

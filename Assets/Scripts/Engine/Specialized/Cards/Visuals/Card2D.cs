@@ -15,7 +15,7 @@ namespace Cards
 
 		[SerializeField]
 		[HideInInspector]
-		protected Card card = new Card(Suit.Spade, Rank.Ace);
+		protected Card card;
 
 		protected SpriteRenderer spriteRenderer;
 

@@ -14,10 +14,10 @@ namespace Cards
 		public const int TileFaceUVStart = 103;
 		public const int TileFaceUVEnd = 135;
 		protected static Vector2[] originalUV;
-		
+
 		[SerializeField]
 		[HideInInspector]
-		protected Card card = new Card(Suit.Spade, Rank.Ace);
+		protected Card card;
 
 		protected Mesh mesh;
 

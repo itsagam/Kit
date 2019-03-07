@@ -98,13 +98,13 @@ public static class Debugger
 	}
 
 	[Conditional("UNITY_EDITOR"), Conditional("DEVELOPMENT_BUILD")]
-	public static void Log(object obj, bool serialize = true)
+	public static void Log(object obj, bool serialize = false)
 	{
 		Log(ObjectToString(obj, serialize));
 	}
 
 	[Conditional("UNITY_EDITOR"), Conditional("DEVELOPMENT_BUILD")]
-	public static void Log(string category, object obj, bool serialize = true)
+	public static void Log(string category, object obj, bool serialize = false)
 	{
 		Log(category, ObjectToString(obj, serialize));
 	}
