@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using System.Reflection;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.Networking;
@@ -32,10 +33,27 @@ public static class ResourceManager
 		= new Dictionary<(Type, ResourceFolder, string), WeakReference>();
 
 	#region Loading
-	// The "where" clause does three things:
-	// 1) Allows to cast from UnityEngine.Object to T with "obj as T"
-	// 2) Allows to pass T to Resource.Load, otherwise there's an error
-	// 3) Allows to return null
+
+	// Non-generics versions so Load can be called from mods, if required
+	public static object Load(Type type, ResourceFolder folder, string file, bool modded = DefaultModding, bool merge = false)
+	{
+		Type[] types = new Type[] { typeof(ResourceFolder), typeof(string), typeof(bool), typeof(bool)};
+		var method = typeof(ResourceManager).GetMethod("Load", types);
+		var genericMethod = method.MakeGenericMethod(type);
+		object result = genericMethod.Invoke(null, new object[] {folder, file, modded, merge} );
+		return result;
+	}
+
+	public static object LoadAsync(Type type, ResourceFolder folder, string file, bool modded = DefaultModding, bool merge = false)
+	{
+		Type[] types = new Type[] { typeof(ResourceFolder), typeof(string), typeof(bool), typeof(bool)};
+		var method = typeof(ResourceManager).GetMethod("LoadAsync", types);
+		var genericMethod = method.MakeGenericMethod(type);
+		object result = genericMethod.Invoke(null, new object[] { folder, file, modded, merge });
+		return result;
+	}
+
+	// The "where" clause does two things: allows to cast to & from UnityEngine.Object, and allows to return null
 	public static T Load<T>(ResourceFolder folder, string file, bool modded = DefaultModding, bool merge = false) where T : class
 	{
 #if MODDING
@@ -648,7 +666,7 @@ public static class ResourceManager
 		return GetPath(folder) + file;
 	}
 
-	public static string LocalToURLPath(string path)
+	private static string LocalToURLPath(string path)
 	{
 		if (!path.Contains("file://"))
 			path = "file://" + path;

@@ -12,6 +12,8 @@ public class Test : MonoBehaviour
 {
 	protected void Awake()
 	{
+		ModManager.LoadMods();
+		//CS.ResourceManager.Load(typeof(UE.Texture), CS.ResourceFolder.Resources, "Textures/test")
 	}
 
 	protected void Start()

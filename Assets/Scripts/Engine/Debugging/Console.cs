@@ -16,7 +16,7 @@ using XLua;
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
 public static class Console
 {
-	public static bool Enabled = false;
+	public static bool Enabled = true;
 	public static int Length = 10000;
 	public static int Depth = 2;
 	private const string Prefab = "Console/Console";
