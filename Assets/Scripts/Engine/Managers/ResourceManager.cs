@@ -33,97 +33,90 @@ public static class ResourceManager
 		= new Dictionary<(Type, ResourceFolder, string), WeakReference>();
 
 	#region Loading
-
-	// Non-generics versions so Load can be called from mods, if required
-	public static object Load(Type type, ResourceFolder folder, string file, bool modded = DefaultModding, bool merge = false)
+	public static T Load<T>(ResourceFolder folder, string file, bool modded = DefaultModding, bool merge = false)
 	{
-		Type[] types = new Type[] { typeof(ResourceFolder), typeof(string), typeof(bool), typeof(bool)};
-		var method = typeof(ResourceManager).GetMethod("Load", types);
-		var genericMethod = method.MakeGenericMethod(type);
-		object result = genericMethod.Invoke(null, new object[] {folder, file, modded, merge} );
-		return result;
+		return (T) Load(typeof(T), folder, file, modded, merge);
 	}
 
-	public static object LoadAsync(Type type, ResourceFolder folder, string file, bool modded = DefaultModding, bool merge = false)
-	{
-		Type[] types = new Type[] { typeof(ResourceFolder), typeof(string), typeof(bool), typeof(bool)};
-		var method = typeof(ResourceManager).GetMethod("LoadAsync", types);
-		var genericMethod = method.MakeGenericMethod(type);
-		object result = genericMethod.Invoke(null, new object[] { folder, file, modded, merge });
-		return result;
-	}
-
-	// The "where" clause does two things: allows to cast to & from UnityEngine.Object, and allows to return null
-	public static T Load<T>(ResourceFolder folder, string file, bool modded = DefaultModding, bool merge = false) where T : class
+	public static object Load(Type type, ResourceFolder folder, string file, bool modded = DefaultModding, bool merge = false) 
 	{
 #if MODDING
 		if (modded)
 		{
 			if (merge)
 			{
-				return LoadMerged<T>(folder, file);
+				return LoadMerged(type, folder, file);
 			}
 			else
 			{
-				T moddedFile = ModManager.Load<T>(folder, file);
+				object moddedFile = ModManager.Load(type, folder, file);
 				if (moddedFile != null)
 					return moddedFile;
 			}		
 		}
 #endif
-		return LoadUnmodded<T>(folder, file);
+		return LoadUnmodded(type, folder, file);
 	}
 
-	public static async UniTask<T> LoadAsync<T>(ResourceFolder folder, string file, bool modded = DefaultModding, bool merge = false) where T : class
+	public static async UniTask<T> LoadAsync<T>(ResourceFolder folder, string file, bool modded = DefaultModding, bool merge = false)
+	{
+		return (T) await LoadAsync(typeof(T), folder, file, modded, merge);
+	}
+
+	public static async UniTask<object> LoadAsync(Type type, ResourceFolder folder, string file, bool modded = DefaultModding, bool merge = false)
 	{
 #if MODDING
 		if (modded)
 		{
 			if (merge)
 			{
-				return await LoadMergedAsync<T>(folder, file);
+				return await LoadMergedAsync(type, folder, file);
 			}
 			else
 			{
-				T moddedFile = await ModManager.LoadAsync<T>(folder, file);
+				object moddedFile = await ModManager.LoadAsync(type, folder, file);
 				if (moddedFile != null)
 					return moddedFile;
 			}
 		}
 #endif
-		return await LoadUnmoddedAsync<T>(folder, file);
+		return await LoadUnmoddedAsync(type, folder, file);
 	}
 
-	private static T LoadCached<T>(ResourceFolder folder, string file) where T : class
+	private static object LoadCached(Type type, ResourceFolder folder, string file)
 	{
-		if (cachedResources.TryGetValue((typeof(T), folder, file), out WeakReference weakReference))
+		if (cachedResources.TryGetValue((type, folder, file), out WeakReference weakReference))
 		{
 			object reference = weakReference.Target;
 			if (reference != null)
 			{
 				ResourceLoaded?.Invoke(folder, file, reference, false);
-				return (T) reference;
+				return reference;
 			}
 		}
 		return null;
 	}
 
-	public static T LoadUnmodded<T>(ResourceFolder folder, string file) where T : class
+	public static T LoadUnmodded<T>(ResourceFolder folder, string file)
 	{
-		T reference = LoadCached<T>(folder, file);
+		return (T) LoadUnmodded(typeof(T), folder, file);
+	}
+
+	public static object LoadUnmodded(Type type, ResourceFolder folder, string file)
+	{
+		object reference = LoadCached(type, folder, file);
 		if (reference != null)
 			return reference;
 
-		Type type = typeof(T);
 		if (folder == ResourceFolder.Resources)
 		{
 			string fileNoExt = Path.ChangeExtension(file, null);
-			reference = Resources.Load(fileNoExt, type) as T;
+			reference = Resources.Load(fileNoExt, type);
 		}
 		else
 		{
 			string fullPath = GetPath(folder, file);
-			reference = Load<T>(fullPath).reference;
+			reference = Load(type, fullPath).reference;
 		}
 
 		if (reference != null)
@@ -135,22 +128,26 @@ public static class ResourceManager
 		return reference;
 	}
 
-	public static async UniTask<T> LoadUnmoddedAsync<T>(ResourceFolder folder, string file) where T : class
+	public static async UniTask<T> LoadUnmoddedAsync<T>(ResourceFolder folder, string file)
 	{
-		T reference = LoadCached<T>(folder, file);
+		return (T) await LoadUnmoddedAsync(typeof(T), folder, file);
+	}
+
+	public static async UniTask<object> LoadUnmoddedAsync(Type type, ResourceFolder folder, string file)
+	{
+		object reference = LoadCached(type, folder, file);
 		if (reference != null)
 			return reference;
 
-		Type type = typeof(T);
 		if (folder == ResourceFolder.Resources)
 		{
 			string fileNoExt = Path.ChangeExtension(file, null);
-			reference = (await Resources.LoadAsync(fileNoExt, type)) as T;
+			reference = (await Resources.LoadAsync(fileNoExt, type));
 		}
 		else
 		{
 			string fullPath = GetPath(folder, file);
-			reference = (await LoadAsync<T>(fullPath)).reference;
+			reference = (await LoadAsync(type, fullPath)).reference;
 		}
 
 		if (reference != null)
@@ -162,9 +159,14 @@ public static class ResourceManager
 	}
 
 #if MODDING
-	public static T LoadMerged<T>(ResourceFolder folder, string file) where T : class
+	public static T LoadMerged<T>(ResourceFolder folder, string file)
 	{
-		T reference = LoadCached<T>(folder, file);
+		return (T) LoadMerged(typeof(T), folder, file);
+	}
+
+	public static object LoadMerged(Type type, ResourceFolder folder, string file)
+	{
+		object reference = LoadCached(type, folder, file);
 		if (reference != null)
 			return reference;
 
@@ -173,19 +175,19 @@ public static class ResourceManager
 		if (folder == ResourceFolder.Resources)
 		{
 			string fileNoExt = Path.ChangeExtension(file, null);
-			reference = Resources.Load(fileNoExt) as T;
+			reference = Resources.Load(fileNoExt, type);
 			if (reference == null)
 				return null;
-			parser = RankParsers(fullPath, typeof(T)).FirstOrDefault().parser;
+			parser = RankParsers(type, fullPath).FirstOrDefault().parser;
 		}
 		else
 		{
-			(reference, parser) = Load<T>(fullPath);
+			(reference, parser) = Load(type, fullPath);
 			if (reference == null)
 				return null;
 		}
 
-		T merged = reference;
+		object merged = reference;
 		if (parser != null)
 		{
 			try
@@ -208,14 +210,19 @@ public static class ResourceManager
 				Debugger.Log("ResourceManager", e.Message);
 			}
 		}
-		cachedResources[(typeof(T), folder, file)] = new WeakReference(merged);
+		cachedResources[(type, folder, file)] = new WeakReference(merged);
 		ResourceLoaded?.Invoke(folder, file, merged, true);
 		return merged;
 	}
 
-	public static async UniTask<T> LoadMergedAsync<T>(ResourceFolder folder, string file) where T : class
+	public static async UniTask<T> LoadMergedAsync<T>(ResourceFolder folder, string file)
 	{
-		T reference = LoadCached<T>(folder, file);
+		return (T) await LoadMergedAsync(typeof(T), folder, file);
+	}
+
+	public static async UniTask<object> LoadMergedAsync(Type type, ResourceFolder folder, string file)
+	{
+		object reference = LoadCached(type, folder, file);
 		if (reference != null)
 			return reference;
 
@@ -224,19 +231,19 @@ public static class ResourceManager
 		if (folder == ResourceFolder.Resources)
 		{
 			string fileNoExt = Path.ChangeExtension(file, null);
-			reference = (await Resources.LoadAsync(fileNoExt)) as T;
+			reference = (await Resources.LoadAsync(fileNoExt, type));
 			if (reference == null)
 				return null;
-			parser = RankParsers(fullPath, typeof(T)).FirstOrDefault().parser;
+			parser = RankParsers(type, fullPath).FirstOrDefault().parser;
 		}
 		else
 		{
-			(reference, parser) = await LoadAsync<T>(fullPath);
+			(reference, parser) = await LoadAsync(type, fullPath);
 			if (reference == null)
 				return null;
 		}
 
-		T merged = reference;
+		object merged = reference;
 		if (parser != null)
 		{
 			try
@@ -259,17 +266,23 @@ public static class ResourceManager
 				Debugger.Log("ResourceManager", e.Message);
 			}
 		}
-		cachedResources[(typeof(T), folder, file)] = new WeakReference(merged);
+		cachedResources[(type, folder, file)] = new WeakReference(merged);
 		ResourceLoaded?.Invoke(folder, file, merged, true);
 		return merged;
 	}
 #endif
 
-	public static (T reference, ResourceParser parser) Load<T>(string fullPath) where T : class
+	public static (T reference, ResourceParser parser) Load<T>(string fullPath)
+	{
+		var (reference, parser) = Load(typeof(T), fullPath);
+		return ((T) reference, parser);
+	}
+
+	public static (object reference, ResourceParser parser) Load(Type type, string fullPath)
 	{
 		string text = null;
 		byte[] bytes = null;
-		foreach (var (parser, certainty) in RankParsers(fullPath, typeof(T)))
+		foreach (var (parser, certainty) in RankParsers(type, fullPath))
 		{
 			try
 			{
@@ -277,13 +290,13 @@ public static class ResourceManager
 				{
 					if (text == null)
 						text = ReadText(fullPath);
-					return text != null ? (parser.Read<T>(text, fullPath), parser) : default;
+					return text != null ? (parser.Read(type, text, fullPath), parser) : default;
 				}
 				else
 				{
 					if (bytes == null)
 						bytes = ReadBytes(fullPath);
-					return bytes != null ? (parser.Read<T>(bytes, fullPath), parser) : default;
+					return bytes != null ? (parser.Read(type, bytes, fullPath), parser) : default;
 				}
 			}
 			catch (Exception)
@@ -293,11 +306,17 @@ public static class ResourceManager
 		return default;
 	}
 
-	public static async UniTask<(T reference, ResourceParser parser)> LoadAsync<T>(string fullPath) where T : class
+	public static async UniTask<(T reference, ResourceParser parser)> LoadAsync<T>(string fullPath)
+	{
+		var (reference, parser) = await LoadAsync(typeof(T), fullPath);
+		return ((T) reference, parser);
+	}
+
+	public static async UniTask<(object reference, ResourceParser parser)> LoadAsync(Type type, string fullPath)
 	{
 		string text = null;
 		byte[] bytes = null;
-		foreach (var (parser, certainty) in RankParsers(fullPath, typeof(T)))
+		foreach (var (parser, certainty) in RankParsers(type, fullPath))
 		{
 			try
 			{
@@ -305,13 +324,13 @@ public static class ResourceManager
 				{
 					if (text == null)
 						text = await ReadTextAsync(fullPath);
-					return text != null ? (parser.Read<T>(text, fullPath), parser) : default;
+					return text != null ? (parser.Read(type, text, fullPath), parser) : default;
 				}
 				else
 				{
 					if (bytes == null)
 						bytes = await ReadBytesAsync(fullPath);
-					return bytes != null ? (parser.Read<T>(bytes, fullPath), parser) : default;
+					return bytes != null ? (parser.Read(type, bytes, fullPath), parser) : default;
 				}
 			}
 			catch (Exception)
@@ -502,7 +521,7 @@ public static class ResourceManager
 
 	public static bool Save(string fullPath, object contents)
 	{
-		foreach (var (parser, certainty) in RankParsers(fullPath, contents.GetType()))
+		foreach (var (parser, certainty) in RankParsers(contents.GetType(), fullPath))
 		{
 			try
 			{
@@ -520,7 +539,7 @@ public static class ResourceManager
 
 	public static UniTask<bool> SaveAsync(string fullPath, object contents)
 	{
-		foreach (var (parser, certainty) in RankParsers(fullPath, contents.GetType()))
+		foreach (var (parser, certainty) in RankParsers(contents.GetType(), fullPath))
 		{
 			try
 			{
@@ -649,9 +668,9 @@ public static class ResourceManager
 	#endregion
 
 	#region Other
-	private static IEnumerable<(ResourceParser parser, float certainty)> RankParsers(string fullPath, Type type)
+	private static IEnumerable<(ResourceParser parser, float certainty)> RankParsers(Type type, string fullPath)
 	{
-		return ModManager.Parsers.Select(parser => (parser, certainty: parser.CanOperate(fullPath, type)))
+		return ModManager.Parsers.Select(parser => (parser, certainty: parser.CanOperate(type, fullPath)))
 			.Where(d => d.certainty > 0)
 			.OrderByDescending(d => d.certainty);
 	}

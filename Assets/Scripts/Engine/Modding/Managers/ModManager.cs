@@ -335,23 +335,23 @@ namespace Modding
 				folderToString[value] = Enum.GetName(typeof(ResourceFolder), value) + "/";
 		}
 
-		private static T LoadCached<T>(ResourceFolder folder, string file) where T : class
+		private static object LoadCached(Type type, ResourceFolder folder, string file)
 		{
-			if (cachedResources.TryGetValue((typeof(T), folder, file), out ResourceInfo resource))
+			if (cachedResources.TryGetValue((type, folder, file), out ResourceInfo resource))
 			{
 				object reference = resource.Reference.Target;
 				if (reference != null)
 				{
 					ResourceLoaded?.Invoke(folder, file, resource, false);
-					return (T) reference;
+					return reference;
 				}
 			}
 			return null;
 		}
 
-		public static T Load<T>(ResourceFolder folder, string file) where T : class
+		public static object Load(Type type, ResourceFolder folder, string file)
 		{
-			T cachedReference = LoadCached<T>(folder, file);
+			object cachedReference = LoadCached(type, folder, file);
 			if (cachedReference != null)
 				return cachedReference;
 
@@ -360,11 +360,11 @@ namespace Modding
 				string path = GetModdingPath(folder, file);
 				foreach (Mod mod in EnabledMods)
 				{
-					var (reference, filePath, parser) = mod.Load<T>(path);
+					var (reference, filePath, parser) = mod.Load(type, path);
 					if (reference != null)
 					{
 						ResourceInfo resource = new ResourceInfo(mod, filePath, parser, reference);
-						cachedResources[(typeof(T), folder, file)] = resource;
+						cachedResources[(type, folder, file)] = resource;
 						ResourceLoaded?.Invoke(folder, file, resource, true);
 						return reference;
 					}
@@ -374,9 +374,9 @@ namespace Modding
 			return null;
 		}
 
-		public static async UniTask<T> LoadAsync<T>(ResourceFolder folder, string file) where T : class
+		public static async UniTask<object> LoadAsync(Type type, ResourceFolder folder, string file)
 		{
-			T cachedReference = LoadCached<T>(folder, file);
+			object cachedReference = LoadCached(type, folder, file);
 			if (cachedReference != null)
 				return cachedReference;
 
@@ -385,11 +385,11 @@ namespace Modding
 				string path = GetModdingPath(folder, file);
 				foreach (Mod mod in EnabledMods)
 				{
-					var (reference, filePath, parser) = await mod.LoadAsync<T>(path);
+					var (reference, filePath, parser) = await mod.LoadAsync(type, path);
 					if (reference != null)
 					{
 						ResourceInfo resource = new ResourceInfo(mod, filePath, parser, reference);
-						cachedResources[(typeof(T), folder, file)] = resource;
+						cachedResources[(type, folder, file)] = resource;
 						ResourceLoaded?.Invoke(folder, file, resource, true);
 						return reference;
 					}
@@ -399,34 +399,34 @@ namespace Modding
 			return null;
 		}
 
-		public static List<T> LoadAll<T>(ResourceFolder folder, string file) where T : class
+		public static List<object> LoadAll(Type type, ResourceFolder folder, string file)
 		{
-			return LoadAll<T>(GetModdingPath(folder, file));
+			return LoadAll(type, GetModdingPath(folder, file));
 		}
 
-		public static List<T> LoadAll<T>(string path) where T : class
+		public static List<object> LoadAll(Type type, string path)
 		{
-			List<T> all = new List<T>();
+			List<object> all = new List<object>();
 			foreach (Mod mod in EnabledMods)
 			{
-				var (reference, filePath, parser) = mod.Load<T>(path);
+				var (reference, filePath, parser) = mod.Load(type, path);
 				if (reference != null)
 					all.Add(reference);
 			}
 			return all;
 		}
 
-		public static UniTask<List<T>> LoadAllAsync<T>(ResourceFolder folder, string file) where T : class
+		public static UniTask<List<object>> LoadAllAsync(Type type, ResourceFolder folder, string file) 
 		{
-			return LoadAllAsync<T>(GetModdingPath(folder, file));
+			return LoadAllAsync(type, GetModdingPath(folder, file));
 		}
 
-		public static async UniTask<List<T>> LoadAllAsync<T>(string path) where T : class
+		public static async UniTask<List<object>> LoadAllAsync(Type type, string path)
 		{
-			List<T> all = new List<T>();
+			List<object> all = new List<object>();
 			foreach (Mod mod in EnabledMods)
 			{
-				var (reference, filePath, parser) = await mod.LoadAsync<T>(path);
+				var (reference, filePath, parser) = await mod.LoadAsync(type, path);
 				if (reference != null)
 					all.Add(reference);
 			}

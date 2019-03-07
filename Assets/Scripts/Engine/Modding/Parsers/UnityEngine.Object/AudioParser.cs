@@ -34,9 +34,9 @@ namespace Modding.Parsers
 		}
 		public override OperateType OperateWith => OperateType.Bytes;
 
-		public override T Read<T>(object data, string path)
+		public override object Read(Type type, object data, string path)
 		{
-			return WavUtility.ToAudioClip((byte[]) data, 0, path) as T;
+			return WavUtility.ToAudioClip((byte[]) data, 0, path);
 		}
 	}
 }

@@ -25,13 +25,13 @@ namespace Modding.Parsers
 		}
 		public override OperateType OperateWith => OperateType.Bytes;
 
-		public override T Read<T>(object data, string path)
+		public override object Read(Type type, object data, string path)
 		{
 			Texture2D texture = null;
 			texture = new Texture2D(0, 0);
 			texture.LoadImage((byte[]) data);
 			texture.name = path;
-			return texture as T;
+			return texture;
 		}
 	}
 }

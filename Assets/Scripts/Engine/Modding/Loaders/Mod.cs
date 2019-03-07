@@ -75,13 +75,13 @@ namespace Modding
 		#endregion
 
 		#region Resources
-		public virtual (T reference, string filePath, ResourceParser parser) Load<T>(string path) where T : class
+		public virtual (object reference, string filePath, ResourceParser parser) Load(Type type, string path)
 		{
 			IEnumerable<string> matchingFiles = FindFiles(path);
 			if (matchingFiles == null)
 				return default;
 
-			var certainties = RankParsers(matchingFiles, typeof(T));
+			var certainties = RankParsers(type, matchingFiles);
 			string text = null;
 			byte[] bytes = null;
 			foreach (var (filePath, parser, certainty) in certainties)
@@ -92,13 +92,13 @@ namespace Modding
 					{
 						if (bytes == null)
 							bytes = ReadBytes(filePath);
-						return (parser.Read<T>(bytes, filePath), filePath, parser);
+						return (parser.Read(type, bytes, filePath), filePath, parser);
 					}
 					else
 					{
 						if (text == null)
 							text = ReadText(filePath);
-						return (parser.Read<T>(text, filePath), filePath, parser);
+						return (parser.Read(type, text, filePath), filePath, parser);
 					}
 				}
 				catch
@@ -109,13 +109,13 @@ namespace Modding
 			return default;
 		}
 
-		public virtual async UniTask<(T reference, string filePath, ResourceParser parser)> LoadAsync<T>(string path) where T : class
+		public virtual async UniTask<(object reference, string filePath, ResourceParser parser)> LoadAsync(Type type, string path)
 		{
 			IEnumerable<string> matchingFiles = FindFiles(path);
 			if (matchingFiles == null)
 				return default;
 
-			var certainties = RankParsers(matchingFiles, typeof(T));
+			var certainties = RankParsers(type, matchingFiles);
 			string text = null;
 			byte[] bytes = null;
 			foreach (var (filePath, parser, certainty) in certainties)
@@ -126,13 +126,13 @@ namespace Modding
 					{
 						if (bytes == null)
 							bytes = await ReadBytesAsync(filePath);
-						return (parser.Read<T>(bytes, filePath), filePath, parser);
+						return (parser.Read(type, bytes, filePath), filePath, parser);
 					}
 					else
 					{
 						if (text == null)
 							text = await ReadTextAsync(filePath);
-						return (parser.Read<T>(text, filePath), filePath, parser);
+						return (parser.Read(type, text, filePath), filePath, parser);
 					}
 				}
 				catch
@@ -143,9 +143,9 @@ namespace Modding
 			return default;
 		}
 
-		protected IEnumerable<(string filePath, ResourceParser parser, float certainty)> RankParsers(IEnumerable<string> matchingFiles, Type type)
+		protected IEnumerable<(string filePath, ResourceParser parser, float certainty)> RankParsers(Type type, IEnumerable<string> matchingFiles)
 		{
-			return matchingFiles.SelectMany(filePath => ModManager.Parsers.Select(parser => (filePath, parser, certainty: parser.CanOperate(filePath, type))))
+			return matchingFiles.SelectMany(filePath => ModManager.Parsers.Select(parser => (filePath, parser, certainty: parser.CanOperate(type, filePath))))
 								.Where(d => d.certainty > 0)
 								.OrderByDescending(d => d.certainty);
 		}

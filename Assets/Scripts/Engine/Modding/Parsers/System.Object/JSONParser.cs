@@ -19,9 +19,9 @@ namespace Modding.Parsers
 		}
 		public override OperateType OperateWith => OperateType.Text;
 
-		public override T Read<T>(object data, string path = null)
+		public override object Read(Type type, object data, string path = null)
 		{
-			return FromJson<T>((string) data);
+			return JsonConvert.DeserializeObject((string) data, type);
 		}
 
 		public override object Write(object data, string path = null)

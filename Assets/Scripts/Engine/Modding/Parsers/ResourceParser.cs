@@ -19,7 +19,7 @@ namespace Modding.Parsers
 		public abstract IEnumerable<string> SupportedExtensions { get; }
 		public abstract OperateType OperateWith { get; }
 
-		public virtual float CanOperate(string path, Type type)
+		public virtual float CanOperate(Type type, string path)
 		{
 			float certainty = 0;
 
@@ -37,7 +37,7 @@ namespace Modding.Parsers
 			throw new NotImplementedException();
 		}
 
-		public virtual T Read<T>(object data, string path = null) where T : class
+		public virtual object Read(Type type, object data, string path = null)
 		{
 			throw new NotImplementedException();
 		}

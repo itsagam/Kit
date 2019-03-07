@@ -23,11 +23,11 @@ namespace Modding.Parsers
 		}
 		public override OperateType OperateWith => OperateType.Text;
 
-		public override T Read<T>(object data, string path)
+		public override object Read(Type type, object data, string path)
 		{
 			TextAsset asset = new TextAsset((string) data);
 			asset.name = path;
-			return asset as T;
+			return asset;
 		}
 	}
 }
