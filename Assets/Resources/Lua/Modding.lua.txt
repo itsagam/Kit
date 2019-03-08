@@ -9,16 +9,8 @@ os.rename = nil
 os.tmpname = nil
 
 -- File-handling
-function readText(file)
-	return self:ReadText(file)
-end
-
-function readBytes(file)
-	return self:ReadBytes(file)
-end
-
 function loadfile(file)
-	return load(readBytes(file))
+	return load(self:ReadBytes(file))
 end
 
 function dofile(file)

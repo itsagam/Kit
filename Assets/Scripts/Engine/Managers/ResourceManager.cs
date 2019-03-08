@@ -369,13 +369,18 @@ public static class ResourceManager
 
 	public static bool Unload<T>(ResourceFolder folder, string file)
 	{
+		return Unload(typeof(T), folder, file);
+	}
+
+	public static bool Unload(Type type, ResourceFolder folder, string file)
+	{
 
 #if MODDING
-		if (ModManager.Unload<T>(folder, file))
+		if (ModManager.Unload(type, folder, file))
 			return true;
 #endif
 
-		var key = (typeof(T), folder, file);
+		var key = (type, folder, file);
 		if (cachedResources.TryGetValue(key, out WeakReference weakReference))
 		{
 			if (weakReference.Target is UnityEngine.Object unityObject)

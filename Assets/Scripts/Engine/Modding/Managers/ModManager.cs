@@ -433,9 +433,9 @@ namespace Modding
 			return all;
 		}
 
-		public static ResourceInfo GetResourceInfo<T>(ResourceFolder folder, string file)
+		public static ResourceInfo GetResourceInfo(Type type, ResourceFolder folder, string file)
 		{
-			if (cachedResources.TryGetValue((typeof(T), folder, file), out ResourceInfo resource))
+			if (cachedResources.TryGetValue((type, folder, file), out ResourceInfo resource))
 				return resource;
 			return default;
 		}
@@ -662,9 +662,9 @@ namespace Modding
 			return false;
 		}
 
-		public static bool Unload<T>(ResourceFolder folder, string file)
+		public static bool Unload(Type type, ResourceFolder folder, string file)
 		{
-			var key = (typeof(T), folder, file);
+			var key = (type, folder, file);
 			if (cachedResources.TryGetValue(key, out ResourceInfo resource))
 			{
 				UnloadInternal(resource.Reference.Target);

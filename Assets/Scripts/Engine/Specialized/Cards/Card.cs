@@ -59,13 +59,6 @@ namespace Cards
 			other.Rank = rank;
 		}
 
-		public static void Swap(ref Card card1, ref Card card2)
-		{
-			Card tmp = card1;
-			card1 = card2;
-			card2 = tmp;
-		}
-
 		public static bool operator ==(Card card1, Card card2)
 		{
 			return card1.Suit == card2.Suit && card1.Rank == card2.Rank;
@@ -78,22 +71,22 @@ namespace Cards
 
 		public static bool operator >(Card card1, Card card2)
 		{
-			return card1.CompareTo(card2) > 0;
+			return card1.Suit == card2.Suit && card1.CompareTo(card2) > 0;
 		}
 
 		public static bool operator <(Card card1, Card card2)
 		{
-			return card1.CompareTo(card2) < 0;
+			return card1.Suit == card2.Suit && card1.CompareTo(card2) < 0;
 		}
 
 		public static bool operator >=(Card card1, Card card2)
 		{
-			return card1.CompareTo(card2) >= 0;
+			return card1.Suit == card2.Suit && card1.CompareTo(card2) >= 0;
 		}
 
 		public static bool operator <=(Card card1, Card card2)
 		{
-			return card1.CompareTo(card2) <= 0;
+			return card1.Suit == card2.Suit && card1.CompareTo(card2) <= 0;
 		}
 
 		public static bool operator ==(Card card, Suit suit)
@@ -149,21 +142,6 @@ namespace Cards
 		public int CompareTo(Suit suit)
 		{
 			return Suit - suit;
-		}
-
-		public int CompareTo(Card other, Comparison<Card> comparison)
-		{
-			return comparison(this, other);
-		}
-
-		public int CompareTo(Rank rank, Comparison<Rank> comparison)
-		{
-			return comparison(Rank, rank);
-		}
-
-		public int CompareTo(Suit suit, Comparison<Suit> comparison)
-		{
-			return comparison(Suit, suit);
 		}
 
 		public bool Equals(Card other)

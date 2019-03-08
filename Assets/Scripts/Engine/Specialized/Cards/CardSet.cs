@@ -60,6 +60,12 @@ namespace Cards
 			return this;
 		}
 
+		public new CardSet Sort()
+		{
+			base.Sort((card1, card2) => card1.CompareTo(card2.Suit) * 100 + card1.CompareTo(card2.Rank));
+			return this;
+		}
+
 		public new CardSet Sort(Comparison<Card> comparison)
 		{
 			base.Sort(comparison);
@@ -68,18 +74,18 @@ namespace Cards
 
 		public CardSet SortByRank()
 		{
-			return Sort((card1, card2) => card1.CompareTo(card2.Rank));
+			return Sort((c1, c2) => c1.CompareTo(c2.Rank));
 		}
 
 		public CardSet SortByRank(Comparison<Rank> comparison)
 		{
-			base.Sort((card1, card2) => comparison(card1.Rank, card2.Rank));
+			base.Sort((c1, c2) => comparison(c1.Rank, c2.Rank));
 			return this;
 		}
 
 		public CardSet SortBySuit()
 		{
-			return Sort((card1, card2) => card1.CompareTo(card2.Suit));
+			return Sort((c1, c2) => c1.CompareTo(c2.Suit));
 		}
 
 		public CardSet SortBySuit(Comparison<Suit> comparison)
@@ -108,7 +114,15 @@ namespace Cards
 			return this.Where(c => c == rank);
 		}
 
-		public IEnumerable<Card> GetAboveRank(Rank rank, bool inclusive = true)
+		public IEnumerable<Card> GetAbove(Card card, bool inclusive = true)
+		{
+			if (inclusive)
+				return this.Where(c => c >= card);
+			else
+				return this.Where(c => c > card);
+		}
+
+		public IEnumerable<Card> GetAbove(Rank rank, bool inclusive = true)
 		{
 			if (inclusive)
 				return this.Where(c => c >= rank);
@@ -116,15 +130,31 @@ namespace Cards
 				return this.Where(c => c > rank);
 		}
 
-		public IEnumerable<Card> GetAboveRank(Rank rank, Comparison<Rank> comparison, bool inclusive = true)
+		public IEnumerable<Card> GetAbove(Card card, Comparison<Card> comparison, bool inclusive = true)
 		{
 			if (inclusive)
-				return this.Where(c => c.CompareTo(rank, comparison) >= 0);
+				return this.Where(c => comparison(c, card) >= 0);
 			else
-				return this.Where(c => c.CompareTo(rank, comparison) > 0);
+				return this.Where(c => comparison(c, card) > 0);
 		}
 
-		public IEnumerable<Card> GetBelowRank(Rank rank, bool inclusive = true)
+		public IEnumerable<Card> GetAbove(Rank rank, Comparison<Rank> comparison, bool inclusive = true)
+		{
+			if (inclusive)
+				return this.Where(c => comparison(c.Rank, rank) >= 0);
+			else
+				return this.Where(c => comparison(c.Rank, rank) > 0);
+		}
+
+		public IEnumerable<Card> GetBelow(Card card, bool inclusive = true)
+		{
+			if (inclusive)
+				return this.Where(c => c <= card);
+			else
+				return this.Where(c => c < card);
+		}
+
+		public IEnumerable<Card> GetBelow(Rank rank, bool inclusive = true)
 		{
 			if (inclusive)
 				return this.Where(c => c <= rank);
@@ -132,12 +162,60 @@ namespace Cards
 				return this.Where(c => c < rank);
 		}
 
-		public IEnumerable<Card> GetBelowRank(Rank rank, Comparison<Rank> comparison, bool inclusive = true)
+		public IEnumerable<Card> GetBelow(Card card, Comparison<Card> comparison, bool inclusive = true)
 		{
 			if (inclusive)
-				return this.Where(c => c.CompareTo(rank, comparison) <= 0);
+				return this.Where(c => comparison(c, card) <= 0);
 			else
-				return this.Where(c => c.CompareTo(rank, comparison) < 0);
+				return this.Where(c => comparison(c, card) < 0);
+		}
+
+		public IEnumerable<Card> GetBelow(Rank rank, Comparison<Rank> comparison, bool inclusive = true)
+		{
+			if (inclusive)
+				return this.Where(c => comparison(c.Rank, rank) <= 0);
+			else
+				return this.Where(c => comparison(c.Rank, rank) < 0);
+		}
+
+		public Card GetHighest()
+		{
+			return this.Max();
+		}
+
+		public Card GetHightest(Suit suit)
+		{
+			return GetBySuit(suit).Max();
+		}
+		
+		public Card GetHighest(Comparison<Card> comparison)
+		{
+			return this.Aggregate((c1, c2) => comparison(c1, c2) > 0 ? c1 : c2);
+		}
+
+		public Card GetHighest(Comparison<Rank> comparison)
+		{
+			return this.Aggregate((c1, c2) => comparison(c1.Rank, c2.Rank) > 0 ? c1 : c2);
+		}
+
+		public Card GetLowest()
+		{
+			return this.Min();
+		}
+
+		public Card GetLowest(Suit suit)
+		{
+			return GetBySuit(suit).Min();
+		}
+		
+		public Card GetLowest(Comparison<Card> comparison)
+		{
+			return this.Aggregate((c1, c2) => comparison(c1, c2) < 0 ? c1 : c2);
+		}
+
+		public Card GetLowest(Comparison<Rank> comparison)
+		{
+			return this.Aggregate((c1, c2) => comparison(c1.Rank, c2.Rank) < 0 ? c1 : c2);
 		}
 
 		public CardSet Move(List<Card> to)
@@ -159,12 +237,8 @@ namespace Cards
 
 		public bool Move(List<Card> to, IEnumerable<Card> cards)
 		{
-			if (Remove(cards))
-			{
-				to.AddRange(cards);
-				return true;
-			}
-			return false;
+			to.AddRange(cards);
+			return Remove(cards);
 		}
 		
 		public Card Deal()
