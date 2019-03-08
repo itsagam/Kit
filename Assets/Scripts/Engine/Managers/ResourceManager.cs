@@ -116,7 +116,7 @@ public static class ResourceManager
 		else
 		{
 			string fullPath = GetPath(folder, file);
-			reference = Load(type, fullPath).reference;
+			reference = LoadEx(type, fullPath).reference;
 		}
 
 		if (reference != null)
@@ -147,7 +147,7 @@ public static class ResourceManager
 		else
 		{
 			string fullPath = GetPath(folder, file);
-			reference = (await LoadAsync(type, fullPath)).reference;
+			reference = (await LoadExAsync(type, fullPath)).reference;
 		}
 
 		if (reference != null)
@@ -182,7 +182,7 @@ public static class ResourceManager
 		}
 		else
 		{
-			(reference, parser) = Load(type, fullPath);
+			(reference, parser) = LoadEx(type, fullPath);
 			if (reference == null)
 				return null;
 		}
@@ -238,7 +238,7 @@ public static class ResourceManager
 		}
 		else
 		{
-			(reference, parser) = await LoadAsync(type, fullPath);
+			(reference, parser) = await LoadExAsync(type, fullPath);
 			if (reference == null)
 				return null;
 		}
@@ -272,13 +272,23 @@ public static class ResourceManager
 	}
 #endif
 
-	public static (T reference, ResourceParser parser) Load<T>(string fullPath)
+	public static T Load<T>(string fullPath)
 	{
-		var (reference, parser) = Load(typeof(T), fullPath);
+		return (T) LoadEx(typeof(T), fullPath).reference;
+	}
+
+	public static object Load(Type type, string fullPath)
+	{
+		return LoadEx(type, fullPath).reference;
+	}
+
+	public static (T reference, ResourceParser parser) LoadEx<T>(string fullPath)
+	{
+		var (reference, parser) = LoadEx(typeof(T), fullPath);
 		return ((T) reference, parser);
 	}
 
-	public static (object reference, ResourceParser parser) Load(Type type, string fullPath)
+	public static (object reference, ResourceParser parser) LoadEx(Type type, string fullPath)
 	{
 		string text = null;
 		byte[] bytes = null;
@@ -306,13 +316,23 @@ public static class ResourceManager
 		return default;
 	}
 
-	public static async UniTask<(T reference, ResourceParser parser)> LoadAsync<T>(string fullPath)
+	public static async UniTask<T> LoadAsync<T>(string fullPath)
 	{
-		var (reference, parser) = await LoadAsync(typeof(T), fullPath);
+		return (T) (await LoadExAsync(typeof(T), fullPath)).reference;
+	}
+
+	public static async UniTask<object> LoadAsync(Type type, string fullPath)
+	{
+		return (await LoadExAsync(type, fullPath)).reference;
+	}
+
+	public static async UniTask<(T reference, ResourceParser parser)> LoadExAsync<T>(string fullPath)
+	{
+		var (reference, parser) = await LoadExAsync(typeof(T), fullPath);
 		return ((T) reference, parser);
 	}
 
-	public static async UniTask<(object reference, ResourceParser parser)> LoadAsync(Type type, string fullPath)
+	public static async UniTask<(object reference, ResourceParser parser)> LoadExAsync(Type type, string fullPath)
 	{
 		string text = null;
 		byte[] bytes = null;

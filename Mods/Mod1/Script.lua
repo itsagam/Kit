@@ -1,0 +1,1 @@
+print(self:Load("Resources/Textures/test"))

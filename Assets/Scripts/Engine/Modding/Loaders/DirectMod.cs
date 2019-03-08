@@ -20,7 +20,7 @@ namespace Modding.Loaders
 			try
 			{
 				DirectMod mod = new DirectMod(path);
-				if (mod.Load())
+				if (mod.LoadMetadata())
 					return mod;
 			}
 			catch (Exception)
@@ -39,7 +39,7 @@ namespace Modding.Loaders
 			try
 			{
 				DirectMod mod = new DirectMod(path);
-				if (await mod.LoadAsync())
+				if (await mod.LoadMetadataAsync())
 					return mod;
 			}
 			catch (Exception)

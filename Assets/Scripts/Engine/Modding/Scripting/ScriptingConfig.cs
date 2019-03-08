@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using XLua;
 
-namespace Modding
+namespace Modding.Scripting
 {
 	public static class ScriptingConfig
 	{

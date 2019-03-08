@@ -133,6 +133,13 @@ namespace Modding
 				folder += "/";
 			return folder;
 		}
+
+		// The "+" operator and Path.Combine are really costly and have a huge perfomance impact, thus this
+		private static void CacheFolderNames()
+		{
+			foreach (ResourceFolder value in Enum.GetValues(typeof(ResourceFolder)))
+				folderToString[value] = Enum.GetName(typeof(ResourceFolder), value) + "/";
+		}
 		#endregion
 
 		#region Mod-loading
@@ -328,13 +335,6 @@ namespace Modding
 		#endregion
 
 		#region Resource-loading
-		// The "+" operator and Path.Combine are really costly and have a huge perfomance impact, thus this
-		private static void CacheFolderNames()
-		{
-			foreach (ResourceFolder value in Enum.GetValues(typeof(ResourceFolder)))
-				folderToString[value] = Enum.GetName(typeof(ResourceFolder), value) + "/";
-		}
-
 		private static object LoadCached(Type type, ResourceFolder folder, string file)
 		{
 			if (cachedResources.TryGetValue((type, folder, file), out ResourceInfo resource))
@@ -360,7 +360,7 @@ namespace Modding
 				string path = GetModdingPath(folder, file);
 				foreach (Mod mod in EnabledMods)
 				{
-					var (reference, filePath, parser) = mod.Load(type, path);
+					var (reference, filePath, parser) = mod.LoadEx(type, path);
 					if (reference != null)
 					{
 						ResourceInfo resource = new ResourceInfo(mod, filePath, parser, reference);
@@ -385,7 +385,7 @@ namespace Modding
 				string path = GetModdingPath(folder, file);
 				foreach (Mod mod in EnabledMods)
 				{
-					var (reference, filePath, parser) = await mod.LoadAsync(type, path);
+					var (reference, filePath, parser) = await mod.LoadExAsync(type, path);
 					if (reference != null)
 					{
 						ResourceInfo resource = new ResourceInfo(mod, filePath, parser, reference);
@@ -409,7 +409,7 @@ namespace Modding
 			List<object> all = new List<object>();
 			foreach (Mod mod in EnabledMods)
 			{
-				var (reference, filePath, parser) = mod.Load(type, path);
+				var (reference, filePath, parser) = mod.LoadEx(type, path);
 				if (reference != null)
 					all.Add(reference);
 			}
@@ -426,7 +426,7 @@ namespace Modding
 			List<object> all = new List<object>();
 			foreach (Mod mod in EnabledMods)
 			{
-				var (reference, filePath, parser) = await mod.LoadAsync(type, path);
+				var (reference, filePath, parser) = await mod.LoadExAsync(type, path);
 				if (reference != null)
 					all.Add(reference);
 			}

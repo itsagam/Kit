@@ -4,7 +4,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Modding
+namespace Modding.Scripting
 {
 	public class SimpleDispatcher : MonoBehaviour
 	{

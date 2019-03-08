@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using XLua;
 
-namespace Modding
+namespace Modding.Scripting
 {
 	public class FullDispatcher : SimpleDispatcher
 	{
