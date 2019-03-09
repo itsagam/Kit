@@ -11,12 +11,17 @@ public class Test : MonoBehaviour
 	{
 		//CS.ResourceManager.Load(typeof(UE.Texture), CS.ResourceFolder.Resources, "Textures/test")
 		//ModManager.LoadMods(false);
-		go = new GameObject("agam");
+		Do(null);
+	}
+
+	protected void Do(Card card)
+	{
+		Card c1 = null;
+		print(c1 >= card );
 	}
 
 	public void Button()
 	{
-		if (go != null)
-			go.transform.SetParent(transform);
+
 	}
 }

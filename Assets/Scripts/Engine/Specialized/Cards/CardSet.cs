@@ -217,12 +217,10 @@ namespace Cards
 
 		public bool Move(List<Card> to, Card card)
 		{
-			if (Remove(card))
-			{
-				to.Add(card);
-				return true;
-			}
-			return false;
+			if (!Remove(card))
+				return false;
+			to.Add(card);
+			return true;
 		}
 
 		public bool Move(List<Card> to, IEnumerable<Card> cards)

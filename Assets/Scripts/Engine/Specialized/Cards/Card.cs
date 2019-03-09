@@ -11,7 +11,7 @@
 // var cardSet1 = new CardSet { card1, card2, card3, card4 };
 // cardSet1.Remove(card4);
 
-// When comparing with ==, cards are always treated value-type.
+// When comparing with relational operators like ==, cards are always treated value-type.
 
 using System;
 using Sirenix.OdinInspector;
@@ -72,62 +72,70 @@ namespace Cards
 
 		public static bool operator >(Card card1, Card card2)
 		{
+			if (ReferenceEquals(card1, null) || ReferenceEquals(card2, null))
+				return false;
 			return card1.Suit == card2.Suit && card1.CompareTo(card2) > 0;
 		}
 
 		public static bool operator <(Card card1, Card card2)
 		{
+			if (ReferenceEquals(card1, null) || ReferenceEquals(card2, null))
+				return false;
 			return card1.Suit == card2.Suit && card1.CompareTo(card2) < 0;
 		}
 
 		public static bool operator >=(Card card1, Card card2)
 		{
+			if (ReferenceEquals(card1, null) || ReferenceEquals(card2, null))
+				return ReferenceEquals(card1, card2);
 			return card1.Suit == card2.Suit && card1.CompareTo(card2) >= 0;
 		}
 
 		public static bool operator <=(Card card1, Card card2)
 		{
+			if (ReferenceEquals(card1, null) || ReferenceEquals(card2, null))
+				return ReferenceEquals(card1, card2);
 			return card1.Suit == card2.Suit && card1.CompareTo(card2) <= 0;
 		}
 
 		public static bool operator ==(Card card, Suit suit)
 		{
-			return card.Suit == suit;
+			return !ReferenceEquals(card, null) && card.Suit == suit;
 		}
 
 		public static bool operator !=(Card card, Suit suit)
 		{
-			return card.Suit != suit;
+			return !ReferenceEquals(card, null) && card.Suit != suit;
 		}
 
 		public static bool operator ==(Card card, Rank rank)
 		{
-			return card.Rank == rank;
+			return !ReferenceEquals(card, null) && card.Rank == rank;
 		}
 
 		public static bool operator !=(Card card, Rank rank)
 		{
-			return card.Rank != rank;
+			return !ReferenceEquals(card, null) && card.Rank != rank;
 		}
 
 		public static bool operator >(Card card, Rank rank)
 		{
-			return card.CompareTo(rank) > 0;
+			return !ReferenceEquals(card, null) && card.CompareTo(rank) > 0;
 		}
 
 		public static bool operator <(Card card, Rank rank)
 		{
-			return card.CompareTo(rank) < 0;
+			return !ReferenceEquals(card, null) && card.CompareTo(rank) < 0;
 		}
 
 		public static bool operator >=(Card card, Rank rank)
 		{
-			return card.CompareTo(rank) >= 0;
+			return !ReferenceEquals(card, null) && card.CompareTo(rank) >= 0;
 		}
 
 		public static bool operator <=(Card card, Rank rank)
 		{
-			return card.CompareTo(rank) <= 0;
+			return !ReferenceEquals(card, null) && card.CompareTo(rank) <= 0;
 		}
 
 		public int CompareTo(Card other)
@@ -145,34 +153,24 @@ namespace Cards
 			return Suit - suit;
 		}
 
+#if !CARDS_REFERENCE_TYPE
 		public bool Equals(Card other)
 		{
-#if CARDS_REFERENCE_TYPE
-			return base.Equals(other);
-#else
 			return this == other;
-#endif
 		}
 
 		public override bool Equals(object obj)
 		{
-#if CARDS_REFERENCE_TYPE
-			return base.Equals(obj);
-#else
 			if (obj is Card card)
 				return this == card;
 			return false;
-#endif
 		}
 
 		public override int GetHashCode()
 		{
-#if CARDS_REFERENCE_TYPE
-			return base.GetHashCode();
-#else
 			return Suit.GetHashCode() * 100 + Rank.GetHashCode();
-#endif
 		}
+#endif
 
 		public override string ToString() => $"{Rank} of {Suit}s";
 	}
