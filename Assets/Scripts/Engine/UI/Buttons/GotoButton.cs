@@ -8,6 +8,7 @@ public class GotoButton : MonoBehaviour, IPointerClickHandler
 
 	public void OnPointerClick (PointerEventData eventData)
 	{
-		Wizard?.GoTo(Step);
+		if (Wizard != null)
+			Wizard.GoTo(Step);
 	}
 }

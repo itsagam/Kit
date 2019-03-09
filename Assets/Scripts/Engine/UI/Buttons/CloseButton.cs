@@ -21,6 +21,7 @@ public class CloseButton : MonoBehaviour, IPointerClickHandler
 
 	protected static void Close()
 	{
-		UIManager.LastWindow?.Hide();
+		if (UIManager.LastWindow != null)
+			UIManager.LastWindow.Hide();
 	}
 }

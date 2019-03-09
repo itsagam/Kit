@@ -353,7 +353,7 @@ public static class Pooler
 			return false;
 
 		PoolInstance poolInstance = instance.GetComponent<PoolInstance>();
-		if (poolInstance?.Pool == null)
+		if (poolInstance != null && poolInstance.Pool == null)
 			return false;
 
 		poolInstance.Pool.Destroy(instance);
