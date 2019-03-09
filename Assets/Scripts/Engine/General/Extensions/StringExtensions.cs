@@ -1,24 +1,16 @@
 ﻿using System;
-using System.Text;
 using System.Text.RegularExpressions;
-using UnityEngine;
 
 public static class StringExtensions
 {
 	public static string Left(this string str, int count)
 	{
-		if (count > str.Length)
-			return str;
-
-		return str.Substring(0, count);
+		return count > str.Length ? str : str.Substring(0, count);
 	}
 
 	public static string Right(this string str, int count)
 	{
-		if (count > str.Length)
-			return str;
-
-		return str.Substring(str.Length - count);
+		return count > str.Length ? str : str.Substring(str.Length - count);
 	}
 
 	public static string Slice(this string str, int startIndex)
@@ -63,9 +55,9 @@ public static class StringExtensions
 
 	public static bool IsEmail(this string str)
 	{
-		string pattern = @"^(?!\.)(""([^""\r\\]|\\[""\r\\])*""|" 
-			+ @"([-a-z0-9!#$%&'*+/=?^_`{|}~]|(?<!\.)\.)*)(?<!\.)" 
-			+ @"@[a-z0-9][\w\.-]*[a-z0-9]\.[a-z][a-z\.]*[a-z]$";
+		const string pattern = @"^(?!\.)(""([^""\r\\]|\\[""\r\\])*""|"
+							 + @"([-a-z0-9!#$%&'*+/=?^_`{|}~]|(?<!\.)\.)*)(?<!\.)"
+							 + @"@[a-z0-9][\w\.-]*[a-z0-9]\.[a-z][a-z\.]*[a-z]$";
 		Regex regex = new Regex(pattern, RegexOptions.IgnoreCase);
 		return regex.IsMatch(str);
 	}

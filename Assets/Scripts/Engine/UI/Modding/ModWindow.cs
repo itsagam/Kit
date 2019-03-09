@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.UI;
 using Modding;
-using UniRx;
 using UniRx.Async;
 
 public class ModWindow : Window
@@ -37,6 +33,11 @@ public class ModWindow : Window
 
 		PlayerPrefs.Save();
 		UIManager.ShowWindow(MessageWindow, "Some changes will not be reflected until you restart the application.").Forget();
+	}
+
+	public static void SetDirty()
+	{
+		UIManager.FindWindow<ModWindow>().IsDirty = true;
 	}
 #endif
 }

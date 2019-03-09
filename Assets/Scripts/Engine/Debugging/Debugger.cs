@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
-using System.Collections;
 using System.Collections.Generic;
 using System.Text;
-using System.Linq;
 using UnityEngine;
 using UnityEngine.Profiling;
 using UniRx;
@@ -114,10 +112,7 @@ public static class Debugger
 		if (obj == null)
 			return nullString;
 
-		if (serialize)
-			return JsonConvert.SerializeObject(obj, Formatting.Indented);
-		else
-			return obj.ToString();
+		return serialize ? JsonConvert.SerializeObject(obj, Formatting.Indented) : obj.ToString();
 	}
 
 	public static void ObjectToString(StringBuilder output, object obj, bool serialize, string nullString)

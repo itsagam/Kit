@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -13,15 +12,10 @@ public class Bag<T> : Dictionary<T, int>
 
     public new int this [T unit]
     {
-        get
+        get => TryGetValue(unit, out int stored) ? stored : 0;
+		set
         {
-			if (TryGetValue(unit, out int stored))
-				return stored;
-			return 0;
-        }
-        set
-        {
-			int final = (Max != null && Max.TryGetValue(unit, out int max)) ? Mathf.Min(value, max) : value;
+			int final = Max != null && Max.TryGetValue(unit, out int max) ? Mathf.Min(value, max) : value;
 			if (final > 0)
 				base[unit] = final;
 			else
@@ -47,7 +41,7 @@ public class Bag<T> : Dictionary<T, int>
 
     public bool Contains(Bag<T> bag)
     {
-        return bag.All(f => Contains(f));
+        return bag.All(Contains);
     }
 
     public void Store(KeyValuePair<T, int> kvp)
@@ -73,13 +67,13 @@ public class Bag<T> : Dictionary<T, int>
 
     public bool Consume(T type, int amount)
     {
-        if (Contains(type, amount))
-        {
-            this[type] -= amount;
-            return true;
-        }
-        return false;
-    }
+		if (!Contains(type, amount))
+			return false;
+
+		this[type] -= amount;
+
+		return true;
+	}
 
     public bool Consume(KeyValuePair<T, int> kvp)
     {
@@ -93,14 +87,14 @@ public class Bag<T> : Dictionary<T, int>
 
     public bool Consume(Bag<T> bag)
     {
-        if (Contains(bag))
-        {
-            foreach (KeyValuePair<T, int> field in bag)
-                this[field.Key] -= field.Value;
-            return true;
-        }
-        return false;
-    }
+		if (!Contains(bag))
+			return false;
+
+		foreach (KeyValuePair<T, int> field in bag)
+			this[field.Key] -= field.Value;
+
+		return true;
+	}
 
     public static Bag<T> operator +(Bag<T> bagTo, Bag<T> bagFrom)
     {
@@ -138,15 +132,8 @@ public class Bag<T> : Dictionary<T, int>
         return bag;
     }
 
-    public IEnumerable<Bunch<T>> AsEnumerable()
-    {
-        return this.Select(kvp => new Bunch<T>(kvp));
-    }
-
-    public List<Bunch<T>> ToList()
-    {
-        return AsEnumerable().ToList();
-    }
+    public IEnumerable<Bunch<T>> AsEnumerable() => this.Select(kvp => new Bunch<T>(kvp));
+	public List<Bunch<T>> ToList() => AsEnumerable().ToList();
 }
 
 [Serializable]
@@ -154,10 +141,6 @@ public struct Bunch<T>
 {
 	public T Unit;
 	public int Amount;
-
-	public Bunch(T unit) : this(unit, 0)
-	{
-	}
 
 	public Bunch(KeyValuePair<T, int> pair) : this(pair.Key, pair.Value)
 	{
@@ -167,7 +150,7 @@ public struct Bunch<T>
 	{
 	}
 
-	public Bunch(T unit, int amount)
+	public Bunch(T unit, int amount = 0)
 	{
 		Unit = unit;
 		Amount = amount;
@@ -233,13 +216,7 @@ public struct Bunch<T>
 		return new Bunch<T>(bunch1.Unit, bunch1.Amount - bunch2.Amount);
 	}
 
-	public KeyValuePair<T, int> ToKVP()
-	{
-		return new KeyValuePair<T, int>(Unit, Amount);
-	}
+	public KeyValuePair<T, int> ToKVP() => new KeyValuePair<T, int>(Unit, Amount);
 
-	public override string ToString()
-	{
-		return "[" + Unit.ToString() + ", " + Amount.ToString() + "]";
-	}
+	public override string ToString() => $"[{Unit}, {Amount}]";
 }

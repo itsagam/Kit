@@ -1,6 +1,4 @@
 ﻿using System;
-using System.IO;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -20,7 +18,7 @@ public enum WindowConflictMode
 	ShowNew,
 	DontShow,
 	OverwriteData,
-	HidePrevious,
+	HidePrevious
 }
 
 public enum WindowHideMode
@@ -52,10 +50,10 @@ public static class UIManager
 								WindowConflictMode mode = DefaultConflictMode)
 	{
 		Window prefab = await ResourceManager.LoadAsync<Window>(ResourceFolder.Resources, path);
-		if (prefab != null)
-			return await ShowWindow(prefab, data, parent, animation, mode);
-		else
+		if (prefab == null)
 			return null;
+
+		return await ShowWindow(prefab, data, parent, animation, mode);
 	}
 
 	public static async UniTask<Window> ShowWindow(
@@ -87,10 +85,6 @@ public static class UIManager
 				}
 			}
 		}
-		
-		Window instance = GameObject.Instantiate(prefab);
-		instance.name = prefab.name;
-		instance.MarkAsInstance();
 
 		if (parent == null)
 		{
@@ -102,7 +96,10 @@ public static class UIManager
 			}
 			parent = lastCanvas.transform;
 		}
-		instance.transform.SetParent(parent, false);
+
+		Window instance = GameObject.Instantiate(prefab, parent, false);
+		instance.name = prefab.name;
+		instance.MarkAsInstance();
 
 		if (animation == null)
 			await instance.Show(data);
@@ -126,12 +123,8 @@ public static class UIManager
 					WindowHideMode mode = DefaultWindowHideMode)
 	{
 		if (window != null)
-			if (animation == null)
-				return window.Hide(mode);
-			else
-				return window.Hide(animation, mode);
-		else
-			return UniTask.FromResult(false);
+			return animation != null ? window.Hide(animation, mode) : window.Hide(mode);
+		return UniTask.FromResult(false);
 	}
 
 	public static Window FindWindow(string name)
@@ -164,31 +157,17 @@ public static class UIManager
 
 	private static Canvas CreateCanvas()
 	{
-		GameObject ui = new GameObject("UI");
-		ui.layer = LayerMask.NameToLayer("UI");
-
-		Canvas canvas = ui.AddComponent<Canvas>();
+		GameObject uiGO = new GameObject("UI") {layer = LayerMask.NameToLayer("UI")};
+		Canvas canvas = uiGO.AddComponent<Canvas>();
 		canvas.renderMode = RenderMode.ScreenSpaceOverlay;
 
-		ui.AddComponent<CanvasScaler>();
-		ui.AddComponent<GraphicRaycaster>();
+		uiGO.AddComponent<CanvasScaler>();
+		uiGO.AddComponent<GraphicRaycaster>();
 
 		return canvas;
 	}
 
-	public static Window FirstWindow
-	{
-		get
-		{
-			return Windows.FirstOrDefault();
-		}
-	}
+	public static Window FirstWindow => Windows.FirstOrDefault();
 
-	public static Window LastWindow
-	{
-		get
-		{
-			return Windows.LastOrDefault();
-		}
-	}
+	public static Window LastWindow => Windows.LastOrDefault();
 }

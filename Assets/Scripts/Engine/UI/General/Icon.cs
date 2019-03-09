@@ -1,10 +1,4 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
-using UnityEngine.UI;
-using UnityEngine.EventSystems;
 
 public class Icon : MonoBehaviour
 {
@@ -16,10 +10,7 @@ public class Icon : MonoBehaviour
 
     public virtual object Data
     {
-        get
-        {
-            return data;
-        }
+        get => data;
         set
         {
             data = value;
@@ -29,13 +20,7 @@ public class Icon : MonoBehaviour
 
     public virtual int Index
     {
-        get
-        {
-            return transform.GetSiblingIndex();
-        }
-        set
-        {
-            transform.SetSiblingIndex(value);
-        }
+        get => transform.GetSiblingIndex();
+        set => transform.SetSiblingIndex(value);
     }
 }

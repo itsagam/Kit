@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using UnityEngine;
-using UniRx;
+﻿using UniRx;
 using UniRx.Async;
 using Game;
 
@@ -17,8 +11,6 @@ public class DataManager
 	public static GameData GameData;
 	public static GameState GameState;
 
-	public static bool ClearGameState = true;
-	
 	static DataManager()
 	{
 		Observable.OnceApplicationQuit().Subscribe(u => SaveGameState());
@@ -35,12 +27,11 @@ public class DataManager
 		return ResourceManager.LoadAsync<GameData>(DataFolder, GameDataFile);
 	}
 
-	public static UniTask<GameState> LoadGameState()
+	public static UniTask<GameState> LoadGameState(bool clearGameState = true)
 	{
-		if (ClearGameState || !ResourceManager.Exists(ResourceFolder.PersistentData, GameStateFile))
+		if (clearGameState || !ResourceManager.Exists(ResourceFolder.PersistentData, GameStateFile))
 			return ResourceManager.LoadAsync<GameState>(DataFolder, GameStateFile);
-		else
-			return ResourceManager.LoadAsync<GameState>(ResourceFolder.PersistentData, GameStateFile);
+		return ResourceManager.LoadAsync<GameState>(ResourceFolder.PersistentData, GameStateFile);
 	}
 
 	public static UniTask SaveGameState()
@@ -50,19 +41,6 @@ public class DataManager
 		return UniTask.CompletedTask;
 	}
 
-	public static bool IsGameDataLoaded
-	{
-		get
-		{
-			return GameData != null;
-		}
-	}
-
-	public static bool IsGameStateLoaded
-	{
-		get
-		{
-			return GameState != null;
-		}
-	}
+	public static bool IsGameDataLoaded => GameData != null;
+	public static bool IsGameStateLoaded => GameState != null;
 }

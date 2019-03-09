@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Collections.Generic;
 using UnityEngine;
 
 public static class Pooler
@@ -31,27 +28,21 @@ public static class Pooler
 	public static PoolGroup GetOrCreateGroup(string name)
 	{
 		PoolGroup group = GetGroup(name);
-		if (group != null)
-			return group;
-		return CreateGroup(name);
+		return group != null ? group : CreateGroup(name);
 	}
 
 	public static PoolGroup GetGroup(string name)
 	{
-		if (poolGroupsByName.TryGetValue(name, out PoolGroup group))
-			return group;
-		return null;
+		return poolGroupsByName.TryGetValue(name, out PoolGroup group) ? @group : null;
 	}
 
 	public static bool DestroyGroup(string name)
 	{
 		PoolGroup group = GetGroup(name);
-		if (group != null)
-		{
-			group.gameObject.Destroy();
-			return true;
-		}
-		return false;
+		if (group == null)
+			return false;
+		group.gameObject.Destroy();
+		return true;
 	}
 
 	public static void AddPoolToGroup(PoolGroup group, Pool pool)
@@ -120,16 +111,12 @@ public static class Pooler
 
 	public static Pool GetPool(string name)
 	{
-		if (poolsByName.TryGetValue(name, out Pool pool))
-			return pool;
-		return null;
+		return poolsByName.TryGetValue(name, out Pool pool) ? pool : null;
 	}
 
 	public static Pool GetPool(Component prefab)
 	{
-		if (poolsByPrefab.TryGetValue(prefab, out Pool pool))
-			return pool;
-		return null;
+		return poolsByPrefab.TryGetValue(prefab, out Pool pool) ? pool : null;
 	}
 
 	public static Pool GetOrCreatePool(Component prefab)
@@ -143,45 +130,39 @@ public static class Pooler
 	public static Pool GetOrCreatePool(string group, Component prefab)
 	{
 		Pool pool = GetPool(prefab);
-		if (pool == null)
-		{
-			pool = CreatePool(prefab);
-			GetOrCreateGroup(group).AddPool(pool);
-		}
+		if (pool != null)
+			return pool;
+		pool = CreatePool(prefab);
+		GetOrCreateGroup(@group).AddPool(pool);
 		return pool;
 	}
 
 	public static Pool GetOrCreatePool(PoolGroup group, Component prefab)
 	{
 		Pool pool = GetPool(prefab);
-		if (pool == null)
-		{
-			pool = CreatePool(prefab);
-			group.AddPool(pool);
-		}
+		if (pool != null)
+			return pool;
+		pool = CreatePool(prefab);
+		group.AddPool(pool);
 		return pool;
 	}
 
 	public static bool DestroyPool(string name)
 	{
 		Pool pool = GetPool(name);
-		if (pool != null)
-		{
-			pool.gameObject.Destroy();
-			return true;
-		}
-		return false;
+		if (pool == null)
+			return false;
+		pool.gameObject.Destroy();
+		return true;
 	}
 
 	public static bool DestroyPool(Component prefab)
 	{
 		Pool pool = GetPool(prefab);
-		if (pool != null)
-		{
-			pool.gameObject.Destroy();
-			return true;
-		}
-		return false;
+		if (pool == null)
+			return false;
+		pool.gameObject.Destroy();
+		return true;
 	}
 	#endregion
 
@@ -368,50 +349,43 @@ public static class Pooler
 
 	public static bool Destroy(Component instance)
 	{
-		if (instance != null)
-		{
-			PoolInstance poolInstance = instance.GetComponent<PoolInstance>();
-			if (poolInstance?.Pool != null)
-			{
-				poolInstance.Pool.Destroy(instance);
-				return true;
-			}
-		}
-		return false;
+		if (instance == null)
+			return false;
+
+		PoolInstance poolInstance = instance.GetComponent<PoolInstance>();
+		if (poolInstance?.Pool == null)
+			return false;
+
+		poolInstance.Pool.Destroy(instance);
+		return true;
 	}
 
 	public static bool DestroyAll(Component prefab)
 	{
 		Pool pool = GetPool(prefab);
-		if (pool != null)
-		{
-			pool.DestroyAll();
-			return true;
-		}
-		return false;
+		if (pool == null)
+			return false;
+		pool.DestroyAll();
+		return true;
 	}
 
 	public static bool DestroyAll(string name)
 	{
 		Pool pool = GetPool(name);
-		if (pool != null)
-		{
-			pool.DestroyAll();
-			return true;
-		}
-		return false;
+		if (pool == null)
+			return false;
+		pool.DestroyAll();
+		return true;
 	}
 
 	public static bool DestroyAllInGroup(string name)
 	{
 		PoolGroup group = GetGroup(name);
-		if (group != null)
-		{
-			foreach (Pool pool in group.Pools)
-				pool.DestroyAll();
-			return true;
-		}
-		return false;
+		if (group == null)
+			return false;
+		foreach (Pool pool in group.Pools)
+			pool.DestroyAll();
+		return true;
 	}
 	#endregion
 }

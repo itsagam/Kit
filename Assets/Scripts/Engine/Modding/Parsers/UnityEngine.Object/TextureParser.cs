@@ -1,6 +1,5 @@
 ﻿using UnityEngine;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 
 namespace Modding.Parsers
@@ -25,12 +24,12 @@ namespace Modding.Parsers
 		}
 		public override OperateType OperateWith => OperateType.Bytes;
 
-		public override object Read(Type type, object data, string path)
+		public override object Read(Type type, object data, string path = null)
 		{
-			Texture2D texture = null;
-			texture = new Texture2D(0, 0);
+			Texture2D texture = new Texture2D(0, 0);
 			texture.LoadImage((byte[]) data);
-			texture.name = path;
+			if (path != null)
+				texture.name = path;
 			return texture;
 		}
 	}

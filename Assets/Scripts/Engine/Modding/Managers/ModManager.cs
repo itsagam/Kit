@@ -33,7 +33,7 @@ namespace Modding
 		public ModType Name;
 		public string Path;
 		public List<Mod> Mods;
-		public bool Deactivateable;
+		public bool Deactivatable;
 		public bool Reorderable;
 
 		public ModGroup(ModType name, string path, bool deactivatable = true, bool reorderable = true)
@@ -41,7 +41,7 @@ namespace Modding
 			Name = name;
 			Path = path;
 			Mods = new List<Mod>();
-			Deactivateable = deactivatable;
+			Deactivatable = deactivatable;
 			Reorderable = reorderable;
 		}
 	}
@@ -70,7 +70,7 @@ namespace Modding
 
 	public static class ModManager
 	{
-		public static List<ResourceParser> Parsers = new List<ResourceParser>() {
+		public static readonly List<ResourceParser> Parsers = new List<ResourceParser>() {
 			new JSONParser(),
 			new TextureParser(),
 			new AudioParser(),
@@ -83,14 +83,14 @@ namespace Modding
 		public static event Action<ResourceFolder, string, ResourceInfo, bool> ResourceLoaded;
 		public static event Action<ResourceFolder, string, Mod> ResourceUnloaded;
 
-		public static Dictionary<ModType, ModGroup> Groups = new Dictionary<ModType, ModGroup>();	
-		public static List<ModLoader> Loaders = new List<ModLoader>() {
+		public static readonly Dictionary<ModType, ModGroup> Groups = new Dictionary<ModType, ModGroup>();
+		public static readonly List<ModLoader> Loaders = new List<ModLoader>() {
 			new DirectModLoader(),
 			new ZipModLoader()
 		};
 		public static IEnumerable<Mod> EnabledMods { get; private set; } = Enumerable.Empty<Mod>();
 
-		private static Dictionary<(Type type, ResourceFolder folder, string file), ResourceInfo> cachedResources 
+		private static Dictionary<(Type type, ResourceFolder folder, string file), ResourceInfo> cachedResources
 			= new Dictionary<(Type, ResourceFolder, string), ResourceInfo>();
 		private static Dictionary<ResourceFolder, string> folderToString = new Dictionary<ResourceFolder, string>();
 
@@ -105,12 +105,12 @@ namespace Modding
 		private static void AddDefaultGroups()
         {
 			// The order in which groups are added is taken into account in mod order and cannot be changed by any means
-			string writeableFolder = GetWriteableFolder();
-			AddGroup(new ModGroup(ModType.Patch, writeableFolder + "Patches/", false, false));
-			AddGroup(new ModGroup(ModType.Mod, writeableFolder + "Mods/", true, true));
+			string writableFolder = GetWritableFolder();
+			AddGroup(new ModGroup(ModType.Patch, writableFolder + "Patches/", false, false));
+			AddGroup(new ModGroup(ModType.Mod, writableFolder + "Mods/", true, true));
 		}
 
-		private static string GetWriteableFolder()
+		private static string GetWritableFolder()
 		{
 			string folder = null;
 			switch (Application.platform)
@@ -134,7 +134,7 @@ namespace Modding
 			return folder;
 		}
 
-		// The "+" operator and Path.Combine are really costly and have a huge perfomance impact, thus this
+		// The "+" operator and Path.Combine are really costly and have a huge performance impact, thus this
 		private static void CacheFolderNames()
 		{
 			foreach (ResourceFolder value in Enum.GetValues(typeof(ResourceFolder)))
@@ -149,7 +149,7 @@ namespace Modding
 			{
 				if (!Directory.Exists(group.Path))
 					continue;
-				
+
 				string[] childPaths = Directory.GetFileSystemEntries(group.Path);
 				foreach (string childPath in childPaths)
 				{
@@ -204,7 +204,7 @@ namespace Modding
 			RefreshEnabledMods();
 
 			if (executeScripts)
-				ExecuteScripts();
+				await ExecuteScriptsAsync();
 		}
 
 		public static void ExecuteScripts()
@@ -221,7 +221,7 @@ namespace Modding
 
 		private static void RefreshEnabledMods()
 		{
-			EnabledMods = Groups.SelectMany(kvp => kvp.Value.Mods).Where(m => IsModEnabled(m));
+			EnabledMods = Groups.SelectMany(kvp => kvp.Value.Mods).Where(IsModEnabled);
 		}
 		#endregion
 
@@ -243,7 +243,7 @@ namespace Modding
 
 		public static void ToggleMod(Mod mod, bool value)
 		{
-			if (!mod.Group.Deactivateable)
+			if (!mod.Group.Deactivatable)
 				return;
 
 			PlayerPrefs.SetInt($"{mod.Group.Name}/{mod.Metadata.Name}.Enabled", value ? 1 : 0);
@@ -252,7 +252,7 @@ namespace Modding
 
 		public static bool IsModEnabled(Mod mod)
 		{
-			if (!mod.Group.Deactivateable)
+			if (!mod.Group.Deactivatable)
 				return true;
 			return PlayerPrefs.GetInt($"{mod.Group.Name}/{mod.Metadata.Name}.Enabled", 1) == 1;
 		}
@@ -330,23 +330,22 @@ namespace Modding
 						PlayerPrefs.SetInt($"{group.Name}/{mod.Metadata.Name}.Order", i);
 					}
 				}
-			}	
+			}
 		}
 		#endregion
 
 		#region Resource-loading
 		private static object LoadCached(Type type, ResourceFolder folder, string file)
 		{
-			if (cachedResources.TryGetValue((type, folder, file), out ResourceInfo resource))
-			{
-				object reference = resource.Reference.Target;
-				if (reference != null)
-				{
-					ResourceLoaded?.Invoke(folder, file, resource, false);
-					return reference;
-				}
-			}
-			return null;
+			if (!cachedResources.TryGetValue((type, folder, file), out ResourceInfo resource))
+				return null;
+
+			object reference = resource.Reference.Target;
+			if (reference == null)
+				return null;
+
+			ResourceLoaded?.Invoke(folder, file, resource, false);
+			return reference;
 		}
 
 		public static object Load(Type type, ResourceFolder folder, string file)
@@ -355,19 +354,19 @@ namespace Modding
 			if (cachedReference != null)
 				return cachedReference;
 
-			if (EnabledMods.Any())
+			if (!EnabledMods.Any())
+				return null;
+
+			string path = GetModdingPath(folder, file);
+			foreach (Mod mod in EnabledMods)
 			{
-				string path = GetModdingPath(folder, file);
-				foreach (Mod mod in EnabledMods)
+				var (reference, filePath, parser) = mod.LoadEx(type, path);
+				if (reference != null)
 				{
-					var (reference, filePath, parser) = mod.LoadEx(type, path);
-					if (reference != null)
-					{
-						ResourceInfo resource = new ResourceInfo(mod, filePath, parser, reference);
-						cachedResources[(type, folder, file)] = resource;
-						ResourceLoaded?.Invoke(folder, file, resource, true);
-						return reference;
-					}
+					ResourceInfo resource = new ResourceInfo(mod, filePath, parser, reference);
+					cachedResources[(type, folder, file)] = resource;
+					ResourceLoaded?.Invoke(folder, file, resource, true);
+					return reference;
 				}
 			}
 
@@ -380,19 +379,19 @@ namespace Modding
 			if (cachedReference != null)
 				return cachedReference;
 
-			if (EnabledMods.Any())
+			if (!EnabledMods.Any())
+				return null;
+
+			string path = GetModdingPath(folder, file);
+			foreach (Mod mod in EnabledMods)
 			{
-				string path = GetModdingPath(folder, file);
-				foreach (Mod mod in EnabledMods)
+				var (reference, filePath, parser) = await mod.LoadExAsync(type, path);
+				if (reference != null)
 				{
-					var (reference, filePath, parser) = await mod.LoadExAsync(type, path);
-					if (reference != null)
-					{
-						ResourceInfo resource = new ResourceInfo(mod, filePath, parser, reference);
-						cachedResources[(type, folder, file)] = resource;
-						ResourceLoaded?.Invoke(folder, file, resource, true);
-						return reference;
-					}
+					ResourceInfo resource = new ResourceInfo(mod, filePath, parser, reference);
+					cachedResources[(type, folder, file)] = resource;
+					ResourceLoaded?.Invoke(folder, file, resource, true);
+					return reference;
 				}
 			}
 
@@ -409,14 +408,14 @@ namespace Modding
 			List<object> all = new List<object>();
 			foreach (Mod mod in EnabledMods)
 			{
-				var (reference, filePath, parser) = mod.LoadEx(type, path);
+				object reference = mod.Load(type, path);
 				if (reference != null)
 					all.Add(reference);
 			}
 			return all;
 		}
 
-		public static UniTask<List<object>> LoadAllAsync(Type type, ResourceFolder folder, string file) 
+		public static UniTask<List<object>> LoadAllAsync(Type type, ResourceFolder folder, string file)
 		{
 			return LoadAllAsync(type, GetModdingPath(folder, file));
 		}
@@ -426,7 +425,7 @@ namespace Modding
 			List<object> all = new List<object>();
 			foreach (Mod mod in EnabledMods)
 			{
-				var (reference, filePath, parser) = await mod.LoadExAsync(type, path);
+				object reference = await mod.LoadAsync(type, path);
 				if (reference != null)
 					all.Add(reference);
 			}
@@ -435,9 +434,7 @@ namespace Modding
 
 		public static ResourceInfo GetResourceInfo(Type type, ResourceFolder folder, string file)
 		{
-			if (cachedResources.TryGetValue((type, folder, file), out ResourceInfo resource))
-				return resource;
-			return default;
+			return cachedResources.TryGetValue((type, folder, file), out ResourceInfo resource) ? resource : default;
 		}
 
 		public static ResourceInfo GetResourceInfo(object resource)
@@ -650,29 +647,31 @@ namespace Modding
 		{
 			var kvp = cachedResources.FirstOrDefault(k => k.Value.Reference.Target == reference);
 			var key = kvp.Key;
+
 			// Because of FirstOrDefault, kvp.file will be null if key is not found
-			if (key.file != null)
-			{
-				ResourceInfo resource = kvp.Value;
-				UnloadInternal(resource.Reference.Target);
-				cachedResources.Remove(key);
-				ResourceUnloaded?.Invoke(key.folder, key.file, resource.Mod);
-				return true;
-			}
-			return false;
+			if (key.file == null)
+				return false;
+
+			ResourceInfo resource = kvp.Value;
+			UnloadInternal(resource.Reference.Target);
+			cachedResources.Remove(key);
+			ResourceUnloaded?.Invoke(key.folder, key.file, resource.Mod);
+
+			return true;
 		}
 
 		public static bool Unload(Type type, ResourceFolder folder, string file)
 		{
 			var key = (type, folder, file);
-			if (cachedResources.TryGetValue(key, out ResourceInfo resource))
-			{
-				UnloadInternal(resource.Reference.Target);
-				cachedResources.Remove(key);
-				ResourceUnloaded?.Invoke(folder, file, resource.Mod);
-				return true;
-			}
-			return false;
+
+			if (!cachedResources.TryGetValue(key, out ResourceInfo resource))
+				return false;
+
+			UnloadInternal(resource.Reference.Target);
+			cachedResources.Remove(key);
+			ResourceUnloaded?.Invoke(folder, file, resource.Mod);
+
+			return true;
 		}
 
 		private static void UnloadInternal(object resource)
@@ -695,9 +694,7 @@ namespace Modding
 
 		public static List<Mod> GetModsByGroup(ModType name)
 		{
-			if (Groups.TryGetValue(name, out ModGroup group))
-				return group.Mods;
-			return null;
+			return Groups.TryGetValue(name, out ModGroup group) ? group.Mods : null;
 		}
 
 		public static string GetModdingPath(ResourceFolder folder)

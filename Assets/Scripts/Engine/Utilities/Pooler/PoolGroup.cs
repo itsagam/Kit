@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -89,8 +88,7 @@ public class PoolGroup : MonoBehaviour, IEnumerable<Component>
 	#if UNITY_EDITOR
 	private void AddPool()
 	{
-		string name = "Pool " + (transform.childCount + 1);
-		GameObject poolGO = new GameObject(name);
+		GameObject poolGO = new GameObject("Pool " + (transform.childCount + 1));
 		Pool pool = poolGO.AddComponent<Pool>();
 		AddPool(pool);
 	}
@@ -113,47 +111,16 @@ public class PoolGroup : MonoBehaviour, IEnumerable<Component>
 			pool.Organize = Organize;
 	}
 
-	private bool ShowPersistent
-	{
-		get
-		{
-			return transform.parent == null;
-		}
-	}
-	#endif
+	private bool ShowPersistent => transform.parent == null;
+#endif
 	#endregion
 
 	#region Public fields
-	public IEnumerable<Component> Available
-	{
-		get
-		{
-			return Pools.SelectMany(p => p.Available);
-		}
-	}
+	public IEnumerable<Component> Available => Pools.SelectMany(p => p.Available);
+	public int AvailableCount => Pools.Sum(p => p.Available.Count);
 
-	public int AvailableCount
-	{
-		get
-		{
-			return Pools.Sum(p => p.Available.Count);
-		}
-	}
+	public IEnumerable<Component> Used => Pools.SelectMany(p => p.Used);
+	public int UsedCount => Pools.Sum(p => p.Used.Count);
 
-	public IEnumerable<Component> Used
-	{
-		get
-		{
-			return Pools.SelectMany(p => p.Used);
-		}
-	}
-
-	public int UsedCount
-	{
-		get
-		{
-			return Pools.Sum(p => p.Used.Count);
-		}
-	}
 	#endregion
 }

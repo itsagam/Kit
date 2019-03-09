@@ -1,19 +1,10 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 
-public class RaycastHelper
+public static class RaycastHelper
 {
-    public static RaycastHit2D ScreenRaycast2D(Vector2 screenPoint, int layerMask)
+    public static RaycastHit2D ScreenRaycast2D(Vector2 screenPoint, int layerMask = int.MaxValue)
     {
         return Physics2D.GetRayIntersection(Camera.main.ScreenPointToRay(screenPoint), float.PositiveInfinity, layerMask);
-    }
-
-    public static RaycastHit2D ScreenRaycast2D(Vector2 screenPoint)
-    {
-        return ScreenRaycast2D(screenPoint, int.MaxValue);
     }
 
     public static RaycastHit2D ScreenRaycast2D(int layerMask)
@@ -53,9 +44,7 @@ public class RaycastHelper
     {
         Ray ray = Camera.main.ScreenPointToRay(screenPoint);
         Plane plane = new Plane(direction, Vector3.zero);
-		if (plane.Raycast(ray, out float distance))
-			return ray.GetPoint(distance);
-		return Vector3.zero;
+		return plane.Raycast(ray, out float distance) ? ray.GetPoint(distance) : Vector3.zero;
     }
 
     public static Vector3 ScreenRaycastAtPlane(Vector3 direction)

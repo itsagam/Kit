@@ -1,6 +1,5 @@
 ﻿using UnityEngine;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 
 namespace Modding.Parsers
@@ -23,10 +22,11 @@ namespace Modding.Parsers
 		}
 		public override OperateType OperateWith => OperateType.Text;
 
-		public override object Read(Type type, object data, string path)
+		public override object Read(Type type, object data, string path = null)
 		{
 			TextAsset asset = new TextAsset((string) data);
-			asset.name = path;
+			if (path != null)
+				asset.name = path;
 			return asset;
 		}
 	}

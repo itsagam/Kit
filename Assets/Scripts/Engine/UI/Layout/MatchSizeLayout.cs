@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 // Give Element the size of this transform whenever it's resized
 public class MatchSizeLayout : MonoBehaviour
@@ -21,14 +18,14 @@ public class MatchSizeLayout : MonoBehaviour
 
 	protected void OnRectTransformDimensionsChange()
 	{
-		if (Element && rectTransform)
-		{
-			Vector2 newSize = Element.sizeDelta;
-			if (Width)
-				newSize.x = rectTransform.sizeDelta.x + Padding.x;
-			if (Height)
-				newSize.y = rectTransform.sizeDelta.y + Padding.y;
-			Element.sizeDelta = newSize;
-		}
+		if (!Element || !rectTransform)
+			return;
+
+		Vector2 newSize = Element.sizeDelta;
+		if (Width)
+			newSize.x = rectTransform.sizeDelta.x + Padding.x;
+		if (Height)
+			newSize.y = rectTransform.sizeDelta.y + Padding.y;
+		Element.sizeDelta = newSize;
 	}
 }

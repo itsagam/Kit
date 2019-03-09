@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
 using DG.Tweening;
@@ -46,9 +42,7 @@ public class DragCursor : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDr
 	public virtual void OnEndDrag(PointerEventData eventData)
 	{
 		float speed = canvas.IsScreenSpace() ? MoveSpeed : MoveSpeed * canvas.transform.localScale.Min() / canvas.scaleFactor;
-		transform.DOMove(previousPosition, speed).SetSpeedBased().OnComplete( () => {
-			MoveBack();
-		});
+		transform.DOMove(previousPosition, speed).SetSpeedBased().OnComplete( MoveBack);
 	}
 
 	public virtual void MoveBack()

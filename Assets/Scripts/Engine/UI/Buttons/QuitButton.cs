@@ -1,9 +1,6 @@
-﻿using System;
-using UnityEngine;
-using UnityEngine.UI;
+﻿using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.EventSystems;
-using UnityEngine.SceneManagement;
 using Sirenix.OdinInspector;
 
 public class QuitButton : MonoBehaviour, IPointerClickHandler

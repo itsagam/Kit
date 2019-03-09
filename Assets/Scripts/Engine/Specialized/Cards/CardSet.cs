@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using UnityEngine;
 
 namespace Cards
 {
@@ -116,66 +114,58 @@ namespace Cards
 
 		public IEnumerable<Card> GetAbove(Card card, bool inclusive = true)
 		{
-			if (inclusive)
-				return this.Where(c => c >= card);
-			else
-				return this.Where(c => c > card);
+			return inclusive ?
+					   this.Where(c => c >= card) :
+					   this.Where(c => c > card);
 		}
 
 		public IEnumerable<Card> GetAbove(Rank rank, bool inclusive = true)
 		{
-			if (inclusive)
-				return this.Where(c => c >= rank);
-			else
-				return this.Where(c => c > rank);
+			return inclusive ?
+					   this.Where(c => c >= rank) :
+					   this.Where(c => c > rank);
 		}
 
 		public IEnumerable<Card> GetAbove(Card card, Comparison<Card> comparison, bool inclusive = true)
 		{
-			if (inclusive)
-				return this.Where(c => comparison(c, card) >= 0);
-			else
-				return this.Where(c => comparison(c, card) > 0);
+			return inclusive ?
+					   this.Where(c => comparison(c, card) >= 0) :
+					   this.Where(c => comparison(c, card) > 0);
 		}
 
 		public IEnumerable<Card> GetAbove(Rank rank, Comparison<Rank> comparison, bool inclusive = true)
 		{
-			if (inclusive)
-				return this.Where(c => comparison(c.Rank, rank) >= 0);
-			else
-				return this.Where(c => comparison(c.Rank, rank) > 0);
+			return inclusive ?
+					   this.Where(c => comparison(c.Rank, rank) >= 0) :
+					   this.Where(c => comparison(c.Rank, rank) > 0);
 		}
 
 		public IEnumerable<Card> GetBelow(Card card, bool inclusive = true)
 		{
-			if (inclusive)
-				return this.Where(c => c <= card);
-			else
-				return this.Where(c => c < card);
+			return inclusive ?
+					   this.Where(c => c <= card) :
+					   this.Where(c => c < card);
 		}
 
 		public IEnumerable<Card> GetBelow(Rank rank, bool inclusive = true)
 		{
-			if (inclusive)
-				return this.Where(c => c <= rank);
-			else
-				return this.Where(c => c < rank);
+			return inclusive ?
+					   this.Where(c => c <= rank) :
+					   this.Where(c => c < rank);
 		}
 
 		public IEnumerable<Card> GetBelow(Card card, Comparison<Card> comparison, bool inclusive = true)
 		{
-			if (inclusive)
-				return this.Where(c => comparison(c, card) <= 0);
-			else
-				return this.Where(c => comparison(c, card) < 0);
+			return inclusive ?
+					   this.Where(c => comparison(c, card) <= 0) :
+					   this.Where(c => comparison(c, card) < 0);
 		}
 
 		public IEnumerable<Card> GetBelow(Rank rank, Comparison<Rank> comparison, bool inclusive = true)
 		{
-			if (inclusive)
-				return this.Where(c => comparison(c.Rank, rank) <= 0);
-			else
-				return this.Where(c => comparison(c.Rank, rank) < 0);
+			return inclusive ?
+					   this.Where(c => comparison(c.Rank, rank) <= 0) :
+					   this.Where(c => comparison(c.Rank, rank) < 0);
 		}
 
 		public Card GetHighest()
@@ -187,7 +177,7 @@ namespace Cards
 		{
 			return GetBySuit(suit).Max();
 		}
-		
+
 		public Card GetHighest(Comparison<Card> comparison)
 		{
 			return this.Aggregate((c1, c2) => comparison(c1, c2) > 0 ? c1 : c2);
@@ -207,7 +197,7 @@ namespace Cards
 		{
 			return GetBySuit(suit).Min();
 		}
-		
+
 		public Card GetLowest(Comparison<Card> comparison)
 		{
 			return this.Aggregate((c1, c2) => comparison(c1, c2) < 0 ? c1 : c2);
@@ -240,7 +230,7 @@ namespace Cards
 			to.AddRange(cards);
 			return Remove(cards);
 		}
-		
+
 		public Card Deal()
 		{
 			Card top = Top;
@@ -297,46 +287,10 @@ namespace Cards
 			return success;
 		}
 
-		public bool IsEmpty
-		{
-			get
-			{
-				return Count > 0;
-			}
-		}
-
-		public Card Top
-		{
-			get
-			{
-				return this[0];
-			}
-		}
-
-		public Card Bottom
-		{
-			get
-			{
-				return this[Count - 1];
-			}
-		}
-
-
-		public Card First
-		{
-			get
-			{
-				return this[0];
-			}
-		}
-
-
-		public Card Last
-		{
-			get
-			{
-				return this[Count - 1];
-			}
-		}
+		public bool IsEmpty => Count > 0;
+		public Card Top => this[0];
+		public Card Bottom => this[Count - 1];
+		public Card First => this[0];
+		public Card Last => this[Count - 1];
 	}
 }

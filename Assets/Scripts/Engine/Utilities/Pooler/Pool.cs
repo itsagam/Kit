@@ -80,7 +80,7 @@ public class Pool : MonoBehaviour, IEnumerable<Component>
 	[ToggleGroup("Limit")]
 	[LabelText("Mode")]
 	public PoolLimitMode LimitMode = PoolLimitMode.DestroyAfterUse;
-	
+
 	[ToggleGroup("Limit")]
 	[LabelText("Amount")]
 	[MinValue(0)]
@@ -89,7 +89,7 @@ public class Pool : MonoBehaviour, IEnumerable<Component>
 
 	[HideInInlineEditors]
 	public bool Organize = true;
-	
+
 	[HideInInlineEditors]
 	[ShowIf("ShowPersistent")]
 	public bool Persistent = false;
@@ -121,7 +121,7 @@ public class Pool : MonoBehaviour, IEnumerable<Component>
 			Group.Pools.Remove(this);
 		Pooler.UncachePool(this);
 	}
-	
+
 	public async UniTask PreloadInstances()
 	{
 		if (PreloadDelay > 0)
@@ -177,7 +177,7 @@ public class Pool : MonoBehaviour, IEnumerable<Component>
 
 	public Component Instantiate()
 	{
-		Component instance = null;
+		Component instance;
 		if (availableInstances.Count > 0)
 		{
 			instance = availableInstances.First.Value;
@@ -200,7 +200,7 @@ public class Pool : MonoBehaviour, IEnumerable<Component>
 						SendDestroyMessage(instance);
 						SendInstantiateMessage(instance);
 						return instance;
-				}				
+				}
 			}
 
 			instance = CreateInstance();
@@ -229,37 +229,34 @@ public class Pool : MonoBehaviour, IEnumerable<Component>
 	public Component Instantiate(Vector3 position, Quaternion rotation)
 	{
 		var instance = Instantiate();
-		if (instance != null)
-		{
-			var trans = instance.transform;
-			trans.position = position;
-			trans.rotation = rotation;
-		}
+		if (instance == null)
+			return instance;
+		var trans = instance.transform;
+		trans.position = position;
+		trans.rotation = rotation;
 		return instance;
 	}
 
 	public Component Instantiate(Vector3 position, Transform parent)
 	{
 		var instance = Instantiate();
-		if (instance != null)
-		{
-			var trans = instance.transform;
-			trans.parent = parent;
-			trans.position = position;
-		}
+		if (instance == null)
+			return instance;
+		var trans = instance.transform;
+		trans.parent = parent;
+		trans.position = position;
 		return instance;
 	}
 
 	public Component Instantiate(Vector3 position, Quaternion rotation, Transform parent)
 	{
 		var instance = Instantiate();
-		if (instance != null)
-		{
-			var trans = instance.transform;
-			trans.parent = parent;
-			trans.position = position;
-			trans.rotation = rotation;
-		}
+		if (instance == null)
+			return instance;
+		var trans = instance.transform;
+		trans.parent = parent;
+		trans.position = position;
+		trans.rotation = rotation;
 		return instance;
 	}
 
@@ -362,23 +359,15 @@ public class Pool : MonoBehaviour, IEnumerable<Component>
 		return usedInstances.GetEnumerator();
 	}
 
-	protected bool Overlimit
-	{
-		get
-		{
-			return UsedCount >= LimitAmount;
-		}
-	}
+	protected bool Overlimit => UsedCount >= LimitAmount;
+
 	#endregion
 
 	#region Editor functionality
 	#if UNITY_EDITOR
 	private IEnumerable<Component> GetComponents()
 	{
-		if (Prefab == null)
-			return Enumerable.Empty<Component>();
-
-		return Prefab.gameObject.GetComponents<Component>();
+		return Prefab != null ? Prefab.gameObject.GetComponents<Component>() : Enumerable.Empty<Component>();
 	}
 
 	private void ResetName()
@@ -393,30 +382,10 @@ public class Pool : MonoBehaviour, IEnumerable<Component>
 			PreloadAmount = MaxPreloadAmount;
 	}
 
-	private bool ShowGroup
-	{
-		get
-		{
-			return Group != null;
-		}
-	}
-
-	private bool ShowPersistent
-	{
-		get
-		{
-			return transform.parent == null;
-		}
-	}
-
-	private int MaxPreloadAmount
-	{
-		get
-		{
-			return Limit ? LimitAmount : UnlimitedMaxPreloadAmount;
-		}
-	}
-	#endif
+	private bool ShowGroup => Group != null;
+	private bool ShowPersistent => transform.parent == null;
+	private int MaxPreloadAmount => Limit ? LimitAmount : UnlimitedMaxPreloadAmount;
+#endif
 	#endregion
 
 	#region Public fields
@@ -425,39 +394,14 @@ public class Pool : MonoBehaviour, IEnumerable<Component>
 	[EnableGUI]
 	[ShowInInspector]
 	[HideInInlineEditors]
-	public LinkedList<Component> Available
-	{
-		get
-		{
-			return availableInstances;
-		}
-	}
-
-	public int AvailableCount
-	{
-		get
-		{
-			return availableInstances.Count;
-		}
-	}
+	public LinkedList<Component> Available => availableInstances;
+	public int AvailableCount => availableInstances.Count;
 
 	[EnableGUI]
 	[ShowInInspector]
 	[HideInInlineEditors]
-	public LinkedList<Component> Used
-	{
-		get
-		{
-			return usedInstances;
-		}
-	}
+	public LinkedList<Component> Used => usedInstances;
+	public int UsedCount => usedInstances.Count;
 
-	public int UsedCount
-	{
-		get
-		{
-			return usedInstances.Count;
-		}
-	}
 	#endregion
 }

@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-using UnityEngine.Events;
+﻿using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 using UniRx;
@@ -52,11 +48,11 @@ public class RatingPicker : MonoBehaviour
 
 	protected void Start()
 	{
-		if (buttons == null)
-		{
-			SpawnButtons();
-			RefreshRating();
-		}
+		if (buttons != null)
+			return;
+
+		SpawnButtons();
+		RefreshRating();
 	}
 
 	protected void SpawnButtons()
@@ -68,9 +64,9 @@ public class RatingPicker : MonoBehaviour
 
 	protected void DestroyButtons()
 	{
-		Transform transform = this.transform;
-		for (int i = transform.childCount - 1; i >= 0; i--)
-			transform.GetChild(i).gameObject.Destroy();
+		Transform transformCached = transform;
+		for (int i = transformCached.childCount - 1; i >= 0; i--)
+			transformCached.GetChild(i).gameObject.Destroy();
 	}
 
 	protected void SpawnButton(int index)
@@ -79,7 +75,7 @@ public class RatingPicker : MonoBehaviour
 		Button button = spriteGO.AddComponent<Button>();
 		button.transform.SetParent(transform, false);
 		button.interactable = !isReadonly;
-		
+
 		var colors = button.colors;
 		colors.disabledColor = colors.normalColor;
 		colors.highlightedColor = highlightedColor;
@@ -118,25 +114,25 @@ public class RatingPicker : MonoBehaviour
 
 		int intPart = (int) newRating;
 		float decimalPart = newRating % 1;
-		bool half = allowHalf ? decimalPart >= 0.5f : false;
+		bool half = allowHalf && decimalPart >= 0.5f;
 
 		if (half)
 			rating = intPart + 0.5f;
 		else
 			rating = intPart;
 
-		if (buttons != null && buttons.Length > 0)
-		{
-			for (int i = 0; i < intPart; i++)
-				buttons[i].image.sprite = oneSprite;
+		if (buttons == null || buttons.Length <= 0)
+			return;
 
-			if (intPart < maxRating)
-			{
-				buttons[intPart].image.sprite = half ? halfSprite : zeroSprite;
-				for (int i = intPart + 1; i < maxRating; i++)
-					buttons[i].image.sprite = zeroSprite;
-			}
-		}
+		for (int i = 0; i < intPart; i++)
+			buttons[i].image.sprite = oneSprite;
+
+		if (intPart >= maxRating)
+			return;
+		
+		buttons[intPart].image.sprite = half ? halfSprite : zeroSprite;
+		for (int i = intPart + 1; i < maxRating; i++)
+			buttons[i].image.sprite = zeroSprite;
 	}
 
 	protected void RefreshRating()
@@ -153,10 +149,7 @@ public class RatingPicker : MonoBehaviour
 	[PropertyRange(1, 10)]
 	public int MaxRating
 	{
-		get
-		{
-			return maxRating;
-		}
+		get => maxRating;
 		set
 		{
 			maxRating = value;
@@ -173,23 +166,14 @@ public class RatingPicker : MonoBehaviour
 	[PropertyRange(0, "GetMaxRatingAsFloat")]
 	public float Rating
 	{
-		get
-		{
-			return rating;
-		}
-		set
-		{
-			SetRating(value);
-		}
+		get => rating;
+		set => SetRating(value);
 	}
 
 	[ShowInInspector]
 	public bool AllowHalf
 	{
-		get
-		{
-			return allowHalf;
-		}
+		get => allowHalf;
 		set
 		{
 			allowHalf = value;
@@ -200,18 +184,14 @@ public class RatingPicker : MonoBehaviour
 	[ShowInInspector]
 	public bool IsReadonly
 	{
-		get
-		{
-			return isReadonly;
-		}
+		get => isReadonly;
 		set
 		{
 			isReadonly = value;
-			if (buttons != null)
-			{
-				foreach (Button button in buttons)
-					button.interactable = !value;
-			}
+			if (buttons == null)
+				return;
+			foreach (Button button in buttons)
+				button.interactable = !value;
 		}
 	}
 
@@ -219,10 +199,7 @@ public class RatingPicker : MonoBehaviour
 	[FoldoutGroup("Sprites")]
 	public Sprite ZeroSprite
 	{
-		get
-		{
-			return zeroSprite;
-		}
+		get => zeroSprite;
 		set
 		{
 			zeroSprite = value;
@@ -235,10 +212,7 @@ public class RatingPicker : MonoBehaviour
 	[FoldoutGroup("Sprites")]
 	public Sprite HalfSprite
 	{
-		get
-		{
-			return halfSprite;
-		}
+		get => halfSprite;
 		set
 		{
 			halfSprite = value;
@@ -250,10 +224,7 @@ public class RatingPicker : MonoBehaviour
 	[FoldoutGroup("Sprites")]
 	public Sprite OneSprite
 	{
-		get
-		{
-			return oneSprite;
-		}
+		get => oneSprite;
 		set
 		{
 			oneSprite = value;
@@ -265,21 +236,17 @@ public class RatingPicker : MonoBehaviour
 	[FoldoutGroup("Appearance")]
 	public Color HighlightedColor
 	{
-		get
-		{
-			return highlightedColor;
-		}
+		get => highlightedColor;
 		set
 		{
 			highlightedColor = value;
-			if (buttons != null)
+			if (buttons == null)
+				return;
+			foreach (Button button in buttons)
 			{
-				foreach (Button button in buttons)
-				{
-					var colors = button.colors;
-					colors.highlightedColor = value;
-					button.colors = colors;
-				}
+				var colors = button.colors;
+				colors.highlightedColor = value;
+				button.colors = colors;
 			}
 		}
 	}
@@ -288,21 +255,17 @@ public class RatingPicker : MonoBehaviour
 	[FoldoutGroup("Appearance")]
 	public Color PressedColor
 	{
-		get
-		{
-			return pressedColor;
-		}
+		get => pressedColor;
 		set
 		{
 			pressedColor = value;
-			if (buttons != null)
+			if (buttons == null)
+				return;
+			foreach (Button button in buttons)
 			{
-				foreach (Button button in buttons)
-				{
-					var colors = button.colors;
-					colors.pressedColor = value;
-					button.colors = colors;
-				}
+				var colors = button.colors;
+				colors.pressedColor = value;
+				button.colors = colors;
 			}
 		}
 	}

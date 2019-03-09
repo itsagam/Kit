@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 public class AutoOrbit: MonoBehaviour
 {
@@ -11,9 +8,6 @@ public class AutoOrbit: MonoBehaviour
 
 	protected void LateUpdate()
 	{
-		if (Target == null)
-			return;
-		
 		transform.RotateAround(Target.position, Axis, Time.deltaTime * Speed);
 	}
 }

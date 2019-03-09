@@ -1,13 +1,5 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using UnityEngine;
-using UniRx;
-using UniRx.Async;
+﻿using UnityEngine;
 using Modding;
-using XLua;
-using Cards;
 
 public class Test : MonoBehaviour
 {
@@ -15,10 +7,6 @@ public class Test : MonoBehaviour
 	{
 		//CS.ResourceManager.Load(typeof(UE.Texture), CS.ResourceFolder.Resources, "Textures/test")
 		ModManager.LoadMods(true);
-	}
-
-	protected void Start()
-	{
 	}
 
 	public void Button()

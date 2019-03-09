@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 using Sirenix.OdinInspector;
 
 // Component added to all instances so we can track the pool they came from
@@ -15,11 +12,10 @@ public class PoolInstance : MonoBehaviour
 	protected void OnDestroy()
 	{
 		// Find and remove individual instances from Pool only if the pool/scene itself is not being unloaded
-		if (Pool != null && !Pool.IsDestroying)
-		{
-			if (!Pool.Used.Remove(Component))
-				Pool.Available.Remove(Component);
-		}
+		if (Pool == null || Pool.IsDestroying)
+			return;
+		if (!Pool.Used.Remove(Component))
+			Pool.Available.Remove(Component);
 	}
 
 #if UNITY_EDITOR
@@ -33,14 +29,8 @@ public class PoolInstance : MonoBehaviour
 		Pool.Destroy(Component);
 	}
 
-	private bool ShowButton
-	{
-		get
-		{
-			return Pool != null && 
-				Component != null &&
-				Pool.Used.Contains(Component);
-		}
-	}
+	private bool ShowButton => Pool      != null && 
+							   Component != null &&
+							   Pool.Used.Contains(Component);
 #endif
 }

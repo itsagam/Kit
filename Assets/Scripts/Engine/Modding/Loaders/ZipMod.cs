@@ -1,18 +1,16 @@
 ﻿#if MODDING
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
-using UnityEngine;
 using UniRx.Async;
 
 namespace Modding.Loaders
 {
 	public class ZipModLoader : ModLoader
 	{
-		public List<string> SupportedExtensions = new List<string> { ".zip" };
+		public readonly List<string> SupportedExtensions = new List<string> { ".zip" };
 
 		public override Mod LoadMod(string path)
 		{
@@ -63,8 +61,8 @@ namespace Modding.Loaders
 
 	public class ZipMod : Mod
 	{
-		public FileStream Stream { get; protected set; }
-		public ZipArchive Archive { get; protected set; }
+		public FileStream Stream { get; }
+		public ZipArchive Archive { get; }
 
 		public ZipMod(string path)
 		{

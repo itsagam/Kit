@@ -1,10 +1,6 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 
-public class MathHelper
+public static class MathHelper
 {
     public static bool IsInRange(Vector2 number, Vector2 from, Vector2 to)
     {

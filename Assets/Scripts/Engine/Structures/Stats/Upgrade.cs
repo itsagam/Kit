@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -13,7 +12,7 @@ public class UpgradeDrawer : OdinValueDrawer<Upgrade>
 {
 	protected override void DrawPropertyLayout(GUIContent label)
 	{
-		SirenixEditorGUI.BeginToolbarBox(label);	
+		SirenixEditorGUI.BeginToolbarBox(label);
 		CallNextDrawer(null);
 		SirenixEditorGUI.EndToolbarBox();
 	}
@@ -92,11 +91,10 @@ public class Upgrade
 	public static bool RemoveFrom(IUpgradeable upgradeable, string id)
 	{
 		Upgrade previous = Find(upgradeable, id);
-		if (previous != null)
-		{
-			upgradeable.GetUpgrades().Remove(previous);
-			return true;
-		}
-		return false;
+		if (previous == null)
+			return false;
+
+		upgradeable.GetUpgrades().Remove(previous);
+		return true;
 	}
 }

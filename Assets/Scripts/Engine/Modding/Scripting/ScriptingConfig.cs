@@ -1,9 +1,7 @@
 ﻿#if MODDING
 using System;
-using System.Reflection;
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 using XLua;
 
 namespace Modding.Scripting

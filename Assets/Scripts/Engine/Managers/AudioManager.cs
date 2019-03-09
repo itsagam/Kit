@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UniRx;
@@ -50,16 +49,12 @@ public static class AudioManager
 
 	public static AudioSource GetGroupSource(string name)
 	{
-		if (groupSources.TryGetValue(name, out AudioSource source))
-			return source;
-		return null;
+		return groupSources.TryGetValue(name, out AudioSource source) ? source : null;
 	}
 
 	public static AudioSource GetOrCreateGroup(string name)
 	{
-		if (groupSources.TryGetValue(name, out AudioSource source))
-			return source;
-		return CreateGroup(name);
+		return groupSources.TryGetValue(name, out AudioSource source) ? source : CreateGroup(name);
 	}
 
 	public static bool RemoveGroup(string name)
@@ -186,10 +181,7 @@ public static class AudioManager
 	#region AudioClip (Unpooled) playback
 	public static AudioSource Play(AudioClip clip, bool loop = false, bool is3D = false)
 	{
-		if (clip == null)
-			return null;
-
-		return PlayDedicated(clip, loop, is3D);
+		return clip == null ? null : PlayDedicated(clip, loop, is3D);
 	}
 
 	public static AudioSource Play(AudioClip clip, Vector3 position, bool loop = false, bool is3D = true)
@@ -251,48 +243,14 @@ public static class AudioManager
 	#endregion
 
 	#region Public fields
-	public static AudioSource BackgroundSource
-	{
-		get
-		{
-			return GetGroupSource(BackgroundGroup);
-		}
-	}
-
+	public static AudioSource BackgroundSource => GetGroupSource(BackgroundGroup);
+	public static AudioSource SoundEffectsSource => GetGroupSource(SoundEffectGroup);
+	public static AudioSource UISource => GetGroupSource(UIGroup);
 	public static float BackgroundMusicFadeSpeed
 	{
-		get
-		{
-			return BackgroundManager.Speed;
-		}
-		set
-		{
-			BackgroundManager.Speed = value;
-		}
+		get => BackgroundManager.Speed;
+		set => BackgroundManager.Speed = value;
 	}
-
-	public static bool IsBackgroundMusicPlaying
-	{
-		get
-		{
-			return BackgroundManager.IsPlaying;
-		}
-	}
-
-	public static AudioSource SoundEffectsSource
-	{
-		get
-		{
-			return GetGroupSource(SoundEffectGroup);
-		}
-	}
-
-	public static AudioSource UISource
-	{
-		get
-		{
-			return GetGroupSource(UIGroup);
-		}
-	}
+	public static bool IsBackgroundMusicPlaying => BackgroundManager.IsPlaying;
 	#endregion
 }

@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.IO;
-using System.Reflection;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.Networking;
@@ -11,8 +9,8 @@ using Modding;
 using Modding.Parsers;
 
 // Notes:	You have to provide file extension for ResourceFolder other than Resources if it is not loaded
-//			by ModManager because you can't enumerate and match files in Data/Resources/StreamingAssets on 
-//			platforms like Android. If the file is loaded by ModManager it can be loaded without providing 
+//			by ModManager because you can't enumerate and match files in Data/Resources/StreamingAssets on
+//			platforms like Android. If the file is loaded by ModManager it can be loaded without providing
 //			an extension since mods are always in an accessible folder which we can enumerate.
 
 public static class ResourceManager
@@ -29,7 +27,7 @@ public static class ResourceManager
 	// Default mode for modding in individual calls
 	private const bool DefaultModding = true;
 
-	private static Dictionary<(Type type, ResourceFolder folder, string file), WeakReference> cachedResources 
+	private static Dictionary<(Type type, ResourceFolder folder, string file), WeakReference> cachedResources
 		= new Dictionary<(Type, ResourceFolder, string), WeakReference>();
 
 	#region Loading
@@ -38,7 +36,7 @@ public static class ResourceManager
 		return (T) Load(typeof(T), folder, file, modded, merge);
 	}
 
-	public static object Load(Type type, ResourceFolder folder, string file, bool modded = DefaultModding, bool merge = false) 
+	public static object Load(Type type, ResourceFolder folder, string file, bool modded = DefaultModding, bool merge = false)
 	{
 #if MODDING
 		if (modded)
@@ -52,7 +50,7 @@ public static class ResourceManager
 				object moddedFile = ModManager.Load(type, folder, file);
 				if (moddedFile != null)
 					return moddedFile;
-			}		
+			}
 		}
 #endif
 		return LoadUnmodded(type, folder, file);
@@ -170,7 +168,7 @@ public static class ResourceManager
 		if (reference != null)
 			return reference;
 
-		ResourceParser parser = null;
+		ResourceParser parser;
 		string fullPath = GetPath(folder, file);
 		if (folder == ResourceFolder.Resources)
 		{
@@ -226,7 +224,7 @@ public static class ResourceManager
 		if (reference != null)
 			return reference;
 
-		ResourceParser parser = null;
+		ResourceParser parser;
 		string fullPath = GetPath(folder, file);
 		if (folder == ResourceFolder.Resources)
 		{
@@ -292,7 +290,7 @@ public static class ResourceManager
 	{
 		string text = null;
 		byte[] bytes = null;
-		foreach (var (parser, certainty) in RankParsers(type, fullPath))
+		foreach (var (parser, _) in RankParsers(type, fullPath))
 		{
 			try
 			{
@@ -336,7 +334,7 @@ public static class ResourceManager
 	{
 		string text = null;
 		byte[] bytes = null;
-		foreach (var (parser, certainty) in RankParsers(type, fullPath))
+		foreach (var (parser, _) in RankParsers(type, fullPath))
 		{
 			try
 			{
@@ -366,9 +364,9 @@ public static class ResourceManager
 		if (ModManager.Unload(reference))
 			return true;
 #endif
-	
+
 		var key = cachedResources.FirstOrDefault(kvp => kvp.Value.Target == reference).Key;
-	
+
 		if (reference is UnityEngine.Object unityObject)
 		{
 			if (key.file == null || key.folder == ResourceFolder.Resources)
@@ -376,7 +374,7 @@ public static class ResourceManager
 			else
 				GameObject.Destroy(unityObject);
 		}
-		
+
 		// Because of FirstOrDefault, if key is not found "file" will be null
 		if (key.file != null)
 		{
@@ -500,8 +498,7 @@ public static class ResourceManager
 		UnityWebRequest request = await WebAsync(fullPath);
 		if (request.isHttpError || request.isNetworkError)
 			return null;
-		else
-			return request.downloadHandler.text;
+		return request.downloadHandler.text;
 	}
 
 	public static byte[] ReadBytes(string fullPath)
@@ -522,8 +519,7 @@ public static class ResourceManager
 		UnityWebRequest request = await WebAsync(fullPath);
 		if (request.isHttpError || request.isNetworkError)
 			return null;
-		else
-			return request.downloadHandler.data;
+		return request.downloadHandler.data;
 	}
 
 	private static UnityWebRequestAsyncOperation WebAsync(string filePath)
@@ -546,14 +542,13 @@ public static class ResourceManager
 
 	public static bool Save(string fullPath, object contents)
 	{
-		foreach (var (parser, certainty) in RankParsers(contents.GetType(), fullPath))
+		foreach (var (parser, _) in RankParsers(contents.GetType(), fullPath))
 		{
 			try
 			{
-				if (parser.OperateWith == OperateType.Text)
-					return SaveText(fullPath, (string) parser.Write(contents));
-				else
-					return SaveBytes(fullPath, (byte[]) parser.Write(contents));
+				return parser.OperateWith == OperateType.Text ?
+						   SaveText(fullPath, (string) parser.Write(contents)) :
+						   SaveBytes(fullPath, (byte[]) parser.Write(contents));
 			}
 			catch (Exception)
 			{
@@ -564,14 +559,13 @@ public static class ResourceManager
 
 	public static UniTask<bool> SaveAsync(string fullPath, object contents)
 	{
-		foreach (var (parser, certainty) in RankParsers(contents.GetType(), fullPath))
+		foreach (var (parser, _) in RankParsers(contents.GetType(), fullPath))
 		{
 			try
 			{
-				if (parser.OperateWith == OperateType.Text)
-					return SaveTextAsync(fullPath, (string) parser.Write(contents));
-				else
-					return SaveBytesAsync(fullPath, (byte[]) parser.Write(contents));
+				return parser.OperateWith == OperateType.Text ?
+						   SaveTextAsync(fullPath, (string) parser.Write(contents)) :
+						   SaveBytesAsync(fullPath, (byte[]) parser.Write(contents));
 			}
 			catch (Exception)
 			{

@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 using UniRx;
 using Sirenix.OdinInspector;
@@ -48,11 +46,11 @@ public class BuffDrawer : OdinValueDrawer<Buff>
 		if (Application.isPlaying && buff.TimeLeft.Value > 0)
 		{
 			GUIHelper.PushGUIEnabled(false);
-			EditorGUILayout.LabelField("Time", string.Format("{0:0.##}s", buff.TimeLeft.Value));
+			EditorGUILayout.LabelField("Time", $"{buff.TimeLeft.Value:0.##}s");
 			GUIHelper.PopGUIEnabled();
 		}
 		CallNextDrawer(null);
-		SirenixEditorGUI.EndToolbarBox();	
+		SirenixEditorGUI.EndToolbarBox();
 	}
 }
 #endif
@@ -73,7 +71,7 @@ public class Buff : Upgrade
 	public float Duration;
 	public BuffMode Mode = BuffMode.Extend;
 
-	public ReactiveProperty<float> TimeLeft { get; protected set; } = new ReactiveProperty<float>(-1);
+	public ReactiveProperty<float> TimeLeft { get; } = new ReactiveProperty<float>(-1);
 
 	public Buff()
 	{
@@ -110,7 +108,7 @@ public class Buff : Upgrade
 		Buff previous = null;
 		if (mode != BuffMode.Nothing)
 			previous = Find(upgradeable, ID) as Buff;
-			
+
 		if (mode == BuffMode.Nothing || previous == null)
 		{
 			upgradeable.GetUpgrades().Add(this);

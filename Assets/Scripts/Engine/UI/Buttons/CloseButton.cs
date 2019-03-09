@@ -1,5 +1,4 @@
-﻿using System;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
 
@@ -20,7 +19,7 @@ public class CloseButton : MonoBehaviour, IPointerClickHandler
 			Close();
 	}
 
-	protected void Close()
+	protected static void Close()
 	{
 		UIManager.LastWindow?.Hide();
 	}

@@ -1,6 +1,3 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 [RequireComponent(typeof(Camera))]
@@ -10,11 +7,11 @@ public class FollowCam : MonoBehaviour
 	public float Distance = 10.0f;
 	public float Speed = 10.0f;
 
-	protected Camera cameraCached;
+	protected Transform transformCached;
 
 	protected void Awake()
 	{
-		cameraCached = GetComponent<Camera>();
+		transformCached = GetComponent<Transform>();
 	}
 
 	public void Follow()
@@ -46,9 +43,9 @@ public class FollowCam : MonoBehaviour
 	{
 		if (Target == null)
 			Stop();
-		
+
 		Vector3 target = Target.position;
-		Vector3 position = target - transform.forward * Distance;
-		transform.position = Vector3.Lerp(transform.position, position, Time.deltaTime * Speed);
+		Vector3 position = target - transformCached.forward * Distance;
+		transformCached.position = Vector3.Lerp(transformCached.position, position, Time.deltaTime * Speed);
 	}
 }

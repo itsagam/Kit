@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -20,21 +19,19 @@ public class StatsProcessor : OdinAttributeProcessor<Stats>
 		{
 			KeyLabel = "Stat Name",
 			ValueLabel = "Base Value"
-		});	
+		});
 	}
 }
 
 public class StatsDrawer : OdinValueDrawer<Stats>
 {
 	public const float FoldoutGap = 15;
-	public static GUIStyle BaseValueStyle = new GUIStyle(SirenixGUIStyles.Label);
-	public static GUIStyle CurrentValueStyle = new GUIStyle(SirenixGUIStyles.BoldTitle)
+	public static readonly GUIStyle BaseValueStyle = new GUIStyle(SirenixGUIStyles.Label);
+	public static readonly GUIStyle CurrentValueStyle = new GUIStyle(SirenixGUIStyles.BoldTitle)
 	{
 		alignment = TextAnchor.MiddleRight
 	};
-	public static GUIStyle EffectsStyle = new GUIStyle(SirenixGUIStyles.Label)
-	{
-	};
+	public static readonly GUIStyle EffectsStyle = new GUIStyle(SirenixGUIStyles.Label);
 
 	protected LocalPersistentContext<bool> toggled;
 
@@ -108,7 +105,7 @@ public class StatsDrawer : OdinValueDrawer<Stats>
 
 				SirenixEditorGUI.EndIndentedHorizontal();
 				SirenixEditorGUI.EndBoxHeader();
-		
+
 				if (isExpanded != null)
 				{
 					// Upgrades and effects
@@ -149,7 +146,7 @@ public class StatsDrawer : OdinValueDrawer<Stats>
 	{
 		foreach (var (upgrade, effects) in groups)
 		{
-			string effectString = effects.Select(e => Effect.Convert(e)).Join();
+			string effectString = effects.Select(Effect.Convert).Join();
 			EditorGUILayout.LabelField(upgrade.ID, effectString, EffectsStyle);
 		}
 	}
@@ -191,14 +188,8 @@ public class Stats : Dictionary<string, StatBaseProperty>, IDisposable
 
 	public new float this[string stat]
 	{
-		get
-		{
-			return GetCurrentValue(stat);
-		}
-		set
-		{
-			SetBaseValue(stat, value);
-		}
+		get => GetCurrentValue(stat);
+		set => SetBaseValue(stat, value);
 	}
 
 	public void Add(string stat, float value)
@@ -208,9 +199,7 @@ public class Stats : Dictionary<string, StatBaseProperty>, IDisposable
 
 	public StatBaseProperty GetBaseProperty(string stat)
 	{
-		if (TryGetValue(stat, out var property))
-			return property;
-		return null;
+		return TryGetValue(stat, out var property) ? property : null;
 	}
 
 	public void SetBaseProperty(string stat, StatBaseProperty value)
@@ -243,7 +232,7 @@ public class Stats : Dictionary<string, StatBaseProperty>, IDisposable
 
 		disposables.Add(currentProperty);
 		currentProperties.Add(stat, currentProperty);
-	
+
 		return currentProperty;
 	}
 
@@ -286,7 +275,6 @@ public class Stats : Dictionary<string, StatBaseProperty>, IDisposable
 	public static IEnumerable<(Upgrade, IEnumerable<Effect>)> GetEffectsAndUpgrades(IUpgradeable upgradeable, string stat)
 	{
 		return upgradeable.GetUpgrades()
-			.Where(u => u != null)
 			.Select(u => (upgrade: u, effects: u.Effects.Where(e => e.Stat == stat)))
 			.Where(g => g.effects.Any());
 	}
@@ -328,6 +316,7 @@ public class Stats : Dictionary<string, StatBaseProperty>, IDisposable
 [Serializable]
 public class StatBaseProperty : ReactiveProperty<float>
 {
-	public StatBaseProperty() : base() { }
+	public StatBaseProperty() { }
+
 	public StatBaseProperty(float initialValue) : base(initialValue) { }
 }

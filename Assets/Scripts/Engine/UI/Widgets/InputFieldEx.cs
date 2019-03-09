@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -20,7 +19,7 @@ public class InputFieldEx : InputField
 
 	public KeyHandler AddKeyHandler(KeyCode key, Action action, EventModifiers modifiers = EventModifiers.None, EventModifiers disregard = EventModifiers.None)
 	{
-		KeyHandler keyHandler = new KeyHandler()
+		KeyHandler keyHandler = new KeyHandler
 		{
 			Key = key,
 			Modifiers = modifiers,
@@ -73,9 +72,8 @@ public class InputFieldEx : InputField
 					action();
 					break;
 				}
-				else
-					KeyPressed(e);
-			}	
+				KeyPressed(e);
+			}
 		}
 		if (consumedEvent)
 			UpdateLabel();

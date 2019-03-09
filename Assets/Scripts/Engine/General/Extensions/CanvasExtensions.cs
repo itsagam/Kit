@@ -1,12 +1,12 @@
-﻿using System;
-using UnityEngine;
+﻿using UnityEngine;
 
 public static class CanvasExtensions
 {
 	public static bool IsScreenSpace(this Canvas canvas)
 	{
+		RenderMode renderMode = canvas.renderMode;
 		return
-			canvas.renderMode == RenderMode.ScreenSpaceOverlay ||
-			(canvas.renderMode == RenderMode.ScreenSpaceCamera && canvas.worldCamera == null);
+			renderMode == RenderMode.ScreenSpaceOverlay ||
+			renderMode == RenderMode.ScreenSpaceCamera && canvas.worldCamera == null;
 	}
 }

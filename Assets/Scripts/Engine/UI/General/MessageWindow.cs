@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -144,24 +142,15 @@ public class MessageWindow : Window
 		MessageInfo.CancelAction?.Invoke();
 	}
 
-	public MessageInfo MessageInfo
-	{
-		get
-		{
-			return (MessageInfo) Data;
-		}
-	}
+	public MessageInfo MessageInfo => (MessageInfo) Data;
 
 	public override object Data
 	{
-		get
-		{
-			return data;
-		}
+		get => data;
 		set
 		{
 			if (value is string message)
-				data = new MessageInfo() { Message = message };
+				data = new MessageInfo { Message = message };
 			else
 				data = value;
 			Refresh();

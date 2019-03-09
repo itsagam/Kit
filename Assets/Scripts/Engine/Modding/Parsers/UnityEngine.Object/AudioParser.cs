@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -34,7 +33,7 @@ namespace Modding.Parsers
 		}
 		public override OperateType OperateWith => OperateType.Bytes;
 
-		public override object Read(Type type, object data, string path)
+		public override object Read(Type type, object data, string path = null)
 		{
 			return WavUtility.ToAudioClip((byte[]) data, 0, path);
 		}

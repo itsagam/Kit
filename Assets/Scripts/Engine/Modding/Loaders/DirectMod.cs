@@ -1,10 +1,8 @@
 ﻿#if MODDING
 using System;
-using System.Collections;
 using System.IO;
 using System.Collections.Generic;
 using System.Linq;
-using UnityEngine;
 using UniRx.Async;
 
 namespace Modding.Loaders
@@ -93,18 +91,18 @@ namespace Modding.Loaders
 			if (File.Exists(fullPath))
 				return EnumerableExtensions.Yield(path);
 
-			if (!System.IO.Path.HasExtension(path))
-			{
-				string fullDir = System.IO.Path.GetDirectoryName(fullPath);
-				if (Directory.Exists(fullDir))
-				{
-					string fullFile = System.IO.Path.GetFileName(fullPath);
-					var matching = Directory.EnumerateFiles(fullDir, $"{fullFile}.*");
-					string relativeDir = System.IO.Path.GetDirectoryName(path);
-					if (matching.Any())
-						return matching.Select(p => relativeDir + "/" + System.IO.Path.GetFileName(p));
-				}
-			}
+			if (System.IO.Path.HasExtension(path))
+				return null;
+
+			string fullDir = System.IO.Path.GetDirectoryName(fullPath);
+			if (!Directory.Exists(fullDir))
+				return null;
+
+			string fullFile = System.IO.Path.GetFileName(fullPath);
+			var matching = Directory.EnumerateFiles(fullDir, $"{fullFile}.*");
+			string relativeDir = System.IO.Path.GetDirectoryName(path);
+			if (matching.Any())
+				return matching.Select(p => relativeDir + "/" + System.IO.Path.GetFileName(p));
 
 			return null;
 		}

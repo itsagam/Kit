@@ -1,9 +1,6 @@
-﻿using System;
-using UnityEngine;
-using UnityEngine.UI;
+﻿using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.EventSystems;
-using UnityEngine.SceneManagement;
 using Sirenix.OdinInspector;
 
 public class SceneButton : MonoBehaviour, IPointerClickHandler
@@ -33,15 +30,11 @@ public class SceneButton : MonoBehaviour, IPointerClickHandler
 
 	public void OnPointerClick (PointerEventData eventData)
 	{
-		SceneManager.LoadBuilder builder = null;
-		if (Reload)
-			builder = SceneManager.ReloadScene();
-		else
-			builder = SceneManager.LoadScene(Scene);
+		SceneManager.LoadBuilder builder = Reload ? SceneManager.ReloadScene() : SceneManager.LoadScene(Scene);
 
 		enabled = false;
 		builder.SetFadeMode(FadeMode).SetFadeColor(FadeColor).SetFadeTime(FadeTime)
-			.OnProgress((float progress) =>
+			.OnProgress(progress =>
 			{
 				OnProgress.Invoke();
 			})

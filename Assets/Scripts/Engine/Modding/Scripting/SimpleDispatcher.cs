@@ -1,7 +1,6 @@
 ﻿#if MODDING
 using System;
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 namespace Modding.Scripting
@@ -10,10 +9,10 @@ namespace Modding.Scripting
 	{
 		protected static Transform parent = null;
 
-		protected void CreateParent()
+		protected static void CreateParent()
 		{
 			GameObject parentGO = new GameObject("Mods");
-			GameObject.DontDestroyOnLoad(parentGO);
+			DontDestroyOnLoad(parentGO);
 			parent = parentGO.transform;
 		}
 

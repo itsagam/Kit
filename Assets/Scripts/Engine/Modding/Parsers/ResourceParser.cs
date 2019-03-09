@@ -1,6 +1,4 @@
-﻿using UnityEngine;
-using System;
-using System.Collections;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -23,7 +21,7 @@ namespace Modding.Parsers
 		{
 			float certainty = 0;
 
-			if (SupportedTypes.Any(t => type.IsAssignableFrom(t)))
+			if (SupportedTypes.Any(type.IsAssignableFrom))
 				certainty += 0.5f;
 
 			if (SupportedExtensions.Any(e => string.Compare(Path.GetExtension(path), e) == 0))

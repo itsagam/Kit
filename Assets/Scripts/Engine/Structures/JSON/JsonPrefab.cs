@@ -9,9 +9,9 @@ using Newtonsoft.Json.Linq;
 /// <summary>
 /// Instantiates a prefab whenever a MonoBehaviour is encountered and populates the
 /// instance with a state provided in JSON. You have to provide path to the prefab.
-/// Anything enclosed with {} in the prefab path is replaced with the actual value of 
+/// Anything enclosed with {} in the prefab path is replaced with the actual value of
 /// a property, so you can instantiate different prefabs depending on the state.
-/// 
+///
 /// There are three ways to use this class – Converter, State-object or JObject method.
 /// In the converter mode, you put a JsonConverter attribute on a MonoBehaviour with
 /// type JsonPrefabConverter and the prefab path as its first argument. On the Json side,
@@ -19,10 +19,10 @@ using Newtonsoft.Json.Linq;
 /// loaded, the converter will instantiate objects and assign them in the GameState. This
 /// way, the MonoBehaviours will be strongly bound to the GameState. The advantage of this
 /// is that you can change MonoBehaviours and they'll automatically be reflected. The
-/// disavantage being if MonoBehaviours are destroyed, they'll become null or inaccesible
+/// disadvantage being if MonoBehaviours are destroyed, they'll become null or inaccessible
 /// in the GameState.
-/// 
-/// In the state-object mode, you put JsonPrefab attribute on a separate class denoting a 
+///
+/// In the state-object mode, you put JsonPrefab attribute on a separate class denoting a
 /// MonoBehaviour's state and use that in the GameState. The Json will be loaded normally,
 /// and nothing will happen by itself. To instantiate objects, you have to call
 /// JsonPrefab.Instantiate on state-objects whenever you want. The advantage of this is
@@ -32,14 +32,14 @@ using Newtonsoft.Json.Linq;
 /// called JsonPrefab.Save which can be called manually and is automatically called when a
 /// Json-created MonoBehaviour is destroyed. This is the slowest method since we have to
 /// convert to and from JObject each time we have to populate data.
-/// 
+///
 /// The JObject mode is very similar to state-object mode, except that you put JObject in
 /// GameState wherever you want to work with MonoBehaviours and call JsonPrefab.Instantiate
 /// by providing it the prefab path and JObjects to instantiate directly. This is the fastest
 /// method and doesn't have problems like having to use JsonSubtypes to create the correct
 /// State-object type.
 /// </summary>
-/// 
+///
 /// <example>
 /// The following will all instantiate two prefabs, "Building/ProducerBuilding" and
 /// "Building/BankBuilding", with Position (1, 1) and (2, 2) respectively.
@@ -60,9 +60,9 @@ using Newtonsoft.Json.Linq;
 ///		]
 /// }
 /// </code>
-/// 
-/// 
-/// 
+///
+///
+///
 /// C# (Converter method):
 /// <code>
 /// [JsonConverter(typeof(JsonPrefabConverter), "Buildings/{Type}")]
@@ -71,19 +71,19 @@ using Newtonsoft.Json.Linq;
 /// {
 ///		[JsonProperty]
 ///		public string Type;
-///		
+///
 /// 	[JsonProperty]
 ///		public Vector2 Position;
 /// }
-/// 
+///
 /// public class GameState
 /// {
 ///		public List<Building> Buildings;
 /// }
 /// </code>
-/// 
-/// 
-/// 
+///
+///
+///
 /// C# (State-object method):
 /// <code>
 /// [JsonObject(MemberSerialization.OptIn)]
@@ -91,28 +91,28 @@ using Newtonsoft.Json.Linq;
 /// {
 ///		[JsonProperty]
 ///		public string Type;
-///		
+///
 /// 	[JsonProperty]
 ///		public Vector2 Position;
 /// }
-/// 
+///
 /// [Prefab("Buildings/{Type}")]
 /// public class GameState
 /// {
 ///		public List<BuildingState> Buildings;
 /// }
-/// 
+///
 /// public class BuildingState
 /// {
 ///		public string Type;
 ///		public Vector2 Position;
 /// }
-/// 
+///
 /// JsonPrefab.Instantiate<Building>(GameState.Buildings);
 /// </code>
-/// 
-/// 
-/// 
+///
+///
+///
 /// C# (JObject method):
 /// <code>
 /// [JsonObject(MemberSerialization.OptIn)]
@@ -120,23 +120,23 @@ using Newtonsoft.Json.Linq;
 /// {
 ///		[JsonProperty]
 ///		public string Type;
-///		
+///
 /// 	[JsonProperty]
 ///		public Vector2 Position;
 /// }
-/// 
+///
 /// public class GameState
 /// {
 ///		public List<JObject> Buildings;
 /// }
-/// 
+///
 /// JsonPrefab.Instantiate<Building>("Buildings/{Type}", GameState.Buildings);
 /// </code>
 /// </example>
 
 public class JsonPrefabConverter : JsonConverter
 {
-	public string Path;
+	public readonly string Path;
 
 	public JsonPrefabConverter(string path)
 	{
@@ -211,12 +211,12 @@ public static class JsonPrefab
 		JObject jObject = JObject.FromObject(stateObject);
 		var instance = Instantiate<T>(attribute.Path, jObject);
 
-		if (instance != null && saveOnDestroy)
-		{
-			var serializeOnDestroy = instance.gameObject.AddComponent<JsonSaveStateOnDestroy>();
-			serializeOnDestroy.MonoObject = instance;
-			serializeOnDestroy.StateObject = stateObject;
-		}
+		if (instance == null || !saveOnDestroy)
+			return instance;
+
+		var serializeOnDestroy = instance.gameObject.AddComponent<JsonSaveStateOnDestroy>();
+		serializeOnDestroy.MonoObject = instance;
+		serializeOnDestroy.StateObject = stateObject;
 
 		return instance;
 	}
@@ -311,7 +311,7 @@ public static class JsonPrefab
 [AttributeUsage(AttributeTargets.Class | AttributeTargets.Interface)]
 public class JsonPrefabAttribute : Attribute
 {
-	public string Path;
+	public readonly string Path;
 
 	public JsonPrefabAttribute(string path)
 	{

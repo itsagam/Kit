@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-using UnityEngine.UI;
-using UnityEngine.EventSystems;
+﻿using UnityEngine.EventSystems;
 
 public class Slot: Icon, IDropHandler
 {
@@ -11,17 +6,17 @@ public class Slot: Icon, IDropHandler
 	public Icon Icon { get; protected set; }
 
 	public virtual void OnDrop(PointerEventData eventData)
-	{			
+	{
 		if (HasIcon)
 			return;
 
 		DragCursor cursor = eventData.pointerDrag.GetComponent<DragCursor>();
 		if (cursor == null || cursor.Icon == null)
 			return;
-	
+
 		if (!CanReceive(cursor.Icon))
 			return;
-		
+
 		Receive(cursor.Icon);
 	}
 
@@ -48,20 +43,14 @@ public class Slot: Icon, IDropHandler
 			Destroy(Icon.gameObject);
 			Icon = null;
 		}
-		if (Data != null)
-		{
-			Icon instance = Instantiate(Prefab);
-			instance.transform.SetParent(transform, false);
-			instance.Data = Data;
-			Icon = instance;
-		}
+
+		if (Data == null)
+			return;
+
+		Icon instance = Instantiate(Prefab, transform, false);
+		instance.Data = Data;
+		Icon = instance;
 	}
 
-	public virtual bool HasIcon
-	{
-		get
-		{
-			return Icon != null;
-		}
-	}
+	public virtual bool HasIcon => Icon != null;
 }

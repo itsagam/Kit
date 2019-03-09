@@ -1,13 +1,11 @@
 ﻿#if MODDING
 using System;
-using System.IO;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using Modding.Parsers;
 using Modding.Scripting;
-using UniRx;
 using UniRx.Async;
 using XLua;
 
@@ -34,12 +32,12 @@ namespace Modding
 	{
 		public const string MetadataFile = "Metadata.json";
 		public const float GCInterval = 1.0f;
-		protected static YieldInstruction GCYield = new WaitForSeconds(GCInterval);
+		private static YieldInstruction gcYield = new WaitForSeconds(GCInterval);
 
 		public ModGroup Group { get; set; }
 		public string Path { get;  protected set; }
 		public ModMetadata Metadata { get; protected set; }
-		
+
 		public abstract IEnumerable<string> FindFiles(string path);
 		public abstract bool Exists(string path);
 		public abstract string ReadText(string path);
@@ -104,7 +102,7 @@ namespace Modding
 			var certainties = RankParsers(type, matchingFiles);
 			string text = null;
 			byte[] bytes = null;
-			foreach (var (filePath, parser, certainty) in certainties)
+			foreach (var (filePath, parser, _) in certainties)
 			{
 				try
 				{
@@ -158,7 +156,7 @@ namespace Modding
 			var certainties = RankParsers(type, matchingFiles);
 			string text = null;
 			byte[] bytes = null;
-			foreach (var (filePath, parser, certainty) in certainties)
+			foreach (var (filePath, parser, _) in certainties)
 			{
 				try
 				{
@@ -231,9 +229,9 @@ namespace Modding
 			var scripts = SetupScripting();
 			if (scripts == null)
 				return;
-	
+
 			CreateDispatcher();
-	
+
 			foreach (string scriptFile in scripts)
 			{
 				var script = await ReadBytesAsync(scriptFile);
@@ -248,10 +246,9 @@ namespace Modding
 			if (Metadata.Persistence != ModPersistence.None)
 			{
 				GameObject gameObject = new GameObject(Metadata.Name);
-				if (Metadata.Persistence == ModPersistence.Simple)
-					ScriptDispatcher = gameObject.AddComponent<SimpleDispatcher>();
-				else
-					ScriptDispatcher = gameObject.AddComponent<FullDispatcher>();
+				ScriptDispatcher = Metadata.Persistence == ModPersistence.Simple ?
+									   gameObject.AddComponent<SimpleDispatcher>() :
+									   gameObject.AddComponent<FullDispatcher>();
 				ScriptDispatcher.StartCoroutine(TickCoroutine());
 			}
 		}
@@ -277,7 +274,7 @@ namespace Modding
 		{
 			while (true)
 			{
-				yield return GCYield;
+				yield return gcYield;
 				ScriptEnv.Tick();
 			}
 		}
@@ -296,18 +293,18 @@ namespace Modding
 
 		protected void DisposeScripting()
 		{
-			if (ScriptEnv != null)
-			{
-				if (ScriptDispatcher != null)
-				{
-					ScriptDispatcher.Stop();
-					ScriptDispatcher.gameObject.Destroy();
-					ScriptDispatcher = null;
-				}
+			if (ScriptEnv == null)
+				return;
 
-				ScriptEnv.Dispose();
-				ScriptEnv = null;
+			if (ScriptDispatcher != null)
+			{
+				ScriptDispatcher.Stop();
+				ScriptDispatcher.gameObject.Destroy();
+				ScriptDispatcher = null;
 			}
+
+			ScriptEnv.Dispose();
+			ScriptEnv = null;
 		}
 		#endregion
 

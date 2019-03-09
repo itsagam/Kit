@@ -1,7 +1,5 @@
-﻿using System;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.UI;
-using UnityEngine.EventSystems;
 using Sirenix.OdinInspector;
 
 [RequireComponent(typeof(Button))]
@@ -48,7 +46,7 @@ public class StepButton : MonoBehaviour
 
 		if (Mode == StepMode.Nothing)
 			return;
-		
+
 		if (Text != null)
 			originalText = Text.text;
 
@@ -60,40 +58,39 @@ public class StepButton : MonoBehaviour
 	{
 		if (Wizard == null)
 			return;
-		
+
 		bool isEdgeCase = IsEdgeCase;
-		if (Mode == StepMode.Change)
+		switch (Mode)
 		{
-			if (Text != null && !Change.IsNullOrEmpty())
-				Text.text = isEdgeCase ? Change : originalText;
-		}
-		else if (Mode == StepMode.Disable)
-		{
-			if (Button != null)
-				Button.interactable = !isEdgeCase;
-		}
-		else if (Mode == StepMode.Hide)
-		{
-			if (Button != null)
-				Button.gameObject.SetActive(!isEdgeCase);
+			case StepMode.Change:
+			{
+				if (Text != null && !Change.IsNullOrEmpty())
+					Text.text = isEdgeCase ? Change : originalText;
+				break;
+			}
+			case StepMode.Disable:
+			{
+				if (Button != null)
+					Button.interactable = !isEdgeCase;
+				break;
+			}
+			case StepMode.Hide:
+			{
+				if (Button != null)
+					Button.gameObject.SetActive(!isEdgeCase);
+				break;
+			}
 		}
 	}
 
-	public bool IsEdgeCase
-	{
-		get
-		{
-			return 
-				(Direction == StepDirection.Previous && Wizard.Index <= 0) ||
-				(Direction == StepDirection.Next && Wizard.Index >= Wizard.Count - 1);	
-		}
-	}
+	public bool IsEdgeCase => Direction == StepDirection.Previous && Wizard.Index <= 0 ||
+							  Direction == StepDirection.Next	  && Wizard.Index >= Wizard.Count - 1;
 
 	public void Perform()
 	{
 		if (Wizard == null)
 			return;
-		
+
 		if (Direction == StepDirection.Next)
 			Wizard.Next();
 		else

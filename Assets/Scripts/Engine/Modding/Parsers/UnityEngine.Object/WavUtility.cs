@@ -1,6 +1,4 @@
 ﻿using UnityEngine;
-using System.Text;
-using System.IO;
 using System;
 
 /// <summary>
@@ -17,7 +15,7 @@ using System;
 /// For documentation and usage examples: https://github.com/deadlyfingers/UnityWav
 /// </remarks>
 
-public class WavUtility
+public static class WavUtility
 {
 	// Force save as 16-bit .wav
 	const int BlockSize_16Bit = 2;

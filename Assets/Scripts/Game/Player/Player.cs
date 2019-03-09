@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class Player
@@ -43,10 +41,7 @@ public class Player
 
 	public int CurrentScore
 	{
-		get
-		{
-			return currentScore;
-		}
+		get => currentScore;
 		set
 		{
 			value = Mathf.Max(0, value);
@@ -57,10 +52,7 @@ public class Player
 
 	public int TotalScore
 	{
-		get
-		{
-			return totalScore;
-		}
+		get => totalScore;
 		set
 		{
 			value = Mathf.Max(0, value);

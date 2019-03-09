@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
@@ -35,7 +33,7 @@ public static class SceneManager
 	public class FadeBuilder
 	{
 		protected Tweener tween;
-		protected event Action onComplete;
+		protected Action onComplete;
 
 		public FadeBuilder(float to)
 		{
@@ -66,9 +64,9 @@ public static class SceneManager
 			return this;
 		}
 
-		public FadeBuilder OnComplete(Action onComplete)
+		public FadeBuilder OnComplete(Action action)
 		{
-			this.onComplete += onComplete;
+			onComplete = action;
 			return this;
 		}
 
@@ -95,8 +93,8 @@ public static class SceneManager
 		public Color FadeColor = DefaultFadeColor;
 		public float FadeTime = DefaultFadeTime;
 
-		protected event Action<float> onProgress;
-		protected event Action onComplete;
+		protected Action<float> onProgress;
+		protected Action onComplete;
 
 		public LoadBuilder(string name)
 		{
@@ -128,15 +126,15 @@ public static class SceneManager
 			return this;
 		}
 
-		public LoadBuilder OnProgress(Action<float> onProgress)
+		public LoadBuilder OnProgress(Action<float> action)
 		{
-			this.onProgress += onProgress;
+			onProgress = action;
 			return this;
 		}
 
-		public LoadBuilder OnComplete(Action onComplete)
+		public LoadBuilder OnComplete(Action action)
 		{
-			this.onComplete += onComplete;
+			onComplete = action;
 			return this;
 		}
 
@@ -253,13 +251,7 @@ public static class SceneManager
 		}
 	}
 
-	public static string ActiveScene
-    {
-        get
-        {
-            return UnityEngine.SceneManagement.SceneManager.GetActiveScene().name;
-        }
-    }
+	public static string ActiveScene => UnityEngine.SceneManagement.SceneManager.GetActiveScene().name;
 
 	public static bool IsScene(string name)
 	{

@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
 using UnityEngine;
 using UnityEngine.Events;
 using UniRx;
@@ -175,36 +171,15 @@ public class Window : MonoBehaviour
 	#endregion
 
 	#region Public functions
-	public virtual bool IsBusy
-    {
-		get
-		{ 
-			return State == WindowState.Showing || State == WindowState.Hiding;
-		}
-	}
+	public virtual bool IsBusy => State == WindowState.Showing || State == WindowState.Hiding;
 
-	public virtual bool IsShown
-	{
-		get
-		{
-			return State == WindowState.Shown;
-		}
-    }
+	public virtual bool IsShown => State == WindowState.Shown;
 
-    public virtual bool IsHidden
-    {
-		get
-		{ 
-			return State == WindowState.Hidden;
-		}
-	}
+	public virtual bool IsHidden => State == WindowState.Hidden;
 
 	public virtual object Data
 	{
-		get
-		{
-			return data;
-		}
+		get => data;
 		set
 		{
 			data = value;

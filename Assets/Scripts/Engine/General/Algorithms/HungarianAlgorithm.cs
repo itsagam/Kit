@@ -19,7 +19,7 @@ public static class HungarianAlgorithm
     public static int[] FindAssignments(this int[,] costs)
     {
         if (costs == null)
-            throw new ArgumentNullException("costs");
+            throw new ArgumentNullException(nameof(costs));
 
         var h = costs.GetLength(0);
         var w = costs.GetLength(1);
@@ -51,7 +51,7 @@ public static class HungarianAlgorithm
         ClearCovers(rowsCovered, colsCovered, w, h);
 
         var path = new Location[w * h];
-        Location pathStart = default(Location);
+        Location pathStart = default;
         var step = 1;
         while (step != -1)
         {
@@ -112,10 +112,9 @@ public static class HungarianAlgorithm
     private static int RunStep2(int[,] costs, byte[,] masks, bool[] rowsCovered, bool[] colsCovered, int w, int h,
         ref Location pathStart)
     {
-        Location loc;
         while (true)
         {
-            loc = FindZero(costs, masks, rowsCovered, colsCovered, w, h);
+            Location loc = FindZero(costs, masks, rowsCovered, colsCovered, w, h);
             if (loc.Row == -1)
             {
                 return 4;
@@ -272,8 +271,8 @@ public static class HungarianAlgorithm
 
         public Location(int row, int col)
         {
-            this.Row = row;
-            this.Column = col;
+            Row = row;
+            Column = col;
         }
     }
 }

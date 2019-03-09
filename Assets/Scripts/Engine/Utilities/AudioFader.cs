@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 using DG.Tweening;
 
@@ -162,11 +159,8 @@ public class AudioFader : MonoBehaviour
 
     public AudioClip Clip
     {
-        get
-        {
-            return Audio.clip;
-        }
-        set
+        get => Audio.clip;
+		set
         {
 			if (Audio.isPlaying)
 				Play(value);
@@ -177,11 +171,8 @@ public class AudioFader : MonoBehaviour
 
     public float Volume
     {
-        get
-        {
-            return Audio.volume;
-        }
-        set
+        get => Audio.volume;
+		set
         {
             lastVolume = value;
             ChangeTo(value);
@@ -190,11 +181,8 @@ public class AudioFader : MonoBehaviour
 
     public bool IsPlaying
     {
-        get
-        {
-            return Audio.isPlaying;
-        }
-        set
+        get => Audio.isPlaying;
+		set
         {
             if (value)
                 Play();

@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Text;
-using UnityEngine;
+﻿using System.Text;
 
 public static class StringBuilderExtensions
 {
@@ -16,7 +12,6 @@ public static class StringBuilderExtensions
 
 	public static int IndexOf(this StringBuilder sb, string value, int startIndex)
 	{
-		int index;
 		int length = value.Length;
 		int maxSearchLength = (sb.Length - length) + 1;
 
@@ -24,8 +19,8 @@ public static class StringBuilderExtensions
 		{
 			if (sb[i] == value[0])
 			{
-				index = 1;
-				while ((index < length) && (sb[i + index] == value[index]))
+				int index = 1;
+				while (index < length && sb[i + index] == value[index])
 					++index;
 
 				if (index == length)

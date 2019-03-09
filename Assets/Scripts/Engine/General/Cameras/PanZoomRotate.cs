@@ -1,9 +1,5 @@
 ﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
-using TouchScript;
 using TouchScript.Pointers;
 using TouchScript.Gestures;
 using Sirenix.OdinInspector;
@@ -39,7 +35,7 @@ public class PanZoomRotate : MonoBehaviour
 	public bool Zoom = true;
 
 	[ToggleGroup("Zoom")]
-	[Tooltip("Zooming speed. Depends on world scale in perpective mode.")]
+	[Tooltip("Zooming speed. Depends on world scale in perspective mode.")]
 	[MinValue(0.0f)]
 	public float ZoomSpeed = 0.025f;
 
@@ -111,10 +107,7 @@ public class PanZoomRotate : MonoBehaviour
 	{
 		targetPosition = transformCached.position;
 		targetRotation = transformCached.rotation;
-		if (cameraCached.orthographic)
-			targetZoom = cameraCached.orthographicSize;
-		else
-			targetZoom = GetForwardComponent(targetPosition);
+		targetZoom = cameraCached.orthographic ? cameraCached.orthographicSize : GetForwardComponent(targetPosition);
 		Clamp();
 	}
 	#endregion
@@ -122,22 +115,28 @@ public class PanZoomRotate : MonoBehaviour
 	#region Pinch/Zoom/Rotate
 	protected void OnMoved(object sender, EventArgs e)
 	{
-		if (gesture.ActivePointers.Count == 1)
+		switch (gesture.ActivePointers.Count)
 		{
-			if (Pan)
-				FlickPan(gesture.NormalizedScreenPosition, gesture.PreviousNormalizedScreenPosition);
-		}
-		else if (gesture.ActivePointers.Count == 2)
-		{
-			Pointer touch1 = gesture.ActivePointers[0];
-			Pointer touch2 = gesture.ActivePointers[1];
+			case 1:
+			{
+				if (Pan)
+					FlickPan(gesture.NormalizedScreenPosition, gesture.PreviousNormalizedScreenPosition);
+				break;
+			}
+			case 2:
+			{
+				Pointer touch1 = gesture.ActivePointers[0];
+				Pointer touch2 = gesture.ActivePointers[1];
 
-			if (Zoom)
-				PinchZoom(touch1.Position, touch2.Position, touch1.PreviousPosition, touch2.PreviousPosition);
+				if (Zoom)
+					PinchZoom(touch1.Position, touch2.Position, touch1.PreviousPosition, touch2.PreviousPosition);
 
-			if (Rotate)
-				TwistRotate(touch1.Position, touch2.Position, touch1.PreviousPosition, touch2.PreviousPosition);
+				if (Rotate)
+					TwistRotate(touch1.Position, touch2.Position, touch1.PreviousPosition, touch2.PreviousPosition);
+				break;
+			}
 		}
+
 		Clamp();
 	}
 
@@ -163,8 +162,8 @@ public class PanZoomRotate : MonoBehaviour
 		float magnitude = 1;
 		if (!cameraCached.orthographic)
 		{
-			// In ortho increasing orthographicSize always zoomes out, in perspective mode it depends on forward
-			// If forward is positive increasing forward component zoomes in, if it's negative increasing forward component zoomes out 
+			// In ortho increasing orthographicSize always zooms out, in perspective mode it depends on forward
+			// If forward is positive increasing forward component zooms in, if it's negative increasing forward component zooms out
 			direction = -forwardSign;
 			// Zoom effect is twice as faster by default in perspective mode
 			magnitude = 0.5f;
@@ -198,7 +197,7 @@ public class PanZoomRotate : MonoBehaviour
 	{
 		if (cameraCached.orthographic)
 		{
-			return targetZoom;	
+			return targetZoom;
 		}
 		else
 		{
@@ -207,7 +206,7 @@ public class PanZoomRotate : MonoBehaviour
 			Vector3 cameraPosition = SetForwardComponent(targetPosition, targetZoom);
 			// Get the distance between the camera and view in forward axis (using absolute value since the difference can be negative)
 			float viewDistance = Math.Abs(GetForwardComponent(viewPosition - cameraPosition));
-			
+
 			// Calculate frustum height from view distance (https://docs.unity3d.com/Manual/FrustumSizeAtDistance.html)
 			float frustumHeight = viewDistance * Mathf.Tan(cameraCached.fieldOfView * 0.5f * Mathf.Deg2Rad);
 
@@ -266,14 +265,14 @@ public class PanZoomRotate : MonoBehaviour
 			float angleAmount = Mathf.Abs(Mathf.Sin(angle * Mathf.Deg2Rad));
 			// Swap width and height of the frustum depending on angle (have to use this, not "targetRotation * frustum" because that doesn't work on width/height)
 			frustum = new Vector2(Mathf.Lerp(frustum.x, frustum.y, angleAmount), Mathf.Lerp(frustum.y, frustum.x, angleAmount));
-			
+
 			// Convert frustum from 2d space to 3d space using camera space
-			Vector3 frustum3d = cameraRotation * frustum;
+			Vector3 frustum3D = cameraRotation * frustum;
 			// Rotation can result in negative values, invalidating the frustum
-			frustum3d = frustum3d.Abs();
-		
+			frustum3D = frustum3D.Abs();
+
 			// Clamp camera position to its bounds, equal to view bounds shrunk by frustum size
-			Vector3 clamped = targetPosition.Clamp(bounds.min + frustum3d, bounds.max - frustum3d);	
+			Vector3 clamped = targetPosition.Clamp(bounds.min + frustum3D, bounds.max - frustum3D);
 			// Set the clamped vector, but use the original forward component
 			targetPosition = SetForwardComponent(clamped, GetForwardComponentVector(targetPosition));
 		}

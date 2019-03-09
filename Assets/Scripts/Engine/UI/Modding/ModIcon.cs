@@ -1,9 +1,5 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.UI;
-using UniRx;
 using Modding;
 using DG.Tweening;
 
@@ -65,7 +61,6 @@ public class ModIcon : Icon
 	protected void Move(int toIndex)
 	{
 		Transform toTransform = transform.parent.GetChild(toIndex);
-		int index = transform.GetSiblingIndex();
 
 		transform.SetSiblingIndex(toIndex);
 		Sequence sequence = DOTween.Sequence();
@@ -76,7 +71,7 @@ public class ModIcon : Icon
 			RefreshInteractable();
 			toTransform.GetComponent<ModIcon>().RefreshInteractable();
 		});
-		SetDirty();
+		ModWindow.SetDirty();
 	}
 
 	public void RefreshInteractable()
@@ -89,20 +84,9 @@ public class ModIcon : Icon
 	{
 		ModManager.ToggleMod(Mod, value);
 		NameText.DOColor(value ? EnabledColor : DisabledColor, RecolorTime);
-		SetDirty();
+		ModWindow.SetDirty();
 	}
 
-	protected void SetDirty()
-	{
-		UIManager.FindWindow<ModWindow>().IsDirty = true;
-	}
-
-	public Mod Mod
-	{
-		get
-		{
-			return (Mod) Data;
-		}
-	}
+	public Mod Mod => (Mod) Data;
 #endif
 }

@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 using Sirenix.OdinInspector;
 
 namespace Cards
@@ -54,10 +51,7 @@ namespace Cards
 
 		public Card Card
 		{
-			get
-			{
-				return card;
-			}
+			get => card;
 			set
 			{
 				card = value;
@@ -68,10 +62,7 @@ namespace Cards
 		[ShowInInspector]
 		public Suit Suit
 		{
-			get
-			{
-				return card.Suit;
-			}
+			get => card.Suit;
 			set
 			{
 				card.Suit = value;
@@ -82,10 +73,7 @@ namespace Cards
 		[ShowInInspector]
 		public Rank Rank
 		{
-			get
-			{
-				return card.Rank;
-			}
+			get => card.Rank;
 			set
 			{
 				card.Rank = value;

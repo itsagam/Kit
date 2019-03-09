@@ -1,9 +1,5 @@
 using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
-using TouchScript;
-using TouchScript.Gestures;
 using TouchScript.Gestures.TransformGestures;
 
 [RequireComponent(typeof(ScreenTransformGesture))]
@@ -17,10 +13,12 @@ public class Orbit: MonoBehaviour
 	public bool Y = true;
 
 	protected ScreenTransformGesture gesture;
+	protected Transform transformCached;
 
 	protected void Awake()
 	{
 		gesture = GetComponent<ScreenTransformGesture>();
+		transformCached = GetComponent<Transform>();
 	}
 
 	protected void OnEnable()
@@ -37,22 +35,22 @@ public class Orbit: MonoBehaviour
 	{
 		if (Target == null)
 			return;
-		
+
 		if (Mathf.Approximately(gesture.DeltaScale, 1.0f))
 		{
 			Vector3 delta = gesture.DeltaPosition * RotateSpeed;
 			if (X)
-				transform.RotateAround(Target.position, transform.up, delta.x);
+				transformCached.RotateAround(Target.position, transformCached.up, delta.x);
 			if (Y)
-				transform.RotateAround(Target.position, transform.right, -delta.y);
+				transformCached.RotateAround(Target.position, transformCached.right, -delta.y);
 		}
 		else
 		{
-			Vector3 delta = transform.forward * (gesture.DeltaScale - 1f) * ZoomSpeed;
-			Vector3 newPosition = transform.position + delta;
+			Vector3 delta = transformCached.forward * (gesture.DeltaScale - 1f) * ZoomSpeed;
+			Vector3 newPosition = transformCached.position + delta;
 			float distance = (Target.position - newPosition).magnitude;
 			if (distance >= ZoomBounds.x && distance <= ZoomBounds.y)
-				transform.position = newPosition;
+				transformCached.position = newPosition;
 		}
 	}
 }

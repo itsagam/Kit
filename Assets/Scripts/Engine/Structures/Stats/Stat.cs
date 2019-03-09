@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -22,7 +21,7 @@ public class StatProcessor : OdinAttributeProcessor<Stat>
 public class StatDrawer : OdinValueDrawer<Stat>
 {
 	public const float FoldoutWidthCorrection = 4;
-	public static GUIStyle CurrentValueStyle = new GUIStyle(SirenixGUIStyles.BoldTitle)
+	public static readonly GUIStyle CurrentValueStyle = new GUIStyle(SirenixGUIStyles.BoldTitle)
 	{
 		alignment = TextAnchor.MiddleRight,
 		padding = new RectOffset(2, 6, 1, 2)
@@ -48,14 +47,14 @@ public class StatDrawer : OdinValueDrawer<Stat>
 	protected void SetupValues()
 	{
 		var stat = ValueEntry.SmartValue;
-		if (stat != null)
-		{
-			if (stat.Upgradeable == null)
-				stat.Upgradeable = Property.Tree.UnitySerializedObject.targetObject as IUpgradeable;
+		if (stat == null)
+			return;
+		
+		if (stat.Upgradeable == null)
+			stat.Upgradeable = Property.Tree.UnitySerializedObject.targetObject as IUpgradeable;
 
-			if (stat.ID.IsNullOrEmpty())
-				stat.ID = Property.Name;
-		}
+		if (stat.ID.IsNullOrEmpty())
+			stat.ID = Property.Name;
 	}
 
 	protected override void DrawPropertyLayout(GUIContent label)
@@ -115,7 +114,7 @@ public class Stat : IDisposable
 	public IUpgradeable Upgradeable;
 	public string ID;
 
-	public StatBaseProperty Base = new StatBaseProperty();
+	public readonly StatBaseProperty Base = new StatBaseProperty();
 	protected ReadOnlyReactiveProperty<float> current;
 
 	public Stat()

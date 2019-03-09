@@ -1,12 +1,10 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Linq;
 using System.Reflection;
 using UnityEngine;
-using UnityEngine.UI;
 using UnityEngine.EventSystems;
 using TouchScript.Layers;
 using TouchScript.Gestures;
@@ -32,14 +30,14 @@ public static class Console
 	[RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
 	public static void Initialize()
 	{
-		if (Enabled && instance == null)
-		{
-			CreateUI();
-			InitializeUI();
-			RegisterLogging();
-			RegisterInput();
-			InitializeScripting();
-		}
+		if (!Enabled || instance != null)
+			return;
+
+		CreateUI();
+		InitializeUI();
+		RegisterLogging();
+		RegisterInput();
+		InitializeScripting();
 	}
 
 	private static void CreateUI()
@@ -56,7 +54,7 @@ public static class Console
 	{
 		if (!(Application.isMobilePlatform || Application.isConsolePlatform))
 		{
-			var keyStream = Observable
+			Observable
 				.EveryUpdate()
 				.Where(l => Input.GetKeyDown(KeyCode.BackQuote))
 				.Subscribe(l => Toggle())
@@ -71,7 +69,7 @@ public static class Console
 
 			var flick = gameObject.AddComponent<FlickGesture>();
 			flick.Direction = FlickGesture.GestureDirection.Vertical;
-			flick.Flicked += (object o, EventArgs e) => {
+			flick.Flicked += (o, e) => {
 				if (flick.ScreenFlickVector.y < 0 && !IsVisible)
 					Show();
 				else if (flick.ScreenFlickVector.y > 0 && IsVisible)
@@ -80,7 +78,7 @@ public static class Console
 		}
 
 		EventModifiers disregard = EventModifiers.FunctionKey | EventModifiers.Numeric | EventModifiers.CapsLock;
-		var input = instance.CommandInput;
+		InputFieldEx input = instance.CommandInput;
 		input.AddKeyHandler(KeyCode.BackQuote,	() =>	{},											EventModifiers.None,	disregard);
 		input.AddKeyHandler(KeyCode.Return,				Submit,										EventModifiers.None,	disregard);
 		input.AddKeyHandler(KeyCode.Return,		() =>	input.SendKeyEvent(KeyCode.Return,'\n'),	EventModifiers.Shift,	disregard);
@@ -141,7 +139,7 @@ public static class Console
 	#endregion
 
 	#region Log
-	public static StringBuilder LogBuilder = new StringBuilder(Length);
+	public static readonly StringBuilder LogBuilder = new StringBuilder(Length);
 	private static string logEnd = Environment.NewLine;
 
 	private static void RegisterLogging()
@@ -244,8 +242,8 @@ public static class Console
 			.Union(extensions.Select(member => ExtensionToString(type, member)))
 			.OrderBy(member => member);
 
-		Log($"<b>{type.FullName} : {type.BaseType.FullName}</b>");
-		allMembers.ForEach(member => Log(member));
+		Log("<b>" + type.FullName + (type.BaseType != typeof(object) ? ": " + type.BaseType.FullName : "") + "</b>");
+		allMembers.ForEach(Log);
 	}
 
 	private static string MemberToString(Type type, MemberInfo member)
@@ -311,7 +309,7 @@ public static class Console
 	{
 		instance.LogScroll.verticalNormalizedPosition = 1;
 	}
-	
+
 	public static void ClearLog()
 	{
 		LogBuilder.Clear();
@@ -354,7 +352,7 @@ public static class Console
 
 	private static void InitializeScripting()
 	{
-		scriptEnv = new LuaEnv();	
+		scriptEnv = new LuaEnv();
 		scriptEnv.DoString("require 'Lua/General'");
 		scriptEnv.DoString("require 'Lua/Console'");
 		Observable.Timer(TimeSpan.FromSeconds(GCInterval)).Subscribe(l => scriptEnv.Tick()).AddTo(disposables);
@@ -382,7 +380,7 @@ public static class Console
 		void ExecuteLocal(string commandActual)
 		{
 			object[] results = scriptEnv.DoString(commandActual);
-			results?.ForEach(result => Log(result));
+			results?.ForEach(Log);
 		}
 	}
 	#endregion

@@ -1,11 +1,6 @@
 ﻿using System;
-using System.Collections;
-using System.Collections.Generic;
 using System.Linq;
-using UnityEngine;
 using UnityEngine.Events;
-using UnityEngine.UI;
-using UniRx;
 using UniRx.Async;
 using Sirenix.OdinInspector;
 
@@ -42,7 +37,7 @@ public class Wizard : Window
 	}
 
 	public virtual async UniTask<bool> GoTo(int index)
-	{		
+	{
 		if (IsBusy)
 			return false;
 
@@ -63,13 +58,13 @@ public class Wizard : Window
 			int previousIndex = Index;
 			Index = index;
 
-			UniTask<bool> previousTask;
-			if (previous == null)
-				previousTask = Show();
-			else
-				previousTask = previous.Hide(isNext ? NextHideAnimation : PreviousHideAnimation, WindowHideMode.Auto);
+			UniTask<bool> previousTask = previous == null ?
+											 Show() :
+											 previous.Hide(isNext ? NextHideAnimation : PreviousHideAnimation);
 
-			UniTask<bool> nextTask = next.Show(null, previous == null ? null : (isNext ? NextShowAnimation : PreviousShowAnimation));
+			UniTask<bool> nextTask = next.Show(null, previous == null ?
+														 null :
+														 isNext ? NextShowAnimation : PreviousShowAnimation);
 
 			OnChanging?.Invoke(previousIndex, previous, Index, next);
 			await UniTask.WhenAll(previousTask, nextTask);
@@ -86,9 +81,7 @@ public class Wizard : Window
 	public virtual UniTask<bool> GoTo(Window window)
 	{
 		int i = IndexOf(window);
-		if (i >= 0)
-			return GoTo(i);
-		return UniTask.FromResult(false);
+		return i >= 0 ? GoTo(i) : UniTask.FromResult(false);
 	}
 
 	public virtual UniTask<bool> Next()
@@ -114,29 +107,7 @@ public class Wizard : Window
 		return -1;
 	}
 
-	public virtual Window this[int index]
-	{
-		get
-		{
-			if (IsValid(index))
-				return transform.GetChild(index)?.GetComponent<Window>();
-			return null;
-		}
-	}
-
-	public virtual int Count
-	{
-		get
-		{
-			return transform.childCount;
-		}
-	}
-
-	public virtual Window Active
-	{
-		get
-		{
-			return this[Index];
-		}
-	}
+	public virtual Window Active => this[Index];
+	public virtual Window this[int index] => IsValid(index) ? transform.GetChild(index).GetComponent<Window>() : null;
+	public virtual int Count => transform.childCount;
 }

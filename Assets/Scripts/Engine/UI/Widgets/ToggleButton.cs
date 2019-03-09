@@ -1,8 +1,5 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.UI;
-using Sirenix.OdinInspector;
 
 [RequireComponent(typeof(Button))]
 public class ToggleButton : MonoBehaviour
@@ -36,10 +33,7 @@ public class ToggleButton : MonoBehaviour
 	
 	public bool IsOn
 	{
-		get
-		{
-			return isOn;
-		}
+		get => isOn;
 		set
 		{
 			isOn = value;

@@ -3,11 +3,12 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 
-public class Path<T> : IEnumerable<T>, IEnumerable
+public class Path<T> : IEnumerable<T>
 {
-	public T LastStep { get; private set; }
-	public Path<T> PreviousSteps { get; private set; }
-	public int TotalCost { get; private set; }
+	public T LastStep { get; }
+	public Path<T> PreviousSteps { get; }
+	public int TotalCost { get; }
+
 	private Path(T lastStep, Path<T> previousSteps, int totalCost)
 	{
 		LastStep = lastStep;
@@ -37,8 +38,7 @@ public class PriorityQueue<T>
 	private SortedDictionary<int, Queue<T>> list = new SortedDictionary<int, Queue<T>>();
 	public void Enqueue(int priority, T value)
 	{
-		Queue<T> q;
-		if (!list.TryGetValue(priority, out q))
+		if (!list.TryGetValue(priority, out var q))
 		{
 			q = new Queue<T>();
 			list.Add(priority, q);
@@ -54,10 +54,7 @@ public class PriorityQueue<T>
 			list.Remove(pair.Key);
 		return v;
 	}
-	public bool IsEmpty
-	{
-		get { return !list.Any(); }
-	}
+	public bool IsEmpty => !list.Any();
 }
 
 public class AStar

@@ -1,8 +1,5 @@
-﻿using System;
-using UnityEngine;
-using UnityEngine.UI;
+﻿using UnityEngine;
 using UnityEngine.EventSystems;
-using UniRx;
 using UniRx.Async;
 using Sirenix.OdinInspector;
 
