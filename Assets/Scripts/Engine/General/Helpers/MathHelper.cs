@@ -21,7 +21,7 @@ public static class MathHelper
             min = to;
             max = from;
         }
-        return (number >= min && number <= max);
+        return number >= min && number <= max;
     }
 
     public static bool IsInRange(int number, int from, int to)
@@ -33,7 +33,7 @@ public static class MathHelper
             min = to;
             max = from;
         }
-        return (number >= min && number <= max);
+        return number >= min && number <= max;
     }
 
 	public static float Clamp(float value, float from, float to)

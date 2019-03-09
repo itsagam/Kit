@@ -77,18 +77,18 @@ namespace Modding.Scripting
 
 		public override void Stop()
 		{
-			if (scriptEnv != null)
-			{
-				var destroyAction = scriptEnv.Global.Get<Action>("onDestroy");
-				if (destroyAction != null)
-					ExecuteSafe(destroyAction);
+			if (scriptEnv == null)
+				return;
 
-				StopAllCoroutines();
-				updateEvent = null;
-				lateUpdateEvent = null;
-				fixedUpdateEvent = null;
-				scriptEnv = null;
-			}
+			var destroyAction = scriptEnv.Global.Get<Action>("onDestroy");
+			if (destroyAction != null)
+				ExecuteSafe(destroyAction);
+
+			StopAllCoroutines();
+			updateEvent = null;
+			lateUpdateEvent = null;
+			fixedUpdateEvent = null;
+			scriptEnv = null;
 		}
 	}
 }

@@ -78,12 +78,18 @@ public class PanZoomRotate : MonoBehaviour
 		cameraCached = GetComponent<Camera>();
 		gesture = GetComponent<MetaGesture>();
 
-		if (View is Transform t)
-			bounds = t.GetBounds();
-		else if (View is Renderer r)
-			bounds = r.bounds;
-		else if (View is Collider c)
-			bounds = c.bounds;
+		switch (View)
+		{
+			case Transform t:
+				bounds = t.GetBounds();
+				break;
+			case Renderer r:
+				bounds = r.bounds;
+				break;
+			case Collider c:
+				bounds = c.bounds;
+				break;
+		}
 
 		forward = transformCached.forward;
 		forwardAbs = forward.Abs();
@@ -196,31 +202,26 @@ public class PanZoomRotate : MonoBehaviour
 	protected float GetFrustumHeight()
 	{
 		if (cameraCached.orthographic)
-		{
 			return targetZoom;
-		}
-		else
-		{
-			// Will be origin if bounds are not provided and camera will try to focus (0, 0, 0) accordingly
-			Vector3 viewPosition = bounds.center;
-			Vector3 cameraPosition = SetForwardComponent(targetPosition, targetZoom);
-			// Get the distance between the camera and view in forward axis (using absolute value since the difference can be negative)
-			float viewDistance = Math.Abs(GetForwardComponent(viewPosition - cameraPosition));
 
-			// Calculate frustum height from view distance (https://docs.unity3d.com/Manual/FrustumSizeAtDistance.html)
-			float frustumHeight = viewDistance * Mathf.Tan(cameraCached.fieldOfView * 0.5f * Mathf.Deg2Rad);
+		// Will be origin if bounds are not provided and camera will try to focus (0, 0, 0) accordingly
+		Vector3 viewPosition = bounds.center;
+		Vector3 cameraPosition = SetForwardComponent(targetPosition, targetZoom);
+		// Get the distance between the camera and view in forward axis (using absolute value since the difference can be negative)
+		float viewDistance = Math.Abs(GetForwardComponent(viewPosition - cameraPosition));
 
-			return frustumHeight;
-		}
+		// Calculate frustum height from view distance (https://docs.unity3d.com/Manual/FrustumSizeAtDistance.html)
+		float frustumHeight = viewDistance * Mathf.Tan(cameraCached.fieldOfView * 0.5f * Mathf.Deg2Rad);
+
+		return frustumHeight;
 	}
 
 	protected float GetZoomMapped(float min, float max)
 	{
 		// If in orthographic mode or if forward is negative, higher targetZoom means lower zoom, so we invert the output range
-		if (cameraCached.orthographic || forwardSign < 0)
-			return MathHelper.Map(targetZoom, ZoomMin, ZoomMax, max, min);
-		else
-			return MathHelper.Map(targetZoom, ZoomMin, ZoomMax, min, max);
+		return cameraCached.orthographic || forwardSign < 0 ?
+				   MathHelper.Map(targetZoom, ZoomMin, ZoomMax, max, min) :
+				   MathHelper.Map(targetZoom, ZoomMin, ZoomMax, min, max);
 	}
 
 	protected float GetForwardComponent(Vector3 vector)
@@ -253,29 +254,29 @@ public class PanZoomRotate : MonoBehaviour
 	{
 		targetZoom = Mathf.Clamp(targetZoom, ZoomMin, ZoomMax);
 		// Don't clamp if bounds are not provided
-		if (bounds.extents != Vector3.zero)
-		{
-			float frustumHeight = GetFrustumHeight();
-			Vector2 frustum = new Vector2(frustumHeight * cameraCached.aspect, frustumHeight);
+		if (bounds.extents == Vector3.zero)
+			return;
+		
+		float frustumHeight = GetFrustumHeight();
+		Vector2 frustum = new Vector2(frustumHeight * cameraCached.aspect, frustumHeight);
 
-			// Calculate applied rotation by multiplying target rotation with inverse camera space
-			Quaternion rotation = targetRotation * cameraRotationInv;
-			float angle = GetForwardComponent(rotation.eulerAngles);
-			// Plot a function that returns 0 at 0 degrees, 1 at 90 degrees, and 0 again at 180 degrees (higher values reset the cycle)
-			float angleAmount = Mathf.Abs(Mathf.Sin(angle * Mathf.Deg2Rad));
-			// Swap width and height of the frustum depending on angle (have to use this, not "targetRotation * frustum" because that doesn't work on width/height)
-			frustum = new Vector2(Mathf.Lerp(frustum.x, frustum.y, angleAmount), Mathf.Lerp(frustum.y, frustum.x, angleAmount));
+		// Calculate applied rotation by multiplying target rotation with inverse camera space
+		Quaternion rotation = targetRotation * cameraRotationInv;
+		float angle = GetForwardComponent(rotation.eulerAngles);
+		// Plot a function that returns 0 at 0 degrees, 1 at 90 degrees, and 0 again at 180 degrees (higher values reset the cycle)
+		float angleAmount = Mathf.Abs(Mathf.Sin(angle * Mathf.Deg2Rad));
+		// Swap width and height of the frustum depending on angle (have to use this, not "targetRotation * frustum" because that doesn't work on width/height)
+		frustum = new Vector2(Mathf.Lerp(frustum.x, frustum.y, angleAmount), Mathf.Lerp(frustum.y, frustum.x, angleAmount));
 
-			// Convert frustum from 2d space to 3d space using camera space
-			Vector3 frustum3D = cameraRotation * frustum;
-			// Rotation can result in negative values, invalidating the frustum
-			frustum3D = frustum3D.Abs();
+		// Convert frustum from 2d space to 3d space using camera space
+		Vector3 frustum3D = cameraRotation * frustum;
+		// Rotation can result in negative values, invalidating the frustum
+		frustum3D = frustum3D.Abs();
 
-			// Clamp camera position to its bounds, equal to view bounds shrunk by frustum size
-			Vector3 clamped = targetPosition.Clamp(bounds.min + frustum3D, bounds.max - frustum3D);
-			// Set the clamped vector, but use the original forward component
-			targetPosition = SetForwardComponent(clamped, GetForwardComponentVector(targetPosition));
-		}
+		// Clamp camera position to its bounds, equal to view bounds shrunk by frustum size
+		Vector3 clamped = targetPosition.Clamp(bounds.min + frustum3D, bounds.max - frustum3D);
+		// Set the clamped vector, but use the original forward component
+		targetPosition = SetForwardComponent(clamped, GetForwardComponentVector(targetPosition));
 	}
 
 	protected void LateUpdate()

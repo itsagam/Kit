@@ -24,9 +24,9 @@ public class PoolGroup : MonoBehaviour, IEnumerable<Component>
 	[InlineEditor]
 	[ListDrawerSettings(CustomAddFunction = "AddPool", CustomRemoveElementFunction = "DestroyPool")]
 	public List<Pool> Pools = new List<Pool>();
-	#endregion
 
 	public bool IsDestroying { get; protected set; }
+	#endregion
 
 	#region Initialization
 	protected void Awake()

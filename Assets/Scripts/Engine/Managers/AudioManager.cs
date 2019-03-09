@@ -60,13 +60,12 @@ public static class AudioManager
 	public static bool RemoveGroup(string name)
 	{
 		var source = GetGroupSource(name);
-		if (source != null)
-		{
-			groupSources.Remove(name);
-			source.Destroy();
-			return true;
-		}
-		return false;
+		if (source == null)
+			return false;
+
+		groupSources.Remove(name);
+		source.Destroy();
+		return true;
 	}
 
 	public static IEnumerable<AudioSource> GetAllGroupSources()
@@ -109,11 +108,11 @@ public static class AudioManager
 
 	public static void PlaySoundEffect(AudioClip[] clips)
 	{
-		if (clips != null && clips.Length > 0)
-		{
-			int randomIndex = UnityEngine.Random.Range(0, clips.Length);
-			PlaySoundEffect(clips[randomIndex]);
-		}
+		if (clips == null || clips.Length <= 0)
+			return;
+		
+		int randomIndex = UnityEngine.Random.Range(0, clips.Length);
+		PlaySoundEffect(clips[randomIndex]);
 	}
 
 	public static void PlayUIEffect(AudioClip clip)

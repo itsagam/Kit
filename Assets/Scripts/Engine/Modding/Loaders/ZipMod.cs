@@ -120,13 +120,13 @@ namespace Modding.Loaders
 			if (result != null)
 				return EnumerableExtensions.Yield(path);
 
-			if (! System.IO.Path.HasExtension(path))
-			{
-				// Name is empty string for directory ZipArchiveEntries and we strip the extension of files to compare with our own
-				var matching = Archive.Entries.Where(e => e.Name != "" && path.Equals(System.IO.Path.ChangeExtension(e.FullName, null), StringComparison.OrdinalIgnoreCase));
-				if (matching.Any())
-					return matching.Select(e => e.FullName);
-			}
+			if (System.IO.Path.HasExtension(path))
+				return null;
+
+			// Name is empty string for directory ZipArchiveEntries and we strip the extension of files to compare with our own
+			var matching = Archive.Entries.Where(e => e.Name != "" && path.Equals(System.IO.Path.ChangeExtension(e.FullName, null), StringComparison.OrdinalIgnoreCase));
+			if (matching.Any())
+				return matching.Select(e => e.FullName);
 
 			return null;
 		}

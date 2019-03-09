@@ -103,10 +103,8 @@ public static class HungarianAlgorithm
             if (colsCovered[j])
                 colsCoveredCount++;
         }
-        if (colsCoveredCount == h)
-            return -1;
-        else
-            return 2;
+
+        return colsCoveredCount == h ? -1 : 2;
     }
 
     private static int RunStep2(int[,] costs, byte[,] masks, bool[] rowsCovered, bool[] colsCovered, int w, int h,
@@ -119,20 +117,18 @@ public static class HungarianAlgorithm
             {
                 return 4;
             }
+
+            masks[loc.Row, loc.Column] = 2;
+            var starCol = FindStarInRow(masks, w, loc.Row);
+            if (starCol != -1)
+            {
+                rowsCovered[loc.Row] = true;
+                colsCovered[starCol] = false;
+            }
             else
             {
-                masks[loc.Row, loc.Column] = 2;
-                var starCol = FindStarInRow(masks, w, loc.Row);
-                if (starCol != -1)
-                {
-                    rowsCovered[loc.Row] = true;
-                    colsCovered[starCol] = false;
-                }
-                else
-                {
-                    pathStart = loc;
-                    return 3;
-                }
+                pathStart = loc;
+                return 3;
             }
         }
     }

@@ -42,15 +42,11 @@ public static class ResourceManager
 		if (modded)
 		{
 			if (merge)
-			{
 				return LoadMerged(type, folder, file);
-			}
-			else
-			{
-				object moddedFile = ModManager.Load(type, folder, file);
-				if (moddedFile != null)
-					return moddedFile;
-			}
+
+			object moddedFile = ModManager.Load(type, folder, file);
+			if (moddedFile != null)
+				return moddedFile;
 		}
 #endif
 		return LoadUnmodded(type, folder, file);
@@ -67,15 +63,11 @@ public static class ResourceManager
 		if (modded)
 		{
 			if (merge)
-			{
 				return await LoadMergedAsync(type, folder, file);
-			}
-			else
-			{
-				object moddedFile = await ModManager.LoadAsync(type, folder, file);
-				if (moddedFile != null)
-					return moddedFile;
-			}
+
+			object moddedFile = await ModManager.LoadAsync(type, folder, file);
+			if (moddedFile != null)
+				return moddedFile;
 		}
 #endif
 		return await LoadUnmoddedAsync(type, folder, file);
@@ -83,16 +75,15 @@ public static class ResourceManager
 
 	private static object LoadCached(Type type, ResourceFolder folder, string file)
 	{
-		if (cachedResources.TryGetValue((type, folder, file), out WeakReference weakReference))
-		{
-			object reference = weakReference.Target;
-			if (reference != null)
-			{
-				ResourceLoaded?.Invoke(folder, file, reference, false);
-				return reference;
-			}
-		}
-		return null;
+		if (!cachedResources.TryGetValue((type, folder, file), out WeakReference weakReference))
+			return null;
+
+		object reference = weakReference.Target;
+		if (reference == null)
+			return null;
+
+		ResourceLoaded?.Invoke(folder, file, reference, false);
+		return reference;
 	}
 
 	public static T LoadUnmodded<T>(ResourceFolder folder, string file)
@@ -114,15 +105,15 @@ public static class ResourceManager
 		else
 		{
 			string fullPath = GetPath(folder, file);
-			reference = LoadEx(type, fullPath).reference;
+			reference = Load(type, fullPath);
 		}
 
-		if (reference != null)
-		{
-			// Important to use [key], not Add(key) because the latter generates an error if key exists
-			cachedResources[(type, folder, file)] = new WeakReference(reference);
-			ResourceLoaded?.Invoke(folder, file, reference, true);
-		}
+		if (reference == null)
+			return null;
+
+		// Important to use [key], not Add(key) because the latter generates an error if key exists
+		cachedResources[(type, folder, file)] = new WeakReference(reference);
+		ResourceLoaded?.Invoke(folder, file, reference, true);
 		return reference;
 	}
 
@@ -140,19 +131,19 @@ public static class ResourceManager
 		if (folder == ResourceFolder.Resources)
 		{
 			string fileNoExt = Path.ChangeExtension(file, null);
-			reference = (await Resources.LoadAsync(fileNoExt, type));
+			reference = await Resources.LoadAsync(fileNoExt, type);
 		}
 		else
 		{
 			string fullPath = GetPath(folder, file);
-			reference = (await LoadExAsync(type, fullPath)).reference;
+			reference = await LoadAsync(type, fullPath);
 		}
 
-		if (reference != null)
-		{
-			cachedResources[(type, folder, file)] = new WeakReference(reference);
-			ResourceLoaded?.Invoke(folder, file, reference, true);
-		}
+		if (reference == null)
+			return null;
+
+		cachedResources[(type, folder, file)] = new WeakReference(reference);
+		ResourceLoaded?.Invoke(folder, file, reference, true);
 		return reference;
 	}
 
@@ -399,20 +390,20 @@ public static class ResourceManager
 #endif
 
 		var key = (type, folder, file);
-		if (cachedResources.TryGetValue(key, out WeakReference weakReference))
+		if (!cachedResources.TryGetValue(key, out WeakReference weakReference))
+			return false;
+
+		if (weakReference.Target is UnityEngine.Object unityObject)
 		{
-			if (weakReference.Target is UnityEngine.Object unityObject)
-			{
-				if (folder == ResourceFolder.Resources)
-					Resources.UnloadAsset(unityObject);
-				else
-					GameObject.Destroy(unityObject);
-			}
-			cachedResources.Remove(key);
-			ResourceUnloaded?.Invoke(folder, file);
-			return true;
+			if (folder == ResourceFolder.Resources)
+				Resources.UnloadAsset(unityObject);
+			else
+				GameObject.Destroy(unityObject);
 		}
-		return false;
+
+		cachedResources.Remove(key);
+		ResourceUnloaded?.Invoke(folder, file);
+		return true;
 	}
 
 	public static void UnloadUnused()

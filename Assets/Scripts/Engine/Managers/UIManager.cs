@@ -33,7 +33,7 @@ public static class UIManager
 	public const WindowConflictMode DefaultConflictMode = WindowConflictMode.ShowNew;
 	public const WindowHideMode DefaultWindowHideMode = WindowHideMode.Auto;
 
-	public static List<Window> Windows = new List<Window>();
+	public static readonly List<Window> Windows = new List<Window>();
 
 	public static event Action<Window> OnWindowShowing;
 	public static event Action<Window> OnWindowShown;

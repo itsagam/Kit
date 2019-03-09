@@ -58,11 +58,15 @@ namespace Cards
 
 		public static bool operator ==(Card card1, Card card2)
 		{
+			if (ReferenceEquals(card1, null) || ReferenceEquals(card2, null))
+				return ReferenceEquals(card1, card2);
 			return card1.Suit == card2.Suit && card1.Rank == card2.Rank;
 		}
 
 		public static bool operator !=(Card card1, Card card2)
 		{
+			if (ReferenceEquals(card1, null) || ReferenceEquals(card2, null))
+				return !ReferenceEquals(card1, card2);
 			return card1.Suit != card2.Suit || card1.Rank != card2.Rank;
 		}
 

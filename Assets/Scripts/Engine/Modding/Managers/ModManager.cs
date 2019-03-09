@@ -84,11 +84,11 @@ namespace Modding
 		public static event Action<ResourceFolder, string, Mod> ResourceUnloaded;
 
 		public static readonly Dictionary<ModType, ModGroup> Groups = new Dictionary<ModType, ModGroup>();
-		public static readonly List<ModLoader> Loaders = new List<ModLoader>() {
+		public static readonly List<ModLoader> Loaders = new List<ModLoader>{
 			new DirectModLoader(),
 			new ZipModLoader()
 		};
-		public static IEnumerable<Mod> EnabledMods { get; private set; } = Enumerable.Empty<Mod>();
+		public static List<Mod> ActiveMods { get; private set; } = new List<Mod>();
 
 		private static Dictionary<(Type type, ResourceFolder folder, string file), ResourceInfo> cachedResources
 			= new Dictionary<(Type, ResourceFolder, string), ResourceInfo>();
@@ -169,7 +169,7 @@ namespace Modding
 
 			LoadModOrder();
 			SaveModOrder();
-			RefreshEnabledMods();
+			RefreshActiveMods();
 
 			if (executeScripts)
 				ExecuteScripts();
@@ -201,7 +201,7 @@ namespace Modding
 
 			LoadModOrder();
 			SaveModOrder();
-			RefreshEnabledMods();
+			RefreshActiveMods();
 
 			if (executeScripts)
 				await ExecuteScriptsAsync();
@@ -209,19 +209,19 @@ namespace Modding
 
 		public static void ExecuteScripts()
 		{
-			foreach (Mod mod in EnabledMods)
+			foreach (Mod mod in ActiveMods)
 				mod.ExecuteScripts();
 		}
 
 		public static async UniTask ExecuteScriptsAsync()
 		{
-			foreach (Mod mod in EnabledMods)
+			foreach (Mod mod in ActiveMods)
 				await mod.ExecuteScriptsAsync();
 		}
 
-		private static void RefreshEnabledMods()
+		private static void RefreshActiveMods()
 		{
-			EnabledMods = Groups.SelectMany(kvp => kvp.Value.Mods).Where(IsModEnabled);
+			ActiveMods = Groups.SelectMany(kvp => kvp.Value.Mods).Where(IsModEnabled).ToList();
 		}
 		#endregion
 
@@ -247,7 +247,7 @@ namespace Modding
 				return;
 
 			PlayerPrefs.SetInt($"{mod.Group.Name}/{mod.Metadata.Name}.Enabled", value ? 1 : 0);
-			RefreshEnabledMods();
+			RefreshActiveMods();
 		}
 
 		public static bool IsModEnabled(Mod mod)
@@ -259,7 +259,7 @@ namespace Modding
 
 		public static int GetModOrder(Mod mod)
 		{
-			return EnabledMods.IndexOf(mod);
+			return ActiveMods.IndexOf(mod);
 		}
 
 		public static int GetModOrderInGroup(Mod mod)
@@ -298,7 +298,7 @@ namespace Modding
 			mod.Group.Mods.Remove(mod);
 			mod.Group.Mods.Insert(index, mod);
 			SaveModOrder();
-			RefreshEnabledMods();
+			RefreshActiveMods();
 		}
 
 		private static void LoadModOrder()
@@ -354,11 +354,11 @@ namespace Modding
 			if (cachedReference != null)
 				return cachedReference;
 
-			if (!EnabledMods.Any())
+			if (!ActiveMods.Any())
 				return null;
 
 			string path = GetModdingPath(folder, file);
-			foreach (Mod mod in EnabledMods)
+			foreach (Mod mod in ActiveMods)
 			{
 				var (reference, filePath, parser) = mod.LoadEx(type, path);
 				if (reference != null)
@@ -379,11 +379,11 @@ namespace Modding
 			if (cachedReference != null)
 				return cachedReference;
 
-			if (!EnabledMods.Any())
+			if (!ActiveMods.Any())
 				return null;
 
 			string path = GetModdingPath(folder, file);
-			foreach (Mod mod in EnabledMods)
+			foreach (Mod mod in ActiveMods)
 			{
 				var (reference, filePath, parser) = await mod.LoadExAsync(type, path);
 				if (reference != null)
@@ -406,7 +406,7 @@ namespace Modding
 		public static List<object> LoadAll(Type type, string path)
 		{
 			List<object> all = new List<object>();
-			foreach (Mod mod in EnabledMods)
+			foreach (Mod mod in ActiveMods)
 			{
 				object reference = mod.Load(type, path);
 				if (reference != null)
@@ -423,7 +423,7 @@ namespace Modding
 		public static async UniTask<List<object>> LoadAllAsync(Type type, string path)
 		{
 			List<object> all = new List<object>();
-			foreach (Mod mod in EnabledMods)
+			foreach (Mod mod in ActiveMods)
 			{
 				object reference = await mod.LoadAsync(type, path);
 				if (reference != null)
@@ -451,7 +451,7 @@ namespace Modding
 
 		public static string ReadText(string path)
 		{
-			foreach (Mod mod in EnabledMods)
+			foreach (Mod mod in ActiveMods)
 			{
 				try
 				{
@@ -471,7 +471,7 @@ namespace Modding
 
 		public static async UniTask<string> ReadTextAsync(string path)
 		{
-			foreach (Mod mod in EnabledMods)
+			foreach (Mod mod in ActiveMods)
 			{
 				try
 				{
@@ -492,7 +492,7 @@ namespace Modding
 		public static List<string> ReadTextAll(string path)
 		{
 			List<string> all = new List<string>();
-			foreach (Mod mod in EnabledMods)
+			foreach (Mod mod in ActiveMods)
 			{
 				try
 				{
@@ -513,7 +513,7 @@ namespace Modding
 		public static async UniTask<List<string>> ReadTextAllAsync(string path)
 		{
 			List<string> all = new List<string>();
-			foreach (Mod mod in EnabledMods)
+			foreach (Mod mod in ActiveMods)
 			{
 				try
 				{
@@ -533,7 +533,7 @@ namespace Modding
 
 		public static byte[] ReadBytes(string path)
 		{
-			foreach (Mod mod in EnabledMods)
+			foreach (Mod mod in ActiveMods)
 			{
 				try
 				{
@@ -553,7 +553,7 @@ namespace Modding
 
 		public static async UniTask<byte[]> ReadBytesAsync(string path)
 		{
-			foreach (Mod mod in EnabledMods)
+			foreach (Mod mod in ActiveMods)
 			{
 				try
 				{
@@ -574,7 +574,7 @@ namespace Modding
 		public static List<byte[]> ReadBytesAll(string path)
 		{
 			List<byte[]> all = new List<byte[]>();
-			foreach (Mod mod in EnabledMods)
+			foreach (Mod mod in ActiveMods)
 			{
 				try
 				{
@@ -595,7 +595,7 @@ namespace Modding
 		public static async UniTask<List<byte[]>> ReadBytesAllAsync(string path)
 		{
 			List<byte[]> all = new List<byte[]>();
-			foreach (Mod mod in EnabledMods)
+			foreach (Mod mod in ActiveMods)
 			{
 				try
 				{
@@ -612,8 +612,8 @@ namespace Modding
 		#region Unloading
 		public static void UnloadMods(bool withResources = false)
 		{
-			foreach (Mod mod in EnabledMods.Reverse())
-				UnloadMod(mod, withResources);
+			for (int i=ActiveMods.Count-1; i>=0; i--)
+				UnloadMod(ActiveMods[i], withResources);
 		}
 
 		public static void UnloadMod(Mod mod, bool withResources = true)

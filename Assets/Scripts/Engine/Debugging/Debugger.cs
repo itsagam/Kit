@@ -31,9 +31,7 @@ public static class Debugger
 
 	public static CustomSampler GetProfile(string name)
 	{
-		if (samples.TryGetValue(name, out CustomSampler sample))
-			return sample;
-		return null;
+		return samples.TryGetValue(name, out CustomSampler sample) ? sample : null;
 	}
 
 	public static void EndProfile()

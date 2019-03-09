@@ -9,7 +9,7 @@ public struct SphericalCoordinates: IEquatable<SphericalCoordinates>
 	private float minElevation, maxElevation;
 	private bool loopPolar, loopElevation;
 
-	public SphericalCoordinates(float radius, float polar, float elevation, 
+	public SphericalCoordinates(float radius, float polar, float elevation,
 		float minRadius = 0, float maxRadius = float.PositiveInfinity,
 		float minPolar = 0, float maxPolar = Mathf.PI * 2f,
 		float minElevation = 0, float maxElevation = Mathf.PI * 2f,
@@ -46,7 +46,7 @@ public struct SphericalCoordinates: IEquatable<SphericalCoordinates>
 		this.loopPolar = loopPolar;
 		this.loopElevation = loopElevation;
 
-		if (cartesian.x == 0f)
+		if (cartesian.x == 0)
 			cartesian.x = Mathf.Epsilon;
 		Radius = cartesian.magnitude;
 
@@ -81,7 +81,7 @@ public struct SphericalCoordinates: IEquatable<SphericalCoordinates>
 
 	public SphericalCoordinates Rotate(float polar, float elevation)
 	{
-		Polar += polar;		
+		Polar += polar;
 		Elevation += elevation;
 		return this;
 	}
@@ -97,61 +97,37 @@ public struct SphericalCoordinates: IEquatable<SphericalCoordinates>
 
 	public float Radius
 	{
-		get
-		{
-			return radius;
-		}
-		set
-		{
-			radius = Mathf.Clamp(value, MinRadius, MaxRadius);
-		}
+		get => radius;
+		set => radius = Mathf.Clamp(value, MinRadius, MaxRadius);
 	}
 
 	public float Polar
-	{ 
-		get
-		{
-			return polar;
-		}
-		set
-		{ 
-			polar = LoopPolar ? Mathf.Repeat(value, MaxPolar - MinPolar)
-				: Mathf.Clamp(value, MinPolar, MaxPolar);
-		}
+	{
+		get => polar;
+		set => polar = LoopPolar ? Mathf.Repeat(value, MaxPolar - MinPolar)
+						   : Mathf.Clamp(value, MinPolar, MaxPolar);
 	}
 
 	public float Elevation
-	{ 
-		get
-		{
-			return elevation;
-		}
-		set
-		{ 
-			elevation = LoopElevation ? Mathf.Repeat(value, MaxElevation - MinElevation)
-				: Mathf.Clamp(value, MinElevation, MaxElevation); 
-		}
+	{
+		get => elevation;
+		set => elevation = LoopElevation ? Mathf.Repeat(value, MaxElevation - MinElevation)
+							   : Mathf.Clamp(value, MinElevation, MaxElevation);
 	}
 
 	public float MinRadius
 	{
-		get
-		{
-			return minRadius;
-		}
+		get => minRadius;
 		set
 		{
 			minRadius = value;
 			Radius = Radius;
 		}
 	}
-	
+
 	public float MaxRadius
 	{
-		get
-		{
-			return maxRadius;
-		}
+		get => maxRadius;
 		set
 		{
 			maxRadius = value;
@@ -161,23 +137,17 @@ public struct SphericalCoordinates: IEquatable<SphericalCoordinates>
 
 	public float MinPolar
 	{
-		get
-		{
-			return minPolar;
-		}
+		get => minPolar;
 		set
 		{
 			minPolar = value;
 			Polar = Polar;
 		}
 	}
-	
+
 	public float MaxPolar
 	{
-		get
-		{
-			return maxPolar;
-		}
+		get => maxPolar;
 		set
 		{
 			maxPolar = value;
@@ -187,49 +157,37 @@ public struct SphericalCoordinates: IEquatable<SphericalCoordinates>
 
 	public float MinElevation
 	{
-		get
-		{
-			return minElevation;
-		}
+		get => minElevation;
 		set
 		{
 			minElevation = value;
 			Elevation = Elevation;
 		}
 	}
-	
+
 	public float MaxElevation
 	{
-		get
-		{
-			return maxElevation;
-		}
+		get => maxElevation;
 		set
 		{
 			maxElevation = value;
 			Elevation = Elevation;
 		}
 	}
-	
+
 	public bool LoopPolar
 	{
-		get
-		{
-			return loopPolar;
-		}
+		get => loopPolar;
 		set
 		{
 			loopPolar = value;
 			Polar = Polar;
 		}
 	}
-	
+
 	public bool LoopElevation
 	{
-		get
-		{
-			return loopElevation;
-		}
+		get => loopElevation;
 		set
 		{
 			loopElevation = value;

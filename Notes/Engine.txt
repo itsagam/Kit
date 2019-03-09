@@ -3,7 +3,7 @@ Engine
 	Scriptable/Moddable
 		- Use UnityWebRequest to decode audio data
 		- Create AssetBundlerLoader
-		- Actual parrarel programmin with UniTasks
+		- Actual parrarel programming with UniTasks
 
 Library
 -----------------------------------------------------------------------------

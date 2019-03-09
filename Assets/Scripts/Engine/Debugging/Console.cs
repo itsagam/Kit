@@ -77,7 +77,7 @@ public static class Console
 			};
 		}
 
-		EventModifiers disregard = EventModifiers.FunctionKey | EventModifiers.Numeric | EventModifiers.CapsLock;
+		const EventModifiers disregard = EventModifiers.FunctionKey | EventModifiers.Numeric | EventModifiers.CapsLock;
 		InputFieldEx input = instance.CommandInput;
 		input.AddKeyHandler(KeyCode.BackQuote,	() =>	{},											EventModifiers.None,	disregard);
 		input.AddKeyHandler(KeyCode.Return,				Submit,										EventModifiers.None,	disregard);
@@ -124,7 +124,7 @@ public static class Console
 			var state = instance.Animator.GetCurrentAnimatorStateInfo(0);
 			if (state.IsName("Show"))
 				return state.normalizedTime > 1;
-			else if (state.IsName("Hide"))
+			if (state.IsName("Hide"))
 				return state.normalizedTime < 1;
 			return false;
 		}
@@ -321,14 +321,14 @@ public static class Console
 	private static void Submit()
 	{
 		string command = instance.CommandInput.text;
-		if (command != "")
-		{
-			Log(FormatCommand(command));
-			AddToHistory(command);
-			Execute(command);
-			ClearCommand();
-			Observable.NextFrame().Subscribe(t => ScrollToBottom());
-		}
+		if (command == "")
+			return;
+
+		Log(FormatCommand(command));
+		AddToHistory(command);
+		Execute(command);
+		ClearCommand();
+		Observable.NextFrame().Subscribe(t => ScrollToBottom());
 	}
 
 	private static string FormatCommand(string command)

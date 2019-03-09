@@ -3,7 +3,7 @@ using System.Linq;
 
 public class Team
 {
-	public List<TeamPlayer> Players { get; protected set; } = new List<TeamPlayer>();
+	public List<TeamPlayer> Players { get; } = new List<TeamPlayer>();
 
 	public Team()
 	{	

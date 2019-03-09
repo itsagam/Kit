@@ -36,9 +36,9 @@ public class DataManager
 
 	public static UniTask SaveGameState()
 	{
-		if (IsGameStateLoaded)
-			return ResourceManager.SaveAsync(ResourceFolder.PersistentData, GameStateFile, GameState);
-		return UniTask.CompletedTask;
+		return IsGameStateLoaded ?
+				   ResourceManager.SaveAsync(ResourceFolder.PersistentData, GameStateFile, GameState) :
+				   UniTask.CompletedTask;
 	}
 
 	public static bool IsGameDataLoaded => GameData != null;

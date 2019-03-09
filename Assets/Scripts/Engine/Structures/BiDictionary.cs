@@ -9,8 +9,8 @@ using System.Collections.Generic;
 /// <typeparam name="TSecond">The type of the "value"</typeparam>
 public class BiDictionary<TFirst, TSecond>
 {
-	IDictionary<TFirst, TSecond> firstToSecond = new Dictionary<TFirst, TSecond>();
-	IDictionary<TSecond, TFirst> secondToFirst = new Dictionary<TSecond, TFirst>();
+	private IDictionary<TFirst, TSecond> firstToSecond = new Dictionary<TFirst, TSecond>();
+	private IDictionary<TSecond, TFirst> secondToFirst = new Dictionary<TSecond, TFirst>();
 
 	#region Exception throwing methods
 
@@ -161,35 +161,20 @@ public class BiDictionary<TFirst, TSecond>
 
 	public TSecond this[TFirst first]
 	{
-		get
-		{
-			return Get(first);
-		}
-		set
-		{
-			Add(first, value);
-		}
+		get => Get(first);
+		set => Add(first, value);
 	}
 
 	public TFirst this[TSecond second]
 	{
-		get
-		{
-			return Get(second);
-		}
-		set
-		{
-			Add(value, second);
-		}
+		get => Get(second);
+		set => Add(value, second);
 	}
 
 	/// <summary>
 	/// The number of pairs stored in the dictionary
 	/// </summary>
-	public int Count
-	{
-		get { return firstToSecond.Count; }
-	}
+	public int Count => firstToSecond.Count;
 
 	/// <summary>
 	/// Removes all items from the dictionary.
