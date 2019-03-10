@@ -14,7 +14,7 @@ public class ContentSizeFitterEx : ContentSizeFitter
 {
 	public Vector2 Padding;
 
-	protected RectTransform rectTrans;
+	protected RectTransform cachedRectTransform;
 
 	public override void SetLayoutHorizontal()
 	{
@@ -32,9 +32,9 @@ public class ContentSizeFitterEx : ContentSizeFitter
 	{
 		get
 		{
-			if (rectTrans == null)
-				rectTrans = GetComponent<RectTransform>();
-			return rectTrans;
+			if (cachedRectTransform == null)
+				cachedRectTransform = GetComponent<RectTransform>();
+			return cachedRectTransform;
 		}
 	}
 }

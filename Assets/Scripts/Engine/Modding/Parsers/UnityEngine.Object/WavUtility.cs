@@ -18,7 +18,7 @@ using System;
 public static class WavUtility
 {
 	// Force save as 16-bit .wav
-	const int BlockSize_16Bit = 2;
+	const int BlockSize16Bit = 2;
 
 	public static AudioClip ToAudioClip(byte[] fileBytes, int offsetSamples = 0, string name = "wav")
 	{

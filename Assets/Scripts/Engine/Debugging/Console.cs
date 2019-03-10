@@ -10,6 +10,7 @@ using TouchScript.Layers;
 using TouchScript.Gestures;
 using UniRx;
 using XLua;
+using Object = UnityEngine.Object;
 
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
 public static class Console
@@ -43,9 +44,9 @@ public static class Console
 	private static void CreateUI()
 	{
 		ConsoleUI prefab = Resources.Load<ConsoleUI>(Prefab);
-		instance = GameObject.Instantiate(prefab);
+		instance = Object.Instantiate(prefab);
 		instance.name = prefab.name;
-		GameObject.DontDestroyOnLoad(instance.gameObject);
+		Object.DontDestroyOnLoad(instance.gameObject);
 		if (EventSystem.current == null)
 			new GameObject("EventSystem", typeof(EventSystem), typeof(StandaloneInputModule));
 	}

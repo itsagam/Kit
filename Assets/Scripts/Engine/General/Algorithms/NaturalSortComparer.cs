@@ -41,17 +41,11 @@ public class NaturalSortComparer : IComparer<string>, IDisposable
 		}
 
 		if (y1.Length > x1.Length)
-		{
 			returnVal = 1;
-		}
 		else if (x1.Length > y1.Length)
-		{
 			returnVal = -1;
-		}
 		else
-		{
 			returnVal = 0;
-		}
 
 		return IsAscending ? returnVal : -returnVal;
 	}

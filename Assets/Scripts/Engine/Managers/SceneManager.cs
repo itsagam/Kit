@@ -5,6 +5,7 @@ using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 using DG.Tweening;
 using UniRx;
+using Object = UnityEngine.Object;
 
 public enum FadeMode
 {
@@ -237,7 +238,7 @@ public static class SceneManager
         canvas.renderMode = RenderMode.ScreenSpaceOverlay;
         canvas.sortingOrder = 99999;
 		Image image = gameObject.AddComponent<Image>();
-		GameObject.DontDestroyOnLoad(gameObject);
+		Object.DontDestroyOnLoad(gameObject);
         return image;
     }
 

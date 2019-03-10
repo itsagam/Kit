@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UniRx;
+using Object = UnityEngine.Object;
 
 public static class AudioManager
 {
@@ -35,7 +36,7 @@ public static class AudioManager
 		CreateGroup(SoundEffectGroup);
 		CreateGroup(UIGroup);
 
-		GameObject.DontDestroyOnLoad(audioGameObject);
+		Object.DontDestroyOnLoad(audioGameObject);
 	}
 
 	public static AudioSource CreateGroup(string name)

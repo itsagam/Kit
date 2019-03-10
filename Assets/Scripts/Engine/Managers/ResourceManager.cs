@@ -7,6 +7,7 @@ using UnityEngine.Networking;
 using UniRx.Async;
 using Modding;
 using Modding.Parsers;
+using Object = UnityEngine.Object;
 
 // Notes:	You have to provide file extension for ResourceFolder other than Resources if it is not loaded
 //			by ModManager because you can't enumerate and match files in Data/Resources/StreamingAssets on
@@ -358,12 +359,12 @@ public static class ResourceManager
 
 		var key = cachedResources.FirstOrDefault(kvp => kvp.Value.Target == reference).Key;
 
-		if (reference is UnityEngine.Object unityObject)
+		if (reference is Object unityObject)
 		{
 			if (key.file == null || key.folder == ResourceFolder.Resources)
 				Resources.UnloadAsset(unityObject);
 			else
-				GameObject.Destroy(unityObject);
+				Object.Destroy(unityObject);
 		}
 
 		// Because of FirstOrDefault, if key is not found "file" will be null
@@ -393,12 +394,12 @@ public static class ResourceManager
 		if (!cachedResources.TryGetValue(key, out WeakReference weakReference))
 			return false;
 
-		if (weakReference.Target is UnityEngine.Object unityObject)
+		if (weakReference.Target is Object unityObject)
 		{
 			if (folder == ResourceFolder.Resources)
 				Resources.UnloadAsset(unityObject);
 			else
-				GameObject.Destroy(unityObject);
+				Object.Destroy(unityObject);
 		}
 
 		cachedResources.Remove(key);

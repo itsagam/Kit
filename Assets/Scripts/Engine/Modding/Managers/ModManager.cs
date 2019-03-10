@@ -5,7 +5,7 @@ using System.Linq;
 using UnityEngine;
 using Modding.Parsers;
 using UniRx;
-
+using Object = UnityEngine.Object;
 #if MODDING
 using UniRx.Async;
 using Modding.Loaders;
@@ -107,7 +107,7 @@ namespace Modding
 			// The order in which groups are added is taken into account in mod order and cannot be changed by any means
 			string writableFolder = GetWritableFolder();
 			AddGroup(new ModGroup(ModType.Patch, writableFolder + "Patches/", false, false));
-			AddGroup(new ModGroup(ModType.Mod, writableFolder + "Mods/", true, true));
+			AddGroup(new ModGroup(ModType.Mod, writableFolder + "Mods/"));
 		}
 
 		private static string GetWritableFolder()
@@ -676,8 +676,8 @@ namespace Modding
 
 		private static void UnloadInternal(object resource)
 		{
-			if (resource is UnityEngine.Object unityObject)
-				GameObject.Destroy(unityObject);
+			if (resource is Object unityObject)
+				Object.Destroy(unityObject);
 		}
 		#endregion
 

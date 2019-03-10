@@ -6,12 +6,12 @@ public class Team
 	public List<TeamPlayer> Players { get; } = new List<TeamPlayer>();
 
 	public Team()
-	{	
+	{
 	}
 
 	public Team(IEnumerable<TeamPlayer> players)
 	{
-		foreach (var player in Players)
+		foreach (var player in players)
 			AddPlayer(player);
 	}
 

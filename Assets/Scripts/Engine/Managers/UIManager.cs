@@ -4,6 +4,7 @@ using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 using UniRx.Async;
+using Object = UnityEngine.Object;
 
 public enum WindowState
 {
@@ -90,14 +91,14 @@ public static class UIManager
 		{
 			if (lastCanvas == null)
 			{
-				lastCanvas = GameObject.FindObjectOfType<Canvas>();
+				lastCanvas = Object.FindObjectOfType<Canvas>();
 				if (lastCanvas == null)
 					lastCanvas = CreateCanvas();
 			}
 			parent = lastCanvas.transform;
 		}
 
-		Window instance = GameObject.Instantiate(prefab, parent, false);
+		Window instance = Object.Instantiate(prefab, parent, false);
 		instance.name = prefab.name;
 		instance.MarkAsInstance();
 

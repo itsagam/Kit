@@ -5,6 +5,7 @@ using System.Linq;
 using UnityEngine;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using Object = UnityEngine.Object;
 
 /// <summary>
 /// Instantiates a prefab whenever a MonoBehaviour is encountered and populates the
@@ -78,7 +79,7 @@ using Newtonsoft.Json.Linq;
 ///
 /// public class GameState
 /// {
-///		public List<Building> Buildings;
+///		public List&lt;Building&gt; Buildings;
 /// }
 /// </code>
 ///
@@ -99,7 +100,7 @@ using Newtonsoft.Json.Linq;
 /// [Prefab("Buildings/{Type}")]
 /// public class GameState
 /// {
-///		public List<BuildingState> Buildings;
+///		public List&lt;BuildingState&lt; Buildings;
 /// }
 ///
 /// public class BuildingState
@@ -108,7 +109,7 @@ using Newtonsoft.Json.Linq;
 ///		public Vector2 Position;
 /// }
 ///
-/// JsonPrefab.Instantiate<Building>(GameState.Buildings);
+/// JsonPrefab.Instantiate&lt;Building&lt;(GameState.Buildings);
 /// </code>
 ///
 ///
@@ -127,10 +128,10 @@ using Newtonsoft.Json.Linq;
 ///
 /// public class GameState
 /// {
-///		public List<JObject> Buildings;
+///		public List&lt;JObject&lt; Buildings;
 /// }
 ///
-/// JsonPrefab.Instantiate<Building>("Buildings/{Type}", GameState.Buildings);
+/// JsonPrefab.Instantiate&lt;Building&lt;("Buildings/{Type}", GameState.Buildings);
 /// </code>
 /// </example>
 
@@ -152,7 +153,7 @@ public class JsonPrefabConverter : JsonConverter
 		if (prefab == null)
 			return null;
 
-		var instance = GameObject.Instantiate(prefab);
+		var instance = Object.Instantiate(prefab);
 		instance.name = prefab.name;
 		using (var jObjectReader = jObject.CreateReader())
 			serializer.Populate(jObjectReader, instance);
@@ -209,7 +210,7 @@ public static class JsonPrefab
 			return null;
 
 		JObject jObject = JObject.FromObject(stateObject);
-		var instance = Instantiate<T>(attribute.Path, jObject);
+		var instance = InstantiateInternal<T>(attribute.Path, jObject);
 
 		if (instance == null || !saveOnDestroy)
 			return instance;
@@ -223,17 +224,17 @@ public static class JsonPrefab
 
 	public static T Instantiate<T>(string path, JObject jObject, bool saveOnDestroy = true) where T : MonoBehaviour
 	{
-		var instance = Instantiate<T>(path, jObject);
-		if (instance != null && saveOnDestroy)
-		{
-			var serializeOnDestroy = instance.gameObject.AddComponent<JsonSaveJObjectOnDestroy>();
-			serializeOnDestroy.MonoObject = instance;
-			serializeOnDestroy.JObject = jObject;
-		}
+		var instance = InstantiateInternal<T>(path, jObject);
+		if (instance == null || !saveOnDestroy)
+			return instance;
+
+		var serializeOnDestroy = instance.gameObject.AddComponent<JsonSaveJObjectOnDestroy>();
+		serializeOnDestroy.MonoObject = instance;
+		serializeOnDestroy.JObject = jObject;
 		return instance;
 	}
 
-	private static T Instantiate<T>(string path, JObject jObject) where T : MonoBehaviour
+	private static T InstantiateInternal<T>(string path, JObject jObject) where T : MonoBehaviour
 	{
 		string currentPath = ReplaceValues(path, jObject);
 
@@ -241,7 +242,7 @@ public static class JsonPrefab
 		if (prefab == null)
 			return null;
 
-		var instance = GameObject.Instantiate(prefab);
+		var instance = Object.Instantiate(prefab);
 		instance.name = prefab.name;
 		using (var jObjectReader = jObject.CreateReader())
 			serializer.Populate(jObjectReader, instance);

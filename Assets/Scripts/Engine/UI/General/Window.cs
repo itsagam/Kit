@@ -73,7 +73,7 @@ public class Window : MonoBehaviour
 			}
 		}
 
-		onShown();
+		OnShownInternal();
 
 		return true;
 	}
@@ -107,19 +107,19 @@ public class Window : MonoBehaviour
             }
         }
 
-		onHidden(mode);
+		OnHiddenInternal(mode);
 
 		return true;
     }
 
-	private void onShown()
+	private void OnShownInternal()
 	{
 		State = WindowState.Shown;
 		OnShown();
 		OnWindowShown.Invoke();
 	}
 
-	private void onHidden(WindowHideMode mode)
+	private void OnHiddenInternal(WindowHideMode mode)
 	{
 		State = WindowState.Hidden;
 		data = null;

@@ -1,6 +1,8 @@
+using UnityEngine;
+
 public class ObjectList : IconList
 {
-    public UnityEngine.Object[] Objects;
+    public Object[] Objects;
 
     public virtual void Start()
     {

@@ -8,6 +8,7 @@ public class DragCursor : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDr
 	public Icon Icon;
 	public float MoveSpeed = 750.0f;
 
+	protected Transform transformCached;
 	protected Graphic graphic;
 	protected Canvas canvas;
 
@@ -16,18 +17,19 @@ public class DragCursor : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDr
 	protected Vector3 previousPosition;
 	protected int previousIndex;
 
-	protected virtual void Start()
+	protected virtual void Awake()
 	{
+		transformCached = GetComponent<Transform>();
 		graphic = GetComponent<Graphic>();
 		canvas = graphic.canvas;
 	}
 
 	public virtual void OnBeginDrag (PointerEventData eventData)
-	{			
+	{
 		graphic.raycastTarget = false;
 		previousParent = transform.parent;
-		previousLocalPosition = transform.localPosition;
-		previousPosition = transform.position;
+		previousLocalPosition = transformCached.localPosition;
+		previousPosition = transformCached.position;
 		previousIndex = transform.GetSiblingIndex();
 		transform.SetParent(canvas.transform, true);
 		transform.SetAsLastSibling();
@@ -48,7 +50,7 @@ public class DragCursor : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDr
 	public virtual void MoveBack()
 	{
 		transform.SetParent(previousParent, true);
-		transform.localPosition = previousLocalPosition;
+		transformCached.localPosition = previousLocalPosition;
 		transform.SetSiblingIndex(previousIndex);
 		graphic.raycastTarget = true;
 	}

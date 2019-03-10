@@ -64,7 +64,7 @@ public class AudioFader : MonoBehaviour
 		if (Audio.isPlaying)
 		{
 			if (IsBusy)
-				Audio.DOKill(false);
+				Audio.DOKill();
 			else
 				lastVolume = Audio.volume;
 
@@ -88,7 +88,7 @@ public class AudioFader : MonoBehaviour
 		if (Audio.isPlaying)
 		{
 			if (IsBusy)
-				Audio.DOKill(false);
+				Audio.DOKill();
 			else
 				lastVolume = Audio.volume;
 
@@ -107,7 +107,7 @@ public class AudioFader : MonoBehaviour
         if (Audio.isPlaying)
         {
 			if (IsBusy)
-				Audio.DOKill(false);
+				Audio.DOKill();
 			else
 				lastVolume = Audio.volume;
 			
@@ -125,7 +125,7 @@ public class AudioFader : MonoBehaviour
         if (Audio.isPlaying)
         {
 			if (IsBusy)
-				Audio.DOKill(false);
+				Audio.DOKill();
 			else
 				lastVolume = Audio.volume;
 			

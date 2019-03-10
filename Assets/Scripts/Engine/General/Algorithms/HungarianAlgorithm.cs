@@ -58,16 +58,16 @@ public static class HungarianAlgorithm
             switch (step)
             {
                 case 1:
-                    step = RunStep1(costs, masks, rowsCovered, colsCovered, w, h);
+                    step = RunStep1(masks, colsCovered, w, h);
                     break;
                 case 2:
                     step = RunStep2(costs, masks, rowsCovered, colsCovered, w, h, ref pathStart);
                     break;
                 case 3:
-                    step = RunStep3(costs, masks, rowsCovered, colsCovered, w, h, path, pathStart);
+                    step = RunStep3(masks, rowsCovered, colsCovered, w, h, path, pathStart);
                     break;
                 case 4:
-                    step = RunStep4(costs, masks, rowsCovered, colsCovered, w, h);
+                    step = RunStep4(costs, rowsCovered, colsCovered, w, h);
                     break;
             }
         }
@@ -87,7 +87,7 @@ public static class HungarianAlgorithm
         return agentsTasks;
     }
 
-    private static int RunStep1(int[,] costs, byte[,] masks, bool[] rowsCovered, bool[] colsCovered, int w, int h)
+    private static int RunStep1(byte[,] masks, bool[] colsCovered, int w, int h)
     {
         for (int i = 0; i < h; i++)
         {
@@ -112,7 +112,7 @@ public static class HungarianAlgorithm
     {
         while (true)
         {
-            Location loc = FindZero(costs, masks, rowsCovered, colsCovered, w, h);
+            Location loc = FindZero(costs, rowsCovered, colsCovered, w, h);
             if (loc.Row == -1)
             {
                 return 4;
@@ -133,7 +133,7 @@ public static class HungarianAlgorithm
         }
     }
 
-    private static int RunStep3(int[,] costs, byte[,] masks, bool[] rowsCovered, bool[] colsCovered, int w, int h,
+    private static int RunStep3(byte[,] masks, bool[] rowsCovered, bool[] colsCovered, int w, int h,
         Location[] path, Location pathStart)
     {
         var pathIndex = 0;
@@ -155,7 +155,7 @@ public static class HungarianAlgorithm
         return 1;
     }
 
-    private static int RunStep4(int[,] costs, byte[,] masks, bool[] rowsCovered, bool[] colsCovered, int w, int h)
+    private static int RunStep4(int[,] costs, bool[] rowsCovered, bool[] colsCovered, int w, int h)
     {
         var minValue = FindMinimum(costs, rowsCovered, colsCovered, w, h);
         for (int i = 0; i < h; i++)
@@ -182,7 +182,7 @@ public static class HungarianAlgorithm
         }
     }
 
-    private static Location FindZero(int[,] costs, byte[,] masks, bool[] rowsCovered, bool[] colsCovered,
+    private static Location FindZero(int[,] costs, bool[] rowsCovered, bool[] colsCovered,
         int w, int h)
     {
         for (int i = 0; i < h; i++)
