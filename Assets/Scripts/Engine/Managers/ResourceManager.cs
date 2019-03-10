@@ -16,6 +16,7 @@ using Object = UnityEngine.Object;
 
 public static class ResourceManager
 {
+	#region Fields
 	public static readonly Dictionary<ResourceFolder, string> Paths = new Dictionary<ResourceFolder, string>
 	{   { ResourceFolder.Data, Application.dataPath + "/"},
 		{ ResourceFolder.StreamingAssets, Application.streamingAssetsPath + "/"},
@@ -30,6 +31,7 @@ public static class ResourceManager
 
 	private static Dictionary<(Type type, ResourceFolder folder, string file), WeakReference> cachedResources
 		= new Dictionary<(Type, ResourceFolder, string), WeakReference>();
+	#endregion
 
 	#region Loading
 	public static T Load<T>(ResourceFolder folder, string file, bool modded = DefaultModding, bool merge = false)

@@ -31,14 +31,11 @@ public enum PoolLimitMode
 [AddComponentMenu("Pooling/Pool")]
 public class Pool : MonoBehaviour, IEnumerable<Component>
 {
+	#region Fields
 	public const string InstantiateMessage = "AwakeFromPool";
 	public const string DestroyMessage = "OnDestroyIntoPool";
 	private const int UnlimitedMaxPreloadAmount = 250;
 
-	protected LinkedList<Component> availableInstances = new LinkedList<Component>();
-	protected LinkedList<Component> usedInstances = new LinkedList<Component>();
-
-	#region Properties
 	[ReadOnly]
 	[HideInInlineEditors]
 	[ShowIf("ShowGroup")]
@@ -93,10 +90,13 @@ public class Pool : MonoBehaviour, IEnumerable<Component>
 	[HideInInlineEditors]
 	[ShowIf("ShowPersistent")]
 	public bool Persistent = false;
-	#endregion
 
 	public bool IsDestroying { get; protected set; }
+
+	protected LinkedList<Component> availableInstances = new LinkedList<Component>();
+	protected LinkedList<Component> usedInstances = new LinkedList<Component>();
 	protected Transform transformCached;
+	#endregion
 
 	#region Initialization
 	protected void Awake()
@@ -388,7 +388,7 @@ public class Pool : MonoBehaviour, IEnumerable<Component>
 #endif
 	#endregion
 
-	#region Public fields
+	#region Public properties
 	[PropertySpace]
 
 	[EnableGUI]

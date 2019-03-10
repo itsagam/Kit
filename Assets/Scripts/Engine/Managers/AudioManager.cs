@@ -6,22 +6,24 @@ using Object = UnityEngine.Object;
 
 public static class AudioManager
 {
-	private static GameObject audioGameObject;
-	private static Transform audioTransform;
-	private static Dictionary<string, AudioSource> groupSources = new Dictionary<string, AudioSource>();
-
+	#region Fields
 	public const string BackgroundGroup = "Background";
 	public const string SoundEffectGroup = "SoundEffect";
 	public const string UIGroup = "UI";
 
 	public static AudioFader BackgroundManager { get; private set; }
 
+	private static GameObject audioGameObject;
+	private static Transform audioTransform;
+	private static Dictionary<string, AudioSource> groupSources = new Dictionary<string, AudioSource>();
+	#endregion
+
+	#region Initialization
 	static AudioManager()
 	{
 		Initialize();
 	}
 
-	#region Group management
 	public static void Initialize()
 	{
 		if (audioGameObject != null)
@@ -38,7 +40,9 @@ public static class AudioManager
 
 		Object.DontDestroyOnLoad(audioGameObject);
 	}
+	#endregion
 
+	#region Group management
 	public static AudioSource CreateGroup(string name)
 	{
 		GameObject gameObject = new GameObject(name);
@@ -111,7 +115,7 @@ public static class AudioManager
 	{
 		if (clips == null || clips.Length <= 0)
 			return;
-		
+
 		int randomIndex = UnityEngine.Random.Range(0, clips.Length);
 		PlaySoundEffect(clips[randomIndex]);
 	}
@@ -242,7 +246,7 @@ public static class AudioManager
 	}
 	#endregion
 
-	#region Public fields
+	#region Public properties
 	public static AudioSource BackgroundSource => GetGroupSource(BackgroundGroup);
 	public static AudioSource SoundEffectsSource => GetGroupSource(SoundEffectGroup);
 	public static AudioSource UISource => GetGroupSource(UIGroup);

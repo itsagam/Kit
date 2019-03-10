@@ -7,7 +7,7 @@ using Sirenix.OdinInspector;
 [AddComponentMenu("Pooling/PoolGroup")]
 public class PoolGroup : MonoBehaviour, IEnumerable<Component>
 {
-	#region Properties
+	#region Fields
 	[LabelText("Message")]
 	[OnValueChanged("ResetMessageMode")]
 	public PoolMessageMode MessageMode = PoolMessageMode.None;
@@ -115,7 +115,7 @@ public class PoolGroup : MonoBehaviour, IEnumerable<Component>
 #endif
 	#endregion
 
-	#region Public fields
+	#region Public properties
 	public IEnumerable<Component> Available => Pools.SelectMany(p => p.Available);
 	public int AvailableCount => Pools.Sum(p => p.Available.Count);
 

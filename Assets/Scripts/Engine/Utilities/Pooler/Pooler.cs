@@ -3,10 +3,12 @@ using UnityEngine;
 
 public static class Pooler
 {
+	#region Fields
 	private static Dictionary<string, PoolGroup> poolGroupsByName = new Dictionary<string, PoolGroup>();
 
 	private static Dictionary<string, Pool> poolsByName = new Dictionary<string, Pool>();
 	private static Dictionary<Component, Pool> poolsByPrefab = new Dictionary<Component, Pool>();
+	#endregion
 
 	#region PoolGroup management
 	public static void CacheGroup(PoolGroup group)

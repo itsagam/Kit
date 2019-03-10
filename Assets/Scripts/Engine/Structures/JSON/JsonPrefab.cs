@@ -36,7 +36,7 @@ using Object = UnityEngine.Object;
 ///
 /// The JObject mode is very similar to state-object mode, except that you put JObject in
 /// GameState wherever you want to work with MonoBehaviours and call JsonPrefab.Instantiate
-/// by providing it the prefab path and JObjects to instantiate directly. This is the fastest
+/// by providing it the prefab path and JObjects to instantiate directly. This is the faster
 /// method and doesn't have problems like having to use JsonSubtypes to create the correct
 /// State-object type.
 /// </summary>
@@ -168,7 +168,7 @@ public class JsonPrefabConverter : JsonConverter
 
 	public override bool CanConvert(Type objectType)
 	{
-		throw new NotImplementedException();
+		return typeof(MonoBehaviour).IsAssignableFrom(objectType);
 	}
 
 	public override bool CanWrite => false;

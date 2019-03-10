@@ -70,7 +70,7 @@ namespace Modding
 
 	public static class ModManager
 	{
-		public static readonly List<ResourceParser> Parsers = new List<ResourceParser>() {
+		public static readonly List<ResourceParser> Parsers = new List<ResourceParser>{
 			new JSONParser(),
 			new TextureParser(),
 			new AudioParser(),
@@ -78,6 +78,7 @@ namespace Modding
 		};
 
 #if MODDING
+		#region Fields
 		public static event Action<Mod> ModLoaded;
 		public static event Action<Mod> ModUnloaded;
 		public static event Action<ResourceFolder, string, ResourceInfo, bool> ResourceLoaded;
@@ -93,6 +94,7 @@ namespace Modding
 		private static Dictionary<(Type type, ResourceFolder folder, string file), ResourceInfo> cachedResources
 			= new Dictionary<(Type, ResourceFolder, string), ResourceInfo>();
 		private static Dictionary<ResourceFolder, string> folderToString = new Dictionary<ResourceFolder, string>();
+		#endregion
 
 		#region Initialization
 		static ModManager()
