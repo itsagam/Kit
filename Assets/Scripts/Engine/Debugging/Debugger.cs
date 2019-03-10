@@ -5,7 +5,6 @@ using System.Text;
 using UnityEngine;
 using UnityEngine.Profiling;
 using UniRx;
-using Newtonsoft.Json;
 
 public static class Debugger
 {
@@ -110,7 +109,7 @@ public static class Debugger
 		if (obj == null)
 			return nullString;
 
-		return serialize ? JsonConvert.SerializeObject(obj, Formatting.Indented) : obj.ToString();
+		return serialize ? JSONParser.ToJson(obj) : obj.ToString();
 	}
 
 	public static void ObjectToString(StringBuilder output, object obj, bool serialize, string nullString)

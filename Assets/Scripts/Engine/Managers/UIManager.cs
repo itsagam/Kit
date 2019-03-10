@@ -115,14 +115,7 @@ public static class UIManager
 						string animation = null,
 						WindowHideMode mode = DefaultWindowHideMode)
 	{
-		return HideWindow(FindWindow(name), animation, mode);
-	}
-
-	public static UniTask<bool> HideWindow(
-					Window window,
-					string animation = null,
-					WindowHideMode mode = DefaultWindowHideMode)
-	{
+		Window window = FindWindow(name);
 		if (window != null)
 			return animation != null ? window.Hide(animation, mode) : window.Hide(mode);
 		return UniTask.FromResult(false);
@@ -169,6 +162,5 @@ public static class UIManager
 	}
 
 	public static Window FirstWindow => Windows.FirstOrDefault();
-
 	public static Window LastWindow => Windows.LastOrDefault();
 }

@@ -1,83 +1,18 @@
-﻿using System;
+﻿#if MODDING
+using System;
 using System.IO;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using Modding.Parsers;
 using UniRx;
-using Object = UnityEngine.Object;
-#if MODDING
 using UniRx.Async;
 using Modding.Loaders;
-#endif
-
-public enum ResourceFolder
-{
-	Data,
-	StreamingAssets,
-	PersistentData,
-	Resources
-}
+using Object = UnityEngine.Object;
 
 namespace Modding
 {
-	#if MODDING
-	public enum ModType
-	{
-		Patch,
-		Mod
-	}
-
-	public struct ModGroup
-	{
-		public ModType Name;
-		public string Path;
-		public List<Mod> Mods;
-		public bool Deactivatable;
-		public bool Reorderable;
-
-		public ModGroup(ModType name, string path, bool deactivatable = true, bool reorderable = true)
-		{
-			Name = name;
-			Path = path;
-			Mods = new List<Mod>();
-			Deactivatable = deactivatable;
-			Reorderable = reorderable;
-		}
-	}
-
-	public struct ResourceInfo
-	{
-		public Mod Mod;
-		public string Path;
-		public ResourceParser Parser;
-		public WeakReference Reference;
-
-		public ResourceInfo(Mod mod, string file, ResourceParser parser, object reference)
-			: this(mod, file, parser, new WeakReference(reference))
-		{
-		}
-
-		public ResourceInfo(Mod mod, string file, ResourceParser parser, WeakReference reference)
-		{
-			Mod = mod;
-			Path = file;
-			Parser = parser;
-			Reference = reference;
-		}
-	}
-	#endif
-
 	public static class ModManager
 	{
-		public static readonly List<ResourceParser> Parsers = new List<ResourceParser>{
-			new JSONParser(),
-			new TextureParser(),
-			new AudioParser(),
-			new TextParser()
-		};
-
-#if MODDING
 		#region Fields
 		public static event Action<Mod> ModLoaded;
 		public static event Action<Mod> ModUnloaded;
@@ -722,6 +657,6 @@ namespace Modding
 			}
 		}
 		#endregion
-#endif
 	}
 }
+#endif

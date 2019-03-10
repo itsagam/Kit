@@ -22,7 +22,7 @@ public class TimedWindow : Window
 		observable?.Dispose();
 		observable = Observable.Timer(TimeSpan.FromSeconds(Time)).Subscribe(t => {
 			observable = null;
-			Hide().Forget();
+			Hide();
 		});
 	}
 }

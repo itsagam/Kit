@@ -1,7 +1,9 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
-using Modding;
 using UniRx.Async;
+#if MODDING
+using Modding;
+#endif
 
 public class ModWindow : Window
 {
@@ -32,7 +34,7 @@ public class ModWindow : Window
 			return;
 
 		PlayerPrefs.Save();
-		UIManager.ShowWindow(MessageWindow, "Some changes will not be reflected until you restart the application.").Forget();
+		UIManager.ShowWindow(MessageWindow, "Some changes will not be reflected until you restart the application.");
 	}
 
 	public static void SetDirty()

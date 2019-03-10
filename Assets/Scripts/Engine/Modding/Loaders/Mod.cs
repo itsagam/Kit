@@ -4,7 +4,6 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using Modding.Parsers;
 using Modding.Scripting;
 using UniRx.Async;
 using XLua;
@@ -30,6 +29,7 @@ namespace Modding
 
 	public abstract class Mod
 	{
+		#region Fields
 		public const string MetadataFile = "Metadata.json";
 		public const float GCInterval = 1.0f;
 		private static YieldInstruction gcYield = new WaitForSeconds(GCInterval);
@@ -47,6 +47,7 @@ namespace Modding
 
 		public LuaEnv ScriptEnv { get; protected set; }
 		public SimpleDispatcher ScriptDispatcher { get; protected set; }
+		#endregion
 
 		#region Initialization
 		public virtual bool LoadMetadata()
@@ -63,12 +64,11 @@ namespace Modding
 		public virtual async UniTask<bool> LoadMetadataAsync()
 		{
 			string metadataText = await ReadTextAsync(MetadataFile);
-			if (metadataText != null)
-			{
-				Metadata = JSONParser.FromJson<ModMetadata>(metadataText);
-				return true;
-			}
-			return false;
+			if (metadataText == null)
+				return false;
+
+			Metadata = JSONParser.FromJson<ModMetadata>(metadataText);
+			return true;
 		}
 		#endregion
 
@@ -106,7 +106,7 @@ namespace Modding
 			{
 				try
 				{
-					if (parser.OperateWith == OperateType.Bytes)
+					if (parser.ParseMode == ParseMode.Binary)
 					{
 						if (bytes == null)
 							bytes = ReadBytes(filePath);
@@ -160,7 +160,7 @@ namespace Modding
 			{
 				try
 				{
-					if (parser.OperateWith == OperateType.Bytes)
+					if (parser.ParseMode == ParseMode.Binary)
 					{
 						if (bytes == null)
 							bytes = await ReadBytesAsync(filePath);
@@ -181,11 +181,12 @@ namespace Modding
 			return default;
 		}
 
-		protected IEnumerable<(string filePath, ResourceParser parser, float certainty)> RankParsers(Type type, IEnumerable<string> matchingFiles)
+		protected IEnumerable<(string filePath, ResourceParser parser, float certainty)> RankParsers(Type type, IEnumerable<string> files)
 		{
-			return matchingFiles.SelectMany(filePath => ModManager.Parsers.Select(parser => (filePath, parser, certainty: parser.CanOperate(type, filePath))))
-								.Where(d => d.certainty > 0)
-								.OrderByDescending(d => d.certainty);
+			return files
+			      .SelectMany(filePath => ResourceManager.Parsers.Select(parser => (filePath, parser, certainty: parser.CanParse(type, filePath))))
+			      .Where(tuple => tuple.certainty > 0)
+			      .OrderByDescending(tuple => tuple.certainty);
 		}
 		#endregion
 

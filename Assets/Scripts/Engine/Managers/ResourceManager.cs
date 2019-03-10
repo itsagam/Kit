@@ -5,23 +5,40 @@ using System.Linq;
 using UnityEngine;
 using UnityEngine.Networking;
 using UniRx.Async;
-using Modding;
-using Modding.Parsers;
 using Object = UnityEngine.Object;
+#if MODDING
+using Modding;
+#endif
 
 // Notes:	You have to provide file extension for ResourceFolder other than Resources if it is not loaded
 //			by ModManager because you can't enumerate and match files in Data/Resources/StreamingAssets on
 //			platforms like Android. If the file is loaded by ModManager it can be loaded without providing
 //			an extension since mods are always in an accessible folder which we can enumerate.
 
+public enum ResourceFolder
+{
+	Data,
+	StreamingAssets,
+	PersistentData,
+	Resources
+}
+
 public static class ResourceManager
 {
 	#region Fields
-	public static readonly Dictionary<ResourceFolder, string> Paths = new Dictionary<ResourceFolder, string>
-	{   { ResourceFolder.Data, Application.dataPath + "/"},
+	public static readonly Dictionary<ResourceFolder, string> Paths = new Dictionary<ResourceFolder, string>{
+		{ ResourceFolder.Data, Application.dataPath + "/"},
 		{ ResourceFolder.StreamingAssets, Application.streamingAssetsPath + "/"},
 		{ ResourceFolder.PersistentData, Application.persistentDataPath + "/"},
-		{ ResourceFolder.Resources, Application.dataPath + "/Resources/"} };
+		{ ResourceFolder.Resources, Application.dataPath + "/Resources/"}
+	};
+
+	public static readonly List<ResourceParser> Parsers = new List<ResourceParser>{
+		new JSONParser(),
+		new Texture2DParser(),
+		new AudioClipParser(),
+		new TextAssetParser()
+	};
 
 	public static event Action<ResourceFolder, string, object, bool> ResourceLoaded;
 	public static event Action<ResourceFolder, string> ResourceUnloaded;
@@ -184,7 +201,7 @@ public static class ResourceManager
 		{
 			try
 			{
-				if (parser.OperateWith == OperateType.Text)
+				if (parser.ParseMode == ParseMode.Text)
 				{
 					List<string> textList = ModManager.ReadTextAll(folder, file);
 					foreach (string text in textList)
@@ -240,7 +257,7 @@ public static class ResourceManager
 		{
 			try
 			{
-				if (parser.OperateWith == OperateType.Text)
+				if (parser.ParseMode == ParseMode.Text)
 				{
 					List<string> textList = await ModManager.ReadTextAllAsync(folder, file);
 					foreach (string text in textList)
@@ -288,7 +305,7 @@ public static class ResourceManager
 		{
 			try
 			{
-				if (parser.OperateWith == OperateType.Text)
+				if (parser.ParseMode == ParseMode.Text)
 				{
 					if (text == null)
 						text = ReadText(fullPath);
@@ -332,7 +349,7 @@ public static class ResourceManager
 		{
 			try
 			{
-				if (parser.OperateWith == OperateType.Text)
+				if (parser.ParseMode == ParseMode.Text)
 				{
 					if (text == null)
 						text = await ReadTextAsync(fullPath);
@@ -540,7 +557,7 @@ public static class ResourceManager
 		{
 			try
 			{
-				return parser.OperateWith == OperateType.Text ?
+				return parser.ParseMode == ParseMode.Text ?
 						   SaveText(fullPath, (string) parser.Write(contents)) :
 						   SaveBytes(fullPath, (byte[]) parser.Write(contents));
 			}
@@ -557,7 +574,7 @@ public static class ResourceManager
 		{
 			try
 			{
-				return parser.OperateWith == OperateType.Text ?
+				return parser.ParseMode == ParseMode.Text ?
 						   SaveTextAsync(fullPath, (string) parser.Write(contents)) :
 						   SaveBytesAsync(fullPath, (byte[]) parser.Write(contents));
 			}
@@ -683,9 +700,9 @@ public static class ResourceManager
 	#region Other
 	private static IEnumerable<(ResourceParser parser, float certainty)> RankParsers(Type type, string fullPath)
 	{
-		return ModManager.Parsers.Select(parser => (parser, certainty: parser.CanOperate(type, fullPath)))
-			.Where(d => d.certainty > 0)
-			.OrderByDescending(d => d.certainty);
+		return Parsers.Select(parser => (parser, certainty: parser.CanParse(type, fullPath)))
+		              .Where(tuple => tuple.certainty > 0)
+		              .OrderByDescending(tuple => tuple.certainty);
 	}
 
 	public static string GetPath(ResourceFolder folder)

@@ -1,7 +1,9 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
-using Modding;
 using DG.Tweening;
+#if MODDING
+using Modding;
+#endif
 
 public class ModIcon : Icon
 {

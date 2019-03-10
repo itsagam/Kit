@@ -40,12 +40,12 @@ public class Window : MonoBehaviour
 		UIManager.RegisterWindow(this);
     }
 
-	public virtual UniTask<bool> Show(object data = null)
+	public UniTask<bool> Show(object data = null)
 	{
 		return Show(ShowAnimation, data);
 	}
 
-	public virtual async UniTask<bool> Show(string animation, object data = null)
+	public async UniTask<bool> Show(string animation, object data = null)
 	{
 		if (IsBusy)
 			return false;
@@ -57,7 +57,7 @@ public class Window : MonoBehaviour
 		OnShowing();
 		OnWindowShowing.Invoke();
 		UIManager.Windows.Add(this);
-		
+
 		Data = data;
 		gameObject.SetActive(true);
 
@@ -78,12 +78,12 @@ public class Window : MonoBehaviour
 		return true;
 	}
 
-	public virtual UniTask<bool> Hide(WindowHideMode mode = UIManager.DefaultWindowHideMode)
+	public UniTask<bool> Hide(WindowHideMode mode = UIManager.DefaultWindowHideMode)
 	{
 		return Hide(HideAnimation, mode);
 	}
 
-	public virtual async UniTask<bool> Hide(string animation, WindowHideMode mode = UIManager.DefaultWindowHideMode)
+	public async UniTask<bool> Hide(string animation, WindowHideMode mode = UIManager.DefaultWindowHideMode)
     {
 		if (IsBusy)
 			return false;
@@ -135,7 +135,7 @@ public class Window : MonoBehaviour
 		OnWindowHidden.Invoke();
 	}
 
-	public virtual void MarkAsInstance()
+	public void MarkAsInstance()
 	{
 		isInstance = true;
 	}
@@ -153,7 +153,7 @@ public class Window : MonoBehaviour
 
     protected virtual void OnShown()
     {
-    
+
     }
 
 	protected virtual void OnHiding()

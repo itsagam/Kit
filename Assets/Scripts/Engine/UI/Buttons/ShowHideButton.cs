@@ -37,18 +37,18 @@ public class ShowHideButton : MonoBehaviour, IPointerClickHandler
 					switch (Mode)
 					{
 						case ShowHideMode.Show:
-							Window.Show().Forget();
+							Window.Show();
 							break;
 
 						case ShowHideMode.Hide:
-							Window.Hide().Forget();
+							Window.Hide();
 							break;
 
 						case ShowHideMode.Toggle:
 							if (Window.IsShown)
-								Window.Hide().Forget();
+								Window.Hide();
 							else
-								Window.Show().Forget();
+								Window.Show();
 							break;
 					}
 				}
@@ -61,19 +61,19 @@ public class ShowHideButton : MonoBehaviour, IPointerClickHandler
 					{
 						case ShowHideMode.Show:
 							if (!UIManager.IsShown(Name))
-								UIManager.ShowWindow(Name).Forget();
+								UIManager.ShowWindow(Name);
 							break;
 
 						case ShowHideMode.Hide:
 							if (UIManager.IsShown(Name))
-								UIManager.HideWindow(Name).Forget();
+								UIManager.HideWindow(Name);
 							break;
 
 						case ShowHideMode.Toggle:
 							if (UIManager.IsShown(Name))
-								UIManager.HideWindow(Name).Forget();
+								UIManager.HideWindow(Name);
 							else
-								UIManager.ShowWindow(Name).Forget();
+								UIManager.ShowWindow(Name);
 							break;
 					}
 				}
