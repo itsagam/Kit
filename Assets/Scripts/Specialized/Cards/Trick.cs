@@ -1,30 +1,67 @@
-﻿namespace Cards
+﻿using System.Collections.Generic;
+using System.Linq;
+using Game;
+
+namespace Cards
 {
-	public class Trick: BiDictionary<Player, Card>
+	public class Trick: CardSet
 	{
-		public new void Add(Player player, Card card)
+		private Dictionary<Card, Player> players = new Dictionary<Card, Player>();
+
+		public Trick()
 		{
-			base.Add(player, card);
+		}
+
+		public Trick(Dictionary<Card, Player> cards)
+		{
+			Add(cards);
+		}
+
+		public Trick(Dictionary<Player, Card> cards)
+		{
+			Add(cards);
+		}
+
+		public Trick Add(Player player, Card card)
+		{
+			base.Add(card);
+			players.Add(card, player);
+			return this;
+		}
+
+		public Trick Add(Dictionary<Card, Player> cards)
+		{
+			foreach (var kvp in cards)
+				Add(kvp.Value, kvp.Key);
+			return this;
+		}
+
+		public Trick Add(Dictionary<Player, Card> cards)
+		{
+			foreach (var kvp in cards)
+				Add(kvp.Key, kvp.Value);
+			return this;
 		}
 
 		public Card GetCard(Player player)
 		{
-			return Get(player);
+			return players.FirstOrDefault(kvp => kvp.Value == player).Key;
 		}
 
 		public Player GetPlayer(Card card)
 		{
-			return Get(card);
+			return players.TryGetValue(card, out Player player) ? player : null;
 		}
 
-		public new void Remove(Player player)
+		public bool Remove(Player player)
 		{
-			base.Remove(player);
+			Card card = GetCard(player);
+			return card != null && Remove(card);
 		}
 
-		public new void Remove(Card card)
+		public override bool Remove(Card card)
 		{
-			base.Remove(card);
+			return base.Remove(card) && players.Remove(card);
 		}
 	}
 }

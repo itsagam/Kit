@@ -15,26 +15,26 @@ namespace Modding.Scripting
 		{
 			scriptEnv = env;
 
-			var awakeAction = scriptEnv.Global.Get<Action>("awake");
+			Action awakeAction = scriptEnv.Global.Get<Action>("awake");
 			if (awakeAction != null)
 				ExecuteSafe(awakeAction);
 
-			var updateAction = scriptEnv.Global.Get<Action>("update");
+			Action updateAction = scriptEnv.Global.Get<Action>("update");
 			if (updateAction != null)
 				updateEvent += () => ExecuteSafe(updateAction);
 
-			var lateUpdateAction = scriptEnv.Global.Get<Action>("lateUpdate");
+			Action lateUpdateAction = scriptEnv.Global.Get<Action>("lateUpdate");
 			if (lateUpdateAction != null)
 				lateUpdateEvent += () => ExecuteSafe(lateUpdateAction);
 
-			var fixedUpdateAction = scriptEnv.Global.Get<Action>("fixedUpdate");
+			Action fixedUpdateAction = scriptEnv.Global.Get<Action>("fixedUpdate");
 			if (fixedUpdateAction != null)
 				fixedUpdateEvent += () => ExecuteSafe(fixedUpdateAction);
 		}
 
 		protected void Start()
 		{
-			var startAction = scriptEnv.Global.Get<Action>("start");
+			Action startAction = scriptEnv.Global.Get<Action>("start");
 			if (startAction != null)
 				ExecuteSafe(startAction);
 		}
@@ -80,7 +80,7 @@ namespace Modding.Scripting
 			if (scriptEnv == null)
 				return;
 
-			var destroyAction = scriptEnv.Global.Get<Action>("onDestroy");
+			Action destroyAction = scriptEnv.Global.Get<Action>("onDestroy");
 			if (destroyAction != null)
 				ExecuteSafe(destroyAction);
 

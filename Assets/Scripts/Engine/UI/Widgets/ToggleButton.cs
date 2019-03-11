@@ -28,9 +28,10 @@ public class ToggleButton : MonoBehaviour
 
 	protected void SetImage()
 	{
-		Button.image.sprite = isOn ? OnSprite : OffSprite;
+		if (Button != null)
+			Button.image.sprite = isOn ? OnSprite : OffSprite;
 	}
-	
+
 	public bool IsOn
 	{
 		get => isOn;

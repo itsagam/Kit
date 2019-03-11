@@ -32,67 +32,67 @@ public enum WindowHideMode
 public static class UIManager
 {
 	public const WindowConflictMode DefaultConflictMode = WindowConflictMode.ShowNew;
-	public const WindowHideMode DefaultWindowHideMode = WindowHideMode.Auto;
+	public const WindowHideMode DefaultHideMode = WindowHideMode.Auto;
 
 	public static readonly List<Window> Windows = new List<Window>();
 
-	public static event Action<Window> OnWindowShowing;
-	public static event Action<Window> OnWindowShown;
-	public static event Action<Window> OnWindowHiding;
-	public static event Action<Window> OnWindowHidden;
+	public static event Action<Window> OnShowing;
+	public static event Action<Window> OnShown;
+	public static event Action<Window> OnHiding;
+	public static event Action<Window> OnHidden;
 
 	private static Canvas lastCanvas = null;
 
 	// Workaround for CS4014: If call async methods, but not await them, C# warns that you should.
 	// Wrapping them in non-async methods prevents the warning.
-	public static UniTask<Window> ShowWindow(
+	public static UniTask<Window> Show(
 										string path,
 										object data = null,
 										Transform parent = null,
 										string animation = null,
-										WindowConflictMode mode = DefaultConflictMode)
+										WindowConflictMode conflictMode = DefaultConflictMode)
 	{
-		return ShowWindowInternal(path, data, parent, animation, mode);
+		return ShowInternal(path, data, parent, animation, conflictMode);
 	}
 
-	public static UniTask<Window> ShowWindow(
+	public static UniTask<Window> Show(
 										Window prefab,
 										object data = null,
 										Transform parent = null,
 										string animation = null,
-										WindowConflictMode mode = DefaultConflictMode)
+										WindowConflictMode conflictMode = DefaultConflictMode)
 	{
-		return ShowWindowInternal(prefab, data, parent, animation, mode);
+		return ShowInternal(prefab, data, parent, animation, conflictMode);
 	}
 
-	private static async UniTask<Window> ShowWindowInternal(
+	private static async UniTask<Window> ShowInternal(
 										string path,
 										object data,
 										Transform parent,
 										string animation,
-										WindowConflictMode mode)
+										WindowConflictMode conflictMode)
 	{
 		Window prefab = await ResourceManager.LoadAsync<Window>(ResourceFolder.Resources, path);
 		if (prefab == null)
 			return null;
 
-		return await ShowWindow(prefab, data, parent, animation, mode);
+		return await Show(prefab, data, parent, animation, conflictMode);
 	}
 
-	private static async UniTask<Window> ShowWindowInternal(
+	private static async UniTask<Window> ShowInternal(
 										Window prefab,
 										object data,
 										Transform parent,
 										string animation,
-										WindowConflictMode mode)
+										WindowConflictMode conflictMode)
 	{
 
-		if (mode != WindowConflictMode.ShowNew)
+		if (conflictMode != WindowConflictMode.ShowNew)
 		{
-			Window previous = FindWindow(prefab.name);
+			Window previous = Find(prefab.name);
 			if (previous != null)
 			{
-				switch (mode)
+				switch (conflictMode)
 				{
 					case WindowConflictMode.DontShow:
 						return null;
@@ -132,43 +132,43 @@ public static class UIManager
 		return instance;
 	}
 
-	public static UniTask<bool> HideWindow(
+	public static UniTask<bool> Hide(
 						string name,
 						string animation = null,
-						WindowHideMode mode = DefaultWindowHideMode)
+						WindowHideMode mode = DefaultHideMode)
 	{
-		Window window = FindWindow(name);
+		Window window = Find(name);
 		if (window != null)
 			return animation != null ? window.Hide(animation, mode) : window.Hide(mode);
 		return UniTask.FromResult(false);
 	}
 
-	public static Window FindWindow(string name)
+	public static Window Find(string name)
 	{
 		return Windows.Find(w => w.name == name);
 	}
 
-	public static T FindWindow<T>() where T: Window
+	public static T Find<T>() where T: Window
 	{
 		return Windows.OfType<T>().FirstOrDefault();
 	}
 
 	public static bool IsShown(string name)
 	{
-		return FindWindow(name) != null;
+		return Find(name) != null;
 	}
 
 	public static bool IsShown<T>() where T: Window
 	{
-		return FindWindow<T>() != null;
+		return Find<T>() != null;
 	}
 
-	public static void RegisterWindow(Window instance)
+	public static void Register(Window instance)
 	{
-		instance.OnWindowHidden.AddListener(() => OnWindowShowing?.Invoke(instance));
-		instance.OnWindowShown.AddListener(() => OnWindowShown?.Invoke(instance));
-		instance.OnWindowShown.AddListener(() => OnWindowHiding?.Invoke(instance));
-		instance.OnWindowShown.AddListener(() => OnWindowHidden?.Invoke(instance));
+		instance.OnWindowHidden.AddListener(() => OnShowing?.Invoke(instance));
+		instance.OnWindowShown.AddListener(() => OnShown?.Invoke(instance));
+		instance.OnWindowShown.AddListener(() => OnHiding?.Invoke(instance));
+		instance.OnWindowShown.AddListener(() => OnHidden?.Invoke(instance));
 	}
 
 	private static Canvas CreateCanvas()
@@ -183,6 +183,6 @@ public static class UIManager
 		return canvas;
 	}
 
-	public static Window FirstWindow => Windows.FirstOrDefault();
-	public static Window LastWindow => Windows.LastOrDefault();
+	public static Window First => Windows.FirstOrDefault();
+	public static Window Last => Windows.LastOrDefault();
 }

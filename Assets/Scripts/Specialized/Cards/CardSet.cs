@@ -12,10 +12,10 @@ namespace Cards
 
 		public CardSet(IEnumerable<Card> cards)
 		{
-			AddRange(cards);
+			Add(cards);
 		}
 
-		public new CardSet Add(Card card)
+		public new virtual CardSet Add(Card card)
 		{
 			base.Add(card);
 			return this;
@@ -23,7 +23,8 @@ namespace Cards
 
 		public CardSet Add(IEnumerable<Card> cards)
 		{
-			AddRange(cards);
+			foreach (Card card in cards)
+				Add(card);
 			return this;
 		}
 
@@ -274,6 +275,11 @@ namespace Cards
 				for (int i=0; i<numberOfCards; i++)
 					dealt.Add(Deal(to));
 			return dealt;
+		}
+
+		public new virtual bool Remove(Card card)
+		{
+			return base.Remove(card);
 		}
 
 		public bool Remove(IEnumerable<Card> cards)

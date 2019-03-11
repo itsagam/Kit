@@ -1,28 +1,31 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 
-public class TeamPlayer : Player
+namespace Game
 {
-	public Team Team;
-
-	public bool IsPartner(TeamPlayer player)
+	public class TeamPlayer : Player
 	{
-		return player.Team == Team;
-	}
+		public Team Team;
 
-	public IEnumerable<TeamPlayer> Partners
-	{
-		get
+		public bool IsPartner(TeamPlayer player)
 		{
-			return Team.Players.Where(p => p != this);
+			return player.Team == Team;
 		}
-	}
 
-	public TeamPlayer Partner
-	{
-		get
+		public IEnumerable<TeamPlayer> Partners
 		{
-			return Team.Players.Find(p => p != this);
+			get
+			{
+				return Team.Players.Where(p => p != this);
+			}
+		}
+
+		public TeamPlayer Partner
+		{
+			get
+			{
+				return Team.Players.Find(p => p != this);
+			}
 		}
 	}
 }

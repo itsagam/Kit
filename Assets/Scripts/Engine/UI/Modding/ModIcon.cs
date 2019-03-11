@@ -1,6 +1,6 @@
-﻿using UnityEngine;
+﻿using DG.Tweening;
+using UnityEngine;
 using UnityEngine.UI;
-using DG.Tweening;
 #if MODDING
 using Modding;
 #endif
@@ -40,7 +40,7 @@ public class ModIcon : Icon
 		if (list[list.Count - 1] == Mod)
 			MoveDownButton.SetInteractableImmediate(false);
 
-		var metadata = Mod.Metadata;
+		ModMetadata metadata = Mod.Metadata;
 		NameText.text = metadata.Name;
 		NameText.color = EnableToggle.IsOn ? EnabledColor : DisabledColor;
 		VersionText.text = metadata.Version;

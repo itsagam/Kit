@@ -36,7 +36,7 @@ public class Window : MonoBehaviour
     {
         animator = GetComponent<Animator>();
         gameObject.SetActive(false);
-		UIManager.RegisterWindow(this);
+		UIManager.Register(this);
     }
 
 	public UniTask<bool> Show(object data = null)
@@ -77,12 +77,12 @@ public class Window : MonoBehaviour
 		return true;
 	}
 
-	public UniTask<bool> Hide(WindowHideMode mode = UIManager.DefaultWindowHideMode)
+	public UniTask<bool> Hide(WindowHideMode mode = UIManager.DefaultHideMode)
 	{
 		return Hide(HideAnimation, mode);
 	}
 
-	public async UniTask<bool> Hide(string animation, WindowHideMode mode = UIManager.DefaultWindowHideMode)
+	public async UniTask<bool> Hide(string animation, WindowHideMode mode = UIManager.DefaultHideMode)
     {
 		if (IsBusy)
 			return false;

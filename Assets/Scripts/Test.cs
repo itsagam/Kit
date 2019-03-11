@@ -1,8 +1,9 @@
 ﻿using UnityEngine;
 
-public class Test : MonoBehaviour
+namespace Game
 {
-	public async void Button()
+	public class Test : MonoBehaviour
 	{
+
 	}
 }

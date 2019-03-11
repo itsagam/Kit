@@ -257,7 +257,7 @@ namespace Modding
 			return validScripts;
 		}
 
-		public virtual void ExecuteScripts()
+		public void ExecuteScripts()
 		{
 			var scripts = SetupScripting();
 			if (scripts == null)
@@ -274,7 +274,7 @@ namespace Modding
 			HookOrDispose();
 		}
 
-		public virtual async UniTask ExecuteScriptsAsync()
+		public async UniTask ExecuteScriptsAsync()
 		{
 			var scripts = SetupScripting();
 			if (scripts == null)

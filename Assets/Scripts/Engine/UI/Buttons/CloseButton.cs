@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
-using UnityEngine.UI;
 using UnityEngine.EventSystems;
+using UnityEngine.UI;
 
 public class CloseButton : MonoBehaviour, IPointerClickHandler
 {
@@ -21,7 +21,7 @@ public class CloseButton : MonoBehaviour, IPointerClickHandler
 
 	protected static void Close()
 	{
-		if (UIManager.LastWindow != null)
-			UIManager.LastWindow.Hide();
+		if (UIManager.Last != null)
+			UIManager.Last.Hide();
 	}
 }

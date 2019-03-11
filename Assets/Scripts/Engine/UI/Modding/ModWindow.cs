@@ -8,7 +8,6 @@ public class ModWindow : Window
 {
 	public IconList ModList;
 	public Text CountText;
-	public Window MessageWindow;
 
 #if MODDING
 	public bool IsDirty { get; set; }
@@ -33,12 +32,12 @@ public class ModWindow : Window
 			return;
 
 		PlayerPrefs.Save();
-		UIManager.ShowWindow(MessageWindow, "Some changes will not be reflected until you restart the application.");
+		UIManager.Show(Game.Windows.Message, "Some changes will not be reflected until you restart the application.");
 	}
 
 	public static void SetDirty()
 	{
-		UIManager.FindWindow<ModWindow>().IsDirty = true;
+		UIManager.Find<ModWindow>().IsDirty = true;
 	}
 #endif
 }

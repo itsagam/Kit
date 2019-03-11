@@ -1,7 +1,6 @@
-﻿using UnityEngine;
+﻿using Sirenix.OdinInspector;
+using UnityEngine;
 using UnityEngine.EventSystems;
-using UniRx.Async;
-using Sirenix.OdinInspector;
 
 public class ShowHideButton : MonoBehaviour, IPointerClickHandler
 {
@@ -61,19 +60,19 @@ public class ShowHideButton : MonoBehaviour, IPointerClickHandler
 					{
 						case ShowHideMode.Show:
 							if (!UIManager.IsShown(Name))
-								UIManager.ShowWindow(Name);
+								UIManager.Show(Name);
 							break;
 
 						case ShowHideMode.Hide:
 							if (UIManager.IsShown(Name))
-								UIManager.HideWindow(Name);
+								UIManager.Hide(Name);
 							break;
 
 						case ShowHideMode.Toggle:
 							if (UIManager.IsShown(Name))
-								UIManager.HideWindow(Name);
+								UIManager.Hide(Name);
 							else
-								UIManager.ShowWindow(Name);
+								UIManager.Show(Name);
 							break;
 					}
 				}
