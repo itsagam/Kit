@@ -28,7 +28,7 @@ namespace Modding.Loaders
 				if (mod.LoadMetadata())
 					return mod;
 			}
-			catch (Exception)
+			catch
 			{
 			}
 
@@ -51,7 +51,7 @@ namespace Modding.Loaders
 				if (await mod.LoadMetadataAsync())
 					return mod;
 			}
-			catch (Exception)
+			catch
 			{
 			}
 
@@ -78,39 +78,67 @@ namespace Modding.Loaders
 
 		public override string ReadText(string path)
 		{
-			ZipArchiveEntry entry = Archive.GetEntry(path);
-			using (Stream stream = entry.Open())
-			using (TextReader text = new StreamReader(stream))
-				return text.ReadToEnd();
+			try
+			{
+				ZipArchiveEntry entry = Archive.GetEntry(path);
+				using (Stream stream = entry.Open())
+				using (TextReader text = new StreamReader(stream))
+					return text.ReadToEnd();
+			}
+			catch
+			{
+				return null;
+			}
 		}
 
-		public override UniTask<string> ReadTextAsync(string path)
+		public override async UniTask<string> ReadTextAsync(string path)
 		{
-			ZipArchiveEntry entry = Archive.GetEntry(path);
-			using (Stream stream = entry.Open())
-			using (TextReader text = new StreamReader(stream))
-				return text.ReadToEndAsync().AsUniTask();
+			try
+			{
+				ZipArchiveEntry entry = Archive.GetEntry(path);
+				using (Stream stream = entry.Open())
+				using (TextReader text = new StreamReader(stream))
+					return await text.ReadToEndAsync();
+			}
+			catch
+			{
+				return null;
+			}
 		}
 
 		public override byte[] ReadBytes(string path)
 		{
-			ZipArchiveEntry entry = Archive.GetEntry(path);
-			using (Stream stream = entry.Open())
+			try
 			{
-				byte[] data = new byte[entry.Length];
-				stream.Read(data, 0, (int) entry.Length);
-				return data;
+				ZipArchiveEntry entry = Archive.GetEntry(path);
+				using (Stream stream = entry.Open())
+				{
+					byte[] data = new byte[entry.Length];
+					stream.Read(data, 0, (int) entry.Length);
+					return data;
+				}
+			}
+			catch
+			{
+				return null;
 			}
 		}
 
 		public override async UniTask<byte[]> ReadBytesAsync(string path)
 		{
-			ZipArchiveEntry entry = Archive.GetEntry(path);
-			using (Stream stream = entry.Open())
+			try
 			{
-				byte[] data = new byte[entry.Length];
-				await stream.ReadAsync(data, 0, (int) entry.Length);
-				return data;
+				ZipArchiveEntry entry = Archive.GetEntry(path);
+				using (Stream stream = entry.Open())
+				{
+					byte[] data = new byte[entry.Length];
+					await stream.ReadAsync(data, 0, (int) entry.Length);
+					return data;
+				}
+			}
+			catch
+			{
+				return null;
 			}
 		}
 
@@ -118,7 +146,7 @@ namespace Modding.Loaders
 		{
 			ZipArchiveEntry result = Archive.GetEntry(path);
 			if (result != null)
-				return EnumerableExtensions.Yield(path);
+				return EnumerableExtensions.One(path);
 
 			if (System.IO.Path.HasExtension(path))
 				return null;

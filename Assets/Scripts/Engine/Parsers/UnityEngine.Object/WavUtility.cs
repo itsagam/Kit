@@ -1,5 +1,5 @@
-﻿using UnityEngine;
-using System;
+﻿using System;
+using UnityEngine;
 
 /// <summary>
 /// WAV utility for recording and audio playback functions in Unity.
@@ -60,7 +60,7 @@ public static class WavUtility
 				throw new FormatException(bitDepth + " bit depth is not supported.");
 		}
 
-		AudioClip audioClip = AudioClip.Create(name, data.Length, (int)channels, sampleRate, false);
+		AudioClip audioClip = AudioClip.Create(name, data.Length, channels, sampleRate, false);
 		audioClip.SetData(data, 0);
 		return audioClip;
 	}

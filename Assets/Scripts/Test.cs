@@ -1,18 +1,8 @@
-﻿using System;
-using UniRx;
-using UniRx.Async;
-using UnityEngine;
+﻿using UnityEngine;
 
 public class Test : MonoBehaviour
 {
-	public void Button()
+	public async void Button()
 	{
-
-	}
-
-	protected async UniTask DoSomething()
-	{
-		await Observable.Timer(TimeSpan.FromSeconds(1));
-		print("Done something");
 	}
 }

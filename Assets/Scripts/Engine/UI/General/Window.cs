@@ -1,9 +1,8 @@
 ﻿using System;
+using Sirenix.OdinInspector;
+using UniRx.Async;
 using UnityEngine;
 using UnityEngine.Events;
-using UniRx;
-using UniRx.Async;
-using Sirenix.OdinInspector;
 
 public class Window : MonoBehaviour
 {
@@ -69,7 +68,7 @@ public class Window : MonoBehaviour
 			{
 				animator.Play(animationHash);
 				//animator.Update(0);
-				await Observable.Timer(TimeSpan.FromSeconds(animator.GetCurrentAnimatorStateInfo(0).length));
+				await UniTask.Delay(TimeSpan.FromSeconds(animator.GetCurrentAnimatorStateInfo(0).length));
 			}
 		}
 
@@ -103,7 +102,7 @@ public class Window : MonoBehaviour
             {
                 animator.Play(animationHash);
                 //animator.Update(0);
-				await Observable.Timer(TimeSpan.FromSeconds(animator.GetCurrentAnimatorStateInfo(0).length));
+				await UniTask.Delay(TimeSpan.FromSeconds(animator.GetCurrentAnimatorStateInfo(0).length));
             }
         }
 

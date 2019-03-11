@@ -1,7 +1,6 @@
 ﻿#if MODDING
-using System;
-using System.IO;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using UniRx.Async;
 
@@ -15,15 +14,9 @@ namespace Modding.Loaders
 			if (!attributes.HasFlag(FileAttributes.Directory))
 				return null;
 
-			try
-			{
-				DirectMod mod = new DirectMod(path);
-				if (mod.LoadMetadata())
-					return mod;
-			}
-			catch (Exception)
-			{
-			}
+			DirectMod mod = new DirectMod(path);
+			if (mod.LoadMetadata())
+				return mod;
 
 			return null;
 		}
@@ -34,15 +27,9 @@ namespace Modding.Loaders
 			if (!attributes.HasFlag(FileAttributes.Directory))
 				return null;
 
-			try
-			{
-				DirectMod mod = new DirectMod(path);
-				if (await mod.LoadMetadataAsync())
-					return mod;
-			}
-			catch (Exception)
-			{
-			}
+			DirectMod mod = new DirectMod(path);
+			if (await mod.LoadMetadataAsync())
+				return mod;
 
 			return null;
 		}
@@ -57,31 +44,59 @@ namespace Modding.Loaders
 
 		public override string ReadText(string path)
 		{
-			string fullPath = GetFullPath(path);
-			return File.ReadAllText(fullPath);
+			try
+			{
+				string fullPath = GetFullPath(path);
+				return File.ReadAllText(fullPath);
+			}
+			catch
+			{
+				return null;
+			}
 		}
 
-		public override UniTask<string> ReadTextAsync(string path)
+		public override async UniTask<string> ReadTextAsync(string path)
 		{
-			string fullPath = GetFullPath(path);
-			using (StreamReader stream = new StreamReader(fullPath))
-				return stream.ReadToEndAsync().AsUniTask();
+			try
+			{
+				string fullPath = GetFullPath(path);
+				using (StreamReader stream = new StreamReader(fullPath))
+					return await stream.ReadToEndAsync();
+			}
+			catch
+			{
+				return null;
+			}
 		}
 
 		public override byte[] ReadBytes(string path)
 		{
-			string fullPath = GetFullPath(path);
-			return File.ReadAllBytes(fullPath);
+			try
+			{
+				string fullPath = GetFullPath(path);
+				return File.ReadAllBytes(fullPath);
+			}
+			catch
+			{
+				return null;
+			}
 		}
 
 		public override async UniTask<byte[]> ReadBytesAsync(string path)
 		{
-			string fullPath = GetFullPath(path);
-			using (FileStream stream = new FileStream(fullPath, FileMode.Open))
+			try
 			{
-				byte[] data = new byte[stream.Length];
-				await stream.ReadAsync(data, 0, (int)stream.Length);
-				return data;
+				string fullPath = GetFullPath(path);
+				using (FileStream stream = new FileStream(fullPath, FileMode.Open))
+				{
+					byte[] data = new byte[stream.Length];
+					await stream.ReadAsync(data, 0, (int)stream.Length);
+					return data;
+				}
+			}
+			catch
+			{
+				return null;
 			}
 		}
 
@@ -89,7 +104,7 @@ namespace Modding.Loaders
 		{
 			string fullPath = GetFullPath(path);
 			if (File.Exists(fullPath))
-				return EnumerableExtensions.Yield(path);
+				return EnumerableExtensions.One(path);
 
 			if (System.IO.Path.HasExtension(path))
 				return null;

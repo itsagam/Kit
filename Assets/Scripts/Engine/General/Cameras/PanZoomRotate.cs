@@ -1,13 +1,14 @@
 ﻿using System;
-using UnityEngine;
-using TouchScript.Pointers;
-using TouchScript.Gestures;
 using Sirenix.OdinInspector;
+using TouchScript.Gestures;
+using TouchScript.Pointers;
+using UnityEngine;
 
 [RequireComponent(typeof(Camera))]
 [RequireComponent(typeof(MetaGesture))]
 public class PanZoomRotate : MonoBehaviour
 {
+	#region Fields
 	[Tooltip("Area/bounds to focus on – it can be a transform, a renderer or a collider; will be origin if not provided.")]
 	[SceneObjectsOnly]
 	public Component View;
@@ -70,6 +71,7 @@ public class PanZoomRotate : MonoBehaviour
 	protected Vector3 targetPosition;
 	protected Quaternion targetRotation;
 	protected float targetZoom;
+	#endregion
 
 	#region Initialization
 	protected void Awake()
@@ -256,7 +258,7 @@ public class PanZoomRotate : MonoBehaviour
 		// Don't clamp if bounds are not provided
 		if (bounds.extents == Vector3.zero)
 			return;
-		
+
 		float frustumHeight = GetFrustumHeight();
 		Vector2 frustum = new Vector2(frustumHeight * cameraCached.aspect, frustumHeight);
 

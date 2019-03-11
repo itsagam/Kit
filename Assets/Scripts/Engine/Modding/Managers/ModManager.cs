@@ -1,12 +1,12 @@
 ﻿#if MODDING
 using System;
-using System.IO;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
-using UnityEngine;
+using Modding.Loaders;
 using UniRx;
 using UniRx.Async;
-using Modding.Loaders;
+using UnityEngine;
 using Object = UnityEngine.Object;
 
 namespace Modding
@@ -44,7 +44,7 @@ namespace Modding
 			// The order in which groups are added is taken into account in mod order and cannot be changed by any means
 			string writableFolder = GetWritableFolder();
 			AddGroup(new ModGroup(ModType.Patch, writableFolder + "Patches/", false, false));
-			AddGroup(new ModGroup(ModType.Mod, writableFolder + "Mods/"));
+			AddGroup(new ModGroup(ModType.Mod, writableFolder + "Mods/", true, true));
 		}
 
 		private static string GetWritableFolder()
@@ -82,6 +82,8 @@ namespace Modding
 		#region Mod-loading
 		public static void LoadMods(bool executeScripts = false)
 		{
+			UnloadMods(false);
+
 			foreach (ModGroup group in Groups.Values)
 			{
 				if (!Directory.Exists(group.Path))
@@ -114,6 +116,8 @@ namespace Modding
 
 		public static async UniTask LoadModsAsync(bool executeScripts = false)
 		{
+			UnloadMods(false);
+
 			foreach (ModGroup group in Groups.Values)
 			{
 				if (!Directory.Exists(group.Path))
@@ -285,6 +289,11 @@ namespace Modding
 			return reference;
 		}
 
+		public static object Load<T>(ResourceFolder folder, string file)
+		{
+			return (T) Load(typeof(T), folder, file);
+		}
+
 		public static object Load(Type type, ResourceFolder folder, string file)
 		{
 			object cachedReference = LoadCached(type, folder, file);
@@ -308,6 +317,11 @@ namespace Modding
 			}
 
 			return null;
+		}
+
+		public static async UniTask<T> LoadAsync<T>(ResourceFolder folder, string file)
+		{
+			return (T) await LoadAsync(typeof(T), folder, file);
 		}
 
 		public static async UniTask<object> LoadAsync(Type type, ResourceFolder folder, string file)
@@ -335,38 +349,48 @@ namespace Modding
 			return null;
 		}
 
-		public static List<object> LoadAll(Type type, ResourceFolder folder, string file)
+		public static IEnumerable<T> LoadAll<T>(ResourceFolder folder, string file)
+		{
+			return LoadAll<T>(GetModdingPath(folder, file));
+		}
+
+		public static IEnumerable<object> LoadAll(Type type, ResourceFolder folder, string file)
 		{
 			return LoadAll(type, GetModdingPath(folder, file));
 		}
 
-		public static List<object> LoadAll(Type type, string path)
+		public static IEnumerable<T> LoadAll<T>(string path)
 		{
-			List<object> all = new List<object>();
-			foreach (Mod mod in ActiveMods)
-			{
-				object reference = mod.Load(type, path);
-				if (reference != null)
-					all.Add(reference);
-			}
-			return all;
+			return ActiveMods.Select(mod => (T) mod.LoadEx(typeof(T), path).reference).Where(b => b != null);
 		}
 
-		public static UniTask<List<object>> LoadAllAsync(Type type, ResourceFolder folder, string file)
+		public static IEnumerable<object> LoadAll(Type type, string path)
+		{
+			return ActiveMods.Select(mod => mod.LoadEx(type, path).reference).Where(b => b != null);
+		}
+
+		public static UniTask<IEnumerable<T>> LoadAllAsync<T>(ResourceFolder folder, string file)
+		{
+			return LoadAllAsync<T>(GetModdingPath(folder, file));
+		}
+
+		public static UniTask<IEnumerable<object>> LoadAllAsync(Type type, ResourceFolder folder, string file)
 		{
 			return LoadAllAsync(type, GetModdingPath(folder, file));
 		}
 
-		public static async UniTask<List<object>> LoadAllAsync(Type type, string path)
+		public static async UniTask<IEnumerable<T>> LoadAllAsync<T>(string path)
 		{
-			List<object> all = new List<object>();
-			foreach (Mod mod in ActiveMods)
-			{
-				object reference = await mod.LoadAsync(type, path);
-				if (reference != null)
-					all.Add(reference);
-			}
-			return all;
+			return (await UniTask.WhenAll(ActiveMods.Select(mod => mod.LoadExAsync(typeof(T), path))))
+			      .Where(b => b.reference != null)
+				  .Select(b => (T) b.reference);
+		}
+
+		public static async UniTask<IEnumerable<object>> LoadAllAsync(Type type, string path)
+		{
+			return (await UniTask.WhenAll(ActiveMods.Select(mod => mod.LoadExAsync(type, path))))
+				  .Where(b => b.reference != null)
+				  .Select(b => b.reference);
 		}
 
 		public static ResourceInfo GetResourceInfo(Type type, ResourceFolder folder, string file)
@@ -390,13 +414,9 @@ namespace Modding
 		{
 			foreach (Mod mod in ActiveMods)
 			{
-				try
-				{
-					return mod.ReadText(path);
-				}
-				catch
-				{
-				}
+				string text = mod.ReadText(path);
+				if (text != null)
+					return text;
 			}
 			return null;
 		}
@@ -410,57 +430,31 @@ namespace Modding
 		{
 			foreach (Mod mod in ActiveMods)
 			{
-				try
-				{
-					return await mod.ReadTextAsync(path);
-				}
-				catch
-				{
-				}
+				string text = await mod.ReadTextAsync(path);
+				if (text != null)
+					return text;
 			}
 			return null;
 		}
 
-		public static List<string> ReadTextAll(ResourceFolder folder, string file)
+		public static IEnumerable<string> ReadTextAll(ResourceFolder folder, string file)
 		{
 			return ReadTextAll(GetModdingPath(folder, file));
 		}
 
-		public static List<string> ReadTextAll(string path)
+		public static IEnumerable<string> ReadTextAll(string path)
 		{
-			List<string> all = new List<string>();
-			foreach (Mod mod in ActiveMods)
-			{
-				try
-				{
-					all.Add(mod.ReadText(path));
-				}
-				catch
-				{
-				}
-			}
-			return all;
+			return ActiveMods.Select(mod => mod.ReadText(path)).Where(b => b != null);
 		}
 
-		public static UniTask<List<string>> ReadTextAllAsync(ResourceFolder folder, string file)
+		public static UniTask<IEnumerable<string>> ReadTextAllAsync(ResourceFolder folder, string file)
 		{
 			return ReadTextAllAsync(GetModdingPath(folder, file));
 		}
 
-		public static async UniTask<List<string>> ReadTextAllAsync(string path)
+		public static async UniTask<IEnumerable<string>> ReadTextAllAsync(string path)
 		{
-			List<string> all = new List<string>();
-			foreach (Mod mod in ActiveMods)
-			{
-				try
-				{
-					all.Add(await mod.ReadTextAsync(path));
-				}
-				catch
-				{
-				}
-			}
-			return all;
+			return (await UniTask.WhenAll(ActiveMods.Select(mod => mod.ReadTextAsync(path)))).Where(b => b != null);
 		}
 
 		public static byte[] ReadBytes(ResourceFolder folder, string file)
@@ -472,13 +466,9 @@ namespace Modding
 		{
 			foreach (Mod mod in ActiveMods)
 			{
-				try
-				{
-					return mod.ReadBytes(path);
-				}
-				catch
-				{
-				}
+				byte[] bytes = mod.ReadBytes(path);
+				if (bytes != null)
+					return bytes;
 			}
 			return null;
 		}
@@ -492,58 +482,33 @@ namespace Modding
 		{
 			foreach (Mod mod in ActiveMods)
 			{
-				try
-				{
-					return await mod.ReadBytesAsync(path);
-				}
-				catch
-				{
-				}
+				byte[] bytes = await mod.ReadBytesAsync(path);
+				if (bytes != null)
+					return bytes;
 			}
 			return null;
 		}
 
-		public static List<byte[]> ReadBytesAll(ResourceFolder folder, string file)
+		public static IEnumerable<byte[]> ReadBytesAll(ResourceFolder folder, string file)
 		{
 			return ReadBytesAll(GetModdingPath(folder, file));
 		}
 
-		public static List<byte[]> ReadBytesAll(string path)
+		public static IEnumerable<byte[]> ReadBytesAll(string path)
 		{
-			List<byte[]> all = new List<byte[]>();
-			foreach (Mod mod in ActiveMods)
-			{
-				try
-				{
-					all.Add(mod.ReadBytes(path));
-				}
-				catch
-				{
-				}
-			}
-			return all;
+			return ActiveMods.Select(mod => mod.ReadBytes(path)).Where(b => b != null);
 		}
 
-		public static UniTask<List<byte[]>> ReadBytesAllAsync(ResourceFolder folder, string file)
+		public static UniTask<IEnumerable<byte[]>> ReadBytesAllAsync(ResourceFolder folder, string file)
 		{
 			return ReadBytesAllAsync(GetModdingPath(folder, file));
 		}
 
-		public static async UniTask<List<byte[]>> ReadBytesAllAsync(string path)
+		public static async UniTask<IEnumerable<byte[]>> ReadBytesAllAsync(string path)
 		{
-			List<byte[]> all = new List<byte[]>();
-			foreach (Mod mod in ActiveMods)
-			{
-				try
-				{
-					all.Add(await mod.ReadBytesAsync(path));
-				}
-				catch
-				{
-				}
-			}
-			return all;
+			return (await UniTask.WhenAll(ActiveMods.Select(mod => mod.ReadBytesAsync(path)))).Where(b => b != null);
 		}
+
 		#endregion
 
 		#region Unloading

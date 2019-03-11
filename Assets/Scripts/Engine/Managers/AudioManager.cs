@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using UnityEngine;
 using UniRx;
+using UnityEngine;
 using Object = UnityEngine.Object;
 
 public static class AudioManager
@@ -64,7 +64,7 @@ public static class AudioManager
 
 	public static bool RemoveGroup(string name)
 	{
-		var source = GetGroupSource(name);
+		AudioSource source = GetGroupSource(name);
 		if (source == null)
 			return false;
 
@@ -132,7 +132,7 @@ public static class AudioManager
 		if (prefab == null)
 			return null;
 
-		var source = Pooler.Instantiate(prefab);
+		AudioSource source = Pooler.Instantiate(prefab);
 		QueueForDestroy(source);
 		return source;
 	}
@@ -142,7 +142,7 @@ public static class AudioManager
 		if (prefab == null)
 			return null;
 
-		var source = Pooler.Instantiate(prefab, parent, worldSpace);
+		AudioSource source = Pooler.Instantiate(prefab, parent, worldSpace);
 		QueueForDestroy(source);
 		return source;
 	}
@@ -152,7 +152,7 @@ public static class AudioManager
 		if (prefab == null)
 			return null;
 
-		var source = Pooler.Instantiate(prefab, position);
+		AudioSource source = Pooler.Instantiate(prefab, position);
 		QueueForDestroy(source);
 		return source;
 	}
@@ -162,8 +162,8 @@ public static class AudioManager
 		if (prefab == null)
 			return null;
 
-		var source = Pooler.Instantiate(prefab);
-		var transform = source.transform;
+		AudioSource source = Pooler.Instantiate(prefab);
+		Transform transform = source.transform;
 		transform.parent = parent;
 		transform.localPosition = position;
 		QueueForDestroy(source);
@@ -193,7 +193,7 @@ public static class AudioManager
 		if (clip == null)
 			return null;
 
-		var source = PlayDedicated(clip, loop, is3D);
+		AudioSource source = PlayDedicated(clip, loop, is3D);
 		source.transform.position = position;
 		return source;
 	}
@@ -203,7 +203,7 @@ public static class AudioManager
 		if (clip == null)
 			return null;
 
-		var source = PlayDedicated(clip, loop, is3D);
+		AudioSource source = PlayDedicated(clip, loop, is3D);
 		source.transform.parent = parent;
 		return source;
 	}
@@ -213,8 +213,8 @@ public static class AudioManager
 		if (clip == null)
 			return null;
 
-		var source = PlayDedicated(clip, loop, is3D);
-		var transform = source.transform;
+		AudioSource source = PlayDedicated(clip, loop, is3D);
+		Transform transform = source.transform;
 		transform.parent = parent;
 		transform.localPosition = position;
 		return source;
@@ -234,8 +234,7 @@ public static class AudioManager
 
 		if (!loop)
 		{
-			Observable.Timer(TimeSpan.FromSeconds(clip.length))
-			.Subscribe(l =>
+			Observable.Timer(TimeSpan.FromSeconds(clip.length)).Subscribe(l =>
 			{
 				if (gameObject != null)
 					gameObject.Destroy();

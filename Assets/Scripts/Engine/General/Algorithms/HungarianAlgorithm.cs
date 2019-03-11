@@ -21,12 +21,12 @@ public static class HungarianAlgorithm
         if (costs == null)
             throw new ArgumentNullException(nameof(costs));
 
-        var h = costs.GetLength(0);
-        var w = costs.GetLength(1);
+        int h = costs.GetLength(0);
+        int w = costs.GetLength(1);
 
         for (int i = 0; i < h; i++)
         {
-            var min = int.MaxValue;
+            int min = int.MaxValue;
             for (int j = 0; j < w; j++)
                 min = Math.Min(min, costs[i, j]);
             for (int j = 0; j < w; j++)
@@ -52,7 +52,7 @@ public static class HungarianAlgorithm
 
         var path = new Location[w * h];
         Location pathStart = default;
-        var step = 1;
+        int step = 1;
         while (step != -1)
         {
             switch (step)
@@ -97,7 +97,7 @@ public static class HungarianAlgorithm
                     colsCovered[j] = true;
             }
         }
-        var colsCoveredCount = 0;
+        int colsCoveredCount = 0;
         for (int j = 0; j < w; j++)
         {
             if (colsCovered[j])
@@ -119,7 +119,7 @@ public static class HungarianAlgorithm
             }
 
             masks[loc.Row, loc.Column] = 2;
-            var starCol = FindStarInRow(masks, w, loc.Row);
+            int starCol = FindStarInRow(masks, w, loc.Row);
             if (starCol != -1)
             {
                 rowsCovered[loc.Row] = true;
@@ -136,16 +136,16 @@ public static class HungarianAlgorithm
     private static int RunStep3(byte[,] masks, bool[] rowsCovered, bool[] colsCovered, int w, int h,
         Location[] path, Location pathStart)
     {
-        var pathIndex = 0;
+        int pathIndex = 0;
         path[0] = pathStart;
         while (true)
         {
-            var row = FindStarInColumn(masks, h, path[pathIndex].Column);
+            int row = FindStarInColumn(masks, h, path[pathIndex].Column);
             if (row == -1)
                 break;
             pathIndex++;
             path[pathIndex] = new Location(row, path[pathIndex - 1].Column);
-            var col = FindPrimeInRow(masks, w, path[pathIndex].Row);
+            int col = FindPrimeInRow(masks, w, path[pathIndex].Row);
             pathIndex++;
             path[pathIndex] = new Location(path[pathIndex - 1].Row, col);
         }
@@ -157,7 +157,7 @@ public static class HungarianAlgorithm
 
     private static int RunStep4(int[,] costs, bool[] rowsCovered, bool[] colsCovered, int w, int h)
     {
-        var minValue = FindMinimum(costs, rowsCovered, colsCovered, w, h);
+        int minValue = FindMinimum(costs, rowsCovered, colsCovered, w, h);
         for (int i = 0; i < h; i++)
         {
             for (int j = 0; j < w; j++)
@@ -198,7 +198,7 @@ public static class HungarianAlgorithm
 
     private static int FindMinimum(int[,] costs, bool[] rowsCovered, bool[] colsCovered, int w, int h)
     {
-        var minValue = int.MaxValue;
+        int minValue = int.MaxValue;
         for (int i = 0; i < h; i++)
         {
             for (int j = 0; j < w; j++)

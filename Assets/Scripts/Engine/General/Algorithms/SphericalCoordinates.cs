@@ -202,7 +202,7 @@ public struct SphericalCoordinates: IEquatable<SphericalCoordinates>
 
 	public static bool operator !=(SphericalCoordinates a, SphericalCoordinates b)
 	{
-		return !(a == b);
+		return a.Radius != b.Radius || a.Polar != b.Polar || a.Elevation == b.Elevation;
 	}
 
 	public override bool Equals(object obj)

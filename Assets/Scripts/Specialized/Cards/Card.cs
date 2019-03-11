@@ -172,6 +172,9 @@ namespace Cards
 		}
 #endif
 
-		public override string ToString() => $"{Rank} of {Suit}s";
+		public override string ToString()
+		{
+			return $"{Rank} of {Suit}s";
+		}
 	}
 }

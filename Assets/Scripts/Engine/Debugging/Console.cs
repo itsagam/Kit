@@ -1,14 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Runtime.CompilerServices;
-using System.Text;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.CompilerServices;
+using System.Text;
+using TouchScript.Gestures;
+using TouchScript.Layers;
+using UniRx;
 using UnityEngine;
 using UnityEngine.EventSystems;
-using TouchScript.Layers;
-using TouchScript.Gestures;
-using UniRx;
 using XLua;
 using Object = UnityEngine.Object;
 
@@ -63,12 +63,12 @@ public static class Console
 		}
 		else
 		{
-			var gameObject = instance.gameObject;
+			GameObject gameObject = instance.gameObject;
 
-			var layer = gameObject.AddComponent<FullscreenLayer>();
+			FullscreenLayer layer = gameObject.AddComponent<FullscreenLayer>();
 			layer.Type = FullscreenLayer.LayerType.Global;
 
-			var flick = gameObject.AddComponent<FlickGesture>();
+			FlickGesture flick = gameObject.AddComponent<FlickGesture>();
 			flick.Direction = FlickGesture.GestureDirection.Vertical;
 			flick.Flicked += (o, e) => {
 				if (flick.ScreenFlickVector.y < 0 && !IsVisible)
@@ -122,7 +122,7 @@ public static class Console
 	{
 		get
 		{
-			var state = instance.Animator.GetCurrentAnimatorStateInfo(0);
+			AnimatorStateInfo state = instance.Animator.GetCurrentAnimatorStateInfo(0);
 			if (state.IsName("Show"))
 				return state.normalizedTime > 1;
 			if (state.IsName("Hide"))
@@ -165,7 +165,7 @@ public static class Console
 
 	public static void Log(string line)
 	{
-		var log = LogBuilder;
+		StringBuilder log = LogBuilder;
 		int newLength = log.Length + line.Length;
 		if (newLength > Length)
 		{
@@ -229,7 +229,7 @@ public static class Console
 
 	public static void List(Type type)
 	{
-		MemberInfo[] members = type.GetMembers(BindingFlags.Public | BindingFlags.DeclaredOnly | BindingFlags.Static | BindingFlags.Instance);
+		var members = type.GetMembers(BindingFlags.Public | BindingFlags.DeclaredOnly | BindingFlags.Static | BindingFlags.Instance);
 		var extensions =  from t in type.Assembly.GetTypes().Union(Assembly.GetExecutingAssembly().GetTypes())
 						  //from t in AppDomain.CurrentDomain.GetAssemblies().SelectMany(a => a.GetTypes())
 						where t.IsSealed && !t.IsGenericType() && !t.IsNested
@@ -380,7 +380,7 @@ public static class Console
 
 		void ExecuteLocal(string commandActual)
 		{
-			object[] results = scriptEnv.DoString(commandActual);
+			var results = scriptEnv.DoString(commandActual);
 			results?.ForEach(Log);
 		}
 	}
@@ -408,7 +408,7 @@ public static class Console
 
 	private static void SelectCommand(int index)
 	{
-		var input = instance.CommandInput;
+		InputFieldEx input = instance.CommandInput;
 		if (index >= history.Count)
 		{
 			input.text = "";

@@ -56,7 +56,7 @@ public class StatsDrawer : OdinValueDrawer<Stats>
 
 	protected void SetupValues()
 	{
-		var stats = ValueEntry.SmartValue;
+		Stats stats = ValueEntry.SmartValue;
 		if (stats != null && stats.Upgradeable == null)
 			stats.Upgradeable = Property.Tree.UnitySerializedObject.targetObject as IUpgradeable;
 	}
@@ -65,7 +65,7 @@ public class StatsDrawer : OdinValueDrawer<Stats>
 	{
 		CallNextDrawer(label);
 
-		var stats = ValueEntry.SmartValue;
+		Stats stats = ValueEntry.SmartValue;
 		if (DrawWarning(Property, stats.Upgradeable))
 			return;
 
@@ -80,9 +80,9 @@ public class StatsDrawer : OdinValueDrawer<Stats>
 			int i = 0;
 			foreach (var kvp in stats)
 			{
-				var stat = kvp.Key;
-				var baseValue = kvp.Value.Value;
-				var currentValue = Stats.CalculateValue(stats.Upgradeable, stat, baseValue);
+				string stat = kvp.Key;
+				float baseValue = kvp.Value.Value;
+				float currentValue = Stats.CalculateValue(stats.Upgradeable, stat, baseValue);
 				var groups = Stats.GetEffectsAndUpgrades(stats.Upgradeable, stat);
 
 				// Stat header
@@ -144,7 +144,7 @@ public class StatsDrawer : OdinValueDrawer<Stats>
 
 	public static void DrawEffects(IEnumerable<(Upgrade, IEnumerable<Effect>)> groups)
 	{
-		foreach (var (upgrade, effects) in groups)
+		foreach ((Upgrade upgrade, var effects) in groups)
 		{
 			string effectString = effects.Select(Effect.Convert).Join();
 			EditorGUILayout.LabelField(upgrade.ID, effectString, EffectsStyle);
@@ -164,7 +164,7 @@ public class StatBasePropertyDrawer : OdinValueDrawer<StatBaseProperty>
 {
 	protected override void DrawPropertyLayout(GUIContent label)
 	{
-		var stat = ValueEntry.SmartValue;
+		StatBaseProperty stat = ValueEntry.SmartValue;
 		stat.Value = SirenixEditorGUI.DynamicPrimitiveField(label, stat.Value);
 	}
 }
@@ -199,7 +199,7 @@ public class Stats : Dictionary<string, StatBaseProperty>, IDisposable
 
 	public StatBaseProperty GetBaseProperty(string stat)
 	{
-		return TryGetValue(stat, out var property) ? property : null;
+		return TryGetValue(stat, out StatBaseProperty property) ? property : null;
 	}
 
 	public void SetBaseProperty(string stat, StatBaseProperty value)
@@ -214,11 +214,11 @@ public class Stats : Dictionary<string, StatBaseProperty>, IDisposable
 
 	public void SetBaseValue(string stat, float value)
 	{
-		if (TryGetValue(stat, out var property))
+		if (TryGetValue(stat, out StatBaseProperty property))
 			property.Value = value;
 		else
 		{
-			var baseProperty = new StatBaseProperty(value).AddTo(disposables);
+			StatBaseProperty baseProperty = new StatBaseProperty(value).AddTo(disposables);
 			SetBaseProperty(stat, baseProperty);
 		}
 	}
@@ -287,7 +287,7 @@ public class Stats : Dictionary<string, StatBaseProperty>, IDisposable
 	public static (float, float, float) GetAggregates(IEnumerable<Effect> effects)
 	{
 		float valueSum = 0, percentSum = 100, multiplierSum = 1;
-		foreach (var effect in effects)
+		foreach (Effect effect in effects)
 		{
 			switch (effect.Type)
 			{
@@ -309,7 +309,7 @@ public class Stats : Dictionary<string, StatBaseProperty>, IDisposable
 
 	public static float CalculateValue((float value, float percent, float multiplier) aggregates, float baseValue)
 	{
-		return ((baseValue + aggregates.value) * aggregates.percent / 100) * aggregates.multiplier;
+		return (baseValue + aggregates.value) * aggregates.percent / 100 * aggregates.multiplier;
 	}
 }
 

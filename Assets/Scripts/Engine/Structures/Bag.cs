@@ -61,7 +61,7 @@ public class Bag<T> : Dictionary<T, int>
 
     public void Store(Bag<T> bag)
     {
-        foreach (KeyValuePair<T, int> field in bag)
+        foreach (var field in bag)
             Store(field);
     }
 
@@ -132,8 +132,15 @@ public class Bag<T> : Dictionary<T, int>
         return bag;
     }
 
-    public IEnumerable<Bunch<T>> AsEnumerable() => this.Select(kvp => new Bunch<T>(kvp));
-	public List<Bunch<T>> ToList() => AsEnumerable().ToList();
+    public IEnumerable<Bunch<T>> AsEnumerable()
+	{
+		return this.Select(kvp => new Bunch<T>(kvp));
+	}
+
+	public List<Bunch<T>> ToList()
+	{
+		return AsEnumerable().ToList();
+	}
 }
 
 [Serializable]
@@ -216,7 +223,13 @@ public struct Bunch<T>
 		return new Bunch<T>(bunch1.Unit, bunch1.Amount - bunch2.Amount);
 	}
 
-	public KeyValuePair<T, int> ToKVP() => new KeyValuePair<T, int>(Unit, Amount);
+	public KeyValuePair<T, int> ToKVP()
+	{
+		return new KeyValuePair<T, int>(Unit, Amount);
+	}
 
-	public override string ToString() => $"[{Unit}, {Amount}]";
+	public override string ToString()
+	{
+		return $"[{Unit}, {Amount}]";
+	}
 }

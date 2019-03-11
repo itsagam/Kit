@@ -1,6 +1,5 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
-using UniRx.Async;
 #if MODDING
 using Modding;
 #endif

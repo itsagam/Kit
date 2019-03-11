@@ -13,7 +13,7 @@ public static class StringBuilderExtensions
 	public static int IndexOf(this StringBuilder sb, string value, int startIndex)
 	{
 		int length = value.Length;
-		int maxSearchLength = (sb.Length - length) + 1;
+		int maxSearchLength = sb.Length - length + 1;
 
 		for (int i = startIndex; i < maxSearchLength; ++i)
 		{

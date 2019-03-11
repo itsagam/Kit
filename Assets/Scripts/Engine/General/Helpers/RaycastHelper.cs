@@ -29,12 +29,12 @@ public static class RaycastHelper
     {
         return ScreenRaycast(screenPoint, int.MaxValue, out hit);
     }
-	
+
     public static bool ScreenRaycast(out RaycastHit hit)
     {
         return ScreenRaycast(Input.mousePosition, out hit);
     }
-	
+
     public static bool ScreenRaycast(int layerMask, out RaycastHit hit)
     {
         return ScreenRaycast(Input.mousePosition, layerMask, out hit);

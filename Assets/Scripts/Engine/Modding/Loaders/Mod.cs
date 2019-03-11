@@ -3,9 +3,9 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using UnityEngine;
 using Modding.Scripting;
 using UniRx.Async;
+using UnityEngine;
 using XLua;
 
 namespace Modding
@@ -50,42 +50,65 @@ namespace Modding
 		#endregion
 
 		#region Initialization
-		public virtual bool LoadMetadata()
+		public bool LoadMetadata()
 		{
-			string metadataText = ReadText(MetadataFile);
-			if (metadataText != null)
+			try
 			{
+				string metadataText = ReadText(MetadataFile);
+				if (metadataText == null)
+					return false;
+
 				Metadata = JSONParser.FromJson<ModMetadata>(metadataText);
 				return true;
 			}
-			return false;
+			catch
+			{
+				return false;
+			}
 		}
 
-		public virtual async UniTask<bool> LoadMetadataAsync()
+		public async UniTask<bool> LoadMetadataAsync()
 		{
-			string metadataText = await ReadTextAsync(MetadataFile);
-			if (metadataText == null)
-				return false;
+			try
+			{
+				string metadataText = await ReadTextAsync(MetadataFile);
+				if (metadataText == null)
+					return false;
 
-			Metadata = JSONParser.FromJson<ModMetadata>(metadataText);
-			return true;
+				Metadata = JSONParser.FromJson<ModMetadata>(metadataText);
+				return true;
+			}
+			catch
+			{
+				return false;
+			}
 		}
 		#endregion
 
 		#region Resources
 		public object Load(ResourceFolder folder, string file)
 		{
-			return Load(typeof(object), folder, file);
+			return LoadEx(typeof(object), ModManager.GetModdingPath(folder, file)).reference;
+		}
+
+		public T Load<T>(ResourceFolder folder, string file)
+		{
+			return (T) LoadEx(typeof(T), ModManager.GetModdingPath(folder, file)).reference;
 		}
 
 		public object Load(Type type, ResourceFolder folder, string file)
 		{
-			return Load(type, ModManager.GetModdingPath(folder, file));
+			return LoadEx(type, ModManager.GetModdingPath(folder, file)).reference;
 		}
 
 		public object Load(string path)
 		{
-			return Load(typeof(object), path);
+			return LoadEx(typeof(object), path).reference;
+		}
+
+		public T Load<T>(string path)
+		{
+			return (T) LoadEx(typeof(T), path).reference;
 		}
 
 		public object Load(Type type, string path)
@@ -95,7 +118,7 @@ namespace Modding
 
 		public virtual (object reference, string filePath, ResourceParser parser) LoadEx(Type type, string path)
 		{
-			IEnumerable<string> matchingFiles = FindFiles(path);
+			var matchingFiles = FindFiles(path);
 			if (matchingFiles == null)
 				return default;
 
@@ -109,13 +132,21 @@ namespace Modding
 					if (parser.ParseMode == ParseMode.Binary)
 					{
 						if (bytes == null)
+						{
 							bytes = ReadBytes(filePath);
+							if (bytes == null)
+								return default;
+						}
 						return (parser.Read(type, bytes, filePath), filePath, parser);
 					}
 					else
 					{
 						if (text == null)
+						{
 							text = ReadText(filePath);
+							if (text == null)
+								return default;
+						}
 						return (parser.Read(type, text, filePath), filePath, parser);
 					}
 				}
@@ -127,19 +158,29 @@ namespace Modding
 			return default;
 		}
 
-		public UniTask<object> LoadAsync(ResourceFolder folder, string file)
+		public async UniTask<object> LoadAsync(ResourceFolder folder, string file)
 		{
-			return LoadAsync(typeof(object), folder, file);
+			return (await LoadExAsync(typeof(object), ModManager.GetModdingPath(folder, file))).reference;
 		}
 
-		public UniTask<object> LoadAsync(Type type, ResourceFolder folder, string file)
+		public async UniTask<T> LoadAsync<T>(ResourceFolder folder, string file)
 		{
-			return LoadAsync(type, ModManager.GetModdingPath(folder, file));
+			return (T) (await LoadExAsync(typeof(T), ModManager.GetModdingPath(folder, file))).reference;
 		}
 
-		public UniTask<object> LoadAsync(string path)
+		public async UniTask<object> LoadAsync(Type type, ResourceFolder folder, string file)
 		{
-			return LoadAsync(typeof(object), path);
+			return (await LoadExAsync(type, ModManager.GetModdingPath(folder, file))).reference;
+		}
+
+		public async UniTask<object> LoadAsync(string path)
+		{
+			return (await LoadExAsync(typeof(object), path)).reference;
+		}
+
+		public async UniTask<T> LoadAsync<T>(string path)
+		{
+			return (T) (await LoadExAsync(typeof(T), path)).reference;
 		}
 
 		public async UniTask<object> LoadAsync(Type type, string path)
@@ -149,7 +190,7 @@ namespace Modding
 
 		public virtual async UniTask<(object reference, string filePath, ResourceParser parser)> LoadExAsync(Type type, string path)
 		{
-			IEnumerable<string> matchingFiles = FindFiles(path);
+			var matchingFiles = FindFiles(path);
 			if (matchingFiles == null)
 				return default;
 
@@ -163,13 +204,21 @@ namespace Modding
 					if (parser.ParseMode == ParseMode.Binary)
 					{
 						if (bytes == null)
+						{
 							bytes = await ReadBytesAsync(filePath);
+							if (bytes == null)
+								return default;
+						}
 						return (parser.Read(type, bytes, filePath), filePath, parser);
 					}
 					else
 					{
 						if (text == null)
+						{
 							text = await ReadTextAsync(filePath);
+							if (text == null)
+								return default;
+						}
 						return (parser.Read(type, text, filePath), filePath, parser);
 					}
 				}

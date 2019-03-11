@@ -1,5 +1,5 @@
-﻿using UnityEngine;
-using UniRx;
+﻿using UniRx;
+using UnityEngine;
 
 public static class EffectsManager
 {
@@ -10,7 +10,7 @@ public static class EffectsManager
 		if (prefab == null)
 			return null;
 
-		var particleSystem = Pooler.Instantiate(Group, prefab, position);
+		ParticleSystem particleSystem = Pooler.Instantiate(Group, prefab, position);
 		QueueForDestroy(particleSystem);
 		return particleSystem;
 	}
@@ -20,7 +20,7 @@ public static class EffectsManager
 		if (prefab == null)
 			return null;
 
-		var particleSystem = Pooler.Instantiate(Group, prefab, position, rotation);
+		ParticleSystem particleSystem = Pooler.Instantiate(Group, prefab, position, rotation);
 		QueueForDestroy(particleSystem);
 		return particleSystem;
 	}
@@ -30,7 +30,7 @@ public static class EffectsManager
 		if (prefab == null)
 			return null;
 
-		var particleSystem = Pooler.Instantiate(Group, prefab, parent, worldSpace);
+		ParticleSystem particleSystem = Pooler.Instantiate(Group, prefab, parent, worldSpace);
 		QueueForDestroy(particleSystem);
 		return particleSystem;
 	}
@@ -40,8 +40,8 @@ public static class EffectsManager
 		if (prefab == null)
 			return null;
 
-		var particleSystem = Pooler.Instantiate(Group, prefab);
-		var transform = particleSystem.transform;
+		ParticleSystem particleSystem = Pooler.Instantiate(Group, prefab);
+		Transform transform = particleSystem.transform;
 		transform.parent = parent;
 		transform.localPosition = position;
 		QueueForDestroy(particleSystem);
@@ -53,8 +53,8 @@ public static class EffectsManager
 		if (prefab == null)
 			return null;
 
-		var particleSystem = Pooler.Instantiate(Group, prefab);
-		var transform = particleSystem.transform;
+		ParticleSystem particleSystem = Pooler.Instantiate(Group, prefab);
+		Transform transform = particleSystem.transform;
 		transform.parent = parent;
 		transform.localPosition = position;
 		transform.localRotation = rotation;

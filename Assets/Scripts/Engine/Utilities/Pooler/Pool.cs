@@ -2,10 +2,10 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using UnityEngine;
+using Sirenix.OdinInspector;
 using UniRx;
 using UniRx.Async;
-using Sirenix.OdinInspector;
+using UnityEngine;
 
 public interface IPooled
 {
@@ -125,7 +125,7 @@ public class Pool : MonoBehaviour, IEnumerable<Component>
 	public async UniTask PreloadInstances()
 	{
 		if (PreloadDelay > 0)
-			await Observable.Timer(TimeSpan.FromSeconds(PreloadDelay));
+			await UniTask.Delay(TimeSpan.FromSeconds(PreloadDelay));
 
 		if (PreloadTime <= 0)
 		{

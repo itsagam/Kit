@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using UniRx.Async;
 using UnityEngine;
 using UnityEngine.UI;
-using UniRx.Async;
 using Object = UnityEngine.Object;
 
 public enum WindowState
@@ -43,12 +43,34 @@ public static class UIManager
 
 	private static Canvas lastCanvas = null;
 
-	public static async UniTask<Window> ShowWindow(
-								string path,
-								object data = null,
-								Transform parent = null,
-								string animation = null,
-								WindowConflictMode mode = DefaultConflictMode)
+	// Workaround for CS4014: If call async methods, but not await them, C# warns that you should.
+	// Wrapping them in non-async methods prevents the warning.
+	public static UniTask<Window> ShowWindow(
+										string path,
+										object data = null,
+										Transform parent = null,
+										string animation = null,
+										WindowConflictMode mode = DefaultConflictMode)
+	{
+		return ShowWindowInternal(path, data, parent, animation, mode);
+	}
+
+	public static UniTask<Window> ShowWindow(
+										Window prefab,
+										object data = null,
+										Transform parent = null,
+										string animation = null,
+										WindowConflictMode mode = DefaultConflictMode)
+	{
+		return ShowWindowInternal(prefab, data, parent, animation, mode);
+	}
+
+	private static async UniTask<Window> ShowWindowInternal(
+										string path,
+										object data,
+										Transform parent,
+										string animation,
+										WindowConflictMode mode)
 	{
 		Window prefab = await ResourceManager.LoadAsync<Window>(ResourceFolder.Resources, path);
 		if (prefab == null)
@@ -57,12 +79,12 @@ public static class UIManager
 		return await ShowWindow(prefab, data, parent, animation, mode);
 	}
 
-	public static async UniTask<Window> ShowWindow(
-							Window prefab,
-							object data = null,
-							Transform parent = null,
-							string animation = null,
-							WindowConflictMode mode = DefaultConflictMode)
+	private static async UniTask<Window> ShowWindowInternal(
+										Window prefab,
+										object data,
+										Transform parent,
+										string animation,
+										WindowConflictMode mode)
 	{
 
 		if (mode != WindowConflictMode.ShowNew)
