@@ -1,34 +1,37 @@
-﻿using UnityEngine;
-using DG.Tweening;
+﻿using DG.Tweening;
+using UnityEngine;
 
-public class MoveRandomly : MonoBehaviour
+namespace Engine.Behaviours
 {
-    public Transform Area;
-    public bool X = true;
-    public bool Y = false;
-    public bool Z = true;
-
-    protected Bounds bounds;
-
-    protected void Awake()
+    public class MoveRandomly : MonoBehaviour
     {
-        if (Area == null)
-            return;
-		
-        bounds = Area.GetBounds();
-        Move();
-    }
+        public Transform Area;
+        public bool X = true;
+        public bool Y = false;
+        public bool Z = true;
 
-    protected void Move()
-    {
-        Vector3 random = bounds.Random();
-        Vector3 position = transform.position;
-        if (!X)
-            random.x = position.x;
-        if (!Y)
-            random.y = position.y;
-        if (!Z)
-            random.z = position.z;
-        transform.DOMove(random, 5.0f).SetSpeedBased().OnComplete(Move);
+        protected Bounds bounds;
+
+        protected void Awake()
+        {
+            if (Area == null)
+                return;
+
+            bounds = Area.GetBounds();
+            Move();
+        }
+
+        protected void Move()
+        {
+            Vector3 random = bounds.Random();
+            Vector3 position = transform.position;
+            if (!X)
+                random.x = position.x;
+            if (!Y)
+                random.y = position.y;
+            if (!Z)
+                random.z = position.z;
+            transform.DOMove(random, 5.0f).SetSpeedBased().OnComplete(Move);
+        }
     }
 }

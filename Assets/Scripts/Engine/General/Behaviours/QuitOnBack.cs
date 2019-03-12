@@ -1,12 +1,15 @@
 using UnityEngine;
 
-public class QuitOnBack: MonoBehaviour
+namespace Engine.Behaviours
 {
-	#if UNITY_ANDROID
+	public class QuitOnBack: MonoBehaviour
+	{
+#if UNITY_ANDROID
 	protected void Update()
 	{
-		if (Input.GetKeyDown(KeyCode.Escape)) 
+		if (Input.GetKeyDown(KeyCode.Escape))
 			Application.Quit();
 	}
-	#endif
+#endif
+	}
 }

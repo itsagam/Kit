@@ -1,13 +1,16 @@
 ﻿using UnityEngine;
 
-public class AutoOrbit: MonoBehaviour
+namespace Engine.Cameras
 {
-	public Transform Target;
-	public Vector3 Axis = Vector3.up;
-	public float Speed = 10.0f;
-
-	protected void LateUpdate()
+	public class AutoOrbit: MonoBehaviour
 	{
-		transform.RotateAround(Target.position, Axis, Time.deltaTime * Speed);
+		public Transform Target;
+		public Vector3 Axis = Vector3.up;
+		public float Speed = 10.0f;
+
+		protected void LateUpdate()
+		{
+			transform.RotateAround(Target.position, Axis, Time.deltaTime * Speed);
+		}
 	}
 }

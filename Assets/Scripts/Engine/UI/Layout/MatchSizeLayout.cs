@@ -1,31 +1,34 @@
 ﻿using UnityEngine;
 
 // Give Element the size of this transform whenever it's resized
-public class MatchSizeLayout : MonoBehaviour
+namespace Engine.UI.Layout
 {
-	public RectTransform Element;
-	public Vector2 Padding;
-
-	public bool Width = true;
-	public bool Height = true;
-
-	protected RectTransform rectTransform;
-
-	protected void Awake()
+	public class MatchSizeLayout : MonoBehaviour
 	{
-		rectTransform = GetComponent<RectTransform>();
-	}
+		public RectTransform Element;
+		public Vector2 Padding;
 
-	protected void OnRectTransformDimensionsChange()
-	{
-		if (!Element || !rectTransform)
-			return;
+		public bool Width = true;
+		public bool Height = true;
 
-		Vector2 newSize = Element.sizeDelta;
-		if (Width)
-			newSize.x = rectTransform.sizeDelta.x + Padding.x;
-		if (Height)
-			newSize.y = rectTransform.sizeDelta.y + Padding.y;
-		Element.sizeDelta = newSize;
+		protected RectTransform rectTransform;
+
+		protected void Awake()
+		{
+			rectTransform = GetComponent<RectTransform>();
+		}
+
+		protected void OnRectTransformDimensionsChange()
+		{
+			if (!Element || !rectTransform)
+				return;
+
+			Vector2 newSize = Element.sizeDelta;
+			if (Width)
+				newSize.x = rectTransform.sizeDelta.x + Padding.x;
+			if (Height)
+				newSize.y = rectTransform.sizeDelta.y + Padding.y;
+			Element.sizeDelta = newSize;
+		}
 	}
 }

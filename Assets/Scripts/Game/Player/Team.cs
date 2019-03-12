@@ -13,7 +13,7 @@ namespace Game
 
 		public Team(IEnumerable<TeamPlayer> players)
 		{
-			foreach (var player in players)
+			foreach (TeamPlayer player in players)
 				AddPlayer(player);
 		}
 

@@ -1,11 +1,14 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
 
-[RequireComponent(typeof(Toggle))]
-public class ToggleGroupFromParent : MonoBehaviour
+namespace Engine.UI.Behaviours
 {
-	protected void Awake()
+	[RequireComponent(typeof(Toggle))]
+	public class ToggleGroupFromParent : MonoBehaviour
 	{
-		GetComponent<Toggle>().group = transform.parent.GetComponent<ToggleGroup>();
+		protected void Awake()
+		{
+			GetComponent<Toggle>().group = transform.parent.GetComponent<ToggleGroup>();
+		}
 	}
 }

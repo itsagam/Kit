@@ -4,7 +4,7 @@ using System.Collections;
 using System.Collections.Generic;
 using XLua;
 
-namespace Modding.Scripting
+namespace Engine.Modding.Scripting
 {
 	public static class ScriptingConfig
 	{

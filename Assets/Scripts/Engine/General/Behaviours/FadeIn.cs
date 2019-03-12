@@ -1,9 +1,12 @@
 ﻿using UnityEngine;
 
-public class FadeIn : MonoBehaviour
+namespace Engine.Behaviours
 {
-	protected void Awake()
+	public class FadeIn : MonoBehaviour
 	{
-		SceneManager.FadeIn();
+		protected void Awake()
+		{
+			SceneManager.FadeIn();
+		}
 	}
 }

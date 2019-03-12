@@ -1,51 +1,54 @@
 using UnityEngine;
 
-[RequireComponent(typeof(Camera))]
-public class FollowCam : MonoBehaviour
+namespace Engine.Cameras
 {
-	public Transform Target;
-	public float Distance = 10.0f;
-	public float Speed = 10.0f;
-
-	protected Transform transformCached;
-
-	protected void Awake()
+	[RequireComponent(typeof(Camera))]
+	public class FollowCam : MonoBehaviour
 	{
-		transformCached = GetComponent<Transform>();
-	}
+		public Transform Target;
+		public float Distance = 10.0f;
+		public float Speed = 10.0f;
 
-	public void Follow()
-	{
-		enabled = true;
-	}
+		protected Transform transformCached;
 
-	public void Follow(Transform target)
-	{
-		if (target == null)
-			return;
+		protected void Awake()
+		{
+			transformCached = GetComponent<Transform>();
+		}
 
-		Follow(target, (target.position - transform.position).magnitude);
-	}
+		public void Follow()
+		{
+			enabled = true;
+		}
 
-	public void Follow(Transform target, float distance)
-	{
-		Target = target;
-		Distance = distance;
-		enabled = true;
-	}
+		public void Follow(Transform target)
+		{
+			if (target == null)
+				return;
 
-	public void Stop()
-	{
-		enabled = false;
-	}
+			Follow(target, (target.position - transform.position).magnitude);
+		}
 
-	protected void LateUpdate()
-	{
-		if (Target == null)
-			Stop();
+		public void Follow(Transform target, float distance)
+		{
+			Target = target;
+			Distance = distance;
+			enabled = true;
+		}
 
-		Vector3 target = Target.position;
-		Vector3 position = target - transformCached.forward * Distance;
-		transformCached.position = Vector3.Lerp(transformCached.position, position, Time.deltaTime * Speed);
+		public void Stop()
+		{
+			enabled = false;
+		}
+
+		protected void LateUpdate()
+		{
+			if (Target == null)
+				Stop();
+
+			Vector3 target = Target.position;
+			Vector3 position = target - transformCached.forward                                        * Distance;
+			transformCached.position = Vector3.Lerp(transformCached.position, position, Time.deltaTime * Speed);
+		}
 	}
 }

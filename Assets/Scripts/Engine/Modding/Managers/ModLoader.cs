@@ -1,7 +1,7 @@
 ﻿#if MODDING
 using UniRx.Async;
 
-namespace Modding
+namespace Engine.Modding
 {
     public abstract class ModLoader
 	{

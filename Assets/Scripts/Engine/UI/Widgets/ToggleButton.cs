@@ -1,45 +1,48 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
 
-[RequireComponent(typeof(Button))]
-public class ToggleButton : MonoBehaviour
+namespace Engine.UI.Widgets
 {
-	public Sprite OnSprite;
-	public Sprite OffSprite;
-
-	public Button Button { get; protected set; }
-
-	[SerializeField]
-	protected bool isOn;
-
-	public Toggle.ToggleEvent OnValueChanged;
-
-	protected void Awake()
+	[RequireComponent(typeof(Button))]
+	public class ToggleButton : MonoBehaviour
 	{
-		Button = GetComponent<Button>();
-		Button.onClick.AddListener(Toggle);
-		SetImage();
-	}
+		public Sprite OnSprite;
+		public Sprite OffSprite;
 
-	protected void Toggle()
-	{
-		IsOn = !IsOn;
-	}
+		public Button Button { get; protected set; }
 
-	protected void SetImage()
-	{
-		if (Button != null)
-			Button.image.sprite = isOn ? OnSprite : OffSprite;
-	}
+		[SerializeField]
+		protected bool isOn;
 
-	public bool IsOn
-	{
-		get => isOn;
-		set
+		public Toggle.ToggleEvent OnValueChanged;
+
+		protected void Awake()
 		{
-			isOn = value;
+			Button = GetComponent<Button>();
+			Button.onClick.AddListener(Toggle);
 			SetImage();
-			OnValueChanged.Invoke(isOn);
+		}
+
+		protected void Toggle()
+		{
+			IsOn = !IsOn;
+		}
+
+		protected void SetImage()
+		{
+			if (Button != null)
+				Button.image.sprite = isOn ? OnSprite : OffSprite;
+		}
+
+		public bool IsOn
+		{
+			get => isOn;
+			set
+			{
+				isOn = value;
+				SetImage();
+				OnValueChanged.Invoke(isOn);
+			}
 		}
 	}
 }

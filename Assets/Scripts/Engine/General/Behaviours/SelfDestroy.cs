@@ -1,11 +1,14 @@
 using UnityEngine;
 
-public class SelfDestroy : MonoBehaviour
+namespace Engine.Behaviours
 {
-	public float Life = 5.0f;
-
-	protected void Start()
+	public class SelfDestroy : MonoBehaviour
 	{
-		Destroy(gameObject, Life);
+		public float Life = 5.0f;
+
+		protected void Start()
+		{
+			Destroy(gameObject, Life);
+		}
 	}
 }

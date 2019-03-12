@@ -3,13 +3,13 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using Modding.Loaders;
+using Engine.Modding.Loaders;
 using UniRx;
 using UniRx.Async;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
-namespace Modding
+namespace Engine.Modding
 {
 	public static class ModManager
 	{
@@ -579,7 +579,7 @@ namespace Modding
 		private static void UnloadInternal(object resource)
 		{
 			if (resource is Object unityObject)
-				Object.Destroy(unityObject);
+				unityObject.Destroy();
 		}
 		#endregion
 

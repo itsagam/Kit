@@ -1,14 +1,17 @@
 ﻿using UnityEngine;
 
-public static class MonoExtensions
+namespace Engine
 {
-    public static void Enable(this MonoBehaviour mono)
+    public static class MonoExtensions
     {
-        mono.enabled = true;
-    }
+        public static void Enable(this MonoBehaviour mono)
+        {
+            mono.enabled = true;
+        }
 
-    public static void Disable(this MonoBehaviour mono)
-    {
-        mono.enabled = false;
+        public static void Disable(this MonoBehaviour mono)
+        {
+            mono.enabled = false;
+        }
     }
 }

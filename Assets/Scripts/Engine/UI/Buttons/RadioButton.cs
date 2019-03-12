@@ -1,35 +1,38 @@
 using UnityEngine;
 using UnityEngine.UI;
 
-[RequireComponent(typeof(Button))]
-public class RadioButton : MonoBehaviour
+namespace Engine.UI.Buttons
 {
-	public Button Button { get; protected set; }
-
-	protected Color onColor, offColor;
-
-	protected virtual void Awake()
+	[RequireComponent(typeof(Button))]
+	public class RadioButton : MonoBehaviour
 	{
-		Button = GetComponent<Button>();
-		Button.onClick.AddListener(Select);
-		onColor = Button.colors.highlightedColor;
-		offColor = Button.colors.normalColor;
-	}
+		public Button Button { get; protected set; }
 
-	public virtual void Select()
-	{
-		ColorBlock block;
+		protected Color onColor, offColor;
 
-		RadioButton[] siblings = transform.parent.GetComponentsInChildren<RadioButton>();
-		foreach (RadioButton sibling in siblings)
+		protected virtual void Awake()
 		{
-			Button button = sibling.Button;
-			block = button.colors;
-			block.normalColor = block.highlightedColor = offColor;
-			button.colors = block;
+			Button = GetComponent<Button>();
+			Button.onClick.AddListener(Select);
+			onColor = Button.colors.highlightedColor;
+			offColor = Button.colors.normalColor;
 		}
-		block = Button.colors;
-		block.normalColor = block.highlightedColor = onColor;
-		Button.colors = block;
+
+		public virtual void Select()
+		{
+			ColorBlock block;
+
+			RadioButton[] siblings = transform.parent.GetComponentsInChildren<RadioButton>();
+			foreach (RadioButton sibling in siblings)
+			{
+				Button button = sibling.Button;
+				block = button.colors;
+				block.normalColor = block.highlightedColor = offColor;
+				button.colors = block;
+			}
+			block = Button.colors;
+			block.normalColor = block.highlightedColor = onColor;
+			Button.colors = block;
+		}
 	}
 }

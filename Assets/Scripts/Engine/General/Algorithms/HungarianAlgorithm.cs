@@ -1,274 +1,237 @@
 ﻿using System;
 
-// Copyright (c) 2010 Alex Regueiro
-// Licensed under MIT license, available at <http://www.opensource.org/licenses/mit-license.php>.
-// Published originally at <http://blog.noldorin.com/2009/09/hungarian-algorithm-in-csharp/>.
-// Based on implementation described at <http://www.public.iastate.edu/~ddoty/HungarianAlgorithm.html>.
-// Version 1.3, released 22nd May 2010.
-public static class HungarianAlgorithm
+namespace Engine.Algorithms
 {
-    /// <summary>
-    /// Finds the optimal assignments for a given matrix of agents and costed tasks such that the total cost is
-    /// minimized.
-    /// </summary>
-    /// <param name="costs">A cost matrix; the element at row <em>i</em> and column <em>j</em> represents the cost of
-    /// agent <em>i</em> performing task <em>j</em>.</param>
-    /// <returns>A matrix of assignments; the value of element <em>i</em> is the column of the task assigned to agent
-    /// <em>i</em>.</returns>
-    /// <exception cref="ArgumentNullException"><paramref name="costs"/> is <see langword="null"/>.</exception>
-    public static int[] FindAssignments(this int[,] costs)
+    // Copyright (c) 2010 Alex Regueiro
+    // Licensed under MIT license, available at <http://www.opensource.org/licenses/mit-license.php>.
+    // Published originally at <http://blog.noldorin.com/2009/09/hungarian-algorithm-in-csharp/>.
+    // Based on implementation described at <http://www.public.iastate.edu/~ddoty/HungarianAlgorithm.html>.
+    // Version 1.3, released 22nd May 2010.
+    public static class HungarianAlgorithm
     {
-        if (costs == null)
-            throw new ArgumentNullException(nameof(costs));
-
-        int h = costs.GetLength(0);
-        int w = costs.GetLength(1);
-
-        for (int i = 0; i < h; i++)
+        /// <summary>
+        /// Finds the optimal assignments for a given matrix of agents and costed tasks such that the total cost is
+        /// minimized.
+        /// </summary>
+        /// <param name="costs">A cost matrix; the element at row <em>i</em> and column <em>j</em> represents the cost of
+        /// agent <em>i</em> performing task <em>j</em>.</param>
+        /// <returns>A matrix of assignments; the value of element <em>i</em> is the column of the task assigned to agent
+        /// <em>i</em>.</returns>
+        /// <exception cref="ArgumentNullException"><paramref name="costs"/> is <see langword="null"/>.</exception>
+        public static int[] FindAssignments(this int[,] costs)
         {
-            int min = int.MaxValue;
-            for (int j = 0; j < w; j++)
-                min = Math.Min(min, costs[i, j]);
-            for (int j = 0; j < w; j++)
-                costs[i, j] -= min;
+            int h = costs.GetLength(0);
+            int w = costs.GetLength(1);
+
+            for (int i = 0; i < h; i++)
+            {
+                int min = int.MaxValue;
+                for (int j = 0; j < w; j++)
+                    min = Math.Min(min, costs[i, j]);
+                for (int j = 0; j < w; j++)
+                    costs[i, j] -= min;
+            }
+
+            var masks = new byte[h, w];
+            var rowsCovered = new bool[h];
+            var colsCovered = new bool[w];
+            for (int i = 0; i < h; i++)
+                for (int j = 0; j < w; j++)
+                    if (costs[i, j] == 0 && !rowsCovered[i] && !colsCovered[j])
+                    {
+                        masks[i, j] = 1;
+                        rowsCovered[i] = true;
+                        colsCovered[j] = true;
+                    }
+
+            ClearCovers(rowsCovered, colsCovered, w, h);
+
+            var path = new Location[w * h];
+            Location pathStart = default;
+            int step = 1;
+            while (step != -1)
+                switch (step)
+                {
+                    case 1:
+                        step = RunStep1(masks, colsCovered, w, h);
+                        break;
+                    case 2:
+                        step = RunStep2(costs, masks, rowsCovered, colsCovered, w, h, ref pathStart);
+                        break;
+                    case 3:
+                        step = RunStep3(masks, rowsCovered, colsCovered, w, h, path, pathStart);
+                        break;
+                    case 4:
+                        step = RunStep4(costs, rowsCovered, colsCovered, w, h);
+                        break;
+                }
+
+            var agentsTasks = new int[h];
+            for (int i = 0; i < h; i++)
+                for (int j = 0; j < w; j++)
+                    if (masks[i, j] == 1)
+                    {
+                        agentsTasks[i] = j;
+                        break;
+                    }
+
+            return agentsTasks;
         }
 
-        var masks = new byte[h, w];
-        var rowsCovered = new bool[h];
-        var colsCovered = new bool[w];
-        for (int i = 0; i < h; i++)
+        private static int RunStep1(byte[,] masks, bool[] colsCovered, int w, int h)
         {
+            for (int i = 0; i < h; i++)
+                for (int j = 0; j < w; j++)
+                    if (masks[i, j] == 1)
+                        colsCovered[j] = true;
+            int colsCoveredCount = 0;
             for (int j = 0; j < w; j++)
+                if (colsCovered[j])
+                    colsCoveredCount++;
+
+            return colsCoveredCount == h ? -1 : 2;
+        }
+
+        private static int RunStep2(int[,] costs, byte[,] masks, bool[] rowsCovered, bool[] colsCovered, int w, int h,
+            ref Location pathStart)
+        {
+            while (true)
             {
-                if (costs[i, j] == 0 && !rowsCovered[i] && !colsCovered[j])
+                Location loc = FindZero(costs, rowsCovered, colsCovered, w, h);
+                if (loc.Row == -1)
+                    return 4;
+
+                masks[loc.Row, loc.Column] = 2;
+                int starCol = FindStarInRow(masks, w, loc.Row);
+                if (starCol != -1)
                 {
-                    masks[i, j] = 1;
-                    rowsCovered[i] = true;
-                    colsCovered[j] = true;
+                    rowsCovered[loc.Row] = true;
+                    colsCovered[starCol] = false;
+                }
+                else
+                {
+                    pathStart = loc;
+                    return 3;
                 }
             }
         }
-        ClearCovers(rowsCovered, colsCovered, w, h);
 
-        var path = new Location[w * h];
-        Location pathStart = default;
-        int step = 1;
-        while (step != -1)
+        private static int RunStep3(byte[,] masks, bool[] rowsCovered, bool[] colsCovered, int w, int h,
+            Location[] path, Location pathStart)
         {
-            switch (step)
+            int pathIndex = 0;
+            path[0] = pathStart;
+            while (true)
             {
-                case 1:
-                    step = RunStep1(masks, colsCovered, w, h);
+                int row = FindStarInColumn(masks, h, path[pathIndex].Column);
+                if (row == -1)
                     break;
-                case 2:
-                    step = RunStep2(costs, masks, rowsCovered, colsCovered, w, h, ref pathStart);
-                    break;
-                case 3:
-                    step = RunStep3(masks, rowsCovered, colsCovered, w, h, path, pathStart);
-                    break;
-                case 4:
-                    step = RunStep4(costs, rowsCovered, colsCovered, w, h);
-                    break;
+                pathIndex++;
+                path[pathIndex] = new Location(row, path[pathIndex - 1].Column);
+                int col = FindPrimeInRow(masks, w, path[pathIndex].Row);
+                pathIndex++;
+                path[pathIndex] = new Location(path[pathIndex - 1].Row, col);
             }
+            ConvertPath(masks, path, pathIndex + 1);
+            ClearCovers(rowsCovered, colsCovered, w, h);
+            ClearPrimes(masks, w, h);
+            return 1;
         }
 
-        var agentsTasks = new int[h];
-        for (int i = 0; i < h; i++)
+        private static int RunStep4(int[,] costs, bool[] rowsCovered, bool[] colsCovered, int w, int h)
         {
-            for (int j = 0; j < w; j++)
-            {
-                if (masks[i, j] == 1)
+            int minValue = FindMinimum(costs, rowsCovered, colsCovered, w, h);
+            for (int i = 0; i < h; i++)
+                for (int j = 0; j < w; j++)
                 {
-                    agentsTasks[i] = j;
-                    break;
+                    if (rowsCovered[i])
+                        costs[i, j] += minValue;
+                    if (!colsCovered[j])
+                        costs[i, j] -= minValue;
                 }
-            }
-        }
-        return agentsTasks;
-    }
 
-    private static int RunStep1(byte[,] masks, bool[] colsCovered, int w, int h)
-    {
-        for (int i = 0; i < h; i++)
+            return 2;
+        }
+
+        private static void ConvertPath(byte[,] masks, Location[] path, int pathLength)
+        {
+            for (int i = 0; i < pathLength; i++)
+                if (masks[path[i].Row, path[i].Column] == 1)
+                    masks[path[i].Row, path[i].Column] = 0;
+                else if (masks[path[i].Row, path[i].Column] == 2)
+                    masks[path[i].Row, path[i].Column] = 1;
+        }
+
+        private static Location FindZero(int[,] costs, bool[] rowsCovered, bool[] colsCovered,
+            int w, int h)
+        {
+            for (int i = 0; i < h; i++)
+                for (int j = 0; j < w; j++)
+                    if (costs[i, j] == 0 && !rowsCovered[i] && !colsCovered[j])
+                        return new Location(i, j);
+            return new Location(-1, -1);
+        }
+
+        private static int FindMinimum(int[,] costs, bool[] rowsCovered, bool[] colsCovered, int w, int h)
+        {
+            int minValue = int.MaxValue;
+            for (int i = 0; i < h; i++)
+                for (int j = 0; j < w; j++)
+                    if (!rowsCovered[i] && !colsCovered[j])
+                        minValue = Math.Min(minValue, costs[i, j]);
+            return minValue;
+        }
+
+        private static int FindStarInRow(byte[,] masks, int w, int row)
         {
             for (int j = 0; j < w; j++)
-            {
-                if (masks[i, j] == 1)
-                    colsCovered[j] = true;
-            }
+                if (masks[row, j] == 1)
+                    return j;
+            return -1;
         }
-        int colsCoveredCount = 0;
-        for (int j = 0; j < w; j++)
+
+        private static int FindStarInColumn(byte[,] masks, int h, int col)
         {
-            if (colsCovered[j])
-                colsCoveredCount++;
+            for (int i = 0; i < h; i++)
+                if (masks[i, col] == 1)
+                    return i;
+            return -1;
         }
 
-        return colsCoveredCount == h ? -1 : 2;
-    }
-
-    private static int RunStep2(int[,] costs, byte[,] masks, bool[] rowsCovered, bool[] colsCovered, int w, int h,
-        ref Location pathStart)
-    {
-        while (true)
-        {
-            Location loc = FindZero(costs, rowsCovered, colsCovered, w, h);
-            if (loc.Row == -1)
-            {
-                return 4;
-            }
-
-            masks[loc.Row, loc.Column] = 2;
-            int starCol = FindStarInRow(masks, w, loc.Row);
-            if (starCol != -1)
-            {
-                rowsCovered[loc.Row] = true;
-                colsCovered[starCol] = false;
-            }
-            else
-            {
-                pathStart = loc;
-                return 3;
-            }
-        }
-    }
-
-    private static int RunStep3(byte[,] masks, bool[] rowsCovered, bool[] colsCovered, int w, int h,
-        Location[] path, Location pathStart)
-    {
-        int pathIndex = 0;
-        path[0] = pathStart;
-        while (true)
-        {
-            int row = FindStarInColumn(masks, h, path[pathIndex].Column);
-            if (row == -1)
-                break;
-            pathIndex++;
-            path[pathIndex] = new Location(row, path[pathIndex - 1].Column);
-            int col = FindPrimeInRow(masks, w, path[pathIndex].Row);
-            pathIndex++;
-            path[pathIndex] = new Location(path[pathIndex - 1].Row, col);
-        }
-        ConvertPath(masks, path, pathIndex + 1);
-        ClearCovers(rowsCovered, colsCovered, w, h);
-        ClearPrimes(masks, w, h);
-        return 1;
-    }
-
-    private static int RunStep4(int[,] costs, bool[] rowsCovered, bool[] colsCovered, int w, int h)
-    {
-        int minValue = FindMinimum(costs, rowsCovered, colsCovered, w, h);
-        for (int i = 0; i < h; i++)
+        private static int FindPrimeInRow(byte[,] masks, int w, int row)
         {
             for (int j = 0; j < w; j++)
-            {
-                if (rowsCovered[i])
-                    costs[i, j] += minValue;
-                if (!colsCovered[j])
-                    costs[i, j] -= minValue;
-            }
+                if (masks[row, j] == 2)
+                    return j;
+            return -1;
         }
-        return 2;
-    }
 
-    private static void ConvertPath(byte[,] masks, Location[] path, int pathLength)
-    {
-        for (int i = 0; i < pathLength; i++)
+        private static void ClearCovers(bool[] rowsCovered, bool[] colsCovered, int w, int h)
         {
-            if (masks[path[i].Row, path[i].Column] == 1)
-                masks[path[i].Row, path[i].Column] = 0;
-            else if (masks[path[i].Row, path[i].Column] == 2)
-                masks[path[i].Row, path[i].Column] = 1;
-        }
-    }
-
-    private static Location FindZero(int[,] costs, bool[] rowsCovered, bool[] colsCovered,
-        int w, int h)
-    {
-        for (int i = 0; i < h; i++)
-        {
+            for (int i = 0; i < h; i++)
+                rowsCovered[i] = false;
             for (int j = 0; j < w; j++)
+                colsCovered[j] = false;
+        }
+
+        private static void ClearPrimes(byte[,] masks, int w, int h)
+        {
+            for (int i = 0; i < h; i++)
+                for (int j = 0; j < w; j++)
+                    if (masks[i, j] == 2)
+                        masks[i, j] = 0;
+        }
+
+        private struct Location
+        {
+            public int Row;
+            public int Column;
+
+            public Location(int row, int col)
             {
-                if (costs[i, j] == 0 && !rowsCovered[i] && !colsCovered[j])
-                    return new Location(i, j);
+                Row = row;
+                Column = col;
             }
-        }
-        return new Location(-1, -1);
-    }
-
-    private static int FindMinimum(int[,] costs, bool[] rowsCovered, bool[] colsCovered, int w, int h)
-    {
-        int minValue = int.MaxValue;
-        for (int i = 0; i < h; i++)
-        {
-            for (int j = 0; j < w; j++)
-            {
-                if (!rowsCovered[i] && !colsCovered[j])
-                    minValue = Math.Min(minValue, costs[i, j]);
-            }
-        }
-        return minValue;
-    }
-
-    private static int FindStarInRow(byte[,] masks, int w, int row)
-    {
-        for (int j = 0; j < w; j++)
-        {
-            if (masks[row, j] == 1)
-                return j;
-        }
-        return -1;
-    }
-
-    private static int FindStarInColumn(byte[,] masks, int h, int col)
-    {
-        for (int i = 0; i < h; i++)
-        {
-            if (masks[i, col] == 1)
-                return i;
-        }
-        return -1;
-    }
-
-    private static int FindPrimeInRow(byte[,] masks, int w, int row)
-    {
-        for (int j = 0; j < w; j++)
-        {
-            if (masks[row, j] == 2)
-                return j;
-        }
-        return -1;
-    }
-
-    private static void ClearCovers(bool[] rowsCovered, bool[] colsCovered, int w, int h)
-    {
-        for (int i = 0; i < h; i++)
-            rowsCovered[i] = false;
-        for (int j = 0; j < w; j++)
-            colsCovered[j] = false;
-    }
-
-    private static void ClearPrimes(byte[,] masks, int w, int h)
-    {
-        for (int i = 0; i < h; i++)
-        {
-            for (int j = 0; j < w; j++)
-            {
-                if (masks[i, j] == 2)
-                    masks[i, j] = 0;
-            }
-        }
-    }
-
-    private struct Location
-    {
-        public int Row;
-        public int Column;
-
-        public Location(int row, int col)
-        {
-            Row = row;
-            Column = col;
         }
     }
 }

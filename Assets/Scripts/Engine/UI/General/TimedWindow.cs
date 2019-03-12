@@ -1,28 +1,30 @@
 ﻿using System;
-using UniRx;
-using UniRx.Async;
 using Sirenix.OdinInspector;
+using UniRx;
 
-public class TimedWindow : Window
+namespace Engine.UI
 {
-	[PropertyOrder(-99)]
-	[SuffixLabel("seconds", true)]
-	[MinValue(0)]
-	public float Time = 3.0f;
-
-	protected IDisposable observable;
-
-	protected override void OnShown()
+	public class TimedWindow : Window
 	{
-		QueueHide();
-	}
+		[PropertyOrder(-99)]
+		[SuffixLabel("seconds", true)]
+		[MinValue(0)]
+		public float Time = 3.0f;
 
-	protected void QueueHide()
-	{
-		observable?.Dispose();
-		observable = Observable.Timer(TimeSpan.FromSeconds(Time)).Subscribe(t => {
-			observable = null;
-			Hide();
-		});
+		protected IDisposable observable;
+
+		protected override void OnShown()
+		{
+			QueueHide();
+		}
+
+		protected void QueueHide()
+		{
+			observable?.Dispose();
+			observable = Observable.Timer(TimeSpan.FromSeconds(Time)).Subscribe(t => {
+																					observable = null;
+																					Hide();
+																				});
+		}
 	}
 }

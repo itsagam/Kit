@@ -1,40 +1,43 @@
-﻿using UnityEngine;
+﻿using Sirenix.OdinInspector.Editor;
+using UnityEditor;
+using UnityEngine;
 using UnityEngine.UI;
 
-#if UNITY_EDITOR
-using UnityEditor;
-using Sirenix.OdinInspector.Editor;
-[CustomEditor(typeof(ContentSizeFitterEx), false)]
-public class ContentSizeFitterExEditor : OdinEditor
+namespace Engine.UI.Layout
 {
-}
+#if UNITY_EDITOR
+	[CustomEditor(typeof(ContentSizeFitterEx), false)]
+	public class ContentSizeFitterExEditor : OdinEditor
+	{
+	}
 #endif
 
-public class ContentSizeFitterEx : ContentSizeFitter
-{
-	public Vector2 Padding;
-
-	protected RectTransform cachedRectTransform;
-
-	public override void SetLayoutHorizontal()
+	public class ContentSizeFitterEx : ContentSizeFitter
 	{
-		base.SetLayoutVertical();
-		rectTransform.sizeDelta = rectTransform.sizeDelta.AddY(Padding.x);
-	}
+		public Vector2 Padding;
 
-	public override void SetLayoutVertical()
-	{
-		base.SetLayoutVertical();
-		rectTransform.sizeDelta = rectTransform.sizeDelta.AddY(Padding.y);
-	}
+		protected RectTransform cachedRectTransform;
 
-	protected RectTransform rectTransform
-	{
-		get
+		public override void SetLayoutHorizontal()
 		{
-			if (cachedRectTransform == null)
-				cachedRectTransform = GetComponent<RectTransform>();
-			return cachedRectTransform;
+			base.SetLayoutVertical();
+			rectTransform.sizeDelta = rectTransform.sizeDelta.AddY(Padding.x);
+		}
+
+		public override void SetLayoutVertical()
+		{
+			base.SetLayoutVertical();
+			rectTransform.sizeDelta = rectTransform.sizeDelta.AddY(Padding.y);
+		}
+
+		protected RectTransform rectTransform
+		{
+			get
+			{
+				if (cachedRectTransform == null)
+					cachedRectTransform = GetComponent<RectTransform>();
+				return cachedRectTransform;
+			}
 		}
 	}
 }

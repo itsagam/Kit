@@ -1,7 +1,7 @@
 #if MODDING
 using System.Collections.Generic;
 
-namespace Modding
+namespace Engine.Modding
 {
 	public enum ModType
 	{

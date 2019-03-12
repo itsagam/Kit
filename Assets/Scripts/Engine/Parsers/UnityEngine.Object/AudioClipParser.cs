@@ -13,26 +13,29 @@ using UnityEngine;
 //				WWW._uwr is private so you cannot change to a custom web request with custom download handler
 //				All data downloading and posting is done internally from C++ and passed to DownloadHandler.ReceiveData which is protected
 
-public class AudioClipParser : ResourceParser
+namespace Engine.Parsers
 {
-	public override IEnumerable<Type> SupportedTypes
+	public class AudioClipParser : ResourceParser
 	{
-		get
+		public override IEnumerable<Type> SupportedTypes
 		{
-			yield return typeof(AudioClip);
+			get
+			{
+				yield return typeof(AudioClip);
+			}
 		}
-	}
-	public override IEnumerable<string> SupportedExtensions
-	{
-		get
+		public override IEnumerable<string> SupportedExtensions
 		{
-			yield return ".wav";
+			get
+			{
+				yield return ".wav";
+			}
 		}
-	}
-	public override ParseMode ParseMode => ParseMode.Binary;
+		public override ParseMode ParseMode => ParseMode.Binary;
 
-	public override object Read(Type type, object data, string path = null)
-	{
-		return WavUtility.ToAudioClip((byte[]) data, 0, path);
+		public override object Read(Type type, object data, string path = null)
+		{
+			return WavUtility.ToAudioClip((byte[]) data, 0, path);
+		}
 	}
 }

@@ -1,120 +1,124 @@
 ﻿using System;
-using System.Diagnostics;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Text;
+using Engine.Parsers;
+using UniRx;
 using UnityEngine;
 using UnityEngine.Profiling;
-using UniRx;
 
-public static class Debugger
+namespace Engine
 {
-	public const string NullString = "Null";
-
-	#region Profiling
-#if UNITY_EDITOR || DEVELOPMENT_BUILD
-	private static Dictionary<string, CustomSampler> samples = new Dictionary<string, CustomSampler>();
-	private static Stack<CustomSampler> runningSamples = new Stack<CustomSampler>();
-
-	public static void StartProfile(string name)
+	public static class Debugger
 	{
-		CustomSampler sample = GetProfile(name);
-		if (sample == null)
+		public const string NullString = "Null";
+
+		#region Profiling
+	#if UNITY_EDITOR || DEVELOPMENT_BUILD
+		private static Dictionary<string, CustomSampler> samples = new Dictionary<string, CustomSampler>();
+		private static Stack<CustomSampler> runningSamples = new Stack<CustomSampler>();
+
+		public static void StartProfile(string name)
 		{
-			sample = CustomSampler.Create(name);
-			samples.Add(name, sample);
-			LogProfile(sample);
+			CustomSampler sample = GetProfile(name);
+			if (sample == null)
+			{
+				sample = CustomSampler.Create(name);
+				samples.Add(name, sample);
+				LogProfile(sample);
+			}
+			runningSamples.Push(sample);
+			sample.Begin();
 		}
-		runningSamples.Push(sample);
-		sample.Begin();
-	}
 
-	public static CustomSampler GetProfile(string name)
-	{
-		return samples.TryGetValue(name, out CustomSampler sample) ? sample : null;
-	}
-
-	public static void EndProfile()
-	{
-		runningSamples.Pop()?.End();
-	}
-
-	private static void LogProfile(CustomSampler sample)
-	{
-		Recorder recorder = sample.GetRecorder();
-		recorder.enabled = true;
-		Observable.EveryEndOfFrame().Subscribe(l => {
-			if (recorder.sampleBlockCount > 0)
-				Log(sample.name + ": " + ConvertTime(recorder.elapsedNanoseconds));
-		});
-	}
-
-	private static string ConvertTime(long time)
-	{
-		if (time < 0)
-			return null;
-		return Math.Round(time / 1000000f, 5) + "ms";
-	}
-#endif
-	#endregion
-
-	#region Logging
-	// Conditionals make these methods calls be ignored in Release builds
-	[Conditional("UNITY_EDITOR"), Conditional("DEVELOPMENT_BUILD")]
-	public static void Log(string line, LogType type = LogType.Log)
-	{
-		switch (type)
+		public static CustomSampler GetProfile(string name)
 		{
-			case LogType.Log:
-				UnityEngine.Debug.Log(line);
-				break;
-
-			case LogType.Warning:
-				UnityEngine.Debug.LogWarning(line);
-				break;
-
-			case LogType.Error:
-				UnityEngine.Debug.LogError(line);
-				break;
-
-			case LogType.Assert:
-				UnityEngine.Debug.LogAssertion(line);
-				break;
-
-			case LogType.Exception:
-				UnityEngine.Debug.LogException(new Exception(line));
-				break;
+			return samples.TryGetValue(name, out CustomSampler sample) ? sample : null;
 		}
-	}
 
-	[Conditional("UNITY_EDITOR"), Conditional("DEVELOPMENT_BUILD")]
-	public static void Log(string category, string line, LogType type = LogType.Log)
-	{
-		Log("[" + category + "] " + line, type);
-	}
+		public static void EndProfile()
+		{
+			runningSamples.Pop()?.End();
+		}
 
-	[Conditional("UNITY_EDITOR"), Conditional("DEVELOPMENT_BUILD")]
-	public static void Log(object obj, bool serialize = false)
-	{
-		Log(ObjectToString(obj, serialize));
-	}
+		private static void LogProfile(CustomSampler sample)
+		{
+			Recorder recorder = sample.GetRecorder();
+			recorder.enabled = true;
+			Observable.EveryEndOfFrame().Subscribe(l => {
+				if (recorder.sampleBlockCount > 0)
+					Log(sample.name + ": " + ConvertTime(recorder.elapsedNanoseconds));
+			});
+		}
 
-	[Conditional("UNITY_EDITOR"), Conditional("DEVELOPMENT_BUILD")]
-	public static void Log(string category, object obj, bool serialize = false)
-	{
-		Log(category, ObjectToString(obj, serialize));
-	}
+		private static string ConvertTime(long time)
+		{
+			if (time < 0)
+				return null;
+			return Math.Round(time / 1000000f, 5) + "ms";
+		}
+	#endif
+		#endregion
 
-	public static string ObjectToString(object obj, bool serialize, string nullString = NullString)
-	{
-		if (obj == null)
-			return nullString;
+		#region Logging
+		// Conditionals make these methods calls be ignored in Release builds
+		[Conditional("UNITY_EDITOR"), Conditional("DEVELOPMENT_BUILD")]
+		public static void Log(string line, LogType type = LogType.Log)
+		{
+			switch (type)
+			{
+				case LogType.Log:
+					UnityEngine.Debug.Log(line);
+					break;
 
-		return serialize ? JSONParser.ToJson(obj) : obj.ToString();
-	}
+				case LogType.Warning:
+					UnityEngine.Debug.LogWarning(line);
+					break;
 
-	public static void ObjectToString(StringBuilder output, object obj, bool serialize, string nullString)
-	{
-		output.Append(ObjectToString(obj, serialize, nullString));
+				case LogType.Error:
+					UnityEngine.Debug.LogError(line);
+					break;
+
+				case LogType.Assert:
+					UnityEngine.Debug.LogAssertion(line);
+					break;
+
+				case LogType.Exception:
+					UnityEngine.Debug.LogException(new Exception(line));
+					break;
+			}
+		}
+
+		[Conditional("UNITY_EDITOR"), Conditional("DEVELOPMENT_BUILD")]
+		public static void Log(string category, string line, LogType type = LogType.Log)
+		{
+			Log("[" + category + "] " + line, type);
+		}
+
+		[Conditional("UNITY_EDITOR"), Conditional("DEVELOPMENT_BUILD")]
+		public static void Log(object obj, bool serialize = false)
+		{
+			Log(ObjectToString(obj, serialize));
+		}
+
+		[Conditional("UNITY_EDITOR"), Conditional("DEVELOPMENT_BUILD")]
+		public static void Log(string category, object obj, bool serialize = false)
+		{
+			Log(category, ObjectToString(obj, serialize));
+		}
+
+		public static string ObjectToString(object obj, bool serialize, string nullString = NullString)
+		{
+			if (obj == null)
+				return nullString;
+
+			return serialize ? JSONParser.ToJson(obj) : obj.ToString();
+		}
+
+		public static void ObjectToString(StringBuilder output, object obj, bool serialize, string nullString)
+		{
+			output.Append(ObjectToString(obj, serialize, nullString));
+		}
+		#endregion
 	}
-	#endregion
 }

@@ -3,7 +3,7 @@ using System;
 using System.Collections;
 using UnityEngine;
 
-namespace Modding.Scripting
+namespace Engine.Modding.Scripting
 {
 	public class SimpleDispatcher : MonoBehaviour
 	{

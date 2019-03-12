@@ -1,15 +1,18 @@
 ﻿using UnityEngine.UI;
 
-public static class SelectableExtensions
+namespace Engine
 {
-	public static void SetInteractableImmediate(this Selectable selectable, bool value)
+	public static class SelectableExtensions
 	{
-		ColorBlock colorBlock = selectable.colors;
-		float previousDuration = colorBlock.fadeDuration;
-		colorBlock.fadeDuration = 0;
-		selectable.colors = colorBlock;
-		selectable.interactable = value;
-		colorBlock.fadeDuration = previousDuration;
-		selectable.colors = colorBlock;
+		public static void SetInteractableImmediate(this Selectable selectable, bool value)
+		{
+			ColorBlock colorBlock = selectable.colors;
+			float previousDuration = colorBlock.fadeDuration;
+			colorBlock.fadeDuration = 0;
+			selectable.colors = colorBlock;
+			selectable.interactable = value;
+			colorBlock.fadeDuration = previousDuration;
+			selectable.colors = colorBlock;
+		}
 	}
 }

@@ -2,7 +2,7 @@
 using System;
 using XLua;
 
-namespace Modding.Scripting
+namespace Engine.Modding.Scripting
 {
 	public class FullDispatcher : SimpleDispatcher
 	{

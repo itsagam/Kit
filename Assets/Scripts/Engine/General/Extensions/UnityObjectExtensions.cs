@@ -1,9 +1,12 @@
 ﻿using UnityEngine;
 
-public static class UnityObjectExtensions
+namespace Engine
 {
-	public static void Destroy(this Object obj)
+	public static class UnityObjectExtensions
 	{
-		Object.Destroy(obj);
+		public static void Destroy(this Object obj)
+		{
+			Object.Destroy(obj);
+		}
 	}
 }

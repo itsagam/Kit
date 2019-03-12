@@ -1,33 +1,36 @@
-﻿using UnityEngine;
-using System;
+﻿using System;
 using System.Collections.Generic;
+using UnityEngine;
 
-public class Texture2DParser : ResourceParser
+namespace Engine.Parsers
 {
-	public override IEnumerable<Type> SupportedTypes
+	public class Texture2DParser : ResourceParser
 	{
-		get
+		public override IEnumerable<Type> SupportedTypes
 		{
-			yield return typeof(Texture2D);
+			get
+			{
+				yield return typeof(Texture2D);
+			}
 		}
-	}
-	public override IEnumerable<string> SupportedExtensions
-	{
-		get
+		public override IEnumerable<string> SupportedExtensions
 		{
-			yield return ".jpg";
-			yield return ".jpeg";
-			yield return ".png";
+			get
+			{
+				yield return ".jpg";
+				yield return ".jpeg";
+				yield return ".png";
+			}
 		}
-	}
-	public override ParseMode ParseMode => ParseMode.Binary;
+		public override ParseMode ParseMode => ParseMode.Binary;
 
-	public override object Read(Type type, object data, string path = null)
-	{
-		Texture2D texture = new Texture2D(0, 0);
-		texture.LoadImage((byte[]) data);
-		if (path != null)
-			texture.name = path;
-		return texture;
+		public override object Read(Type type, object data, string path = null)
+		{
+			Texture2D texture = new Texture2D(0, 0);
+			texture.LoadImage((byte[]) data);
+			if (path != null)
+				texture.name = path;
+			return texture;
+		}
 	}
 }

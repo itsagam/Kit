@@ -1,24 +1,27 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
 
-[RequireComponent(typeof(Button))]
-public class PanelRadioButton : RadioButton
+namespace Engine.UI.Buttons
 {
-	public RectTransform Panel;
-
-	protected override void Awake()
+	[RequireComponent(typeof(Button))]
+	public class PanelRadioButton : RadioButton
 	{
-		base.Awake();
-		if (Panel != null)
-			Panel.gameObject.SetActive(false);
-	}
+		public RectTransform Panel;
 
-	public override void Select()
-	{
-		base.Select();
-		PanelRadioButton[] siblings = transform.parent.GetComponentsInChildren<PanelRadioButton>();
-		foreach (PanelRadioButton sibling in siblings)
-			sibling.Panel.gameObject.SetActive(false);
-		Panel.gameObject.SetActive(true);
+		protected override void Awake()
+		{
+			base.Awake();
+			if (Panel != null)
+				Panel.gameObject.SetActive(false);
+		}
+
+		public override void Select()
+		{
+			base.Select();
+			PanelRadioButton[] siblings = transform.parent.GetComponentsInChildren<PanelRadioButton>();
+			foreach (PanelRadioButton sibling in siblings)
+				sibling.Panel.gameObject.SetActive(false);
+			Panel.gameObject.SetActive(true);
+		}
 	}
 }

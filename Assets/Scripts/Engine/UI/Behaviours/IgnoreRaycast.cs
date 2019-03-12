@@ -1,9 +1,12 @@
 ﻿using UnityEngine;
 
-public class IgnoreRaycast : MonoBehaviour, ICanvasRaycastFilter 
+namespace Engine.UI.Behaviours
 {
-	public bool IsRaycastLocationValid(Vector2 sp, Camera eventCamera)
+	public class IgnoreRaycast : MonoBehaviour, ICanvasRaycastFilter 
 	{
-		return false;
+		public bool IsRaycastLocationValid(Vector2 sp, Camera eventCamera)
+		{
+			return false;
+		}
 	}
 }

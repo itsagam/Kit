@@ -2,81 +2,84 @@
 using UnityEngine;
 using UnityEngine.EventSystems;
 
-public class ShowHideButton : MonoBehaviour, IPointerClickHandler
+namespace Engine.UI.Buttons
 {
-	public enum ShowHideMode
+	public class ShowHideButton : MonoBehaviour, IPointerClickHandler
 	{
-		Show,
-		Hide,
-		Toggle
-	}
-
-	public enum ShowHideType
-	{
-		Window,
-		Name
-	}
-
-	public ShowHideMode Mode;
-	public ShowHideType Type;
-
-	[ShowIf("Type", ShowHideType.Window)]
-	public Window Window;
-
-	[ShowIf("Type", ShowHideType.Name)]
-	public string Name;
-
-	public void OnPointerClick (PointerEventData eventData)
-	{
-		switch (Type)
+		public enum ShowHideMode
 		{
-			case ShowHideType.Window:
-				if (Window != null)
-				{
-					switch (Mode)
+			Show,
+			Hide,
+			Toggle
+		}
+
+		public enum ShowHideType
+		{
+			Window,
+			Name
+		}
+
+		public ShowHideMode Mode;
+		public ShowHideType Type;
+
+		[ShowIf("Type", ShowHideType.Window)]
+		public Window Window;
+
+		[ShowIf("Type", ShowHideType.Name)]
+		public string Name;
+
+		public void OnPointerClick (PointerEventData eventData)
+		{
+			switch (Type)
+			{
+				case ShowHideType.Window:
+					if (Window != null)
 					{
-						case ShowHideMode.Show:
-							Window.Show();
-							break;
-
-						case ShowHideMode.Hide:
-							Window.Hide();
-							break;
-
-						case ShowHideMode.Toggle:
-							if (Window.IsShown)
-								Window.Hide();
-							else
+						switch (Mode)
+						{
+							case ShowHideMode.Show:
 								Window.Show();
-							break;
-					}
-				}
-				break;
+								break;
 
-			case ShowHideType.Name:
-				if (!Name.IsNullOrEmpty())
-				{
-					switch (Mode)
+							case ShowHideMode.Hide:
+								Window.Hide();
+								break;
+
+							case ShowHideMode.Toggle:
+								if (Window.IsShown)
+									Window.Hide();
+								else
+									Window.Show();
+								break;
+						}
+					}
+					break;
+
+				case ShowHideType.Name:
+					if (!Name.IsNullOrEmpty())
 					{
-						case ShowHideMode.Show:
-							if (!UIManager.IsShown(Name))
-								UIManager.Show(Name);
-							break;
+						switch (Mode)
+						{
+							case ShowHideMode.Show:
+								if (!UIManager.IsShown(Name))
+									UIManager.Show(Name);
+								break;
 
-						case ShowHideMode.Hide:
-							if (UIManager.IsShown(Name))
-								UIManager.Hide(Name);
-							break;
+							case ShowHideMode.Hide:
+								if (UIManager.IsShown(Name))
+									UIManager.Hide(Name);
+								break;
 
-						case ShowHideMode.Toggle:
-							if (UIManager.IsShown(Name))
-								UIManager.Hide(Name);
-							else
-								UIManager.Show(Name);
-							break;
+							case ShowHideMode.Toggle:
+								if (UIManager.IsShown(Name))
+									UIManager.Hide(Name);
+								else
+									UIManager.Show(Name);
+								break;
+						}
 					}
-				}
-				break;
+					break;
+			}
 		}
 	}
 }

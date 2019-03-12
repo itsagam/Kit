@@ -1,33 +1,36 @@
 ﻿using System.Text;
 
-public static class StringBuilderExtensions
+namespace Engine
 {
-	public static int IndexOf(this StringBuilder sb, char value, int startIndex)
+	public static class StringBuilderExtensions
 	{
-		for (int i = startIndex; i < sb.Length; i++)
-			if (sb[i] == value)
-				return i;
-		return -1;
-	}
-
-	public static int IndexOf(this StringBuilder sb, string value, int startIndex)
-	{
-		int length = value.Length;
-		int maxSearchLength = sb.Length - length + 1;
-
-		for (int i = startIndex; i < maxSearchLength; ++i)
+		public static int IndexOf(this StringBuilder sb, char value, int startIndex)
 		{
-			if (sb[i] == value[0])
-			{
-				int index = 1;
-				while (index < length && sb[i + index] == value[index])
-					++index;
-
-				if (index == length)
+			for (int i = startIndex; i < sb.Length; i++)
+				if (sb[i] == value)
 					return i;
-			}
+			return -1;
 		}
 
-		return -1;
+		public static int IndexOf(this StringBuilder sb, string value, int startIndex)
+		{
+			int length = value.Length;
+			int maxSearchLength = sb.Length - length + 1;
+
+			for (int i = startIndex; i < maxSearchLength; ++i)
+			{
+				if (sb[i] == value[0])
+				{
+					int index = 1;
+					while (index < length && sb[i + index] == value[index])
+						++index;
+
+					if (index == length)
+						return i;
+				}
+			}
+
+			return -1;
+		}
 	}
 }

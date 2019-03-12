@@ -2,26 +2,29 @@
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
-public class CloseButton : MonoBehaviour, IPointerClickHandler
+namespace Engine.UI.Buttons
 {
-	protected Button button;
-
-	protected void Awake()
+	public class CloseButton : MonoBehaviour, IPointerClickHandler
 	{
-		button = GetComponent<Button>();
-		if (button != null)
-			button.onClick.AddListener(Close);
-	}
+		protected Button button;
 
-	public void OnPointerClick (PointerEventData eventData)
-	{
-		if (button == null)
-			Close();
-	}
+		protected void Awake()
+		{
+			button = GetComponent<Button>();
+			if (button != null)
+				button.onClick.AddListener(Close);
+		}
 
-	protected static void Close()
-	{
-		if (UIManager.Last != null)
-			UIManager.Last.Hide();
+		public void OnPointerClick (PointerEventData eventData)
+		{
+			if (button == null)
+				Close();
+		}
+
+		protected static void Close()
+		{
+			if (UIManager.Last != null)
+				UIManager.Last.Hide();
+		}
 	}
 }

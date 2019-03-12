@@ -6,7 +6,7 @@ using System.IO.Compression;
 using System.Linq;
 using UniRx.Async;
 
-namespace Modding.Loaders
+namespace Engine.Modding.Loaders
 {
 	public class ZipModLoader : ModLoader
 	{

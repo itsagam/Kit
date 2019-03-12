@@ -1,10 +1,14 @@
-﻿using UnityEngine;
+﻿using Engine.UI.Widgets;
+using UnityEngine;
 using UnityEngine.UI;
 
-public class ConsoleUI : MonoBehaviour
+namespace Engine
 {
-	public Animator Animator;
-	public ScrollRect LogScroll;
-	public Text LogText;
-	public InputFieldEx CommandInput;
+	public class ConsoleUI : MonoBehaviour
+	{
+		public Animator Animator;
+		public ScrollRect LogScroll;
+		public Text LogText;
+		public InputFieldEx CommandInput;
+	}
 }

@@ -1,7 +1,8 @@
-using System;
-
 #if MODDING
-namespace Modding
+using System;
+using Engine.Parsers;
+
+namespace Engine.Modding
 {
 	public struct ResourceInfo
 	{

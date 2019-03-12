@@ -1,12 +1,15 @@
 using UnityEngine;
 
-public class ObjectList : IconList
+namespace Engine.UI
 {
-    public Object[] Objects;
-
-    public virtual void Start()
+    public class ObjectList : IconList
     {
-        if (Objects != null)
-            Items = Objects;
+        public Object[] Objects;
+
+        public virtual void Start()
+        {
+            if (Objects != null)
+                Items = Objects;
+        }
     }
 }

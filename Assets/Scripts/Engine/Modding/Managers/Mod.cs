@@ -3,12 +3,13 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using Modding.Scripting;
+using Engine.Modding.Scripting;
+using Engine.Parsers;
 using UniRx.Async;
 using UnityEngine;
 using XLua;
 
-namespace Modding
+namespace Engine.Modding
 {
     public class ModMetadata
     {

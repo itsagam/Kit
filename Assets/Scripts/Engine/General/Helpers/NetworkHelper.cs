@@ -1,22 +1,25 @@
 ﻿using System.Net;
 using UnityEngine;
 
-public class NetworkHelper
+namespace Engine
 {
-	public static bool IsConnectedToInternet(bool quick = true)
+	public class NetworkHelper
 	{
-		if (quick)
-			return Application.internetReachability != NetworkReachability.NotReachable;
+		public static bool IsConnectedToInternet(bool quick = true)
+		{
+			if (quick)
+				return Application.internetReachability != NetworkReachability.NotReachable;
 
-		try
-		{
-			using (var client = new WebClient())
-			using (client.OpenRead("http://www.google.com"))
-				return true;
-		}
-		catch
-		{
-			return false;
+			try
+			{
+				using (var client = new WebClient())
+				using (client.OpenRead("http://www.google.com"))
+					return true;
+			}
+			catch
+			{
+				return false;
+			}
 		}
 	}
 }

@@ -1,15 +1,18 @@
 ﻿using UnityEngine;
-using UnityEngine.UI;
 using UnityEngine.EventSystems;
+using UnityEngine.UI;
 
-public class PlayOnClick : MonoBehaviour, IPointerDownHandler
+namespace Engine.UI.Buttons
 {
-	public AudioClip Audio;
-
-	public void OnPointerDown (PointerEventData eventData)
+	public class PlayOnClick : MonoBehaviour, IPointerDownHandler
 	{
-		Button button = GetComponent<Button>();
-		if (button == null || button.IsInteractable())
-			AudioManager.PlayUIEffect(Audio);
+		public AudioClip Audio;
+
+		public void OnPointerDown (PointerEventData eventData)
+		{
+			Button button = GetComponent<Button>();
+			if (button == null || button.IsInteractable())
+				AudioManager.PlayUIEffect(Audio);
+		}
 	}
 }
