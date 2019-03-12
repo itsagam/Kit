@@ -1,6 +1,5 @@
 #if MODDING
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -27,24 +26,27 @@ namespace Engine.Modding.Loaders
 			try
 			{
 				AssetBundle bundle = AssetBundle.LoadFromFile(path);
-				if (bundle != null)
+				if (bundle == null)
 				{
-					AssetBundleMod mod = new AssetBundleMod(bundle);
-					ModMetadata metadata = mod.Load<ModMetadata>(MetadataFile);
-					if (metadata != null)
-					{
-						mod.Metadata = metadata;
-						return mod;
-					}
-					Debugger.Log("ModManager", $"Could not load metadata for mod \"{path}\"");
+					Debugger.Log("ModManager", $"AssetBundle could be loaded for mod \"{path}\"");
+					return null;
 				}
+
+				AssetBundleMod mod = new AssetBundleMod(bundle);
+				ModMetadata metadata = mod.Load<ModMetadata>(MetadataFile);
+				if (metadata == null)
+				{
+					Debugger.Log("ModManager", $"Could not load metadata for mod \"{path}\"");
+					return null;
+				}
+				mod.Metadata = metadata;
+				return mod;
 			}
 			catch (Exception ex)
 			{
 				Debugger.Log("ModManager", $"Error loading mod \"{path}\" – {ex.Message}");
+				return null;
 			}
-
-			return null;
 		}
 
 		public override async UniTask<Mod> LoadModAsync(string path)
@@ -60,23 +62,27 @@ namespace Engine.Modding.Loaders
 			{
 				AssetBundleCreateRequest request = AssetBundle.LoadFromFileAsync(path);
 				await request;
-				if (request.assetBundle != null)
+				if (request.assetBundle == null)
 				{
-					AssetBundleMod mod = new AssetBundleMod(request.assetBundle);
-					ModMetadata metadata = await mod.LoadAsync<ModMetadata>(MetadataFile);
-					if (metadata != null)
-					{
-						mod.Metadata = metadata;
-						return mod;
-					}
-					Debugger.Log("ModManager", $"Could not load metadata for mod \"{path}\"");
+					Debugger.Log("ModManager", $"AssetBundle could be loaded for mod \"{path}\"");
+					return null;
 				}
+
+				AssetBundleMod mod = new AssetBundleMod(request.assetBundle);
+				ModMetadata metadata = await mod.LoadAsync<ModMetadata>(MetadataFile);
+				if (metadata == null)
+				{
+					Debugger.Log("ModManager", $"Could not load metadata for mod \"{path}\"");
+					return null;
+				}
+				mod.Metadata = metadata;
+				return mod;
 			}
 			catch (Exception ex)
 			{
 				Debugger.Log("ModManager", $"Error loading mod \"{path}\" – {ex.Message}");
+				return null;
 			}
-			return null;
 		}
 	}
 

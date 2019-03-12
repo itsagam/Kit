@@ -16,13 +16,14 @@ namespace Engine.Modding.Loaders
 
 			DirectMod mod = new DirectMod(path);
 			ModMetadata metadata = mod.Load<ModMetadata>(MetadataFile);
-			if (metadata != null)
+			if (metadata == null)
 			{
-				mod.Metadata = metadata;
-				return mod;
+				Debugger.Log("ModManager", $"Could not load metadata for mod \"{path}\"");
+				return null;
 			}
-			Debugger.Log("ModManager", $"Could not load metadata for mod \"{path}\"");
-			return null;
+
+			mod.Metadata = metadata;
+			return mod;
 		}
 
 		public override async UniTask<Mod> LoadModAsync(string path)
@@ -33,13 +34,14 @@ namespace Engine.Modding.Loaders
 
 			DirectMod mod = new DirectMod(path);
 			ModMetadata metadata = await mod.LoadAsync<ModMetadata>(MetadataFile);
-			if (metadata != null)
+			if (metadata == null)
 			{
-				mod.Metadata = metadata;
-				return mod;
+				Debugger.Log("ModManager", $"Could not load metadata for mod \"{path}\"");
+				return null;
 			}
-			Debugger.Log("ModManager", $"Could not load metadata for mod \"{path}\"");
-			return null;
+
+			mod.Metadata = metadata;
+			return mod;
 		}
 	}
 

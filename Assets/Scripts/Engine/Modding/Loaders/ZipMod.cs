@@ -27,20 +27,20 @@ namespace Engine.Modding.Loaders
 				archive = ZipFile.OpenRead(path);
 				ZipMod mod = new ZipMod(archive);
 				ModMetadata metadata = mod.Load<ModMetadata>(MetadataFile);
-				if (metadata != null)
+				if (metadata == null)
 				{
-					mod.Metadata = metadata;
-					return mod;
+					Debugger.Log("ModManager", $"Could not load metadata for mod \"{path}\"");
+					return null;
 				}
-				Debugger.Log("ModManager", $"Could not load metadata for mod \"{path}\"");
+				mod.Metadata = metadata;
+				return mod;
 			}
 			catch (Exception ex)
 			{
 				archive?.Dispose();
 				Debugger.Log("ModManager", $"Error loading mod \"{path}\" – {ex.Message}");
+				return null;
 			}
-
-			return null;
 		}
 
 		public override async UniTask<Mod> LoadModAsync(string path)
@@ -58,20 +58,20 @@ namespace Engine.Modding.Loaders
 				archive = ZipFile.OpenRead(path);
 				ZipMod mod = new ZipMod(archive);
 				ModMetadata metadata = await mod.LoadAsync<ModMetadata>(MetadataFile);
-				if (metadata != null)
+				if (metadata == null)
 				{
-					mod.Metadata = metadata;
-					return mod;
+					Debugger.Log("ModManager", $"Could not load metadata for mod \"{path}\"");
+					return null;
 				}
-				Debugger.Log("ModManager", $"Could not load metadata for mod \"{path}\"");
+				mod.Metadata = metadata;
+				return mod;
 			}
 			catch (Exception ex)
 			{
 				archive?.Dispose();
 				Debugger.Log("ModManager", $"Error loading mod \"{path}\" – {ex.Message}");
+				return null;
 			}
-
-			return null;
 		}
 	}
 
