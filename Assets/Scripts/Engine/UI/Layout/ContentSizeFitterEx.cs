@@ -1,7 +1,9 @@
-﻿using Sirenix.OdinInspector.Editor;
-using UnityEditor;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.UI;
+#if UNITY_EDITOR
+using UnityEditor;
+using Sirenix.OdinInspector.Editor;
+#endif
 
 namespace Engine.UI.Layout
 {

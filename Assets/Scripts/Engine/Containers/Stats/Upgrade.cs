@@ -1,25 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Sirenix.OdinInspector.Editor;
-using Sirenix.Utilities.Editor;
 using UniRx;
-using UnityEngine;
 
 namespace Engine.Containers
 {
-#if UNITY_EDITOR
-	public class UpgradeDrawer : OdinValueDrawer<Upgrade>
-	{
-		protected override void DrawPropertyLayout(GUIContent label)
-		{
-			SirenixEditorGUI.BeginToolbarBox(label);
-			CallNextDrawer(null);
-			SirenixEditorGUI.EndToolbarBox();
-		}
-	}
-#endif
-
 	public interface IUpgradeable
 	{
 		ReactiveCollection<Upgrade> GetUpgrades();
