@@ -29,19 +29,19 @@ namespace Engine
 	public static class ResourceManager
 	{
 		#region Fields
-		public static readonly Dictionary<ResourceFolder, string> Paths = new Dictionary<ResourceFolder, string>{
-																													{ ResourceFolder.Data, Application.dataPath                       + "/"},
-																													{ ResourceFolder.StreamingAssets, Application.streamingAssetsPath + "/"},
-																													{ ResourceFolder.PersistentData, Application.persistentDataPath   + "/"},
-																													{ ResourceFolder.Resources, Application.dataPath                  + "/Resources/"}
-																												};
+		public static readonly Dictionary<ResourceFolder, string> Paths = new Dictionary<ResourceFolder, string> {
+			{ ResourceFolder.Data, Application.dataPath                       + "/"},
+			{ ResourceFolder.StreamingAssets, Application.streamingAssetsPath + "/"},
+			{ ResourceFolder.PersistentData, Application.persistentDataPath   + "/"},
+			{ ResourceFolder.Resources, Application.dataPath                  + "/Resources/"}
+		};
 
-		public static readonly List<ResourceParser> Parsers = new List<ResourceParser>{
-																						  new JSONParser(),
-																						  new Texture2DParser(),
-																						  new AudioClipParser(),
-																						  new TextAssetParser()
-																					  };
+		public static readonly List<ResourceParser> Parsers = new List<ResourceParser> {
+			  new JSONParser(),
+			  new Texture2DParser(),
+			  new AudioClipParser(),
+			  new TextAssetParser()
+		};
 
 		public static event Action<ResourceFolder, string, object, bool> ResourceLoaded;
 		public static event Action<ResourceFolder, string> ResourceUnloaded;
@@ -49,8 +49,8 @@ namespace Engine
 		// Default mode for modding in individual calls
 		private const bool DefaultModding = true;
 
-		private static Dictionary<(Type type, ResourceFolder folder, string file), WeakReference> cachedResources
-			= new Dictionary<(Type, ResourceFolder, string), WeakReference>();
+		private static Dictionary<(Type type, ResourceFolder folder, string file), WeakReference> cachedResources =
+			new Dictionary<(Type, ResourceFolder, string), WeakReference>();
 		#endregion
 
 		#region Loading
@@ -707,13 +707,6 @@ namespace Engine
 			}
 		}
 
-		private static void CreateDirectoryForFile(string fullPath)
-		{
-			string directory = Path.GetDirectoryName(fullPath);
-			if (directory != null && !Directory.Exists(directory))
-				Directory.CreateDirectory(directory);
-		}
-
 		public static bool Delete(ResourceFolder folder, string file)
 		{
 			return Delete(GetPath(folder, file));
@@ -750,6 +743,30 @@ namespace Engine
 			return Parsers.Select(parser => (parser, certainty: parser.CanParse(type, fullPath)))
 						  .Where(tuple => tuple.certainty > 0)
 						  .OrderByDescending(tuple => tuple.certainty);
+		}
+
+		public static bool MatchExtension(string path, IEnumerable<string> extensions)
+		{
+			string extracted = Path.GetExtension(path);
+			return extensions.Any(e => e.Equals(extracted, StringComparison.OrdinalIgnoreCase));
+		}
+
+		public static bool MatchExtension(string path, string extension)
+		{
+			string extracted = Path.GetExtension(path);
+			return extension.Equals(extracted, StringComparison.OrdinalIgnoreCase);
+		}
+
+		public static bool ComparePath(string path1, string path2)
+		{
+			return path1.Equals(path2, StringComparison.OrdinalIgnoreCase);
+		}
+
+		public static void CreateDirectoryForFile(string fullPath)
+		{
+			string directory = Path.GetDirectoryName(fullPath);
+			if (directory != null && !Directory.Exists(directory))
+				Directory.CreateDirectory(directory);
 		}
 
 		public static string GetPath(ResourceFolder folder)

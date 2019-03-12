@@ -1,1 +1,1 @@
-print(self:Load("Resources/Textures/test"))
+print("Loaded texture from self Mod 1: " .. self:Load("Resources/Textures/Test.jpg"):ToString())

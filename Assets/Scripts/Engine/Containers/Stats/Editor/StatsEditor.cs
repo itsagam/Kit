@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using Sirenix.OdinInspector;
 using Sirenix.OdinInspector.Editor;
@@ -111,7 +112,7 @@ namespace Engine.Containers.Editor
 						if (SirenixEditorGUI.BeginFadeGroup(isExpanded, isExpanded.Value))
 						{
 							GUIHelper.PushIndentLevel(1);
-							EditorGUILayout.LabelField("Base", baseValue.ToString(), BaseValueStyle);
+							EditorGUILayout.LabelField("Base", baseValue.ToString(CultureInfo.CurrentCulture), BaseValueStyle);
 							SirenixEditorGUI.DrawThickHorizontalSeparator(1, 1);
 							DrawEffects(groups);
 							GUIHelper.PopIndentLevel();

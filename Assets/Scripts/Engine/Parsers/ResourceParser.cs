@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 
 namespace Engine.Parsers
@@ -24,7 +23,7 @@ namespace Engine.Parsers
 			if (SupportedTypes.Any(type.IsAssignableFrom))
 				certainty += 0.5f;
 
-			if (SupportedExtensions.Any(e => string.Compare(Path.GetExtension(path), e) == 0))
+			if (ResourceManager.MatchExtension(path, SupportedExtensions))
 				certainty += 0.5f;
 
 			return certainty;

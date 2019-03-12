@@ -37,6 +37,8 @@ namespace Engine.Modding.Loaders
 
 	public class DirectMod: Mod
 	{
+		public string Path { get; }
+
 		public DirectMod(string path)
 		{
 			Path = path + "/";
@@ -107,20 +109,25 @@ namespace Engine.Modding.Loaders
 				return EnumerableExtensions.One(path);
 
 			if (System.IO.Path.HasExtension(path))
-				return null;
+				return Enumerable.Empty<string>();
 
-			string fullDir = System.IO.Path.GetDirectoryName(fullPath);
-			if (!Directory.Exists(fullDir))
-				return null;
+			// There are three ways to match files without an extension:
+			// 1) Extract the extension of found files and strap it to input path
+			// 2) Extract the directory of input path, and strap it to found filenames
+			// 3) Remove the absolute path part from found file paths
+			// Only the third can correct typos in input path, but since we yield input path if it exists anyway...
 
-			string fullFile = System.IO.Path.GetFileName(fullPath);
-			var matching = Directory.EnumerateFiles(fullDir, $"{fullFile}.*");
-			string relativeDir = System.IO.Path.GetDirectoryName(path);
-
-			if (matching.Any())
-				return matching.Select(p => relativeDir + "/" + System.IO.Path.GetFileName(p));
-
-			return null;
+			try
+			{
+				string fullDir = System.IO.Path.GetDirectoryName(fullPath);
+				string fullFile = System.IO.Path.GetFileName(fullPath);
+				var foundPaths = Directory.EnumerateFiles(fullDir, $"{fullFile}.*");
+				return foundPaths.Select(p => path + System.IO.Path.GetExtension(p));
+			}
+			catch
+			{
+				return Enumerable.Empty<string>();
+			}
 		}
 
 		public override bool Exists(string path)
@@ -128,7 +135,7 @@ namespace Engine.Modding.Loaders
 			return File.Exists(GetFullPath(path));
 		}
 
-		public virtual string GetFullPath(string subPath)
+		public string GetFullPath(string subPath)
 		{
 			return Path + subPath;
 		}

@@ -37,12 +37,12 @@ namespace Engine.Containers
 		public static (EffectType, float) Parse(string str)
 		{
 			(EffectType type, float value) output;
-			if (str.StartsWith("x"))
+			if (str.StartsWith("x", StringComparison.Ordinal))
 			{
 				output.type = EffectType.Multiplier;
 				output.value = System.Convert.ToSingle(str.Substring(1));
 			}
-			else if (str.EndsWith("%"))
+			else if (str.EndsWith("%", StringComparison.Ordinal))
 			{
 				output.type = EffectType.Percentage;
 				output.value = System.Convert.ToSingle(str.Substring(0, str.Length - 1));

@@ -18,18 +18,21 @@ namespace Engine.Modding.Loaders
 			if (attributes.HasFlag(FileAttributes.Directory))
 				return null;
 
-			string fileExtension = Path.GetExtension(path);
-			if (!SupportedExtensions.Contains(fileExtension))
+			if (!ResourceManager.MatchExtension(path, SupportedExtensions))
 				return null;
 
+			ZipArchive archive = null;
 			try
 			{
-				ZipMod mod = new ZipMod(path);
+				archive = ZipFile.OpenRead(path);
+				ZipMod mod = new ZipMod(archive);
 				if (mod.LoadMetadata())
 					return mod;
 			}
-			catch
+			catch (Exception ex)
 			{
+				archive?.Dispose();
+				Debugger.Log("ModManager", $"Error loading mod \"{path}\" – {ex.Message}");
 			}
 
 			return null;
@@ -41,18 +44,21 @@ namespace Engine.Modding.Loaders
 			if (attributes.HasFlag(FileAttributes.Directory))
 				return null;
 
-			string fileExtension = Path.GetExtension(path);
-			if (!SupportedExtensions.Contains(fileExtension))
+			if (!ResourceManager.MatchExtension(path, SupportedExtensions))
 				return null;
 
+			ZipArchive archive = null;
 			try
 			{
-				ZipMod mod = new ZipMod(path);
+				archive = ZipFile.OpenRead(path);
+				ZipMod mod = new ZipMod(archive);
 				if (await mod.LoadMetadataAsync())
 					return mod;
 			}
-			catch
+			catch (Exception ex)
 			{
+				archive?.Dispose();
+				Debugger.Log("ModManager", $"Error loading mod \"{path}\" – {ex.Message}");
 			}
 
 			return null;
@@ -61,14 +67,11 @@ namespace Engine.Modding.Loaders
 
 	public class ZipMod : Mod
 	{
-		public FileStream Stream { get; }
 		public ZipArchive Archive { get; }
 
-		public ZipMod(string path)
+		public ZipMod(ZipArchive archive)
 		{
-			Path = path;
-			Stream = new FileStream(path, FileMode.Open);
-			Archive = new ZipArchive(Stream, ZipArchiveMode.Read);
+			Archive = archive;
 		}
 
 		public override bool Exists(string path)
@@ -148,22 +151,20 @@ namespace Engine.Modding.Loaders
 			if (result != null)
 				return EnumerableExtensions.One(path);
 
-			if (System.IO.Path.HasExtension(path))
-				return null;
+			if (Path.HasExtension(path))
+				return Enumerable.Empty<string>();
 
-			// Name is empty string for directory ZipArchiveEntries and we strip the extension of files to compare with our own
-			var matching = Archive.Entries.Where(e => e.Name != "" && path.Equals(System.IO.Path.ChangeExtension(e.FullName, null), StringComparison.OrdinalIgnoreCase));
-			if (matching.Any())
-				return matching.Select(e => e.FullName);
-
-			return null;
+			// Name is empty string for directory ZipArchiveEntries
+			return Archive.Entries
+			              .Where(entry => entry.Name != "" &&
+										  ResourceManager.ComparePath(path, Path.ChangeExtension(entry.FullName, null)))
+			              .Select(entry => entry.FullName);
 		}
 
 		public override void Unload()
 		{
 			base.Unload();
 			Archive.Dispose();
-			Stream.Dispose();
 		}
 	}
 }

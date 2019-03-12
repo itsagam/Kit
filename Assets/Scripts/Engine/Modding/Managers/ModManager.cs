@@ -21,13 +21,14 @@ namespace Engine.Modding
 
 		public static readonly Dictionary<ModType, ModGroup> Groups = new Dictionary<ModType, ModGroup>();
 		public static readonly List<ModLoader> Loaders = new List<ModLoader>{
-			new DirectModLoader(),
-			new ZipModLoader()
+				new DirectModLoader(),
+				new ZipModLoader(),
+				new AssetBundleModLoader()
 		};
 		public static List<Mod> ActiveMods { get; private set; } = new List<Mod>();
 
 		private static Dictionary<(Type type, ResourceFolder folder, string file), ResourceInfo> cachedResources
-			= new Dictionary<(Type, ResourceFolder, string), ResourceInfo>();
+				= new Dictionary<(Type, ResourceFolder, string), ResourceInfo>();
 		private static Dictionary<ResourceFolder, string> folderToString = new Dictionary<ResourceFolder, string>();
 		#endregion
 

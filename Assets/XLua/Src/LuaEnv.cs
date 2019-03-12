@@ -11,6 +11,8 @@ using LuaAPI = UniLua.Lua;
 using RealStatePtr = UniLua.ILuaState;
 using LuaCSFunction = UniLua.CSharpFunctionDelegate;
 #else
+using System;
+using System.Collections.Generic;
 using LuaAPI = XLua.LuaDLL.Lua;
 using RealStatePtr = System.IntPtr;
 using LuaCSFunction = XLua.LuaDLL.lua_CSFunction;
@@ -19,9 +21,6 @@ using LuaCSFunction = XLua.LuaDLL.lua_CSFunction;
 
 namespace XLua
 {
-    using System;
-    using System.Collections.Generic;
-
     public class LuaEnv : IDisposable
     {
         public const string CSHARP_NAMESPACE = "xlua_csharp_namespace";
@@ -359,7 +358,7 @@ namespace XLua
 #endif
         }
 
-        //兼容API
+        //录忙脠脻API
         public void GC()
         {
             Tick();
@@ -411,7 +410,7 @@ namespace XLua
                 {
                     throw new InvalidOperationException("try to dispose a LuaEnv with C# callback!");
                 }
-                
+
                 ObjectTranslatorPool.Instance.Remove(L);
 
                 LuaAPI.lua_close(L);
@@ -462,7 +461,7 @@ namespace XLua
             }
         }
 
-        private string init_xlua = @" 
+        private string init_xlua = @"
             local metatable = {}
             local rawget = rawget
             local setmetatable = setmetatable
@@ -470,7 +469,7 @@ namespace XLua
             local import_generic_type = xlua.import_generic_type
             local load_assembly = xlua.load_assembly
 
-            function metatable:__index(key) 
+            function metatable:__index(key)
                 local fqn = rawget(self,'.fqn')
                 fqn = ((fqn and fqn .. '.') or '') .. key
 
@@ -581,7 +580,7 @@ namespace XLua
                 impl.UnderlyingSystemType = parent[name].UnderlyingSystemType
                 rawset(parent, name, impl)
             end
-            
+
             local base_mt = {
                 __index = function(t, k)
                     local csobj = t['__csobj']
@@ -600,8 +599,8 @@ namespace XLua
 
         internal List<CustomLoader> customLoaders = new List<CustomLoader>();
 
-        //loader : CustomLoader， filepath参数：（ref类型）输入是require的参数，如果需要支持调试，需要输出真实路径。
-        //                        返回值：如果返回null，代表加载该源下无合适的文件，否则返回UTF8编码的byte[]
+        //loader : CustomLoader拢卢 filepath虏脦脢媒拢潞拢篓ref脌脿脨脥拢漏脢盲脠毛脢脟require碌脛虏脦脢媒拢卢脠莽鹿没脨猫脪陋脰搂鲁脰碌梅脢脭拢卢脨猫脪陋脢盲鲁枚脮忙脢碌脗路戮露隆拢
+        //                        路碌禄脴脰碌拢潞脠莽鹿没路碌禄脴null拢卢麓煤卤铆录脫脭脴赂脙脭麓脧脗脦脼潞脧脢脢碌脛脦脛录镁拢卢路帽脭貌路碌禄脴UTF8卤脿脗毛碌脛byte[]
         public void AddLoader(CustomLoader loader)
         {
             customLoaders.Add(loader);
@@ -618,9 +617,9 @@ namespace XLua
             buildin_initer.Add(name, initer);
         }
 
-        //The garbage-collector pause controls how long the collector waits before starting a new cycle. 
-        //Larger values make the collector less aggressive. Values smaller than 100 mean the collector 
-        //will not wait to start a new cycle. A value of 200 means that the collector waits for the total 
+        //The garbage-collector pause controls how long the collector waits before starting a new cycle.
+        //Larger values make the collector less aggressive. Values smaller than 100 mean the collector
+        //will not wait to start a new cycle. A value of 200 means that the collector waits for the total
         //memory in use to double before starting a new cycle.
         public int GcPause
         {
@@ -650,10 +649,10 @@ namespace XLua
             }
         }
 
-        //The step multiplier controls the relative speed of the collector relative to memory allocation. 
-        //Larger values make the collector more aggressive but also increase the size of each incremental 
-        //step. Values smaller than 100 make the collector too slow and can result in the collector never 
-        //finishing a cycle. The default, 200, means that the collector runs at "twice" the speed of memory 
+        //The step multiplier controls the relative speed of the collector relative to memory allocation.
+        //Larger values make the collector more aggressive but also increase the size of each incremental
+        //step. Values smaller than 100 make the collector too slow and can result in the collector never
+        //finishing a cycle. The default, 200, means that the collector runs at "twice" the speed of memory
         //allocation.
         public int GcStepmul
         {

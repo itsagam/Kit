@@ -36,7 +36,6 @@ namespace Engine.Modding
 		private static YieldInstruction gcYield = new WaitForSeconds(GCInterval);
 
 		public ModGroup Group { get; set; }
-		public string Path { get;  protected set; }
 		public ModMetadata Metadata { get; protected set; }
 
 		public abstract IEnumerable<string> FindFiles(string path);
@@ -62,8 +61,9 @@ namespace Engine.Modding
 				Metadata = JSONParser.FromJson<ModMetadata>(metadataText);
 				return true;
 			}
-			catch
+			catch (Exception ex)
 			{
+				Debugger.Log("ModManager", $"Error parsing mod metadata – {ex.Message}");
 				return false;
 			}
 		}
@@ -79,8 +79,9 @@ namespace Engine.Modding
 				Metadata = JSONParser.FromJson<ModMetadata>(metadataText);
 				return true;
 			}
-			catch
+			catch (Exception ex)
 			{
+				Debugger.Log("ModManager", $"Error parsing mod metadata – {ex.Message}");
 				return false;
 			}
 		}
@@ -120,14 +121,10 @@ namespace Engine.Modding
 		public virtual (object reference, string filePath, ResourceParser parser) LoadEx(Type type, string path)
 		{
 			var matchingFiles = FindFiles(path);
-			if (matchingFiles == null)
-				return default;
-
 			var certainties = RankParsers(type, matchingFiles);
 			string text = null;
 			byte[] bytes = null;
 			foreach (var (filePath, parser, _) in certainties)
-			{
 				try
 				{
 					if (parser.ParseMode == ParseMode.Binary)
@@ -154,7 +151,6 @@ namespace Engine.Modding
 				catch
 				{
 				}
-			}
 
 			return default;
 		}
@@ -192,14 +188,10 @@ namespace Engine.Modding
 		public virtual async UniTask<(object reference, string filePath, ResourceParser parser)> LoadExAsync(Type type, string path)
 		{
 			var matchingFiles = FindFiles(path);
-			if (matchingFiles == null)
-				return default;
-
 			var certainties = RankParsers(type, matchingFiles);
 			string text = null;
 			byte[] bytes = null;
 			foreach (var (filePath, parser, _) in certainties)
-			{
 				try
 				{
 					if (parser.ParseMode == ParseMode.Binary)
@@ -226,12 +218,11 @@ namespace Engine.Modding
 				catch
 				{
 				}
-			}
 
 			return default;
 		}
 
-		protected IEnumerable<(string filePath, ResourceParser parser, float certainty)> RankParsers(Type type, IEnumerable<string> files)
+		protected static IEnumerable<(string filePath, ResourceParser parser, float certainty)> RankParsers(Type type, IEnumerable<string> files)
 		{
 			return files
 			      .SelectMany(filePath => ResourceManager.Parsers.Select(parser => (filePath, parser, certainty: parser.CanParse(type, filePath))))

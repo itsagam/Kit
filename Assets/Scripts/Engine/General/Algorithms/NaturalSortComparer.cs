@@ -54,10 +54,10 @@ namespace Engine.Algorithms
 		private static int PartCompare(string left, string right)
 		{
 			if (!int.TryParse(left, out int x))
-				return left.CompareTo(right);
+				return string.Compare(left, right, StringComparison.Ordinal);
 
 			if (!int.TryParse(right, out int y))
-				return left.CompareTo(right);
+				return string.Compare(left, right, StringComparison.Ordinal);
 
 			return x.CompareTo(y);
 		}
