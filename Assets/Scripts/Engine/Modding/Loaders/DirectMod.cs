@@ -15,9 +15,13 @@ namespace Engine.Modding.Loaders
 				return null;
 
 			DirectMod mod = new DirectMod(path);
-			if (mod.LoadMetadata())
+			ModMetadata metadata = mod.Load<ModMetadata>(MetadataFile);
+			if (metadata != null)
+			{
+				mod.Metadata = metadata;
 				return mod;
-
+			}
+			Debugger.Log("ModManager", $"Could not load metadata for mod \"{path}\"");
 			return null;
 		}
 
@@ -28,9 +32,13 @@ namespace Engine.Modding.Loaders
 				return null;
 
 			DirectMod mod = new DirectMod(path);
-			if (await mod.LoadMetadataAsync())
+			ModMetadata metadata = await mod.LoadAsync<ModMetadata>(MetadataFile);
+			if (metadata != null)
+			{
+				mod.Metadata = metadata;
 				return mod;
-
+			}
+			Debugger.Log("ModManager", $"Could not load metadata for mod \"{path}\"");
 			return null;
 		}
 	}

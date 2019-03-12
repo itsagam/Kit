@@ -3,6 +3,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices;
 using Engine.Modding.Scripting;
 using Engine.Parsers;
 using UniRx.Async;
@@ -31,12 +32,11 @@ namespace Engine.Modding
 	public abstract class Mod
 	{
 		#region Fields
-		public const string MetadataFile = "Metadata.json";
 		public const float GCInterval = 1.0f;
 		private static YieldInstruction gcYield = new WaitForSeconds(GCInterval);
 
 		public ModGroup Group { get; set; }
-		public ModMetadata Metadata { get; protected set; }
+		public ModMetadata Metadata { get; set; }
 
 		public abstract IEnumerable<string> FindFiles(string path);
 		public abstract bool Exists(string path);
@@ -47,44 +47,6 @@ namespace Engine.Modding
 
 		public LuaEnv ScriptEnv { get; protected set; }
 		public SimpleDispatcher ScriptDispatcher { get; protected set; }
-		#endregion
-
-		#region Initialization
-		public bool LoadMetadata()
-		{
-			try
-			{
-				string metadataText = ReadText(MetadataFile);
-				if (metadataText == null)
-					return false;
-
-				Metadata = JSONParser.FromJson<ModMetadata>(metadataText);
-				return true;
-			}
-			catch (Exception ex)
-			{
-				Debugger.Log("ModManager", $"Error parsing mod metadata – {ex.Message}");
-				return false;
-			}
-		}
-
-		public async UniTask<bool> LoadMetadataAsync()
-		{
-			try
-			{
-				string metadataText = await ReadTextAsync(MetadataFile);
-				if (metadataText == null)
-					return false;
-
-				Metadata = JSONParser.FromJson<ModMetadata>(metadataText);
-				return true;
-			}
-			catch (Exception ex)
-			{
-				Debugger.Log("ModManager", $"Error parsing mod metadata – {ex.Message}");
-				return false;
-			}
-		}
 		#endregion
 
 		#region Resources

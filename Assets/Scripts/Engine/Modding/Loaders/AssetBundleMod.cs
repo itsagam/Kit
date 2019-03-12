@@ -7,6 +7,7 @@ using System.Linq;
 using Engine.Parsers;
 using UniRx.Async;
 using UnityEngine;
+using Object = UnityEngine.Object;
 
 namespace Engine.Modding.Loaders
 {
@@ -29,8 +30,13 @@ namespace Engine.Modding.Loaders
 				if (bundle != null)
 				{
 					AssetBundleMod mod = new AssetBundleMod(bundle);
-					if (mod.LoadMetadata())
+					ModMetadata metadata = mod.Load<ModMetadata>(MetadataFile);
+					if (metadata != null)
+					{
+						mod.Metadata = metadata;
 						return mod;
+					}
+					Debugger.Log("ModManager", $"Could not load metadata for mod \"{path}\"");
 				}
 			}
 			catch (Exception ex)
@@ -52,26 +58,24 @@ namespace Engine.Modding.Loaders
 
 			try
 			{
-				AssetBundle bundle = null;
-				await LoadLocal();
-				IEnumerator LoadLocal()
+				AssetBundleCreateRequest request = AssetBundle.LoadFromFileAsync(path);
+				await request;
+				if (request.assetBundle != null)
 				{
-					AssetBundleCreateRequest request = AssetBundle.LoadFromFileAsync(path);
-					yield return request;
-					bundle = request.assetBundle;
-				}
-				if (bundle != null)
-				{
-					AssetBundleMod mod = new AssetBundleMod(bundle);
-					if (await mod.LoadMetadataAsync())
+					AssetBundleMod mod = new AssetBundleMod(request.assetBundle);
+					ModMetadata metadata = await mod.LoadAsync<ModMetadata>(MetadataFile);
+					if (metadata != null)
+					{
+						mod.Metadata = metadata;
 						return mod;
+					}
+					Debugger.Log("ModManager", $"Could not load metadata for mod \"{path}\"");
 				}
 			}
 			catch (Exception ex)
 			{
 				Debugger.Log("ModManager", $"Error loading mod \"{path}\" – {ex.Message}");
 			}
-
 			return null;
 		}
 	}
@@ -87,12 +91,18 @@ namespace Engine.Modding.Loaders
 
 		public override (object reference, string filePath, ResourceParser parser) LoadEx(Type type, string path)
 		{
+			// If input type is UnityEngine.Object, load the asset from bundle locally otherwise try to parse
+			return typeof(Object).IsAssignableFrom(type) ? LoadUnityObject(type, path) : base.LoadEx(type, path);
+		}
+
+		private (object reference, string filePath, ResourceParser parser) LoadUnityObject(Type type, string path)
+		{
 			try
 			{
 				string matchingFile = FindFiles(path).First();
 				object reference = Bundle.LoadAsset(matchingFile, type);
 				if (reference != null)
-					return (reference, path, null);
+					return (reference, matchingFile, null);
 			}
 			catch
 			{
@@ -100,51 +110,49 @@ namespace Engine.Modding.Loaders
 			return default;
 		}
 
-		public override async UniTask<(object reference, string filePath, ResourceParser parser)> LoadExAsync(Type type, string path)
+
+		public override UniTask<(object reference, string filePath, ResourceParser parser)> LoadExAsync(Type type, string path)
 		{
-			object reference = null;
+			return typeof(Object).IsAssignableFrom(type) ? LoadUnityObjectAsync(type, path) : base.LoadExAsync(type, path);
+		}
+
+		private async UniTask<(object reference, string filePath, ResourceParser parser)> LoadUnityObjectAsync(Type type, string path)
+		{
 			try
 			{
-				await LoadLocal();
-				IEnumerator LoadLocal()
-				{
-					string matchingFile = FindFiles(path).First();
-					AssetBundleRequest request = Bundle.LoadAssetAsync(matchingFile);
-					yield return request;
-					reference = request.asset;
-				}
+				string matchingFile = FindFiles(path).First();
+				AssetBundleRequest request = Bundle.LoadAssetAsync(matchingFile, type);
+				await request;
+				if (request.asset != null)
+					return (request.asset, matchingFile, null);
 			}
 			catch
 			{
 			}
-
-			if (reference != null)
-				return (reference, path, null);
-
 			return default;
 		}
 
 		public override string ReadText(string path)
 		{
-			TextAsset textAsset = (TextAsset) LoadEx(typeof(TextAsset), path).reference;
+			TextAsset textAsset = (TextAsset) LoadUnityObject(typeof(TextAsset), path).reference;
 			return textAsset != null ? textAsset.text : null;
 		}
 
 		public override async UniTask<string> ReadTextAsync(string path)
 		{
-			TextAsset textAsset = (TextAsset) (await LoadExAsync(typeof(TextAsset), path)).reference;
+			TextAsset textAsset = (TextAsset) (await LoadUnityObjectAsync(typeof(TextAsset), path)).reference;
 			return textAsset != null ? textAsset.text : null;
 		}
 
 		public override byte[] ReadBytes(string path)
 		{
-			TextAsset textAsset = (TextAsset) LoadEx(typeof(TextAsset), path).reference;
+			TextAsset textAsset = (TextAsset) LoadUnityObject(typeof(TextAsset), path).reference;
 			return textAsset != null ? textAsset.bytes : null;
 		}
 
 		public override async UniTask<byte[]> ReadBytesAsync(string path)
 		{
-			TextAsset textAsset = (TextAsset) (await LoadExAsync(typeof(TextAsset), path)).reference;
+			TextAsset textAsset = (TextAsset) (await LoadUnityObjectAsync(typeof(TextAsset), path)).reference;
 			return textAsset != null ? textAsset.bytes : null;
 		}
 
@@ -157,8 +165,8 @@ namespace Engine.Modding.Loaders
 			if (Path.HasExtension(path))
 				return Enumerable.Empty<string>();
 
-			var assetNames = Bundle.GetAllAssetNames();
-			return assetNames.Where(name => ResourceManager.ComparePath(path, Path.ChangeExtension(name, null)));
+			return Bundle.GetAllAssetNames()
+			             .Where(assetPath => ResourceManager.ComparePath(path, Path.ChangeExtension(assetPath, null)));
 		}
 
 		public override bool Exists(string path)
@@ -166,10 +174,12 @@ namespace Engine.Modding.Loaders
 			return Bundle.Contains(GetAssetPath(path));
 		}
 
-		// AssetBundle paths include "Assets/" and file extensions
-		public static string GetAssetPath(string path)
+		// AssetBundle paths include "Assets/" and file extensions. We add "Assets/" to path if it doesn't already contain it
+		// because when we load non-UnityObjects LoadEx -> FindFiles -> ReadText -> LoadUnityObject -> FindFiles can create a
+		// chain of commands where "Assets/" is appended multiple times.
+		private static string GetAssetPath(string path)
 		{
-			return "Assets/" + path;
+			return path.StartsWith("Assets/", StringComparison.OrdinalIgnoreCase) ? path : "Assets/" + path;
 		}
 
 		public override void Unload()

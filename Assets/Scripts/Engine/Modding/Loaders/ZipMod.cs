@@ -26,8 +26,13 @@ namespace Engine.Modding.Loaders
 			{
 				archive = ZipFile.OpenRead(path);
 				ZipMod mod = new ZipMod(archive);
-				if (mod.LoadMetadata())
+				ModMetadata metadata = mod.Load<ModMetadata>(MetadataFile);
+				if (metadata != null)
+				{
+					mod.Metadata = metadata;
 					return mod;
+				}
+				Debugger.Log("ModManager", $"Could not load metadata for mod \"{path}\"");
 			}
 			catch (Exception ex)
 			{
@@ -52,8 +57,13 @@ namespace Engine.Modding.Loaders
 			{
 				archive = ZipFile.OpenRead(path);
 				ZipMod mod = new ZipMod(archive);
-				if (await mod.LoadMetadataAsync())
+				ModMetadata metadata = await mod.LoadAsync<ModMetadata>(MetadataFile);
+				if (metadata != null)
+				{
+					mod.Metadata = metadata;
 					return mod;
+				}
+				Debugger.Log("ModManager", $"Could not load metadata for mod \"{path}\"");
 			}
 			catch (Exception ex)
 			{

@@ -18,7 +18,7 @@ namespace Engine
 {
 	public static class Console
 	{
-		public static bool Enabled = true;
+		public static bool Enabled = false;
 		public static int Length = 10000;
 		public static int Depth = 2;
 		private const string Prefab = "Console/Console";
