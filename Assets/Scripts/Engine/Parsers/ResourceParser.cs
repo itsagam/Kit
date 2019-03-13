@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 
 namespace Engine.Parsers
@@ -12,8 +11,8 @@ namespace Engine.Parsers
 
 	public abstract class ResourceParser
 	{
-		public abstract IEnumerable<Type> SupportedTypes { get; }
-		public abstract IEnumerable<string> SupportedExtensions { get; }
+		public abstract Type[] SupportedTypes { get; }
+		public abstract string[] SupportedExtensions { get; }
 		public abstract ParseMode ParseMode { get; }
 
 		public virtual float CanParse(Type type, string path)

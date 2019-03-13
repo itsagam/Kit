@@ -27,8 +27,8 @@ namespace Engine.Modding
 		};
 		public static List<Mod> ActiveMods { get; private set; } = new List<Mod>();
 
-		private static Dictionary<(Type type, ResourceFolder folder, string file), ResourceInfo> cachedResources
-				= new Dictionary<(Type, ResourceFolder, string), ResourceInfo>();
+		private static Dictionary<(Type type, ResourceFolder folder, string file), ResourceInfo> cachedResources =
+				new Dictionary<(Type, ResourceFolder, string), ResourceInfo>();
 		private static Dictionary<ResourceFolder, string> folderToString = new Dictionary<ResourceFolder, string>();
 		#endregion
 
@@ -188,7 +188,7 @@ namespace Engine.Modding
 			if (!mod.Group.Deactivatable)
 				return;
 
-			PlayerPrefs.SetInt($"{mod.Group.Name}/{mod.Metadata.Name}.Enabled", value ? 1 : 0);
+			PlayerPrefs.SetInt(GetModKey(mod, "Enabled"), value ? 1 : 0);
 			RefreshActiveMods();
 		}
 
@@ -196,7 +196,7 @@ namespace Engine.Modding
 		{
 			if (!mod.Group.Deactivatable)
 				return true;
-			return PlayerPrefs.GetInt($"{mod.Group.Name}/{mod.Metadata.Name}.Enabled", 1) == 1;
+			return PlayerPrefs.GetInt(GetModKey(mod, "Enabled"), 1) == 1;
 		}
 
 		public static int GetModOrder(Mod mod)
@@ -245,35 +245,30 @@ namespace Engine.Modding
 
 		private static void LoadModOrder()
 		{
-			foreach (var kvp in Groups)
-			{
-				ModGroup group = kvp.Value;
+			// Reversing the list makes sure new mods (whose entries we do not have and will have all the same value -1)
+			// are ordered in reverse (newer on top)
+			foreach (ModGroup group in Groups.Values)
 				if (group.Reorderable)
-				{
-					// Reversing the list makes sure new mods (whose entries we do not have and will have all the same value -1)
-					// are ordered in reverse (newer on top)
 					group.Mods = group.Mods.AsEnumerable()
-						.Reverse()
-						.OrderBy(m => PlayerPrefs.GetInt($"{group.Name}/{m.Metadata.Name}.Order", -1))
-						.ToList();
-				}
-			}
+									  .Reverse()
+									  .OrderBy(mod => PlayerPrefs.GetInt(GetModKey(mod, "Order"), -1))
+									  .ToList();
 		}
 
 		private static void SaveModOrder()
 		{
 			foreach (ModGroup group in Groups.Values)
-			{
 				if (group.Reorderable)
-				{
 					for (int i = 0; i < group.Mods.Count; i++)
-					{
-						Mod mod = group.Mods[i];
-						PlayerPrefs.SetInt($"{group.Name}/{mod.Metadata.Name}.Order", i);
-					}
-				}
-			}
+						PlayerPrefs.SetInt(GetModKey(group.Mods[i], "Order"), i);
 		}
+
+
+		private static string GetModKey(Mod mod, string property)
+		{
+			return $"{mod.Group.Name}/{mod.Metadata.Name}.{property}";
+		}
+
 		#endregion
 
 		#region Resource-loading

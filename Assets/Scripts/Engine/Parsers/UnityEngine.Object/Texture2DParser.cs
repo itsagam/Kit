@@ -1,27 +1,13 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.IO;
 using UnityEngine;
 
 namespace Engine.Parsers
 {
 	public class Texture2DParser : ResourceParser
 	{
-		public override IEnumerable<Type> SupportedTypes
-		{
-			get
-			{
-				yield return typeof(Texture2D);
-			}
-		}
-		public override IEnumerable<string> SupportedExtensions
-		{
-			get
-			{
-				yield return ".jpg";
-				yield return ".jpeg";
-				yield return ".png";
-			}
-		}
+		public override Type[] SupportedTypes { get; } = { typeof(Texture2D) };
+		public override string[] SupportedExtensions { get; } = { ".jpg", ".jpeg", ".png" };
 		public override ParseMode ParseMode => ParseMode.Binary;
 
 		public override object Read(Type type, object data, string path = null)
@@ -31,6 +17,26 @@ namespace Engine.Parsers
 			if (path != null)
 				texture.name = path;
 			return texture;
+		}
+
+		public override object Write(object data, string path = null)
+		{
+			Texture2D texture = (Texture2D) data;
+			string extension = Path.GetExtension(path);
+			switch (extension)
+			{
+				case ".png":
+					return texture.EncodeToPNG();
+
+				case ".exr":
+					return texture.EncodeToEXR();
+
+				case ".tga":
+					return texture.EncodeToTGA();
+
+				default:
+					return texture.EncodeToJPG();
+			}
 		}
 	}
 }

@@ -28,7 +28,7 @@ namespace Engine.Modding.Loaders
 				AssetBundle bundle = AssetBundle.LoadFromFile(path);
 				if (bundle == null)
 				{
-					Debugger.Log("ModManager", $"AssetBundle could be loaded for mod \"{path}\"");
+					Debugger.Log("ModManager", $"AssetBundle could not be loaded for mod \"{path}\"");
 					return null;
 				}
 
@@ -64,7 +64,7 @@ namespace Engine.Modding.Loaders
 				await request;
 				if (request.assetBundle == null)
 				{
-					Debugger.Log("ModManager", $"AssetBundle could be loaded for mod \"{path}\"");
+					Debugger.Log("ModManager", $"AssetBundle could not be loaded for mod \"{path}\"");
 					return null;
 				}
 

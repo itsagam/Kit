@@ -1,20 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using Newtonsoft.Json;
 
 namespace Engine.Parsers
 {
 	public class JSONParser : ResourceParser
 	{
-		public override IEnumerable<Type> SupportedTypes => Enumerable.Empty<Type>();
-		public override IEnumerable<string> SupportedExtensions
-		{
-			get
-			{
-				yield return ".json";
-			}
-		}
+		public override Type[] SupportedTypes { get; } = { };
+		public override string[] SupportedExtensions { get; } = { ".json" };
 		public override ParseMode ParseMode => ParseMode.Text;
 
 		public override object Read(Type type, object data, string path = null)
@@ -24,18 +16,15 @@ namespace Engine.Parsers
 
 		public override object Write(object data, string path = null)
 		{
-			return ToJson(data);
+			return JsonConvert.SerializeObject(data, Formatting.Indented);
 		}
 
 		public override void Merge(object current, object overwrite)
 		{
-			OverwriteJson(current, (string) overwrite);
+			JsonConvert.PopulateObject((string) overwrite, current);
 		}
 
-
-
-
-
+		// Static functions
 		public static T FromJson<T>(string json)
 		{
 			return JsonConvert.DeserializeObject<T>(json);
@@ -43,12 +32,7 @@ namespace Engine.Parsers
 
 		public static string ToJson(object data)
 		{
-			return JsonConvert.SerializeObject(data);
-		}
-
-		public static void OverwriteJson(object data, string overwrite)
-		{
-			JsonConvert.PopulateObject(overwrite, data);
+			return JsonConvert.SerializeObject(data, Formatting.Indented);
 		}
 	}
 }

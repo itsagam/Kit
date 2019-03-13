@@ -594,34 +594,36 @@ namespace Engine
 		public static bool Save(string fullPath, object contents)
 		{
 			foreach (var (parser, _) in RankParsers(contents.GetType(), fullPath))
-			{
 				try
 				{
-					return parser.ParseMode == ParseMode.Text ?
-							   SaveText(fullPath, (string) parser.Write(contents)) :
-							   SaveBytes(fullPath, (byte[]) parser.Write(contents));
+					object output = parser.Write(contents, fullPath);
+					if (output != null)
+						return parser.ParseMode == ParseMode.Text ?
+								   SaveText(fullPath, (string) output) :
+								   SaveBytes(fullPath, (byte[]) output);
 				}
-				catch (Exception)
+				catch
 				{
 				}
-			}
+
 			return false;
 		}
 
 		public static UniTask<bool> SaveAsync(string fullPath, object contents)
 		{
 			foreach (var (parser, _) in RankParsers(contents.GetType(), fullPath))
-			{
 				try
 				{
-					return parser.ParseMode == ParseMode.Text ?
-							   SaveTextAsync(fullPath, (string) parser.Write(contents)) :
-							   SaveBytesAsync(fullPath, (byte[]) parser.Write(contents));
+					object output = parser.Write(contents, fullPath);
+					if (output != null)
+						return parser.ParseMode == ParseMode.Text ?
+								   SaveTextAsync(fullPath, (string) output) :
+								   SaveBytesAsync(fullPath, (byte[]) output);
 				}
-				catch (Exception)
+				catch
 				{
 				}
-			}
+
 			return UniTask.FromResult(false);
 		}
 

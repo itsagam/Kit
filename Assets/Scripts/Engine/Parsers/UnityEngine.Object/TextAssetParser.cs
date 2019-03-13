@@ -1,25 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
 using UnityEngine;
 
 namespace Engine.Parsers
 {
 	public class TextAssetParser : ResourceParser
 	{
-		public override IEnumerable<Type> SupportedTypes
-		{
-			get
-			{
-				yield return typeof(TextAsset);
-			}
-		}
-		public override IEnumerable<string> SupportedExtensions
-		{
-			get
-			{
-				yield return ".txt";
-			}
-		}
+		public override Type[] SupportedTypes { get; } = { typeof(TextAsset) };
+		public override string[] SupportedExtensions { get; } = { ".txt" };
 		public override ParseMode ParseMode => ParseMode.Text;
 
 		public override object Read(Type type, object data, string path = null)
@@ -28,6 +15,11 @@ namespace Engine.Parsers
 			if (path != null)
 				asset.name = path;
 			return asset;
+		}
+
+		public override object Write(object data, string path = null)
+		{
+			return ((TextAsset) data).text;
 		}
 	}
 }

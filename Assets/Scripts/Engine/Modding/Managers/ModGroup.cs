@@ -9,7 +9,7 @@ namespace Engine.Modding
 		Mod
 	}
 
-	public struct ModGroup
+	public class ModGroup
 	{
 		public ModType Name;
 		public string Path;

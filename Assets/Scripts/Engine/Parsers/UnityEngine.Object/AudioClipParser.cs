@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using UnityEngine;
 
 // Use UnityWebRequest to decode audio data
@@ -17,20 +16,8 @@ namespace Engine.Parsers
 {
 	public class AudioClipParser : ResourceParser
 	{
-		public override IEnumerable<Type> SupportedTypes
-		{
-			get
-			{
-				yield return typeof(AudioClip);
-			}
-		}
-		public override IEnumerable<string> SupportedExtensions
-		{
-			get
-			{
-				yield return ".wav";
-			}
-		}
+		public override Type[] SupportedTypes { get; } = { typeof(AudioClip) };
+		public override string[] SupportedExtensions { get; } = { ".wav" };
 		public override ParseMode ParseMode => ParseMode.Binary;
 
 		public override object Read(Type type, object data, string path = null)

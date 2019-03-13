@@ -24,9 +24,12 @@ namespace Engine.UI.Modding
 		public float RecolorTime = 0.35f;
 		public float ReorderTime = 0.35f;
 
+		protected Transform transformCached;
+
 #if MODDING
 		protected void Awake()
 		{
+			transformCached = transform;
 			EnableToggle.OnValueChanged.AddListener(Toggle);
 			MoveUpButton.onClick.AddListener(MoveUp);
 			MoveDownButton.onClick.AddListener(MoveDown);
@@ -54,35 +57,37 @@ namespace Engine.UI.Modding
 		protected void MoveUp()
 		{
 			ModManager.MoveModUp(Mod);
-			Move(transform.GetSiblingIndex() - 1);
+			Move(transformCached.GetSiblingIndex() - 1);
 		}
 
 		protected void MoveDown()
 		{
 			ModManager.MoveModDown(Mod);
-			Move(transform.GetSiblingIndex() + 1);
+			Move(transformCached.GetSiblingIndex() + 1);
 		}
 
 		protected void Move(int toIndex)
 		{
-			Transform toTransform = transform.parent.GetChild(toIndex);
+			Transform toTransform = transformCached.parent.GetChild(toIndex);
+			int fromIndex = transformCached.GetSiblingIndex();
 
-			transform.SetSiblingIndex(toIndex);
 			Sequence sequence = DOTween.Sequence();
-			sequence.Insert(0, transform.DOMove(toTransform.position, ReorderTime));
-			sequence.Insert(0, toTransform.DOMove(transform.position, ReorderTime));
-			sequence.InsertCallback(ReorderTime / 2.0f, () =>
-														{
-															RefreshInteractable();
-															toTransform.GetComponent<ModIcon>().RefreshInteractable();
-														});
+			sequence.Insert(0, transformCached.DOMove(toTransform.position, ReorderTime));
+			sequence.Insert(0, toTransform.DOMove(transformCached.position, ReorderTime));
+			sequence.InsertCallback(ReorderTime / 2.0f,
+									() =>
+									{
+										SetInteractable(toIndex);
+										toTransform.GetComponent<ModIcon>().SetInteractable(fromIndex);
+									});
+			sequence.OnComplete(() => transformCached.SetSiblingIndex(toIndex));
 			ModWindow.SetDirty();
 		}
 
-		public void RefreshInteractable()
+		public void SetInteractable(int index)
 		{
-			MoveUpButton.SetInteractableImmediate(!transform.IsFirstSibling());
-			MoveDownButton.SetInteractableImmediate(!transform.IsLastSibling());
+			MoveUpButton.SetInteractableImmediate(index != 0);
+			MoveDownButton.SetInteractableImmediate(index < transformCached.parent.childCount - 1);
 		}
 
 		protected void Toggle(bool value)

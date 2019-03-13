@@ -152,6 +152,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a9741d94d97fe8d4baba072d570b3019, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  Texture: {fileID: 2800000, guid: 7b18555a065b3184c8e4855206ed5aa7, type: 3}
+  Text: {fileID: 4900000, guid: 32835ea5052cae644a359d1de7569c27, type: 3}
 --- !u!20 &225321743
 Camera:
   m_ObjectHideFlags: 0

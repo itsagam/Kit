@@ -34,7 +34,7 @@ namespace Engine.UI.Modding
 				return;
 
 			PlayerPrefs.Save();
-			UIManager.Show(Game.Windows.Message, "Some changes will not be reflected until you restart the application.");
+			//UIManager.Show(Game.Windows.Message, "Some changes will not be reflected until you restart the application.");
 		}
 
 		public static void SetDirty()
