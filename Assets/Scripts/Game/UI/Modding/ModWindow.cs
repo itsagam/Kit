@@ -15,6 +15,7 @@ namespace Game.UI.Modding
 
 #if MODDING
 		public bool IsDirty { get; set; }
+		public bool IsAnimating { get; set; }
 
 		protected override void Awake()
 		{
@@ -37,11 +38,6 @@ namespace Game.UI.Modding
 
 			PlayerPrefs.Save();
 			UIManager.Show(Windows.Message, "Some changes will not be reflected until you restart the application.");
-		}
-
-		public static void SetDirty()
-		{
-			UIManager.Find<ModWindow>().IsDirty = true;
 		}
 #endif
 	}

@@ -26,11 +26,13 @@ namespace Game.UI.Modding
 		public float RecolorTime = 0.35f;
 		public float ReorderTime = 0.35f;
 
+#if MODDING
+		protected ModWindow window;
 		protected Transform transformCached;
 
-#if MODDING
 		protected void Awake()
 		{
+			window = GetComponentInParent<ModWindow>();
 			transformCached = transform;
 			EnableToggle.OnValueChanged.AddListener(Toggle);
 			MoveUpButton.onClick.AddListener(MoveUp);
@@ -70,33 +72,39 @@ namespace Game.UI.Modding
 
 		protected void Move(int toIndex)
 		{
+			if (window.IsAnimating)
+				return;
+
+			window.IsAnimating = true;
+			window.IsDirty = true;
+
 			Transform toTransform = transformCached.parent.GetChild(toIndex);
 			int fromIndex = transformCached.GetSiblingIndex();
+
+			SetInteractable(toIndex);
+			toTransform.GetComponent<ModIcon>().SetInteractable(fromIndex);
 
 			Sequence sequence = DOTween.Sequence();
 			sequence.Insert(0, transformCached.DOMove(toTransform.position, ReorderTime));
 			sequence.Insert(0, toTransform.DOMove(transformCached.position, ReorderTime));
-			sequence.InsertCallback(ReorderTime / 2.0f,
-									() =>
-									{
-										SetInteractable(toIndex);
-										toTransform.GetComponent<ModIcon>().SetInteractable(fromIndex);
-									});
-			sequence.OnComplete(() => transformCached.SetSiblingIndex(toIndex));
-			ModWindow.SetDirty();
+			sequence.OnComplete(() =>
+								{
+									transformCached.SetSiblingIndex(toIndex);
+									window.IsAnimating = false;
+								});
 		}
 
 		public void SetInteractable(int index)
 		{
-			MoveUpButton.SetInteractableImmediate(index != 0);
-			MoveDownButton.SetInteractableImmediate(index < transformCached.parent.childCount - 1);
+			MoveUpButton.interactable = index != 0;
+			MoveDownButton.interactable = index < transformCached.parent.childCount - 1;
 		}
 
 		protected void Toggle(bool value)
 		{
 			ModManager.ToggleMod(Mod, value);
 			NameText.DOColor(value ? EnabledColor : DisabledColor, RecolorTime);
-			ModWindow.SetDirty();
+			window.IsDirty = true;
 		}
 
 		public Mod Mod => (Mod) Data;

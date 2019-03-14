@@ -22,7 +22,7 @@ namespace Engine.UI.Buttons
 		public void OnPointerClick (PointerEventData eventData)
 		{
 			if (Fade)
-				SceneDirector.FadeOut().SetColor(FadeColor).SetTime(FadeTime).OnComplete(Quit);
+				SceneDirector.FadeOut(FadeColor, FadeTime, Quit);
 			else
 				Quit();
 		}

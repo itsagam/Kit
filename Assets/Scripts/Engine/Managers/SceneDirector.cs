@@ -1,273 +1,157 @@
 ﻿using System;
-using System.Collections;
 using DG.Tweening;
-using UniRx;
+using Engine;
+using UniRx.Async;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using Object = UnityEngine.Object;
 
-namespace Engine
+public enum FadeMode
 {
-	public enum FadeMode
+    None,
+    FadeOut,
+    FadeIn,
+    FadeOutIn
+}
+
+public static class SceneDirector
+{
+	public static event Action<string> OnSceneChanging;
+	public static event Action<string> OnSceneChanged;
+	public static event Action OnFadingIn;
+	public static event Action OnFadedIn;
+	public static event Action OnFadingOut;
+	public static event Action OnFadedOut;
+	public static event Action<float> OnFading;
+	public static event Action<float> OnFaded;
+
+	public const FadeMode DefaultFadeMode = FadeMode.FadeOutIn;
+	public static readonly Color DefaultFadeColor = Color.black;
+	public const float DefaultFadeTime = 1.0f;
+
+	private static Image fadeImage;
+
+	public static UniTask Fade(float to, float? from = null,
+							   Color? color = null, float time = DefaultFadeTime,
+							   Action onComplete = null)
 	{
-		None,
-		FadeOut,
-		FadeIn,
-		FadeOutIn
+		if (fadeImage == null)
+			fadeImage = CreateFadeImage();
+
+		OnFading?.Invoke(to);
+		fadeImage.gameObject.SetActive(true);
+		fadeImage.DOKill();
+
+		if (!color.HasValue)
+			color = DefaultFadeColor;
+
+		if (!from.HasValue)
+			from = fadeImage.color.a;
+
+		color = color.Value.SetAlpha(1 - from.Value);
+
+		fadeImage.color = color.Value;
+		return fadeImage
+			  .DOFade(1 - to, time)
+			  .OnComplete(() =>
+						  {
+							  if (fadeImage.color.a <= 0)
+								  fadeImage.gameObject.SetActive(false);
+							  onComplete?.Invoke();
+							  OnFaded?.Invoke(to);
+						  })
+			  .ToUniTask();
 	}
 
-	public static class SceneDirector
+	public static UniTask FadeIn(Color? color = null, float time = DefaultFadeTime, Action onComplete = null)
 	{
-		public static event Action<string> OnSceneChanging;
-		public static event Action<string> OnSceneChanged;
-		public static event Action OnFadingIn;
-		public static event Action OnFadedIn;
-		public static event Action OnFadingOut;
-		public static event Action OnFadedOut;
-		public static event Action<float> OnFading;
-		public static event Action<float> OnFaded;
-
-		public static float DefaultFadeTime = 1.0f;
-		public static Color DefaultFadeColor = Color.black;
-
-		private static Image fadeImage;
-
-		public class FadeBuilder
-		{
-			protected Tweener tween;
-			protected Action onComplete;
-
-			public FadeBuilder(float to)
-			{
-				Execute(to);
-			}
-
-			public FadeBuilder SetFrom(float from)
-			{
-				tween.ChangeStartValue(FadeImage.color.SetAlpha(1 - from));
-				return this;
-			}
-
-			public FadeBuilder SetTo(float to)
-			{
-				tween.ChangeEndValue(FadeImage.color.SetAlpha(1 - to));
-				return this;
-			}
-
-			public FadeBuilder SetColor(Color color)
-			{
-				FadeImage.color = color.SetAlpha(FadeImage.color.a);
-				return this;
-			}
-
-			public FadeBuilder SetTime(float time)
-			{
-				tween.timeScale = tween.Duration(false) / time;
-				return this;
-			}
-
-			public FadeBuilder OnComplete(Action action)
-			{
-				onComplete = action;
-				return this;
-			}
-
-			protected void Execute(float to)
-			{
-				OnFading?.Invoke(to);
-				FadeImage.gameObject.SetActive(true);
-				FadeImage.DOKill();
-				FadeImage.color = DefaultFadeColor.SetAlpha(FadeImage.color.a);
-				tween = FadeImage.DOFade(1 - to, DefaultFadeTime)
-								 .OnComplete(() =>
-											 {
-												 if (FadeImage.color.a <= 0)
-													 FadeImage.gameObject.SetActive(false);
-												 onComplete?.Invoke();
-												 OnFaded?.Invoke(to);
-											 });
-			}
-		}
-
-		public class LoadBuilder
-		{
-			public string Name;
-			public bool Additive;
-			public FadeMode FadeMode = FadeMode.FadeOutIn;
-			public Color FadeColor = DefaultFadeColor;
-			public float FadeTime = DefaultFadeTime;
-
-			protected Action<float> onProgress;
-			protected Action onComplete;
-
-			public LoadBuilder(string name)
-			{
-				Name = name;
-				Observable.NextFrame().Subscribe(t => Execute());
-			}
-
-			public LoadBuilder SetAdditive(bool additive = true)
-			{
-				Additive = additive;
-				return this;
-			}
-
-			public LoadBuilder SetFadeMode(FadeMode fadeMode)
-			{
-				FadeMode = fadeMode;
-				return this;
-			}
-
-			public LoadBuilder SetFadeColor(Color fadeColor)
-			{
-				FadeColor = fadeColor;
-				return this;
-			}
-
-			public LoadBuilder SetFadeTime(float fadeTime)
-			{
-				FadeTime = fadeTime;
-				return this;
-			}
-
-			public LoadBuilder OnProgress(Action<float> action)
-			{
-				onProgress = action;
-				return this;
-			}
-
-			public LoadBuilder OnComplete(Action action)
-			{
-				onComplete = action;
-				return this;
-			}
-
-			protected void Execute()
-			{
-				if (!Additive)
-					OnSceneChanging?.Invoke(Name);
-
-				switch (FadeMode)
-				{
-					case FadeMode.None:
+		OnFadingIn?.Invoke();
+		return Fade(1,
+					0,
+					color,
+					time,
+					() =>
 					{
-						LoadSceneInternal(Name, Additive, onProgress, onComplete);
-						break;
-					}
-					case FadeMode.FadeOut:
+						onComplete?.Invoke();
+						OnFadedIn?.Invoke();
+					});
+	}
+
+	public static UniTask FadeOut(Color? color = null, float time = DefaultFadeTime, Action onComplete = null)
+	{
+		OnFadingOut?.Invoke();
+		return Fade(0,
+					1,
+					color,
+					time,
+					() =>
 					{
-						FadeOut()
-						   .SetColor(FadeColor)
-						   .SetTime(FadeTime)
-						   .OnComplete(() => LoadSceneInternal(Name, Additive, onProgress, onComplete));
-						break;
-					}
-					case FadeMode.FadeIn:
-					{
-						LoadSceneInternal(Name,
-										  Additive,
-										  onProgress,
-										  () =>
-										  {
-											  FadeIn().SetColor(FadeColor).SetTime(FadeTime);
-											  onComplete?.Invoke();
-										  });
-						break;
-					}
-					case FadeMode.FadeOutIn:
-					{
-						FadeOut()
-						   .SetColor(FadeColor)
-						   .SetTime(FadeTime)
-						   .OnComplete(() => LoadScene(Name)
-											.SetFadeMode(FadeMode.FadeIn)
-											.SetFadeColor(FadeColor)
-											.SetFadeTime(FadeTime)
-											.OnProgress(onProgress)
-											.OnComplete(onComplete));
-						break;
-					}
-				}
-			}
-		}
+						onComplete?.Invoke();
+						OnFadedOut?.Invoke();
+					});
+	}
 
-		public static LoadBuilder LoadScene(string name)
-		{
-			return new LoadBuilder(name);
-		}
+	public static UniTask ReloadScene(FadeMode fadeMode = DefaultFadeMode,
+									  Color? fadeColor = null, float fadeTime = DefaultFadeTime,
+									  bool additive = false,
+									  Action<float> onLoadProgress = null, Action onLoadComplete = null,
+									  Action onComplete = null)
+	{
+		return LoadScene(ActiveScene.path, fadeMode, fadeColor, fadeTime, additive, onLoadProgress, onLoadComplete, onComplete);
+	}
 
-		public static LoadBuilder ReloadScene()
-		{
-			return LoadScene(ActiveScene);
-		}
+	public static async UniTask LoadScene(string nameOrPath,
+										  FadeMode fadeMode = DefaultFadeMode,
+										  Color? fadeColor = null, float fadeTime = DefaultFadeTime,
+										  bool additive = false,
+										  Action<float> onLoadProgress = null, Action onLoadComplete = null,
+										  Action onComplete = null)
+	{
+		if (fadeMode == FadeMode.FadeOut || fadeMode == FadeMode.FadeOutIn)
+			await FadeOut(fadeColor, fadeTime);
 
-		private static void LoadSceneInternal(string name, bool additive, Action<float> onProgress, Action onComplete)
-		{
-			AsyncOperation load = SceneManager.LoadSceneAsync(name, additive ? LoadSceneMode.Additive : LoadSceneMode.Single);
-			MainThreadDispatcher.StartUpdateMicroCoroutine(LoadSceneProgress(load,
-																			 onProgress,
-																			 () =>
-																			 {
-																				 onComplete?.Invoke();
-																				 if (!additive)
-																					 OnSceneChanged?.Invoke(name);
-																			 }));
-		}
+		await LoadScene(nameOrPath, additive, onLoadProgress, onLoadComplete);
 
-		private static IEnumerator LoadSceneProgress(AsyncOperation load, Action<float> onProgress, Action onComplete)
-		{
-			while (!load.isDone)
-			{
-				onProgress?.Invoke(load.progress);
-				yield return null;
-			}
-			onComplete?.Invoke();
-		}
+		if (fadeMode == FadeMode.FadeOutIn)
+			await FadeIn(fadeColor, fadeTime);
 
-		public static FadeBuilder Fade(float to)
-		{
-			return new FadeBuilder(to);
-		}
+		onComplete?.Invoke();
+	}
 
-		public static FadeBuilder FadeIn()
-		{
-			OnFadingIn?.Invoke();
-			return new FadeBuilder(1).SetFrom(0).OnComplete(() => OnFadedIn?.Invoke());
-		}
+	private static async UniTask LoadScene(string nameOrPath,
+										   bool additive = false,
+										   Action<float> onProgress = null, Action onComplete = null)
+	{
+		if (!additive)
+			OnSceneChanging?.Invoke(nameOrPath);
 
-		public static FadeBuilder FadeOut()
-		{
-			OnFadingOut?.Invoke();
-			return new FadeBuilder(0).SetFrom(1).OnComplete(() => OnFadedOut?.Invoke());
-		}
+		AsyncOperation load = SceneManager.LoadSceneAsync(nameOrPath, additive ? LoadSceneMode.Additive : LoadSceneMode.Single);
+		if (onProgress != null)
+			await load.ConfigureAwait(new Progress<float>(onProgress));
+		else
+			await load;
+		onComplete?.Invoke();
+		if (!additive)
+			OnSceneChanged?.Invoke(nameOrPath);
+	}
 
-		private static Image GetFadeImage()
-		{
-			GameObject gameObject = new GameObject(typeof(SceneDirector).Name);
-			Canvas canvas = gameObject.AddComponent<Canvas>();
-			canvas.renderMode = RenderMode.ScreenSpaceOverlay;
-			canvas.sortingOrder = 99999;
-			Image image = gameObject.AddComponent<Image>();
-			Object.DontDestroyOnLoad(gameObject);
-			return image;
-		}
+	private static Image CreateFadeImage()
+    {
+		GameObject gameObject = new GameObject(typeof(SceneManager).Name);
+        Canvas canvas = gameObject.AddComponent<Canvas>();
+        canvas.renderMode = RenderMode.ScreenSpaceOverlay;
+        canvas.sortingOrder = 999;
+		Image image = gameObject.AddComponent<Image>();
+		Object.DontDestroyOnLoad(gameObject);
+        return image;
+    }
 
-		public static Image FadeImage
-		{
-			get
-			{
-				if (fadeImage == null)
-					fadeImage = GetFadeImage();
-				return fadeImage;
-			}
-		}
+	public static Scene ActiveScene => SceneManager.GetActiveScene();
+	public static string ActiveName => ActiveScene.name;
 
-		public static string ActiveScene => SceneManager.GetActiveScene().name;
-
-		public static bool IsScene(string name)
-		{
-			return ActiveScene == name;
-		}
+	public static bool IsScene(string name)
+	{
+		return ActiveScene.name == name;
 	}
 }

@@ -113,7 +113,7 @@ namespace Engine.Audio
 				else
 					lastVolume = Audio.volume;
 
-				ChangeTo(0, () => Audio.Pause());
+				ChangeTo(0, Audio.Pause);
 			}
 			else
 				Audio.Pause();
@@ -129,7 +129,7 @@ namespace Engine.Audio
 				else
 					lastVolume = Audio.volume;
 
-				ChangeTo(0, () => Audio.Stop());
+				ChangeTo(0,  Audio.Stop);
 			}
 			else
 				Audio.Stop();
@@ -149,10 +149,14 @@ namespace Engine.Audio
 		protected Tweener ChangeTo(float volume, Action onComplete = null)
 		{
 			IsBusy = true;
-			return Audio.DOFade(volume, Speed).SetSpeedBased().SetEase(Ease.Linear).OnComplete(() => {
-																								   IsBusy = false;
-																								   onComplete?.Invoke();
-																							   });
+			return Audio.DOFade(volume, Speed)
+						.SetSpeedBased()
+						.SetEase(Ease.Linear)
+						.OnComplete(() =>
+									{
+										IsBusy = false;
+										onComplete?.Invoke();
+									});
 		}
 
 		public AudioClip Clip

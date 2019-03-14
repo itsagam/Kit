@@ -91,7 +91,7 @@ namespace Engine.Containers
 										.ObserveCountChanged()
 										.Select(c => GetAggregates(upgradeable, stat))
 										.StartWith(GetAggregates(upgradeable, stat))
-										.CombineLatest(baseProperty, (aggregates, baseValue) => CalculateValue(aggregates, baseValue));
+										.CombineLatest(baseProperty, CalculateValue);
 
 			return new ReadOnlyReactiveProperty<float>(observable);
 		}

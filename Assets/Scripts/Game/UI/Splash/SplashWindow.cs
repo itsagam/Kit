@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using System.Linq;
-using Engine;
 using Engine.UI.Widgets;
 using UniRx.Async;
 using UnityEngine;
@@ -16,32 +15,26 @@ namespace Game.UI.Splash
 
 		protected readonly Queue<SplashTask> tasks = new Queue<SplashTask>();
 
+		#region Initalization
 		protected void Awake()
 		{
 			SceneDirector.FadeIn();
 		}
+		#endregion
 
+		#region Task execution
 		private void Start()
 		{
 			QueueTasks();
 			RunTasks().Forget();
 		}
 
-		protected void QueueTasks()
+		public void QueueTask(string taskName, UniTask task, int taskWeight)
 		{
-			QueueTask("Task 1", TestTask(), 2);
-			// QueueTask("Task 2", TestTask(), 3);
-			// QueueTask("Task 4", TestTask(), 5);
-			// QueueTask("Task 5", TestTask(), 5);
-			// QueueTask("Task 6", TestTask(), 10);
+			QueueTask(new SplashTask(taskName, task, taskWeight));
 		}
 
-		protected void QueueTask(string message, UniTask task, int weight)
-		{
-			QueueTask(new SplashTask(message, task, weight));
-		}
-
-		protected void QueueTask(SplashTask task)
+		public void QueueTask(SplashTask task)
 		{
 			tasks.Enqueue(task);
 		}
@@ -67,18 +60,29 @@ namespace Game.UI.Splash
 					ProgressImage.fillAmount += task.Weight / totalWeight;
 			}
 
-			OnComplete();
+			await LoadNextScene();
 		}
 
-
-		protected void OnComplete()
+		protected UniTask LoadNextScene()
 		{
-			SceneDirector.LoadScene(NextScene.Path);
+			return SceneDirector.LoadScene(NextScene.Path);
+		}
+		#endregion
+
+		#region Tasks
+		protected void QueueTasks()
+		{
+			QueueTask("Task 1", TestTask(), 2);
+			QueueTask("Task 2", TestTask(), 3);
+			QueueTask("Task 4", TestTask(), 5);
+			QueueTask("Task 5", TestTask(), 5);
+			QueueTask("Task 6", TestTask(), 10);
 		}
 
-		protected UniTask TestTask()
+		protected static UniTask TestTask()
 		{
 			return UniTask.Delay(1000);
 		}
+		#endregion
 	}
 }

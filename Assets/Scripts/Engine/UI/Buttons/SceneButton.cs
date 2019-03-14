@@ -1,4 +1,5 @@
 ﻿using Sirenix.OdinInspector;
+using UniRx.Async;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.EventSystems;
@@ -25,19 +26,22 @@ namespace Engine.UI.Buttons
 		public float FadeTime = 1.0f;
 
 		[FoldoutGroup("Events")]
-		public UnityEvent OnProgress;
+		public UnityEvent OnLoadProgress;
+
+		[FoldoutGroup("Events")]
+		public UnityEvent OnLoadComplete;
 
 		[FoldoutGroup("Events")]
 		public UnityEvent OnComplete;
 
 		public void OnPointerClick (PointerEventData eventData)
 		{
-			SceneDirector.LoadBuilder builder = Reload ? SceneDirector.ReloadScene() : SceneDirector.LoadScene(Scene);
-
 			enabled = false;
-			builder.SetFadeMode(FadeMode).SetFadeColor(FadeColor).SetFadeTime(FadeTime)
-				   .OnProgress(progress => OnProgress.Invoke())
-				   .OnComplete(() => OnComplete.Invoke());
+			string scene = Reload ? SceneDirector.ActiveScene.path : Scene;
+			SceneDirector.LoadScene(scene, FadeMode, FadeColor, FadeTime, false,
+									progress => OnLoadProgress.Invoke(), OnLoadComplete.Invoke,
+									OnComplete.Invoke)
+			             .Forget();
 		}
 	}
 }
