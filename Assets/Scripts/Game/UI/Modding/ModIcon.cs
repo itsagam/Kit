@@ -1,4 +1,6 @@
 ﻿using DG.Tweening;
+using Engine;
+using Engine.UI;
 using Engine.UI.Widgets;
 using UnityEngine;
 using UnityEngine.UI;
@@ -6,7 +8,7 @@ using UnityEngine.UI;
 using Engine.Modding;
 #endif
 
-namespace Engine.UI.Modding
+namespace Game.UI.Modding
 {
 	public class ModIcon : Icon
 	{

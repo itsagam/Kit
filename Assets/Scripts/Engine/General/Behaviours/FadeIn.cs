@@ -6,7 +6,7 @@ namespace Engine.Behaviours
 	{
 		protected void Awake()
 		{
-			SceneManager.FadeIn();
+			SceneDirector.FadeIn();
 		}
 	}
 }

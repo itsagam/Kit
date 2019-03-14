@@ -32,7 +32,7 @@ namespace Engine.UI.Buttons
 
 		public void OnPointerClick (PointerEventData eventData)
 		{
-			SceneManager.LoadBuilder builder = Reload ? SceneManager.ReloadScene() : SceneManager.LoadScene(Scene);
+			SceneDirector.LoadBuilder builder = Reload ? SceneDirector.ReloadScene() : SceneDirector.LoadScene(Scene);
 
 			enabled = false;
 			builder.SetFadeMode(FadeMode).SetFadeColor(FadeColor).SetFadeTime(FadeTime)

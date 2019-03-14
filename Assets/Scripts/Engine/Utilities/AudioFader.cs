@@ -26,16 +26,16 @@ namespace Engine.Audio
 
 		protected void OnEnable()
 		{
-			SceneManager.OnSceneChanging += OnSceneChanging;
-			SceneManager.OnFadingOut += OnFadingOut;
-			SceneManager.OnFadingIn += OnFadingIn;
+			SceneDirector.OnSceneChanging += OnSceneChanging;
+			SceneDirector.OnFadingOut += OnFadingOut;
+			SceneDirector.OnFadingIn += OnFadingIn;
 		}
 
 		protected void OnDisable()
 		{
-			SceneManager.OnSceneChanging -= OnSceneChanging;
-			SceneManager.OnFadingOut -= OnFadingOut;
-			SceneManager.OnFadingIn -= OnFadingIn;
+			SceneDirector.OnSceneChanging -= OnSceneChanging;
+			SceneDirector.OnFadingOut -= OnFadingOut;
+			SceneDirector.OnFadingIn -= OnFadingIn;
 		}
 
 		protected void OnSceneChanging(string scene)

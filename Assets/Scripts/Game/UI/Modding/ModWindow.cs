@@ -1,10 +1,12 @@
-﻿using UnityEngine;
+﻿using Engine;
+using Engine.UI;
+using UnityEngine;
 using UnityEngine.UI;
 #if MODDING
 using Engine.Modding;
 #endif
 
-namespace Engine.UI.Modding
+namespace Game.UI.Modding
 {
 	public class ModWindow : Window
 	{
@@ -34,7 +36,7 @@ namespace Engine.UI.Modding
 				return;
 
 			PlayerPrefs.Save();
-			//UIManager.Show(Game.Windows.Message, "Some changes will not be reflected until you restart the application.");
+			UIManager.Show(Windows.Message, "Some changes will not be reflected until you restart the application.");
 		}
 
 		public static void SetDirty()

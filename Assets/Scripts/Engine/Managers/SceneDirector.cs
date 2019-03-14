@@ -17,7 +17,7 @@ namespace Engine
 		FadeOutIn
 	}
 
-	public static class SceneManager
+	public static class SceneDirector
 	{
 		public static event Action<string> OnSceneChanging;
 		public static event Action<string> OnSceneChanged;
@@ -79,12 +79,14 @@ namespace Engine
 				FadeImage.gameObject.SetActive(true);
 				FadeImage.DOKill();
 				FadeImage.color = DefaultFadeColor.SetAlpha(FadeImage.color.a);
-				tween = FadeImage.DOFade(1 - to, DefaultFadeTime).OnComplete(() => {
-																				 if (FadeImage.color.a <= 0)
-																					 FadeImage.gameObject.SetActive(false);
-																				 onComplete?.Invoke();
-																				 OnFaded?.Invoke(to);
-																			 });
+				tween = FadeImage.DOFade(1 - to, DefaultFadeTime)
+								 .OnComplete(() =>
+											 {
+												 if (FadeImage.color.a <= 0)
+													 FadeImage.gameObject.SetActive(false);
+												 onComplete?.Invoke();
+												 OnFaded?.Invoke(to);
+											 });
 			}
 		}
 
@@ -155,25 +157,35 @@ namespace Engine
 					}
 					case FadeMode.FadeOut:
 					{
-						FadeOut().SetColor(FadeColor).SetTime(FadeTime).OnComplete(() =>
-																				   {
-																					   LoadSceneInternal(Name, Additive, onProgress, onComplete);
-																				   });
+						FadeOut()
+						   .SetColor(FadeColor)
+						   .SetTime(FadeTime)
+						   .OnComplete(() => LoadSceneInternal(Name, Additive, onProgress, onComplete));
 						break;
 					}
 					case FadeMode.FadeIn:
 					{
-						LoadSceneInternal(Name, Additive, onProgress, () => {
-																		  FadeIn().SetColor(FadeColor).SetTime(FadeTime);
-																		  onComplete?.Invoke();
-																	  });
+						LoadSceneInternal(Name,
+										  Additive,
+										  onProgress,
+										  () =>
+										  {
+											  FadeIn().SetColor(FadeColor).SetTime(FadeTime);
+											  onComplete?.Invoke();
+										  });
 						break;
 					}
 					case FadeMode.FadeOutIn:
 					{
-						FadeOut().SetColor(FadeColor).SetTime(FadeTime).OnComplete(() => {
-																					   LoadScene(Name).SetFadeMode(FadeMode.FadeIn).SetFadeColor(FadeColor).SetFadeTime(FadeTime).OnProgress(onProgress).OnComplete(onComplete);
-																				   });
+						FadeOut()
+						   .SetColor(FadeColor)
+						   .SetTime(FadeTime)
+						   .OnComplete(() => LoadScene(Name)
+											.SetFadeMode(FadeMode.FadeIn)
+											.SetFadeColor(FadeColor)
+											.SetFadeTime(FadeTime)
+											.OnProgress(onProgress)
+											.OnComplete(onComplete));
 						break;
 					}
 				}
@@ -192,12 +204,15 @@ namespace Engine
 
 		private static void LoadSceneInternal(string name, bool additive, Action<float> onProgress, Action onComplete)
 		{
-			AsyncOperation load = UnityEngine.SceneManagement.SceneManager.LoadSceneAsync(name, additive ? LoadSceneMode.Additive : LoadSceneMode.Single);
-			MainThreadDispatcher.StartUpdateMicroCoroutine(LoadSceneProgress(load, onProgress, () => {
-																								   onComplete?.Invoke();
-																								   if (!additive)
-																									   OnSceneChanged?.Invoke(name);
-																							   }));
+			AsyncOperation load = SceneManager.LoadSceneAsync(name, additive ? LoadSceneMode.Additive : LoadSceneMode.Single);
+			MainThreadDispatcher.StartUpdateMicroCoroutine(LoadSceneProgress(load,
+																			 onProgress,
+																			 () =>
+																			 {
+																				 onComplete?.Invoke();
+																				 if (!additive)
+																					 OnSceneChanged?.Invoke(name);
+																			 }));
 		}
 
 		private static IEnumerator LoadSceneProgress(AsyncOperation load, Action<float> onProgress, Action onComplete)
@@ -218,24 +233,18 @@ namespace Engine
 		public static FadeBuilder FadeIn()
 		{
 			OnFadingIn?.Invoke();
-			return new FadeBuilder(1).SetFrom(0).OnComplete(() =>
-															{
-																OnFadedIn?.Invoke();
-															});
+			return new FadeBuilder(1).SetFrom(0).OnComplete(() => OnFadedIn?.Invoke());
 		}
 
 		public static FadeBuilder FadeOut()
 		{
 			OnFadingOut?.Invoke();
-			return new FadeBuilder(0).SetFrom(1).OnComplete(() =>
-															{
-																OnFadedOut?.Invoke();
-															});
+			return new FadeBuilder(0).SetFrom(1).OnComplete(() => OnFadedOut?.Invoke());
 		}
 
 		private static Image GetFadeImage()
 		{
-			GameObject gameObject = new GameObject(typeof(SceneManager).Name);
+			GameObject gameObject = new GameObject(typeof(SceneDirector).Name);
 			Canvas canvas = gameObject.AddComponent<Canvas>();
 			canvas.renderMode = RenderMode.ScreenSpaceOverlay;
 			canvas.sortingOrder = 99999;
@@ -254,7 +263,7 @@ namespace Engine
 			}
 		}
 
-		public static string ActiveScene => UnityEngine.SceneManagement.SceneManager.GetActiveScene().name;
+		public static string ActiveScene => SceneManager.GetActiveScene().name;
 
 		public static bool IsScene(string name)
 		{
