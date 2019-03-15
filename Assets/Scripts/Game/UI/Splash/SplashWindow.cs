@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using Engine.Modding;
 using Engine.UI.Widgets;
 using UniRx.Async;
 using UnityEngine;
@@ -13,10 +14,10 @@ namespace Game.UI.Splash
 		public Image ProgressImage;
 		public SceneReference NextScene;
 
-		protected readonly Queue<SplashTask> tasks = new Queue<SplashTask>();
+		private readonly Queue<SplashTask> tasks = new Queue<SplashTask>();
 
 		#region Initalization
-		protected void Awake()
+		private void Awake()
 		{
 			SceneDirector.FadeIn();
 		}
@@ -39,7 +40,7 @@ namespace Game.UI.Splash
 			tasks.Enqueue(task);
 		}
 
-		protected async UniTask RunTasks()
+		private async UniTask RunTasks()
 		{
 			float totalWeight = 0;
 			if (ProgressImage != null)
@@ -63,25 +64,29 @@ namespace Game.UI.Splash
 			await LoadNextScene();
 		}
 
-		protected UniTask LoadNextScene()
+		private UniTask LoadNextScene()
 		{
 			return SceneDirector.LoadScene(NextScene.Path);
 		}
 		#endregion
 
 		#region Tasks
-		protected void QueueTasks()
+		private void QueueTasks()
 		{
-			QueueTask("Task 1", TestTask(), 2);
-			QueueTask("Task 2", TestTask(), 3);
-			QueueTask("Task 4", TestTask(), 5);
-			QueueTask("Task 5", TestTask(), 5);
-			QueueTask("Task 6", TestTask(), 10);
+			QueueModTasks();
 		}
 
-		protected static UniTask TestTask()
+		private void QueueModTasks()
 		{
-			return UniTask.Delay(1000);
+#if MODDING
+			var modPaths = ModManager.GetModPathsByGroup();
+			int totalMods = modPaths.Sum(kvp => kvp.Value.Length);
+			if (totalMods <= 0)
+				return;
+
+			QueueTask("Loading mods",   ModManager.LoadModsAsync(modPaths), totalMods);
+			QueueTask("Executing mods", ModManager.ExecuteScriptsAsync(),   totalMods);
+#endif
 		}
 		#endregion
 	}

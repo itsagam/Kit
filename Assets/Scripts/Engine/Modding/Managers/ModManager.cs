@@ -25,7 +25,7 @@ namespace Engine.Modding
 				new ZipModLoader(),
 				new AssetBundleModLoader()
 		};
-		public static List<Mod> ActiveMods { get; private set; } = new List<Mod>();
+		public static IReadOnlyList<Mod> ActiveMods { get; private set; } = new List<Mod>();
 
 		private static Dictionary<(Type type, ResourceFolder folder, string file), ResourceInfo> cachedResources =
 				new Dictionary<(Type, ResourceFolder, string), ResourceInfo>();
@@ -48,7 +48,7 @@ namespace Engine.Modding
 			AddGroup(new ModGroup(ModType.Mod, writableFolder + "Mods/", true, true));
 		}
 
-		private static string GetWritableFolder()
+		public static string GetWritableFolder()
 		{
 			string folder = null;
 			switch (Application.platform)
@@ -81,18 +81,24 @@ namespace Engine.Modding
 		#endregion
 
 		#region Mod-loading
+		public static Dictionary<ModGroup, string[]> GetModPathsByGroup()
+		{
+			return Groups.Values
+			             .Where(g => Directory.Exists(g.Path))
+						 .ToDictionary(g => g, g => Directory.GetFileSystemEntries(g.Path));
+		}
+
 		public static void LoadMods(bool executeScripts = false)
+		{
+			LoadMods(GetModPathsByGroup(), executeScripts);
+		}
+
+		public static void LoadMods(Dictionary<ModGroup, string[]> modPaths, bool executeScripts = false)
 		{
 			UnloadMods(false);
 
-			foreach (ModGroup group in Groups.Values)
-			{
-				if (!Directory.Exists(group.Path))
-					continue;
-
-				string[] childPaths = Directory.GetFileSystemEntries(group.Path);
+			foreach ((ModGroup group, var childPaths) in modPaths)
 				foreach (string childPath in childPaths)
-				{
 					foreach (ModLoader loader in Loaders)
 					{
 						Mod mod = loader.LoadMod(childPath);
@@ -104,29 +110,28 @@ namespace Engine.Modding
 							break;
 						}
 					}
-				}
-			}
 
 			LoadModOrder();
 			SaveModOrder();
 			RefreshActiveMods();
 
+			Debugger.Log("ModManager", $"{Mods.Count()} mods loaded, {ActiveMods.Count} active.");
+
 			if (executeScripts)
 				ExecuteScripts();
 		}
 
-		public static async UniTask LoadModsAsync(bool executeScripts = false)
+		public static UniTask LoadModsAsync(bool executeScripts = false)
+		{
+			return LoadModsAsync(GetModPathsByGroup(), executeScripts);
+		}
+
+		public static async UniTask LoadModsAsync(Dictionary<ModGroup, string[]> modPaths, bool executeScripts = false)
 		{
 			UnloadMods(false);
 
-			foreach (ModGroup group in Groups.Values)
-			{
-				if (!Directory.Exists(group.Path))
-					continue;
-
-				string[] childPaths = Directory.GetFileSystemEntries(group.Path);
+			foreach ((ModGroup group, var childPaths) in modPaths)
 				foreach (string childPath in childPaths)
-				{
 					foreach (ModLoader loader in Loaders)
 					{
 						Mod mod = await loader.LoadModAsync(childPath);
@@ -135,15 +140,16 @@ namespace Engine.Modding
 							mod.Group = group;
 							group.Mods.Add(mod);
 							ModLoaded?.Invoke(mod);
+							Debugger.Log("ModManager", $"Loaded mod \"{mod.Metadata.Name}\".");
 							break;
 						}
 					}
-				}
-			}
 
 			LoadModOrder();
 			SaveModOrder();
 			RefreshActiveMods();
+
+			Debugger.Log("ModManager",$"{Mods.Count()} mods loaded, {ActiveMods.Count} active.");
 
 			if (executeScripts)
 				await ExecuteScriptsAsync();
@@ -408,13 +414,7 @@ namespace Engine.Modding
 
 		public static string ReadText(string path)
 		{
-			foreach (Mod mod in ActiveMods)
-			{
-				string text = mod.ReadText(path);
-				if (text != null)
-					return text;
-			}
-			return null;
+			return ActiveMods.Select(mod => mod.ReadText(path)).FirstOrDefault(text => text != null);
 		}
 
 		public static UniTask<string> ReadTextAsync(ResourceFolder folder, string file)
@@ -460,13 +460,7 @@ namespace Engine.Modding
 
 		public static byte[] ReadBytes(string path)
 		{
-			foreach (Mod mod in ActiveMods)
-			{
-				byte[] bytes = mod.ReadBytes(path);
-				if (bytes != null)
-					return bytes;
-			}
-			return null;
+			return ActiveMods.Select(mod => mod.ReadBytes(path)).FirstOrDefault(bytes => bytes != null);
 		}
 
 		public static UniTask<byte[]> ReadBytesAsync(ResourceFolder folder, string file)
@@ -510,26 +504,40 @@ namespace Engine.Modding
 		#region Unloading
 		public static void UnloadMods(bool withResources = false)
 		{
-			for (int i=ActiveMods.Count-1; i>=0; i--)
-				UnloadMod(ActiveMods[i], withResources);
+			int activeCount = ActiveMods.Count;
+			int totalCount = 0;
+			foreach (ModGroup group in Groups.Values)
+				for (int i = group.Mods.Count - 1; i >= 0; i--)
+				{
+					UnloadModInternal(group.Mods[i], withResources);
+					totalCount++;
+				}
+			ActiveMods = new List<Mod>();
+
+			if (totalCount > 0)
+				Debugger.Log("ModManager", $"{totalCount} mods unloaded, {activeCount} of them active.");
 		}
 
 		public static void UnloadMod(Mod mod, bool withResources = true)
+		{
+			UnloadModInternal(mod, withResources);
+			RefreshActiveMods();
+		}
+
+		private static void UnloadModInternal(Mod mod, bool withResources)
 		{
 			if (withResources)
 				UnloadAll(mod);
 			mod.Unload();
 			mod.Group.Mods.Remove(mod);
 			ModUnloaded?.Invoke(mod);
+			Debugger.Log("ModManager", $"Unloaded mod \"{mod.Metadata.Name}\"");
 		}
 
 		public static bool UnloadAll(Mod mod)
 		{
 			bool found = false;
-			foreach (var kvp in cachedResources.Reverse())
-			{
-				ResourceInfo resource = kvp.Value;
-				var key = kvp.Key;
+			foreach ((var key, ResourceInfo resource) in cachedResources.Reverse())
 				if (resource.Mod == mod)
 				{
 					UnloadInternal(resource.Reference.Target);
@@ -537,20 +545,18 @@ namespace Engine.Modding
 					found = true;
 					ResourceUnloaded?.Invoke(key.folder, key.file, resource.Mod);
 				}
-			}
+
 			return found;
 		}
 
 		public static bool Unload(object reference)
 		{
-			var kvp = cachedResources.FirstOrDefault(k => k.Value.Reference.Target == reference);
-			var key = kvp.Key;
+			(var key, ResourceInfo resource) = cachedResources.FirstOrDefault(kvp => kvp.Value.Reference.Target == reference);
 
 			// Because of FirstOrDefault, kvp.file will be null if key is not found
 			if (key.file == null)
 				return false;
 
-			ResourceInfo resource = kvp.Value;
 			UnloadInternal(resource.Reference.Target);
 			cachedResources.Remove(key);
 			ResourceUnloaded?.Invoke(key.folder, key.file, resource.Mod);

@@ -3,6 +3,7 @@ using Sirenix.OdinInspector;
 using UnityEngine;
 #if UNITY_EDITOR
 using UnityEditor;
+using Sirenix.OdinInspector.Editor;
 #endif
 
 namespace Engine.UI.Widgets
@@ -11,17 +12,15 @@ namespace Engine.UI.Widgets
 	[InlineProperty]
 	public class SceneReference: ISerializationCallbackReceiver
 	{
-#if UNITY_EDITOR
-		[PropertyOrder(-1)]
-		[ShowInInspector]
+		[SerializeField]
 		[ReadOnly]
 		[HideLabel]
-#endif
-		public string Path { get; protected set; }
+		protected string path;
+		public string Path => path;
 
 		public override string ToString()
 		{
-			return Path;
+			return path;
 		}
 
 #if UNITY_EDITOR
@@ -32,17 +31,17 @@ namespace Engine.UI.Widgets
 
 		public void OnBeforeSerialize()
 		{
-			EditorDispatcher.Enqueue(Refresh);
+			UnityEditorEventUtility.DelayAction(Refresh);
 		}
 
 		public void OnAfterDeserialize()
 		{
-			EditorDispatcher.Enqueue(Refresh);
+			UnityEditorEventUtility.DelayAction(Refresh);
 		}
 
 		protected void Refresh()
 		{
-			Path = GetActualPath();
+			path = GetActualPath();
 		}
 
 		private string GetActualPath()
