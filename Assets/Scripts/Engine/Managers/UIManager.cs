@@ -39,10 +39,10 @@ namespace Engine
 
 		public static readonly List<Window> Windows = new List<Window>();
 
-		public static event Action<Window> OnShowing;
-		public static event Action<Window> OnShown;
-		public static event Action<Window> OnHiding;
-		public static event Action<Window> OnHidden;
+		public static event Action<Window> Showing;
+		public static event Action<Window> Shown;
+		public static event Action<Window> Hiding;
+		public static event Action<Window> Hidden;
 
 		private static Canvas lastCanvas = null;
 
@@ -168,10 +168,10 @@ namespace Engine
 
 		public static void Register(Window instance)
 		{
-			instance.OnWindowHidden.AddListener(() => OnShowing?.Invoke(instance));
-			instance.OnWindowShown.AddListener(() => OnShown?.Invoke(instance));
-			instance.OnWindowShown.AddListener(() => OnHiding?.Invoke(instance));
-			instance.OnWindowShown.AddListener(() => OnHidden?.Invoke(instance));
+			instance.Hidden.AddListener(() => Showing?.Invoke(instance));
+			instance.Shown.AddListener(() => Shown?.Invoke(instance));
+			instance.Shown.AddListener(() => Hiding?.Invoke(instance));
+			instance.Shown.AddListener(() => Hidden?.Invoke(instance));
 		}
 
 		private static Canvas CreateCanvas()

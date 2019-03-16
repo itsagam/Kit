@@ -26,21 +26,21 @@ namespace Engine.UI.Buttons
 		public float FadeTime = 1.0f;
 
 		[FoldoutGroup("Events")]
-		public UnityEvent OnLoadProgress;
+		public UnityEvent LoadProgressed;
 
 		[FoldoutGroup("Events")]
-		public UnityEvent OnLoadComplete;
+		public UnityEvent LoadCompleted;
 
 		[FoldoutGroup("Events")]
-		public UnityEvent OnComplete;
+		public UnityEvent Completed;
 
 		public void OnPointerClick (PointerEventData eventData)
 		{
 			enabled = false;
 			string scene = Reload ? SceneDirector.ActiveScene.path : Scene;
 			SceneDirector.LoadScene(scene, FadeMode, FadeColor, FadeTime, false,
-									progress => OnLoadProgress.Invoke(), OnLoadComplete.Invoke,
-									OnComplete.Invoke)
+									progress => LoadProgressed.Invoke(), LoadCompleted.Invoke,
+									Completed.Invoke)
 			             .Forget();
 		}
 	}

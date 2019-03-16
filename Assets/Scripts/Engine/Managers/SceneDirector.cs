@@ -17,14 +17,14 @@ public enum FadeMode
 
 public static class SceneDirector
 {
-	public static event Action<string> OnSceneChanging;
-	public static event Action<string> OnSceneChanged;
-	public static event Action OnFadingIn;
-	public static event Action OnFadedIn;
-	public static event Action OnFadingOut;
-	public static event Action OnFadedOut;
-	public static event Action<float> OnFading;
-	public static event Action<float> OnFaded;
+	public static event Action<string> SceneChanging;
+	public static event Action<string> SceneChanged;
+	public static event Action FadingIn;
+	public static event Action FadedIn;
+	public static event Action FadingOut;
+	public static event Action FadedOut;
+	public static event Action<float> Fading;
+	public static event Action<float> Faded;
 
 	public const FadeMode DefaultFadeMode = FadeMode.FadeOutIn;
 	public static readonly Color DefaultFadeColor = Color.black;
@@ -39,7 +39,7 @@ public static class SceneDirector
 		if (fadeImage == null)
 			fadeImage = CreateFadeImage();
 
-		OnFading?.Invoke(to);
+		Fading?.Invoke(to);
 		fadeImage.gameObject.SetActive(true);
 		fadeImage.DOKill();
 
@@ -59,14 +59,14 @@ public static class SceneDirector
 							  if (fadeImage.color.a <= 0)
 								  fadeImage.gameObject.SetActive(false);
 							  onComplete?.Invoke();
-							  OnFaded?.Invoke(to);
+							  Faded?.Invoke(to);
 						  })
 			  .ToUniTask();
 	}
 
 	public static UniTask FadeIn(Color? color = null, float time = DefaultFadeTime, Action onComplete = null)
 	{
-		OnFadingIn?.Invoke();
+		FadingIn?.Invoke();
 		return Fade(1,
 					0,
 					color,
@@ -74,13 +74,13 @@ public static class SceneDirector
 					() =>
 					{
 						onComplete?.Invoke();
-						OnFadedIn?.Invoke();
+						FadedIn?.Invoke();
 					});
 	}
 
 	public static UniTask FadeOut(Color? color = null, float time = DefaultFadeTime, Action onComplete = null)
 	{
-		OnFadingOut?.Invoke();
+		FadingOut?.Invoke();
 		return Fade(0,
 					1,
 					color,
@@ -88,7 +88,7 @@ public static class SceneDirector
 					() =>
 					{
 						onComplete?.Invoke();
-						OnFadedOut?.Invoke();
+						FadedOut?.Invoke();
 					});
 	}
 
@@ -124,7 +124,7 @@ public static class SceneDirector
 										   Action<float> onProgress = null, Action onComplete = null)
 	{
 		if (!additive)
-			OnSceneChanging?.Invoke(nameOrPath);
+			SceneChanging?.Invoke(nameOrPath);
 
 		AsyncOperation load = SceneManager.LoadSceneAsync(nameOrPath, additive ? LoadSceneMode.Additive : LoadSceneMode.Single);
 		if (onProgress != null)
@@ -133,7 +133,7 @@ public static class SceneDirector
 			await load;
 		onComplete?.Invoke();
 		if (!additive)
-			OnSceneChanged?.Invoke(nameOrPath);
+			SceneChanged?.Invoke(nameOrPath);
 	}
 
 	private static Image CreateFadeImage()

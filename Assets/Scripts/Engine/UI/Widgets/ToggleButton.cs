@@ -14,7 +14,7 @@ namespace Engine.UI.Widgets
 		[SerializeField]
 		protected bool isOn;
 
-		public Toggle.ToggleEvent OnValueChanged;
+		public Toggle.ToggleEvent ValueChanged;
 
 		protected void Awake()
 		{
@@ -41,7 +41,7 @@ namespace Engine.UI.Widgets
 			{
 				isOn = value;
 				SetImage();
-				OnValueChanged.Invoke(isOn);
+				ValueChanged.Invoke(isOn);
 			}
 		}
 	}

@@ -21,9 +21,9 @@ namespace Engine.UI
 		public string PreviousHideAnimation = "PreviousHide";
 
 		[FoldoutGroup("Events")]
-		public ChangeEvent OnChanging;
+		public ChangeEvent Changing;
 		[FoldoutGroup("Events")]
-		public ChangeEvent OnChanged;
+		public ChangeEvent Changed;
 
 		[Serializable]
 		public class ChangeEvent : UnityEvent<int, Window, int, Window>
@@ -65,9 +65,9 @@ namespace Engine.UI
 										 previous == null ? null :
 										 isNext           ? NextShowAnimation : PreviousShowAnimation);
 
-				OnChanging?.Invoke(previousIndex, previous, Index, next);
+				Changing?.Invoke(previousIndex, previous, Index, next);
 				await UniTask.WhenAll(previousTask, nextTask);
-				OnChanged?.Invoke(previousIndex, previous, Index, next);
+				Changed?.Invoke(previousIndex, previous, Index, next);
 			}
 			else
 			{

@@ -17,7 +17,7 @@ namespace Engine.UI.Buttons
 		[SuffixLabel("seconds", true)]
 		public float FadeTime = 1.0f;
 
-		public UnityEvent OnComplete;
+		public UnityEvent Completed;
 
 		public void OnPointerClick (PointerEventData eventData)
 		{
@@ -29,11 +29,11 @@ namespace Engine.UI.Buttons
 
 		public void Quit()
 		{
-			OnComplete.Invoke();
+			Application.Quit();
+			Completed.Invoke();
 #if UNITY_EDITOR
 			UnityEditor.EditorApplication.isPlaying = false;
 #endif
-			Application.Quit();
 		}
 	}
 }

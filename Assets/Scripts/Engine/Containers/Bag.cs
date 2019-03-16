@@ -5,30 +5,121 @@ using UnityEngine;
 
 namespace Engine.Containers
 {
+	// To create nested inventories, create Bag<object> and add other bags
 	[Serializable]
 	public class Bag<T> : Dictionary<T, int>
 	{
-		public event Action<T, int> OnChanged;
+		public event Action<T, int> Added;
+		public event Action<T, int> Changed;
+		public event Action<T, int> Removed;
 
-		public Dictionary<T, int> Max;
+		public IDictionary<T, int> Max;
 
-		public new int this [T unit]
+		// Every call ultimately reaches here
+		public new int this [T item]
 		{
-			get => TryGetValue(unit, out int stored) ? stored : 0;
+			get => TryGetValue(item, out int value) ? value : 0;
 			set
 			{
-				int final = Max != null && Max.TryGetValue(unit, out int max) ? Mathf.Min(value, max) : value;
-				if (final > 0)
-					base[unit] = final;
+				int clamped = Max != null && Max.TryGetValue(item, out int max) ? Mathf.Min(value, max) : value;
+				if (clamped > 0)
+				{
+					bool contained = ContainsKey(item);
+					base[item] = clamped;
+					if (contained)
+						Changed?.Invoke(item, clamped);
+					else
+						Added?.Invoke(item, clamped);
+				}
 				else
-					Remove(unit);
-				OnChanged?.Invoke(unit, final);
+				{
+					if (base.Remove(item))
+						Removed?.Invoke(item, 0);
+				}
 			}
+		}
+
+		public new void Add(T item, int amount = 1)
+		{
+			this[item] += amount;
+		}
+
+		public void Add(KeyValuePair<T, int> kvp)
+		{
+			Add(kvp.Key, kvp.Value);
+		}
+
+		public void Add(Bunch<T> bunch)
+		{
+			Add(bunch.Item, bunch.Amount);
+		}
+
+		public void Add(IDictionary<T, int> bag)
+		{
+			foreach (var field in bag)
+				Add(field);
+		}
+
+		public bool Remove(T item, int amount = 1)
+		{
+			if (!Contains(item, amount))
+				return false;
+
+			this[item] -= amount;
+
+			return true;
+		}
+
+		public bool RemoveAll(T item)
+		{
+			if (!ContainsKey(item))
+				return false;
+
+			this[item] = 0;
+
+			return true;
+		}
+
+		public bool RemoveAll(IEnumerable<T> items)
+		{
+			bool success = true;
+			foreach (T item in items)
+				if (ContainsKey(item))
+					this[item] = 0;
+				else
+					success = false;
+			return success;
+		}
+
+		public bool Remove(KeyValuePair<T, int> kvp)
+		{
+			return Remove(kvp.Key, kvp.Value);
+		}
+
+		public bool Remove(Bunch<T> bunch)
+		{
+			return Remove(bunch.Item, bunch.Amount);
+		}
+
+		public bool Remove(IDictionary<T, int> bag)
+		{
+			if (!Contains(bag))
+				return false;
+
+			foreach ((T key, int value) in bag)
+				this[key] -= value;
+
+			return true;
+		}
+
+		public bool Contains(T item, int amount)
+		{
+			return this[item] >= amount;
 		}
 
 		public bool Contains(Bunch<T> bunch)
 		{
-			return Contains(bunch.Unit, bunch.Amount);
+			return Contains(bunch.Item, bunch.Amount);
 		}
 
 		public bool Contains(KeyValuePair<T, int> kvp)
@@ -36,203 +127,154 @@ namespace Engine.Containers
 			return Contains(kvp.Key, kvp.Value);
 		}
 
-		public bool Contains(T type, int amount)
-		{
-			return this[type] >= amount;
-		}
-
-		public bool Contains(Bag<T> bag)
+		public bool Contains(IDictionary<T, int> bag)
 		{
 			return bag.All(Contains);
 		}
 
-		public void Store(KeyValuePair<T, int> kvp)
+		public static Bag<T> operator +(Bag<T> bag, T item)
 		{
-			Store(kvp.Key, kvp.Value);
+			bag.Add(item);
+			return bag;
 		}
 
-		public void Store(Bunch<T> bunch)
+		public static Bag<T> operator +(Bag<T> bagTo, IDictionary<T, int> bagFrom)
 		{
-			Store(bunch.Unit, bunch.Amount);
-		}
-
-		public void Store(T type, int amount)
-		{
-			this[type] += amount;
-		}
-
-		public void Store(Bag<T> bag)
-		{
-			foreach (var field in bag)
-				Store(field);
-		}
-
-		public bool Consume(T type, int amount)
-		{
-			if (!Contains(type, amount))
-				return false;
-
-			this[type] -= amount;
-
-			return true;
-		}
-
-		public bool Consume(KeyValuePair<T, int> kvp)
-		{
-			return Consume(kvp.Key, kvp.Value);
-		}
-
-		public bool Consume(Bunch<T> bunch)
-		{
-			return Consume(bunch.Unit, bunch.Amount);
-		}
-
-		public bool Consume(Bag<T> bag)
-		{
-			if (!Contains(bag))
-				return false;
-
-			foreach (var field in bag)
-				this[field.Key] -= field.Value;
-
-			return true;
-		}
-
-		public static Bag<T> operator +(Bag<T> bagTo, Bag<T> bagFrom)
-		{
-			bagTo.Store(bagFrom);
+			bagTo.Add(bagFrom);
 			return bagTo;
 		}
 
 		public static Bag<T> operator +(Bag<T> bag, Bunch<T> bunch)
 		{
-			bag.Store(bunch);
+			bag.Add(bunch);
 			return bag;
 		}
 
 		public static Bag<T> operator +(Bag<T> bag, KeyValuePair<T, int> kvp)
 		{
-			bag.Store(kvp);
+			bag.Add(kvp);
 			return bag;
 		}
 
-		public static Bag<T> operator -(Bag<T> bagTo, Bag<T> bagFrom)
+		public static Bag<T> operator -(Bag<T> bag, T item)
 		{
-			bagTo.Consume(bagFrom);
+			bag.Remove(item);
+			return bag;
+		}
+
+		public static Bag<T> operator -(Bag<T> bagTo, IDictionary<T, int> bagFrom)
+		{
+			bagTo.Remove(bagFrom);
 			return bagTo;
 		}
 
 		public static Bag<T> operator -(Bag<T> bag, Bunch<T> bunch)
 		{
-			bag.Consume(bunch);
+			bag.Remove(bunch);
 			return bag;
 		}
 
 		public static Bag<T> operator -(Bag<T> bag, KeyValuePair<T, int> kvp)
 		{
-			bag.Consume(kvp);
+			bag.Remove(kvp);
 			return bag;
 		}
 
-		public IEnumerable<Bunch<T>> AsEnumerable()
+		public IEnumerable<Bunch<T>> AsBunches()
 		{
 			return this.Select(kvp => new Bunch<T>(kvp));
 		}
 
-		public List<Bunch<T>> ToList()
+		public List<Bunch<T>> ToBunches()
 		{
-			return AsEnumerable().ToList();
+			return AsBunches().ToList();
 		}
 	}
 
+	// Bunch<T> is just KeyValuePair<T, int> with operators (would've just derived from KeyValuePair but that's struct)
 	[Serializable]
 	public struct Bunch<T>
 	{
-		public T Unit;
+		public T Item;
 		public int Amount;
 
 		public Bunch(KeyValuePair<T, int> pair) : this(pair.Key, pair.Value)
 		{
 		}
 
-		public Bunch(Bunch<T> field) : this(field.Unit, field.Amount)
+		public Bunch(Bunch<T> field) : this(field.Item, field.Amount)
 		{
 		}
 
-		public Bunch(T unit, int amount = 0)
+		public Bunch(T item, int amount = 0)
 		{
-			Unit = unit;
+			Item = item;
 			Amount = amount;
 		}
 
 		public static Bunch<T> operator *(Bunch<T> bunch, float multiply)
 		{
-			return new Bunch<T>(bunch.Unit, (int) (bunch.Amount * multiply));
+			return new Bunch<T>(bunch.Item, (int) (bunch.Amount * multiply));
 		}
 
 		public static Bunch<T> operator /(Bunch<T> bunch, float divide)
 		{
-			return new Bunch<T>(bunch.Unit, (int) (bunch.Amount * divide));
+			return new Bunch<T>(bunch.Item, (int) (bunch.Amount * divide));
 		}
 
 		public static Bunch<T> operator +(Bunch<T> bunch, float plus)
 		{
-			return new Bunch<T>(bunch.Unit, (int) (bunch.Amount + plus));
+			return new Bunch<T>(bunch.Item, (int) (bunch.Amount + plus));
 		}
 
 		public static Bunch<T> operator -(Bunch<T> bunch, float minus)
 		{
-			return new Bunch<T>(bunch.Unit, (int) (bunch.Amount - minus));
+			return new Bunch<T>(bunch.Item, (int) (bunch.Amount - minus));
 		}
 
 		public static Bunch<T> operator *(Bunch<T> bunch, int multiply)
 		{
-			return new Bunch<T>(bunch.Unit, bunch.Amount * multiply);
+			return new Bunch<T>(bunch.Item, bunch.Amount * multiply);
 		}
 
 		public static Bunch<T> operator /(Bunch<T> bunch, int divide)
 		{
-			return new Bunch<T>(bunch.Unit, bunch.Amount * divide);
+			return new Bunch<T>(bunch.Item, bunch.Amount * divide);
 		}
 
 		public static Bunch<T> operator +(Bunch<T> bunch, int plus)
 		{
-			return new Bunch<T>(bunch.Unit, bunch.Amount + plus);
+			return new Bunch<T>(bunch.Item, bunch.Amount + plus);
 		}
 
 		public static Bunch<T> operator -(Bunch<T> bunch, int minus)
 		{
-			return new Bunch<T>(bunch.Unit, bunch.Amount - minus);
+			return new Bunch<T>(bunch.Item, bunch.Amount - minus);
 		}
 
 		public static Bunch<T> operator *(Bunch<T> bunch1, Bunch<T> bunch2)
 		{
-			return new Bunch<T>(bunch1.Unit, bunch1.Amount * bunch2.Amount);
+			return new Bunch<T>(bunch1.Item, bunch1.Amount * bunch2.Amount);
 		}
 
 		public static Bunch<T> operator /(Bunch<T> bunch1, Bunch<T> bunch2)
 		{
-			return new Bunch<T>(bunch1.Unit, bunch1.Amount / bunch2.Amount);
+			return new Bunch<T>(bunch1.Item, bunch1.Amount / bunch2.Amount);
 		}
 
 		public static Bunch<T> operator +(Bunch<T> bunch1, Bunch<T> bunch2)
 		{
-			return new Bunch<T>(bunch1.Unit, bunch1.Amount + bunch2.Amount);
+			return new Bunch<T>(bunch1.Item, bunch1.Amount + bunch2.Amount);
 		}
 
 		public static Bunch<T> operator -(Bunch<T> bunch1, Bunch<T> bunch2)
 		{
-			return new Bunch<T>(bunch1.Unit, bunch1.Amount - bunch2.Amount);
+			return new Bunch<T>(bunch1.Item, bunch1.Amount - bunch2.Amount);
 		}
 
 		public KeyValuePair<T, int> ToKVP()
 		{
-			return new KeyValuePair<T, int>(Unit, Amount);
-		}
-
-		public override string ToString()
-		{
-			return $"[{Unit}, {Amount}]";
+			return new KeyValuePair<T, int>(Item, Amount);
 		}
 	}
 }

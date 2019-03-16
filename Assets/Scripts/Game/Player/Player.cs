@@ -8,8 +8,8 @@ namespace Game
 		protected int currentScore;
 		protected int totalScore;
 
-		public event Action<int> OnCurrentScoreChanged;
-		public event Action<int> OnTotalScoreChanged;
+		public event Action<int> CurrentScoreChanged;
+		public event Action<int> TotalScoreChanged;
 
 		public void IncreaseCurrentScore(int by = 1)
 		{
@@ -48,7 +48,7 @@ namespace Game
 			{
 				value = Mathf.Max(0, value);
 				currentScore = value;
-				OnCurrentScoreChanged?.Invoke(value);
+				CurrentScoreChanged?.Invoke(value);
 			}
 		}
 
@@ -59,7 +59,7 @@ namespace Game
 			{
 				value = Mathf.Max(0, value);
 				totalScore = value;
-				OnTotalScoreChanged?.Invoke(value);
+				TotalScoreChanged?.Invoke(value);
 			}
 		}
 	}

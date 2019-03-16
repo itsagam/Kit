@@ -1,7 +1,7 @@
 Engine
 -----------------------------------------------------------------------------
 	Scriptable/Moddable
-		- Use UnityWebRequest to decode audio data
+		Use UnityWebRequest to decode audio data
 		
 Library
 -----------------------------------------------------------------------------
@@ -12,6 +12,5 @@ Library
 
 	UI
 	-------------------------------------------------------------------------
-		Splash
 		Menu
 		Settings

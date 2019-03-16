@@ -53,7 +53,7 @@ namespace Engine.UI.Buttons
 				originalText = Text.text;
 
 			if (Wizard != null)
-				Wizard.OnChanging.AddListener(OnChanging);
+				Wizard.Changing.AddListener(OnChanging);
 		}
 
 		protected void OnChanging(int previousIndex, Window previous, int nextIndex, Window next)

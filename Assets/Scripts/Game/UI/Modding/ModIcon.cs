@@ -34,7 +34,7 @@ namespace Game.UI.Modding
 		{
 			window = GetComponentInParent<ModWindow>();
 			transformCached = transform;
-			EnableToggle.OnValueChanged.AddListener(Toggle);
+			EnableToggle.ValueChanged.AddListener(Toggle);
 			MoveUpButton.onClick.AddListener(MoveUp);
 			MoveDownButton.onClick.AddListener(MoveDown);
 		}

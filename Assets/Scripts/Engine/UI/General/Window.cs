@@ -19,13 +19,13 @@ namespace Engine.UI
 		public AudioClip HideSound;
 
 		[FoldoutGroup("Events")]
-		public UnityEvent OnWindowShowing;
+		public UnityEvent Showing;
 		[FoldoutGroup("Events")]
-		public UnityEvent OnWindowShown;
+		public UnityEvent Shown;
 		[FoldoutGroup("Events")]
-		public UnityEvent OnWindowHiding;
+		public UnityEvent Hiding;
 		[FoldoutGroup("Events")]
-		public UnityEvent OnWindowHidden;
+		public UnityEvent Hidden;
 
 		public WindowState State { get; protected set; } = WindowState.Hidden;
 
@@ -56,7 +56,7 @@ namespace Engine.UI
 
 			State = WindowState.Showing;
 			OnShowing();
-			OnWindowShowing.Invoke();
+			Showing.Invoke();
 			UIManager.Windows.Add(this);
 
 			Data = data;
@@ -94,7 +94,7 @@ namespace Engine.UI
 
 			State = WindowState.Hiding;
 			OnHiding();
-			OnWindowHiding.Invoke();
+			Hiding.Invoke();
 
 			AudioManager.PlayUIEffect(HideSound);
 			if (animator != null && !animation.IsNullOrEmpty())
@@ -117,7 +117,7 @@ namespace Engine.UI
 		{
 			State = WindowState.Shown;
 			OnShown();
-			OnWindowShown.Invoke();
+			Shown.Invoke();
 		}
 
 		private void OnHiddenInternal(WindowHideMode mode)
@@ -133,7 +133,7 @@ namespace Engine.UI
 			}
 
 			OnHidden();
-			OnWindowHidden.Invoke();
+			Hidden.Invoke();
 		}
 
 		public void MarkAsInstance()
