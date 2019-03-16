@@ -1,0 +1,45 @@
+-> Async method exception <-------------------------------------|
+	? Exception handler											|
+		o Yes													|
+			-> Handled											|
+		o No													|
+			? async void or Uni	Task							|
+				o async void									|
+					-> Loop Exceptions							|
+				o async UniTask									|
+					? await in parent							|
+						o No									|
+							-> Print Warning					|
+						o Yes									|
+							-> Exception propagates to parent	|
+
+Task-s are the same, except they don't print warnings
+
+Task.Run = Task.RunInSeparateThread
+UniTask.Run = UniTask.SwitchToThreadPool
+UniTask.Yield = UniTask.SwitchToMainThread
+UniTask.Yield !- Task.Yield (UniTask switches to Main-thread on yield)
+
+No Try-Catch
+––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––
+						Parent
+						async UniTask		async void
+Child	async UniTask	Print Warning		Loop Exceptions
+		async void		Loop Exceptions		Loop Exceptions
+
+
+Try-Catch
+––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––
+						Parent
+						async UniTask		async void
+Child	async UniTask	Caught Exception	Caught Exception
+		async void		Loop Exceptions 	Loop Exceptions
+
+Awake No Try-Catch
+––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––
+void (with Forget)		Print Warning
+void					Print Warning
+async UniTask			Print Warning
+async UniTask (await)	Print Warning
+async void				Print Warning
+async void (await)		Loop Exceptions
