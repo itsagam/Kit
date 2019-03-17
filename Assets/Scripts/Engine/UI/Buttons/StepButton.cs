@@ -4,8 +4,7 @@ using UnityEngine.UI;
 
 namespace Engine.UI.Buttons
 {
-	[RequireComponent(typeof(Button))]
-	public class StepButton : MonoBehaviour
+	public class StepButton : ButtonBehaviour
 	{
 		public enum StepDirection
 		{
@@ -38,14 +37,11 @@ namespace Engine.UI.Buttons
 		[ShowIf("Mode", StepMode.Change)]
 		public string Change;
 
-		public Button Button { get; protected set; }
 		protected string originalText;
 
-		protected void Awake()
+		protected override void Awake()
 		{
-			Button = GetComponent<Button>();
-			Button.onClick.AddListener(Perform);
-
+			base.Awake();
 			if (Mode == StepMode.Nothing)
 				return;
 
@@ -72,14 +68,13 @@ namespace Engine.UI.Buttons
 				}
 				case StepMode.Disable:
 				{
-					if (Button != null)
-						Button.interactable = !isEdgeCase;
+					if (button != null)
+						button.interactable = !isEdgeCase;
 					break;
 				}
 				case StepMode.Hide:
 				{
-					if (Button != null)
-						Button.gameObject.SetActive(!isEdgeCase);
+					gameObject.SetActive(!isEdgeCase);
 					break;
 				}
 			}
@@ -88,7 +83,7 @@ namespace Engine.UI.Buttons
 		public bool IsEdgeCase => Direction == StepDirection.Previous && Wizard.Index <= 0 ||
 								  Direction == StepDirection.Next     && Wizard.Index >= Wizard.Count - 1;
 
-		public void Perform()
+		protected override void OnClick()
 		{
 			if (Wizard == null)
 				return;

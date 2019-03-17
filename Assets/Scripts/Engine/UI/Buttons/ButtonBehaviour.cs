@@ -9,7 +9,7 @@ namespace Engine.UI.Buttons
 		protected abstract void OnClick();
 		protected Button button;
 
-		protected void Awake()
+		protected virtual void Awake()
 		{
 			button = GetComponent<Button>();
 			if (button != null)

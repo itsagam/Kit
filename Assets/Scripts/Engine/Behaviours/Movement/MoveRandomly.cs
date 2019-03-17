@@ -5,7 +5,7 @@ namespace Engine.Behaviours
 {
     public class MoveRandomly : MonoBehaviour
     {
-        public Transform Area;
+        public Component Area;
         public bool X = true;
         public bool Y = false;
         public bool Z = true;

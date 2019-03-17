@@ -7,7 +7,7 @@ namespace Engine
 		public static Bounds GetBounds(this Transform transform)
 		{
 			Bounds result = new Bounds {center = transform.position};
-			Renderer[] renderers = transform.GetComponentsInChildren<Renderer>();
+			var renderers = transform.GetComponentsInChildren<Renderer>();
 			foreach (Renderer renderer in renderers)
 				result.Encapsulate(renderer.bounds);
 			return result;

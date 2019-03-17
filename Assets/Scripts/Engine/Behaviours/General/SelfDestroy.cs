@@ -4,11 +4,11 @@ namespace Engine.Behaviours
 {
 	public class SelfDestroy : MonoBehaviour
 	{
-		public float Life = 5.0f;
+		public float Time = 5.0f;
 
 		protected void Start()
 		{
-			Destroy(gameObject, Life);
+			Destroy(gameObject, Time);
 		}
 	}
 }

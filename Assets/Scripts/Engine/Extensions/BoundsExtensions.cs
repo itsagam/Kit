@@ -7,7 +7,7 @@ namespace Engine
     {
         public static Bounds Rotate(this Bounds bounds, Quaternion rotation)
         {
-            Vector3[] points = bounds.Points();
+            var points = bounds.Points();
             for (int i = 0; i < points.Length; i++)
                 points[i] = rotation * points[i];
             Bounds rotated = new Bounds
@@ -20,7 +20,7 @@ namespace Engine
 
         public static Vector3[] Points(this Bounds bounds)
         {
-            Vector3[] points = new Vector3[8];
+            var points = new Vector3[8];
             points[0] = bounds.min;
             points[1] = bounds.max;
             points[2] = new Vector3(points[0].x, points[0].y, points[1].z);

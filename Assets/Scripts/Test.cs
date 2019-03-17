@@ -1,21 +1,11 @@
 ﻿using UnityEngine;
 
-// TODO: SetInteractiveImmediate fix
-// TODO: PanelRadioButton and RadioButton diagnose
-// TODO: StepButton with ButtonBehaviour
+// TODO: Loading animation in splash
+// TODO: Icons in main menu
 
 namespace Game
 {
 	public class Test: MonoBehaviour
 	{
-		private void Awake()
-		{
-
-		}
-
-		public void Button()
-		{
-
-		}
 	}
 }

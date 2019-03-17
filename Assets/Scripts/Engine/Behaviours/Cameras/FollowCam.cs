@@ -47,7 +47,7 @@ namespace Engine.Cameras
 				Stop();
 
 			Vector3 target = Target.position;
-			Vector3 position = target - transformCached.forward                                        * Distance;
+			Vector3 position = target - transformCached.forward * Distance;
 			transformCached.position = Vector3.Lerp(transformCached.position, position, Time.deltaTime * Speed);
 		}
 	}

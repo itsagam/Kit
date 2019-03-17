@@ -81,20 +81,7 @@ namespace Engine.Cameras
 			transformCached = GetComponent<Transform>();
 			cameraCached = GetComponent<Camera>();
 			gesture = GetComponent<MetaGesture>();
-
-			switch (View)
-			{
-				case Transform t:
-					bounds = t.GetBounds();
-					break;
-				case Renderer r:
-					bounds = r.bounds;
-					break;
-				case Collider c:
-					bounds = c.bounds;
-					break;
-			}
-
+			bounds = View.GetBounds();
 			forward = transformCached.forward;
 			forwardAbs = forward.Abs();
 			forwardSign = (int) Mathf.Sign(Vector3.Dot(Vector3.one, forward));

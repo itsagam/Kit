@@ -1,7 +1,6 @@
 ﻿using DG.Tweening;
 using Engine;
 using Engine.UI;
-using Engine.UI.Widgets;
 using UnityEngine;
 using UnityEngine.UI;
 #if MODDING
@@ -12,7 +11,7 @@ namespace Game.UI.Modding
 {
 	public class ModIcon : Icon
 	{
-		public ToggleButton EnableToggle;
+		public Toggle EnableToggle;
 
 		public Text NameText;
 		public Text VersionText;
@@ -34,14 +33,14 @@ namespace Game.UI.Modding
 		{
 			window = GetComponentInParent<ModWindow>();
 			transformCached = transform;
-			EnableToggle.ValueChanged.AddListener(Toggle);
+			EnableToggle.onValueChanged.AddListener(Toggle);
 			MoveUpButton.onClick.AddListener(MoveUp);
 			MoveDownButton.onClick.AddListener(MoveDown);
 		}
 
 		public override void Refresh()
 		{
-			EnableToggle.IsOn = ModManager.IsModEnabled(Mod);
+			EnableToggle.isOn = ModManager.IsModEnabled(Mod);
 
 			var list = ModManager.GetModsByGroup(ModType.Mod);
 			if (list[0] == Mod)
@@ -52,7 +51,7 @@ namespace Game.UI.Modding
 
 			ModMetadata metadata = Mod.Metadata;
 			NameText.text = metadata.Name;
-			NameText.color = EnableToggle.IsOn ? EnabledColor : DisabledColor;
+			NameText.color = EnableToggle.isOn ? EnabledColor : DisabledColor;
 			VersionText.text = metadata.Version;
 			AuthorText.text = metadata.Author;
 			DescriptionText.text = metadata.Description;
