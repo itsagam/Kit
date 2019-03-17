@@ -18,7 +18,7 @@ namespace Engine.UI.Buttons
 		public override void Select()
 		{
 			base.Select();
-			PanelRadioButton[] siblings = transform.parent.GetComponentsInChildren<PanelRadioButton>();
+			var siblings = transform.parent.GetComponentsInChildren<PanelRadioButton>();
 			foreach (PanelRadioButton sibling in siblings)
 				sibling.Panel.gameObject.SetActive(false);
 			Panel.gameObject.SetActive(true);

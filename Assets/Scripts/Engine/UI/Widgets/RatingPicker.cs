@@ -78,7 +78,7 @@ namespace Engine.UI.Widgets
 			button.transform.SetParent(transform, false);
 			button.interactable = !isReadonly;
 
-			var colors = button.colors;
+			ColorBlock colors = button.colors;
 			colors.disabledColor = colors.normalColor;
 			colors.highlightedColor = highlightedColor;
 			colors.pressedColor = pressedColor;
@@ -131,7 +131,7 @@ namespace Engine.UI.Widgets
 
 			if (intPart >= maxRating)
 				return;
-		
+
 			buttons[intPart].image.sprite = half ? halfSprite : zeroSprite;
 			for (int i = intPart + 1; i < maxRating; i++)
 				buttons[i].image.sprite = zeroSprite;
@@ -245,11 +245,7 @@ namespace Engine.UI.Widgets
 				if (buttons == null)
 					return;
 				foreach (Button button in buttons)
-				{
-					var colors = button.colors;
-					colors.highlightedColor = value;
-					button.colors = colors;
-				}
+					button.colors = button.colors.SetHighlightedColor(value);
 			}
 		}
 
@@ -264,11 +260,7 @@ namespace Engine.UI.Widgets
 				if (buttons == null)
 					return;
 				foreach (Button button in buttons)
-				{
-					var colors = button.colors;
-					colors.pressedColor = value;
-					button.colors = colors;
-				}
+					button.colors = button.colors.SetPressedColor(value);
 			}
 		}
 	}

@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using Engine;
 using Game;
 
 namespace Cards
@@ -50,7 +51,7 @@ namespace Cards
 
 		public Player GetPlayer(Card card)
 		{
-			return players.TryGetValue(card, out Player player) ? player : null;
+			return players.GetOrDefault(card);
 		}
 
 		public bool Remove(Player player)

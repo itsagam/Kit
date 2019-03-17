@@ -30,7 +30,7 @@ namespace Engine.UI
 		public virtual void Receive(Icon icon)
 		{
 			Data = icon.Data;
-			Destroy(icon.gameObject);
+			icon.gameObject.Destroy();
 		}
 
 		public virtual void Clear()
@@ -42,7 +42,7 @@ namespace Engine.UI
 		{
 			if (HasIcon)
 			{
-				Destroy(Icon.gameObject);
+				Icon.gameObject.Destroy();
 				Icon = null;
 			}
 

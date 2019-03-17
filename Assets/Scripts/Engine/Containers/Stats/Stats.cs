@@ -34,7 +34,7 @@ namespace Engine.Containers
 
 		public StatBaseProperty GetBaseProperty(string stat)
 		{
-			return TryGetValue(stat, out StatBaseProperty property) ? property : null;
+			return this.GetOrDefault(stat);
 		}
 
 		public void SetBaseProperty(string stat, StatBaseProperty value)

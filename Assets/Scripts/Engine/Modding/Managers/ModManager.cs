@@ -397,7 +397,7 @@ namespace Engine.Modding
 
 		public static ResourceInfo GetResourceInfo(Type type, ResourceFolder folder, string file)
 		{
-			return cachedResources.TryGetValue((type, folder, file), out ResourceInfo resource) ? resource : default;
+			return cachedResources.GetOrDefault((type, folder, file));
 		}
 
 		public static ResourceInfo GetResourceInfo(object resource)

@@ -1,11 +1,10 @@
 ﻿using Sirenix.OdinInspector;
 using UnityEngine;
 using UnityEngine.Events;
-using UnityEngine.EventSystems;
 
 namespace Engine.UI.Buttons
 {
-	public class QuitButton : MonoBehaviour, IPointerClickHandler
+	public class QuitButton : ButtonBehaviour
 	{
 		[ToggleGroup("Fade")]
 		public bool Fade = true;
@@ -19,7 +18,7 @@ namespace Engine.UI.Buttons
 
 		public UnityEvent Completed;
 
-		public void OnPointerClick (PointerEventData eventData)
+		protected override void OnClick()
 		{
 			if (Fade)
 				SceneDirector.FadeOut(FadeColor, FadeTime, Quit);

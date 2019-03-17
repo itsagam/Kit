@@ -57,9 +57,9 @@ namespace Engine
 			return source;
 		}
 
-		public static AudioSource GetGroupSource(string name)
+		public static AudioSource GetGroup(string name)
 		{
-			return groupSources.TryGetValue(name, out AudioSource source) ? source : null;
+			return groupSources.GetOrDefault(name);
 		}
 
 		public static AudioSource GetOrCreateGroup(string name)
@@ -69,7 +69,7 @@ namespace Engine
 
 		public static bool RemoveGroup(string name)
 		{
-			AudioSource source = GetGroupSource(name);
+			AudioSource source = GetGroup(name);
 			if (source == null)
 				return false;
 
@@ -78,7 +78,7 @@ namespace Engine
 			return true;
 		}
 
-		public static IEnumerable<AudioSource> GetAllGroupSources()
+		public static IEnumerable<AudioSource> GetAllGroups()
 		{
 			return groupSources.Values;
 		}
@@ -251,9 +251,9 @@ namespace Engine
 		#endregion
 
 		#region Public properties
-		public static AudioSource BackgroundSource => GetGroupSource(BackgroundGroup);
-		public static AudioSource SoundEffectsSource => GetGroupSource(SoundEffectGroup);
-		public static AudioSource UISource => GetGroupSource(UIGroup);
+		public static AudioSource BackgroundSource => GetGroup(BackgroundGroup);
+		public static AudioSource SoundEffectsSource => GetGroup(SoundEffectGroup);
+		public static AudioSource UISource => GetGroup(UIGroup);
 		public static float BackgroundMusicFadeSpeed
 		{
 			get => BackgroundManager.Speed;

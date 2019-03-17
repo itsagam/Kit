@@ -125,7 +125,7 @@ namespace Engine.UI
 			State = WindowState.Hidden;
 			data = null;
 			if (mode == WindowHideMode.Destroy || (mode == WindowHideMode.Auto && isInstance))
-				Destroy(gameObject);
+				gameObject.Destroy();
 			else
 			{
 				gameObject.SetActive(false);

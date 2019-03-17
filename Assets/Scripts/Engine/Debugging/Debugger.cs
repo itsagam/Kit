@@ -33,7 +33,7 @@ namespace Engine
 
 		public static CustomSampler GetProfile(string name)
 		{
-			return samples.TryGetValue(name, out CustomSampler sample) ? sample : null;
+			return samples.GetOrDefault(name);
 		}
 
 		public static void EndProfile()

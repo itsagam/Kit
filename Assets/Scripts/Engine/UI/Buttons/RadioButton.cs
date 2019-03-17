@@ -1,3 +1,4 @@
+using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -22,10 +23,9 @@ namespace Engine.UI.Buttons
 		{
 			ColorBlock block;
 
-			RadioButton[] siblings = transform.parent.GetComponentsInChildren<RadioButton>();
-			foreach (RadioButton sibling in siblings)
+			var siblings = transform.parent.GetComponentsInChildren<RadioButton>();
+			foreach (Button button in siblings.Select(sibling => sibling.Button))
 			{
-				Button button = sibling.Button;
 				block = button.colors;
 				block.normalColor = block.highlightedColor = offColor;
 				button.colors = block;

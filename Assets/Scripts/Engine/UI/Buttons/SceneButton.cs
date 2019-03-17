@@ -1,17 +1,17 @@
-﻿using Sirenix.OdinInspector;
+﻿using Engine.UI.Widgets;
+using Sirenix.OdinInspector;
 using UniRx.Async;
 using UnityEngine;
 using UnityEngine.Events;
-using UnityEngine.EventSystems;
 
 namespace Engine.UI.Buttons
 {
-	public class SceneButton : MonoBehaviour, IPointerClickHandler
+	public class SceneButton : ButtonBehaviour
 	{
-		[HideIf("Reload")]
-		public string Scene;
-
 		public bool Reload;
+
+		[HideIf("Reload")]
+		public SceneReference Scene;
 
 		[FoldoutGroup("Fading")]
 		public FadeMode FadeMode = FadeMode.FadeOutIn;
@@ -34,10 +34,13 @@ namespace Engine.UI.Buttons
 		[FoldoutGroup("Events")]
 		public UnityEvent Completed;
 
-		public void OnPointerClick (PointerEventData eventData)
+		protected override void OnClick()
 		{
+			string scene = Reload ? SceneDirector.ActiveScene.path : Scene.Path;
+			if (scene.IsNullOrEmpty())
+				return;
+
 			enabled = false;
-			string scene = Reload ? SceneDirector.ActiveScene.path : Scene;
 			SceneDirector.LoadScene(scene, FadeMode, FadeColor, FadeTime, false,
 									progress => LoadProgressed.Invoke(), LoadCompleted.Invoke,
 									Completed.Invoke)

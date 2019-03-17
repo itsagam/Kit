@@ -1,14 +1,11 @@
-﻿using UnityEngine;
-using UnityEngine.EventSystems;
-
-namespace Engine.UI.Buttons
+﻿namespace Engine.UI.Buttons
 {
-	public class GotoButton : MonoBehaviour, IPointerClickHandler
+	public class GotoButton : ButtonBehaviour
 	{
 		public Wizard Wizard;
 		public Window Step;
 
-		public void OnPointerClick (PointerEventData eventData)
+		protected override void OnClick()
 		{
 			if (Wizard != null)
 				Wizard.GoTo(Step);

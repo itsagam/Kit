@@ -37,7 +37,7 @@ namespace Engine.Pooling
 
 		public static PoolGroup GetGroup(string name)
 		{
-			return poolGroupsByName.TryGetValue(name, out PoolGroup group) ? @group : null;
+			return poolGroupsByName.GetOrDefault(name);
 		}
 
 		public static bool DestroyGroup(string name)
@@ -115,12 +115,12 @@ namespace Engine.Pooling
 
 		public static Pool GetPool(string name)
 		{
-			return poolsByName.TryGetValue(name, out Pool pool) ? pool : null;
+			return poolsByName.GetOrDefault(name);
 		}
 
 		public static Pool GetPool(Component prefab)
 		{
-			return poolsByPrefab.TryGetValue(prefab, out Pool pool) ? pool : null;
+			return poolsByPrefab.GetOrDefault(prefab);
 		}
 
 		public static Pool GetOrCreatePool(Component prefab)

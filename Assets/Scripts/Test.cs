@@ -1,5 +1,9 @@
 ﻿using UnityEngine;
 
+// TODO: SetInteractiveImmediate fix
+// TODO: PanelRadioButton and RadioButton diagnose
+// TODO: StepButton with ButtonBehaviour
+
 namespace Game
 {
 	public class Test: MonoBehaviour
@@ -11,6 +15,7 @@ namespace Game
 
 		public void Button()
 		{
+
 		}
 	}
 }
