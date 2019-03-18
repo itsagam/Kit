@@ -4,59 +4,41 @@ namespace Engine
 {
     public static class RaycastHelper
     {
-        public static RaycastHit2D ScreenRaycast2D(Vector2 screenPoint, int layerMask = int.MaxValue)
+        public static RaycastHit2D ScreenRaycast2D(Camera camera, Vector2 screenPoint, int layerMask = int.MaxValue)
         {
-            return Physics2D.GetRayIntersection(Camera.main.ScreenPointToRay(screenPoint), float.PositiveInfinity, layerMask);
+            return Physics2D.GetRayIntersection(camera.ScreenPointToRay(screenPoint), float.PositiveInfinity, layerMask);
         }
 
-        public static RaycastHit2D ScreenRaycast2D(int layerMask)
+        public static RaycastHit2D ScreenRaycast2D(Camera camera, int layerMask = int.MaxValue)
         {
-            return ScreenRaycast2D(Input.mousePosition, layerMask);
+            return ScreenRaycast2D(camera, Input.mousePosition, layerMask);
         }
 
-        public static RaycastHit2D ScreenRaycast2D()
-        {
-            return ScreenRaycast2D(Input.mousePosition);
-        }
 
-        public static bool ScreenRaycast(Vector2 screenPoint, int layerMask, out RaycastHit hit)
+        public static bool ScreenRaycast(Camera camera, Vector2 screenPoint, out RaycastHit hit, int layerMask = int.MaxValue)
         {
-            Ray ray = Camera.main.ScreenPointToRay(screenPoint);
+            Ray ray = camera.ScreenPointToRay(screenPoint);
             bool result = Physics.Raycast(ray, out RaycastHit rayHit, float.PositiveInfinity, layerMask);
             hit = rayHit;
             return result;
         }
 
-        public static bool ScreenRaycast(Vector2 screenPoint, out RaycastHit hit)
+        public static bool ScreenRaycast(Camera camera, out RaycastHit hit, int layerMask = int.MaxValue)
         {
-            return ScreenRaycast(screenPoint, int.MaxValue, out hit);
+            return ScreenRaycast(camera, Input.mousePosition, out hit, layerMask);
         }
 
-        public static bool ScreenRaycast(out RaycastHit hit)
-        {
-            return ScreenRaycast(Input.mousePosition, out hit);
-        }
 
-        public static bool ScreenRaycast(int layerMask, out RaycastHit hit)
+        public static Vector3 ScreenRaycastAtPlane(Camera camera, Vector3 screenPoint, Vector3 direction)
         {
-            return ScreenRaycast(Input.mousePosition, layerMask, out hit);
-        }
-
-        public static Vector3 ScreenRaycastAtPlane(Vector3 screenPoint, Vector3 direction)
-        {
-            Ray ray = Camera.main.ScreenPointToRay(screenPoint);
+            Ray ray = camera.ScreenPointToRay(screenPoint);
             Plane plane = new Plane(direction, Vector3.zero);
             return plane.Raycast(ray, out float distance) ? ray.GetPoint(distance) : Vector3.zero;
         }
 
-        public static Vector3 ScreenRaycastAtPlane(Vector3 direction)
+        public static Vector3 ScreenRaycastAtPlane(Camera camera, Vector3? direction = null)
         {
-            return ScreenRaycastAtPlane(Input.mousePosition, direction);
-        }
-
-        public static Vector3 ScreenRaycastAtPlane()
-        {
-            return ScreenRaycastAtPlane(Input.mousePosition, Vector3.forward);
+            return ScreenRaycastAtPlane(camera, Input.mousePosition, direction ?? Vector3.forward);
         }
     }
 }

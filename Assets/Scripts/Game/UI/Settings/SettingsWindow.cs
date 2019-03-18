@@ -1,5 +1,5 @@
+using Engine;
 using Engine.UI;
-using UnityEngine;
 
 namespace Game.UI.Settings
 {
@@ -7,7 +7,7 @@ namespace Game.UI.Settings
 	{
 		protected override void OnHidden()
 		{
-			PlayerPrefs.Save();
+			PreferenceManager.Save();
 		}
 	}
 }

@@ -12,20 +12,7 @@ namespace Game
 			return player.Team == Team;
 		}
 
-		public IEnumerable<TeamPlayer> Partners
-		{
-			get
-			{
-				return Team.Players.Where(p => p != this);
-			}
-		}
-
-		public TeamPlayer Partner
-		{
-			get
-			{
-				return Team.Players.Find(p => p != this);
-			}
-		}
+		public IEnumerable<TeamPlayer> Partners => Team.Players.Where(p => p != this);
+		public TeamPlayer Partner => Team.Players.Find(p => p != this);
 	}
 }

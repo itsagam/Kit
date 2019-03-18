@@ -115,11 +115,7 @@ namespace Engine
 			if (parent == null)
 			{
 				if (lastCanvas == null)
-				{
-					lastCanvas = Object.FindObjectOfType<Canvas>();
-					if (lastCanvas == null)
-						lastCanvas = CreateCanvas();
-				}
+					lastCanvas = CreateCanvas();
 				parent = lastCanvas.transform;
 			}
 
@@ -176,7 +172,7 @@ namespace Engine
 
 		private static Canvas CreateCanvas()
 		{
-			GameObject uiGO = new GameObject("UI") {layer = LayerMask.NameToLayer("UI")};
+			GameObject uiGO = new GameObject("Windows") {layer = LayerMask.NameToLayer("UI")};
 			Canvas canvas = uiGO.AddComponent<Canvas>();
 			canvas.renderMode = RenderMode.ScreenSpaceOverlay;
 

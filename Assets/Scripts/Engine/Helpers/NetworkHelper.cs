@@ -12,7 +12,7 @@ namespace Engine
 
 			try
 			{
-				using (var client = new WebClient())
+				using (WebClient client = new WebClient())
 				using (client.OpenRead("http://www.google.com"))
 					return true;
 			}

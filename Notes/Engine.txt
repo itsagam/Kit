@@ -13,7 +13,6 @@ Library
 			- Load on Demand
 		Audio Manager
 			- Select group from inspector
-		Player Prefs Manager
 
 Specific
 -------------------------------------------------------------------------

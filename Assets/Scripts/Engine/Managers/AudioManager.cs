@@ -87,17 +87,12 @@ namespace Engine
 
 		public static float LoadGroupVolume(string group)
 		{
-			return PlayerPrefs.GetFloat(GetGroupVolumeKey(group), 1);
+			return PreferenceManager.Get("Audio", group, "Volume", 1.0f);
 		}
 
 		public static void SaveGroupVolume(string group, float volume)
 		{
-			PlayerPrefs.SetFloat(GetGroupVolumeKey(group), volume);
-		}
-
-		private static string GetGroupVolumeKey(string group)
-		{
-			return $"Volume/{group}";
+			PreferenceManager.Set("Audio", group, "Volume", volume);
 		}
 		#endregion
 

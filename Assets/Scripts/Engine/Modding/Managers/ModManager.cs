@@ -194,7 +194,7 @@ namespace Engine.Modding
 			if (!mod.Group.Deactivatable)
 				return;
 
-			PlayerPrefs.SetInt(GetModKey(mod, "Enabled"), value ? 1 : 0);
+			PreferenceManager.Set(mod.Group.Name.ToString(), mod.Metadata.Name, "Enabled", value);
 			RefreshActiveMods();
 		}
 
@@ -202,7 +202,8 @@ namespace Engine.Modding
 		{
 			if (!mod.Group.Deactivatable)
 				return true;
-			return PlayerPrefs.GetInt(GetModKey(mod, "Enabled"), 1) == 1;
+
+			return PreferenceManager.Get(mod.Group.Name.ToString(), mod.Metadata.Name, "Enabled", true);
 		}
 
 		public static int GetModOrder(Mod mod)
@@ -257,7 +258,9 @@ namespace Engine.Modding
 				if (group.Reorderable)
 					group.Mods = group.Mods.AsEnumerable()
 									  .Reverse()
-									  .OrderBy(mod => PlayerPrefs.GetInt(GetModKey(mod, "Order"), -1))
+									  .OrderBy(mod => PreferenceManager.Get(group.Name.ToString(),
+																			 mod.Metadata.Name,
+																			 "Order", -1))
 									  .ToList();
 		}
 
@@ -265,14 +268,11 @@ namespace Engine.Modding
 		{
 			foreach (ModGroup group in Groups.Values)
 				if (group.Reorderable)
-					for (int i = 0; i < group.Mods.Count; i++)
-						PlayerPrefs.SetInt(GetModKey(group.Mods[i], "Order"), i);
-		}
-
-
-		private static string GetModKey(Mod mod, string property)
-		{
-			return $"{mod.Group.Name}/{mod.Metadata.Name}.{property}";
+					for (int order = 0; order < group.Mods.Count; order++)
+					{
+						Mod mod = group.Mods[order];
+						PreferenceManager.Set(group.Name.ToString(), mod.Metadata.Name, "Order", order);
+					}
 		}
 
 		#endregion

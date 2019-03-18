@@ -7,7 +7,7 @@ using UnityEngine.UI;
 using Engine.Modding;
 #endif
 
-namespace Game.UI.Modding
+namespace Game.UI.Mods
 {
 	public class ModIcon : Icon
 	{
