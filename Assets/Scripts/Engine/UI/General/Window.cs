@@ -62,7 +62,7 @@ namespace Engine.UI
 			Data = data;
 			gameObject.SetActive(true);
 
-			AudioManager.PlayUIEffect(ShowSound);
+			AudioManager.PlayUI(ShowSound);
 			if (animator != null && !animation.IsNullOrEmpty())
 			{
 				int animationHash = Animator.StringToHash(animation);
@@ -96,7 +96,7 @@ namespace Engine.UI
 			OnHiding();
 			Hiding.Invoke();
 
-			AudioManager.PlayUIEffect(HideSound);
+			AudioManager.PlayUI(HideSound);
 			if (animator != null && !animation.IsNullOrEmpty())
 			{
 				int animationHash = Animator.StringToHash(animation);

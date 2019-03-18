@@ -12,8 +12,8 @@ namespace Engine
 	public static class AudioManager
 	{
 		#region Fields
-		public const string BackgroundGroup = "Background";
-		public const string SoundEffectGroup = "SoundEffect";
+		public const string SoundGroup = "Sounds";
+		public const string MusicGroup = "Music";
 		public const string UIGroup = "UI";
 
 		public static AudioFader BackgroundManager { get; private set; }
@@ -37,21 +37,23 @@ namespace Engine
 			audioGameObject = new GameObject("Audio");
 			audioTransform = audioGameObject.transform;
 
-			AudioSource bgSource = CreateGroup(BackgroundGroup);
+			AudioSource bgSource = CreateGroup(MusicGroup, true);
 			BackgroundManager = bgSource.gameObject.AddComponent<AudioFader>();
 
-			CreateGroup(SoundEffectGroup);
-			CreateGroup(UIGroup);
+			CreateGroup(SoundGroup, true);
+			CreateGroup(UIGroup, true);
 
 			Object.DontDestroyOnLoad(audioGameObject);
 		}
 		#endregion
 
 		#region Group management
-		public static AudioSource CreateGroup(string name)
+		public static AudioSource CreateGroup(string name, bool loadVolume = false)
 		{
 			GameObject gameObject = new GameObject(name);
 			AudioSource source = gameObject.AddComponent<AudioSource>();
+			if (loadVolume)
+				source.volume = LoadGroupVolume(name);
 			source.transform.parent = audioTransform;
 			groupSources.Add(name, source);
 			return source;
@@ -82,6 +84,21 @@ namespace Engine
 		{
 			return groupSources.Values;
 		}
+
+		public static float LoadGroupVolume(string group)
+		{
+			return PlayerPrefs.GetFloat(GetGroupVolumeKey(group), 1);
+		}
+
+		public static void SaveGroupVolume(string group, float volume)
+		{
+			PlayerPrefs.SetFloat(GetGroupVolumeKey(group), volume);
+		}
+
+		private static string GetGroupVolumeKey(string group)
+		{
+			return $"Volume/{group}";
+		}
 		#endregion
 
 		#region Group playback
@@ -91,41 +108,41 @@ namespace Engine
 				GetOrCreateGroup(group).PlayOneShot(clip);
 		}
 
-		public static void PlayBackgroundMusic(AudioClip clip)
+		public static void PlayMusic(AudioClip clip)
 		{
 			BackgroundManager.Play(clip);
 		}
 
-		public static void PlayBackgroundMusic()
+		public static void PlayMusic()
 		{
 			BackgroundManager.Play();
 		}
 
-		public static void PauseBackgroundMusic()
+		public static void PauseMusic()
 		{
 			BackgroundManager.Pause();
 		}
 
-		public static void StopBackgroundMusic()
+		public static void StopMusic()
 		{
 			BackgroundManager.Stop();
 		}
 
-		public static void PlaySoundEffect(AudioClip clip)
+		public static void PlaySound(AudioClip clip)
 		{
-			Play(SoundEffectGroup, clip);
+			Play(SoundGroup, clip);
 		}
 
-		public static void PlaySoundEffect(AudioClip[] clips)
+		public static void PlaySound(AudioClip[] clips)
 		{
 			if (clips == null || clips.Length <= 0)
 				return;
 
 			int randomIndex = Random.Range(0, clips.Length);
-			PlaySoundEffect(clips[randomIndex]);
+			PlaySound(clips[randomIndex]);
 		}
 
-		public static void PlayUIEffect(AudioClip clip)
+		public static void PlayUI(AudioClip clip)
 		{
 			Play(UIGroup, clip);
 		}
@@ -251,15 +268,15 @@ namespace Engine
 		#endregion
 
 		#region Public properties
-		public static AudioSource BackgroundSource => GetGroup(BackgroundGroup);
-		public static AudioSource SoundEffectsSource => GetGroup(SoundEffectGroup);
+		public static AudioSource MusicSource => GetGroup(MusicGroup);
+		public static AudioSource SoundSource => GetGroup(SoundGroup);
 		public static AudioSource UISource => GetGroup(UIGroup);
-		public static float BackgroundMusicFadeSpeed
+		public static float MusicFadeSpeed
 		{
 			get => BackgroundManager.Speed;
 			set => BackgroundManager.Speed = value;
 		}
-		public static bool IsBackgroundMusicPlaying => BackgroundManager.IsPlaying;
+		public static bool IsMusicPlaying => BackgroundManager.IsPlaying;
 		#endregion
 	}
 }

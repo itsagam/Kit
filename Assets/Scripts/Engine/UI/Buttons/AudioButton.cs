@@ -8,7 +8,7 @@ namespace Engine.UI.Buttons
 
 		protected override void OnClick()
 		{
-			AudioManager.PlayUIEffect(Audio);
+			AudioManager.PlayUI(Audio);
 		}
 	}
 }

@@ -9,7 +9,14 @@ Library
 	-------------------------------------------------------------------------
 		Data Manager
 		Input Manager
+		UI Manager
+			- Load on Demand
+		Audio Manager
+			- Select group from inspector
+		Player Prefs Manager
 
-	UI
-	-------------------------------------------------------------------------
-		Settings
+Specific
+-------------------------------------------------------------------------
+	Card System -> A card system with a support of all functions on a deck of playing cards	
+	Weapon/Projectile System -> A projectile system with a variety of projectile behaviours and support for beams.
+	Grid System -> A generic grid system with 2D, Isometric, and 3D modes.
