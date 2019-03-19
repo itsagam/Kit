@@ -16,6 +16,10 @@ namespace Engine
 					PlayerPrefs.SetInt(key, @int);
 					break;
 
+				case uint @uint:
+					PlayerPrefs.SetInt(key, (int) @uint);
+					break;
+
 				case float @float:
 					PlayerPrefs.SetFloat(key, @float);
 					break;
@@ -32,12 +36,19 @@ namespace Engine
 					PlayerPrefs.SetInt(key, @byte);
 					break;
 
+				case sbyte @sbyte:
+					PlayerPrefs.SetInt(key, @sbyte);
+					break;
+
 				case char @char:
 					PlayerPrefs.SetInt(key, @char);
 					break;
 
 				case short @short:
 					PlayerPrefs.SetInt(key, @short);
+					break;
+				case ushort @ushort:
+					PlayerPrefs.SetInt(key, @ushort);
 					break;
 
 				case Enum @enum:
@@ -58,6 +69,9 @@ namespace Engine
 				case int @int:
 					return (T) (object) PlayerPrefs.GetInt(key, @int);
 
+				case uint @uint:
+					return (T) (object) PlayerPrefs.GetInt(key, (int) @uint);
+
 				case float @float:
 					return (T) (object) PlayerPrefs.GetFloat(key, @float);
 
@@ -70,11 +84,17 @@ namespace Engine
 				case byte @byte:
 					return (T) (object) PlayerPrefs.GetInt(key, @byte);
 
+				case sbyte @sbyte:
+					return (T) (object) PlayerPrefs.GetInt(key, @sbyte);
+
 				case char @char:
 					return (T) (object) PlayerPrefs.GetInt(key, @char);
 
 				case short @short:
 					return (T) (object) PlayerPrefs.GetInt(key, @short);
+
+				case ushort @ushort:
+					return (T) (object) PlayerPrefs.GetInt(key, @ushort);
 
 				case Enum @enum:
 					return (T) Enum.ToObject(typeof(T), PlayerPrefs.GetInt(key, Convert.ToInt32(@enum)));
