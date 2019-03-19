@@ -36,7 +36,7 @@ namespace Engine.UI.Buttons
 
 		protected override void OnClick()
 		{
-			string scene = Reload ? SceneDirector.ActiveScene.path : Scene.Path;
+			string scene = Reload ? SceneDirector.ActiveScene.path : Scene;
 			if (scene.IsNullOrEmpty())
 				return;
 

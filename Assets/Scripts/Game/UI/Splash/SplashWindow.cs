@@ -66,7 +66,7 @@ namespace Game.UI.Splash
 
 		private UniTask LoadNextScene()
 		{
-			return SceneDirector.LoadScene(NextScene.Path);
+			return SceneDirector.LoadScene(NextScene);
 		}
 		#endregion
 

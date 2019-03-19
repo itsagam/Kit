@@ -1348,7 +1348,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 12aa95e3e7ff55b4ea27acc125888fe4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Window: {fileID: 1244094513969230672, guid: be16c1611b02fee44a1ff03476c94cc9, type: 3}
+  UseSoftReference: 1
+  HardReference: {fileID: 0}
+  SoftReference:
+    path: Windows/ModWindow.prefab
+    Asset: {fileID: 1244094513969230672, guid: be16c1611b02fee44a1ff03476c94cc9, type: 3}
   Action: 0
 --- !u!114 &758223933 stripped
 MonoBehaviour:
@@ -1457,7 +1461,7 @@ MonoBehaviour:
   Reload: 0
   Scene:
     path: Assets/Scenes/Game.unity
-    scene: {fileID: 102900000, guid: 6e78a11eff0808540a015f0ea868515d, type: 3}
+    Asset: {fileID: 102900000, guid: 6e78a11eff0808540a015f0ea868515d, type: 3}
   FadeMode: 3
   FadeColor: {r: 0, g: 0, b: 0, a: 1}
   FadeTime: 1
@@ -1716,7 +1720,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 12aa95e3e7ff55b4ea27acc125888fe4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Window: {fileID: 8105554666432306860, guid: 9dab6f24a1ec1c94796cb89c29d56420, type: 3}
+  UseSoftReference: 1
+  HardReference: {fileID: 0}
+  SoftReference:
+    path: Windows/SettingsWindow.prefab
+    Asset: {fileID: 8105554666432306860, guid: 9dab6f24a1ec1c94796cb89c29d56420, type: 3}
   Action: 0
 --- !u!1001 &1701196318
 PrefabInstance:

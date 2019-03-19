@@ -4,6 +4,11 @@ namespace Engine
 {
 	public static class ComponentExtensions
 	{
+		public static bool IsPrefab(this Component component)
+		{
+			return component.gameObject.IsPrefab();
+		}
+
 		public static Bounds GetBounds(this Component component)
 		{
 			switch (component)

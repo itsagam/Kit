@@ -376,7 +376,7 @@ MonoBehaviour:
   ProgressImage: {fileID: 1618835993}
   NextScene:
     path: Assets/Scenes/Menu.unity
-    scene: {fileID: 102900000, guid: c82ece6a277ffbe4ebd54bc15df279b5, type: 3}
+    Asset: {fileID: 102900000, guid: c82ece6a277ffbe4ebd54bc15df279b5, type: 3}
 --- !u!114 &1618835993 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 1416516012667134638, guid: a2d6fbded7bbcf84785498fbd26e99c6,
@@ -400,16 +400,6 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: Status
-      objectReference: {fileID: 0}
-    - target: {fileID: 6610920684805784606, guid: 86edc72d3b5bdb04b9898f531e0363ee,
-        type: 3}
-      propertyPath: m_Text
-      value: Status
-      objectReference: {fileID: 0}
-    - target: {fileID: 6610920684805784606, guid: 86edc72d3b5bdb04b9898f531e0363ee,
-        type: 3}
-      propertyPath: m_FontData.m_Alignment
-      value: 4
       objectReference: {fileID: 0}
     - target: {fileID: 1712564635289878256, guid: 86edc72d3b5bdb04b9898f531e0363ee,
         type: 3}
@@ -515,6 +505,16 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Pivot.y
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6610920684805784606, guid: 86edc72d3b5bdb04b9898f531e0363ee,
+        type: 3}
+      propertyPath: m_Text
+      value: Status
+      objectReference: {fileID: 0}
+    - target: {fileID: 6610920684805784606, guid: 86edc72d3b5bdb04b9898f531e0363ee,
+        type: 3}
+      propertyPath: m_FontData.m_Alignment
+      value: 4
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 86edc72d3b5bdb04b9898f531e0363ee, type: 3}
