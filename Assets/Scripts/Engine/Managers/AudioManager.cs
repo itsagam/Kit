@@ -76,7 +76,7 @@ namespace Engine
 				return false;
 
 			groupSources.Remove(name);
-			source.Destroy();
+			source.gameObject.Destroy();
 			return true;
 		}
 
@@ -85,14 +85,14 @@ namespace Engine
 			return groupSources.Values;
 		}
 
-		public static float LoadGroupVolume(string group)
+		public static float LoadGroupVolume(string name)
 		{
-			return PreferenceManager.Get("Audio", group, "Volume", 1.0f);
+			return PreferenceManager.Get("Audio", name, "Volume", 1.0f);
 		}
 
-		public static void SaveGroupVolume(string group, float volume)
+		public static void SaveGroupVolume(string name, float volume)
 		{
-			PreferenceManager.Set("Audio", group, "Volume", volume);
+			PreferenceManager.Set("Audio", name, "Volume", volume);
 		}
 		#endregion
 
@@ -190,12 +190,7 @@ namespace Engine
 		private static void QueueForDestroy(AudioSource source)
 		{
 			if (!source.loop)
-			{
-				Observable.Timer(TimeSpan.FromSeconds(source.clip.length)).Subscribe(l =>
-																					 {
-																						 Pooler.Destroy(source);
-																					 });
-			}
+				Observable.Timer(TimeSpan.FromSeconds(source.clip.length)).Subscribe(l => Pooler.Destroy(source));
 		}
 		#endregion
 
@@ -250,13 +245,11 @@ namespace Engine
 			source.Play();
 
 			if (!loop)
-			{
 				Observable.Timer(TimeSpan.FromSeconds(clip.length)).Subscribe(l =>
 																			  {
 																				  if (gameObject != null)
 																					  gameObject.Destroy();
 																			  });
-			}
 
 			return source;
 		}

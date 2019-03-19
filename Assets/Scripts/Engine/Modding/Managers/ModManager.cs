@@ -302,7 +302,7 @@ namespace Engine.Modding
 			if (cachedReference != null)
 				return cachedReference;
 
-			if (!ActiveMods.Any())
+			if (ActiveMods.Count <= 0)
 				return null;
 
 			string path = GetModdingPath(folder, file);
@@ -332,7 +332,7 @@ namespace Engine.Modding
 			if (cachedReference != null)
 				return cachedReference;
 
-			if (!ActiveMods.Any())
+			if (ActiveMods.Count <= 0)
 				return null;
 
 			string path = GetModdingPath(folder, file);
