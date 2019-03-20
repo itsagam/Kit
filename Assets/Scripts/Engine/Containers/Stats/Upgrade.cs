@@ -25,8 +25,7 @@ namespace Engine.Containers
 			ID = id;
 		}
 
-		public Upgrade(string id, IEnumerable<Effect> effects)
-			: this(id)
+		public Upgrade(string id, IEnumerable<Effect> effects) : this(id)
 		{
 			AddEffects(effects);
 		}
@@ -59,14 +58,6 @@ namespace Engine.Containers
 		public void RemoveEffects(string stat)
 		{
 			Effects.RemoveAll(e => e.Stat == stat);
-		}
-
-		public override string ToString()
-		{
-			string output = "";
-			foreach (Effect effect in Effects)
-				output += effect.ToString() + "\n";
-			return output;
 		}
 
 		public static Upgrade Find(IUpgradeable upgradeable, string id)

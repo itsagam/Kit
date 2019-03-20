@@ -26,7 +26,7 @@ namespace Engine.Algorithms
 		}
 		public IEnumerator<T> GetEnumerator()
 		{
-			for (Path<T> p = this; p != null; p = p.PreviousSteps)
+			for (var p = this; p != null; p = p.PreviousSteps)
 				yield return p.LastStep;
 		}
 		IEnumerator IEnumerable.GetEnumerator()
@@ -50,10 +50,10 @@ namespace Engine.Algorithms
 		public T Dequeue()
 		{
 			// will throw if there isn’t any first element!
-			var pair = list.First();
-			T v = pair.Value.Dequeue();
-			if (pair.Value.Count == 0) // nothing left of the top priority.
-				list.Remove(pair.Key);
+			(int key, var value) = list.First();
+			T v = value.Dequeue();
+			if (value.Count == 0) // nothing left of the top priority.
+				list.Remove(key);
 			return v;
 		}
 		public bool IsEmpty => !list.Any();
@@ -68,7 +68,7 @@ namespace Engine.Algorithms
 			queue.Enqueue(0, new Path<T>(start));
 			while (!queue.IsEmpty)
 			{
-				Path<T> path = queue.Dequeue();
+				var path = queue.Dequeue();
 				if (closed.Contains(path.LastStep))
 					continue;
 				if (path.LastStep.Equals(destination))
@@ -79,7 +79,7 @@ namespace Engine.Algorithms
 					int d = distance(path.LastStep, n);
 					if (d >= int.MaxValue)
 						continue;
-					Path<T> newPath = path.AddStep(n, d);
+					var newPath = path.AddStep(n, d);
 					queue.Enqueue(newPath.TotalCost + estimate(n), newPath);
 				}
 			}

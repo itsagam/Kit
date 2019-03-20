@@ -1,24 +1,21 @@
-﻿using UnityEngine;
+using Engine.Containers;
+using Sirenix.OdinInspector;
+using UniRx;
 
 namespace Game
 {
-	public class Test: MonoBehaviour
+	public class Test: SerializedMonoBehaviour, IUpgradeable
 	{
-		// public WindowReference Obj;
-		//
-		// [ValueDropdown("GetAllValues", FlattenTreeView = true)]
-		// public string Value;
-		//
-		// private void Awake()
-		// {
-		// 	print(typeof(Windows).GetField(Value).GetValue(null));
-		// }
-		//
-		// public IEnumerable<ValueDropdownItem<string>> GetAllValues()
-		// {
-		// 	var fields = typeof(Windows).GetFields(BindingFlags.Public | BindingFlags.Static);
-		// 	var strings = fields.Where(f => f.FieldType == typeof(string));
-		// 	return strings.Select(s => new ValueDropdownItem<string>(ObjectNames.NicifyVariableName(s.Name), s.Name));
-		// }
+		public Stat Health;
+		public ReactiveCollection<Upgrade> Upgrades;
+
+		private void Awake()
+		{
+		}
+
+		public ReactiveCollection<Upgrade> GetUpgrades()
+		{
+			return Upgrades;
+		}
 	}
 }

@@ -48,10 +48,7 @@ namespace Engine.Algorithms
 			this.loopPolar = loopPolar;
 			this.loopElevation = loopElevation;
 
-			if (cartesian.x == 0)
-				cartesian.x = Mathf.Epsilon;
 			Radius = cartesian.magnitude;
-
 			Polar = Mathf.Atan(cartesian.z / cartesian.x);
 
 			if (cartesian.x < 0f)
@@ -65,26 +62,26 @@ namespace Engine.Algorithms
 		}
 
 		// Haversine Formula
-		public float DistanceTo(SphericalCoordinates other, float radius)
+		public float DistanceTo(SphericalCoordinates other, float atRadius)
 		{
 			float dLat = other.Elevation - Elevation;
 			float dLon =  other.Polar - Polar;
 			float a = Mathf.Pow(Mathf.Sin(dLat / 2), 2) +
 				Mathf.Cos(Elevation) * Mathf.Cos(other.Elevation) * Mathf.Pow(Mathf.Sin(dLon / 2), 2);
 			float c = 2 * Mathf.Atan2(Mathf.Sqrt(a), Mathf.Sqrt(1 - a));
-			return radius * c;
+			return atRadius * c;
 		}
 
-		public SphericalCoordinates Translate(float radius)
+		public SphericalCoordinates Translate(float byRadius)
 		{
-			Radius += radius;
+			Radius += byRadius;
 			return this;
 		}
 
-		public SphericalCoordinates Rotate(float polar, float elevation)
+		public SphericalCoordinates Rotate(float byPolar /*haha!*/, float byElevation)
 		{
-			Polar += polar;
-			Elevation += elevation;
+			Polar += byPolar;
+			Elevation += byElevation;
 			return this;
 		}
 

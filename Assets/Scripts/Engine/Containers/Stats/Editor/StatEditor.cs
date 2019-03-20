@@ -75,7 +75,8 @@ namespace Engine.Containers.Editor
 
 			SirenixEditorGUI.BeginIndentedHorizontal();
 			var groups = Stats.GetEffectsAndUpgrades(stat.Upgradeable, stat.ID);
-			if (groups.Any())
+			bool any = groups.Any();
+			if (any)
 			{
 				Rect rect = EditorGUILayout.GetControlRect(false, GUILayout.Width(EditorGUIUtility.labelWidth - FoldoutWidthCorrection));
 				toggled.Value = SirenixEditorGUI.Foldout(rect, toggled.Value, label);
@@ -89,7 +90,7 @@ namespace Engine.Containers.Editor
 			float currentValue = Stats.CalculateValue(stat.Upgradeable, stat.ID, stat.BaseValue);
 			GUI.Label(GUILayoutUtility.GetLastRect(), Mathf.RoundToInt(currentValue).ToString(), CurrentValueStyle);
 			SirenixEditorGUI.EndIndentedHorizontal();
-			if (groups.Any())
+			if (any)
 			{
 				if (SirenixEditorGUI.BeginFadeGroup(UniqueDrawerKey.Create(Property, this), toggled.Value))
 				{

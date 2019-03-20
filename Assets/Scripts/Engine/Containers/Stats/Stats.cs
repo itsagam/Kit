@@ -5,6 +5,7 @@ using UniRx;
 
 namespace Engine.Containers
 {
+	[Serializable]
 	public class Stats : Dictionary<string, StatBaseProperty>, IDisposable
 	{
 		public IUpgradeable Upgradeable;
@@ -106,16 +107,21 @@ namespace Engine.Containers
 			return CalculateValue(GetAggregates(upgradeable, stat), baseValue);
 		}
 
-		public static IEnumerable<(Upgrade, IEnumerable<Effect>)> GetEffectsAndUpgrades(IUpgradeable upgradeable, string stat)
+		public static IEnumerable<(Upgrade upgrade, IEnumerable<Effect> effects)> GetEffectsAndUpgrades(IUpgradeable upgradeable,
+																										string stat)
 		{
 			return upgradeable.GetUpgrades()
+							  .Where(u => u != null)
 							  .Select(u => (upgrade: u, effects: u.Effects.Where(e => e.Stat == stat)))
 							  .Where(g => g.effects.Any());
 		}
 
 		public static IEnumerable<Effect> GetEffects(IUpgradeable upgradeable, string stat)
 		{
-			return upgradeable.GetUpgrades().Where(u => u != null).SelectMany(u => u.Effects).Where(e => e.Stat == stat);
+			return upgradeable.GetUpgrades()
+			                  .Where(u => u != null)
+			                  .SelectMany(u => u.Effects)
+			                  .Where(e => e.Stat == stat);
 		}
 
 		public static (float, float, float) GetAggregates(IEnumerable<Effect> effects)

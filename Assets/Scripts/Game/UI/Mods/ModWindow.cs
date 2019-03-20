@@ -1,5 +1,6 @@
 ﻿using Engine;
 using Engine.UI;
+using Engine.UI.Widgets;
 using UnityEngine.UI;
 #if MODDING
 using Engine.Modding;
@@ -11,6 +12,7 @@ namespace Game.UI.Mods
 	{
 		public IconList ModList;
 		public Text CountText;
+		public WindowReference MessageWindow;
 
 #if MODDING
 		public bool IsDirty { get; set; }
@@ -35,7 +37,7 @@ namespace Game.UI.Mods
 				return;
 
 			PreferenceManager.Save();
-			UIManager.Show(Windows.Message, "Some changes will not be reflected until you restart the application.");
+			UIManager.Show(MessageWindow, "Some changes will not be reflected until you restart the application.");
 		}
 #endif
 	}

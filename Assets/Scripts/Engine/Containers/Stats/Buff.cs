@@ -27,14 +27,6 @@ namespace Engine.Containers
 		{
 		}
 
-		public Buff(IEnumerable<Effect> effects, float time, BuffMode mode = BuffMode.Extend)
-		{
-			AddEffects(effects);
-			ID = ToString();
-			Duration = time;
-			Mode = mode;
-		}
-
 		public Buff(string id, float time, BuffMode mode = BuffMode.Extend)
 		{
 			ID = id;
