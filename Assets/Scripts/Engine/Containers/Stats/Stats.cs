@@ -10,8 +10,9 @@ namespace Engine.Containers
 	{
 		public IUpgradeable Upgradeable;
 
-		protected Dictionary<string, ReadOnlyReactiveProperty<float>> currentProperties = new Dictionary<string, ReadOnlyReactiveProperty<float>>();
-		protected CompositeDisposable disposables = new CompositeDisposable();
+		protected readonly Dictionary<string, ReadOnlyReactiveProperty<float>> currentProperties =
+			new Dictionary<string, ReadOnlyReactiveProperty<float>>();
+		protected readonly CompositeDisposable disposables = new CompositeDisposable();
 
 		public Stats()
 		{

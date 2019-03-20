@@ -18,7 +18,6 @@ namespace Engine
 			int maxSearchLength = sb.Length - length + 1;
 
 			for (int i = startIndex; i < maxSearchLength; ++i)
-			{
 				if (sb[i] == value[0])
 				{
 					int index = 1;
@@ -28,7 +27,6 @@ namespace Engine
 					if (index == length)
 						return i;
 				}
-			}
 
 			return -1;
 		}
