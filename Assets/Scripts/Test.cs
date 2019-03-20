@@ -1,21 +1,11 @@
-using Engine.Containers;
-using Sirenix.OdinInspector;
-using UniRx;
+using UnityEngine;
 
 namespace Game
 {
-	public class Test: SerializedMonoBehaviour, IUpgradeable
+	public class Test: MonoBehaviour
 	{
-		public Stat Health;
-		public ReactiveCollection<Upgrade> Upgrades;
-
 		private void Awake()
 		{
-		}
-
-		public ReactiveCollection<Upgrade> GetUpgrades()
-		{
-			return Upgrades;
 		}
 	}
 }
