@@ -7,7 +7,7 @@ namespace Weapons.Modifiers.Spawners
 	public class Circle : ISpawn
 	{
 		[MinValue(0)]
-		public int Count = 20;
+		public int Count = 10;
 
 		[Range(-180, 180)]
 		public float Rotation = 0.0f;

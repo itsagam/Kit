@@ -26,18 +26,34 @@ namespace Weapons
 
 		public void Fire(Vector3 startPosition, Quaternion startRotation)
 		{
-			var positions = new List<Transformation> { new Transformation(startPosition, startRotation) };
-			foreach(ISpawn spawner in Spawners)
+			switch (Spawners.Count)
 			{
-				int count = positions.Count;
-				for (int i=0; i <count; i++)
-				{
-					positions.AddRange(spawner.GetPositions(positions[0].Position, positions[0].Rotation));
-					positions.RemoveAt(0);
-				}
+				case 0:
+					Spawn(startPosition, startRotation);
+					break;
+
+				case 1:
+					foreach(Transformation position in Spawners[0].GetPositions(startPosition, startRotation))
+						Spawn(position.Position, position.Rotation);
+					break;
+
+				default:
+					var positions = new Queue<Transformation>();
+					positions.Enqueue(new Transformation(startPosition, startRotation));
+					foreach(ISpawn spawner in Spawners)
+					{
+						int count = positions.Count;
+						for (int i=0; i <count; i++)
+						{
+							Transformation previous = positions.Dequeue();
+							foreach (Transformation position in spawner.GetPositions(previous.Position, previous.Rotation))
+								positions.Enqueue(position);
+						}
+					}
+					foreach(Transformation position in positions)
+						Spawn(position.Position, position.Rotation);
+					break;
 			}
-			foreach(Transformation transformation in positions)
-				Spawn(transformation.Position, transformation.Rotation);
 		}
 
 		protected void Update()

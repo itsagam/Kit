@@ -1,9 +1,10 @@
-Allow for Looping
-Allow for Nested Graphs
+Pool on Invisible
 Make frame-rate independant
 Make world-space independant
 Directions/Speeds/Accelerations: Absolute/Relative/Sequential
 Effects: Nozzle, Impact
+Allow for Looping
+Allow for Nested Graphs
 
 Bullet Node
 -------------------

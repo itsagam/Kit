@@ -24,16 +24,14 @@ namespace Engine.Pooling
 		[PropertySpace]
 
 		[Button(ButtonSizes.Large)]
-		[ShowIf("ShowButton")]
+		[ShowIf("IsValid")]
 		[LabelText("Move To Pool")]
-		private void Destroy()
+#endif
+		public void Destroy()
 		{
 			Pool.Destroy(Component);
 		}
 
-		private bool ShowButton => Pool      != null &&
-								   Component != null &&
-								   Pool.Used.Contains(Component);
-#endif
+		public bool IsValid => Pool != null && Component != null;
 	}
 }

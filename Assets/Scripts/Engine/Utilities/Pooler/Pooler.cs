@@ -357,10 +357,10 @@ namespace Engine.Pooling
 				return false;
 
 			PoolInstance poolInstance = instance.GetComponent<PoolInstance>();
-			if (poolInstance != null && poolInstance.Pool == null)
+			if (poolInstance == null || !poolInstance.IsValid)
 				return false;
 
-			poolInstance.Pool.Destroy(instance);
+			poolInstance.Destroy();
 			return true;
 		}
 

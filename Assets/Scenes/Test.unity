@@ -219,19 +219,43 @@ MonoBehaviour:
         mscorlib
     - Name: 
       Entry: 12
-      Data: 1
+      Data: 3
     - Name: 
       Entry: 7
-      Data: 1|Weapons.Modifiers.Spawners.Arc, Assembly-CSharp
+      Data: 1|Weapons.Modifiers.Spawners.Multiple, Assembly-CSharp
     - Name: Count
       Entry: 3
-      Data: 20
+      Data: 3
+    - Name: Space
+      Entry: 4
+      Data: 15
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 2|Weapons.Modifiers.Spawners.Arc, Assembly-CSharp
+    - Name: Count
+      Entry: 3
+      Data: 5
     - Name: Rotation
       Entry: 4
       Data: 0
     - Name: Angle
       Entry: 4
-      Data: 60
+      Data: 30
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 3|Weapons.Modifiers.Spawners.Multiple, Assembly-CSharp
+    - Name: Count
+      Entry: 3
+      Data: 2
+    - Name: Space
+      Entry: 4
+      Data: 1
     - Name: 
       Entry: 8
       Data: 
@@ -243,20 +267,17 @@ MonoBehaviour:
       Data: 
     - Name: Steerers
       Entry: 7
-      Data: 2|System.Collections.Generic.List`1[[Weapons.Modifiers.ISteer, Assembly-CSharp]],
+      Data: 4|System.Collections.Generic.List`1[[Weapons.Modifiers.ISteer, Assembly-CSharp]],
         mscorlib
     - Name: 
       Entry: 12
       Data: 1
     - Name: 
       Entry: 7
-      Data: 3|Weapons.Modifiers.Steerers.Rotating, Assembly-CSharp
-    - Name: MoveSpeed
+      Data: 5|Weapons.Modifiers.Steerers.Straight, Assembly-CSharp
+    - Name: Speed
       Entry: 4
       Data: 20
-    - Name: RotateSpeed
-      Entry: 4
-      Data: 0.21
     - Name: 
       Entry: 8
       Data: 
