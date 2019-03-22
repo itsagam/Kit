@@ -4,18 +4,18 @@ namespace Engine
 {
     public static class RaycastHelper
     {
-        public static RaycastHit2D ScreenRaycast2D(Camera camera, Vector2 screenPoint, int layerMask = int.MaxValue)
+        public static RaycastHit2D ScreenRaycast2D(Camera camera, Vector2 screenPoint, int layerMask = -5)
         {
             return Physics2D.GetRayIntersection(camera.ScreenPointToRay(screenPoint), float.PositiveInfinity, layerMask);
         }
 
-        public static RaycastHit2D ScreenRaycast2D(Camera camera, int layerMask = int.MaxValue)
+        public static RaycastHit2D ScreenRaycast2D(Camera camera, int layerMask = -5)
         {
             return ScreenRaycast2D(camera, Input.mousePosition, layerMask);
         }
 
 
-        public static bool ScreenRaycast(Camera camera, Vector2 screenPoint, out RaycastHit hit, int layerMask = int.MaxValue)
+        public static bool ScreenRaycast(Camera camera, Vector2 screenPoint, out RaycastHit hit, int layerMask = -5)
         {
             Ray ray = camera.ScreenPointToRay(screenPoint);
             bool result = Physics.Raycast(ray, out RaycastHit rayHit, float.PositiveInfinity, layerMask);
@@ -23,7 +23,7 @@ namespace Engine
             return result;
         }
 
-        public static bool ScreenRaycast(Camera camera, out RaycastHit hit, int layerMask = int.MaxValue)
+        public static bool ScreenRaycast(Camera camera, out RaycastHit hit, int layerMask = -5)
         {
             return ScreenRaycast(camera, Input.mousePosition, out hit, layerMask);
         }

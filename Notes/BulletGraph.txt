@@ -23,11 +23,7 @@ Fire Action
 Bullet
 Spawner
 Steerer
-Damager
-(Users)
-(Impactors)
-(Deflectors)
-(Enders)
+Impactors
 
 Repeat Action
 -------------------
@@ -44,6 +40,23 @@ Modifier
 
 
 
+
+
+
+ISteer
+------------------
+Homing
+
+IDeflect
+-----------------
+Bouncing
+
+IEnd
+-----------------
+Bouncing
+
+
+
 IUse
 ------------------
 Charging
@@ -55,19 +68,7 @@ Critical
 Stronger
 Draining
 
-ISteer
-------------------
-Homing
-
 IImpact
 -----------------
 Buffing
 Slowing
-
-IDeflect
------------------
-Bouncing
-
-IEnd
------------------
-Bouncing

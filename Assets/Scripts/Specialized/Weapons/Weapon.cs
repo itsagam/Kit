@@ -26,6 +26,7 @@ namespace Weapons
 
 		public List<Transform> Fireables { get; } = new List<Transform>();
 		protected new Transform transform;
+		protected static readonly ContactFilter2D contactFilter = new ContactFilter2D().NoFilter();
 
 		protected void Awake()
 		{
@@ -104,14 +105,15 @@ namespace Weapons
 
 		protected void FixedUpdate()
 		{
-			foreach (Transform fireable in ((IEnumerable<Transform>) Fireables).Reverse())
-				CheckForImpact(fireable);
+			for (int i=Fireables.Count-1; i>=0; i--)
+				CheckForImpact(Fireables[i]);
 		}
 
 		protected void CheckForImpact(Transform fireable)
 		{
 			Vector3 origin = fireable.position;
 			Vector3 direction = fireable.up;
+			Physics2D.defaultPhysicsScene.Raycast(origin, direction, RaycastDistance, contactFilter);
 			RaycastHit2D hit = Physics2D.Raycast(origin, direction, RaycastDistance);
 			if (!ReferenceEquals(hit.transform, null))
 				Impact(fireable, hit.transform, hit.point, hit.normal);
@@ -119,11 +121,7 @@ namespace Weapons
 
 		protected void Impact(Transform fireable, Transform impact, Vector3 position, Vector2 normal)
 		{
-			if (Impacters.Any(e => !e.OnImpact(fireable, impact, position, normal)))
-			{
-
-			}
-			else
+			if (Impacters.All(e => e.OnImpact(fireable, impact, position, normal)))
 				Destroy(fireable);
 			EffectsManager.Spawn(ImpactEffect, position);
 		}
