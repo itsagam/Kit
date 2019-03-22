@@ -1,0 +1,84 @@
+Allow for Looping
+Allow for Nested Graphs
+Make frame-rate independant
+Make world-space independant
+Directions/Speeds/Accelerations: Absolute/Relative/Sequential
+Effects: Nozzle, Impact
+
+Bullet Node
+-------------------
+Sprite
+
+Modifier Node
+-------------------
+
+Action Node
+-------------------
+
+Fire Action
+-------------------
+Bullet
+Spawner
+Steerer
+Damager
+(Users)
+(Impactors)
+(Deflectors)
+(Enders)
+
+Repeat Action
+-------------------
+Times
+Actions
+
+Wait Frames/Time Action
+-------------------
+Time
+
+Add/Remove Modifier Action
+------------------
+Modifier
+
+
+
+-------------------------------------------------
+Fireable
+- Projectile
+- Beam
+
+IUse
+------------------
+Charging
+Detonating
+
+ISpawn
+------------------
+Twin
+Spread
+Multiple
+
+IDamage
+------------------
+Critical
+Stronger
+Draining
+
+ISteer
+------------------
+Straight
+Random
+Homing
+
+IImpact
+-----------------
+Buffing
+Slowing
+
+IDeflect
+-----------------
+Bouncing
+
+IEnd
+-----------------
+Bouncing
+Piercing
