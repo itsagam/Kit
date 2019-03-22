@@ -8,7 +8,7 @@ namespace Weapons.Modifiers.Spawners
 		[Range(0, 360)]
 		public float Angle = 60.0f;
 
-		public override IEnumerable<Transformation> GetPositions(Vector3 startPosition, Quaternion startRotation)
+		public override IEnumerable<Location> GetLocations(Vector3 startPosition, Quaternion startRotation)
 		{
 			float angleDiff = Angle / (Count - 1);
 			float rotation = (180 - Angle) / 2;

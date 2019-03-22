@@ -11,20 +11,20 @@ namespace Weapons.Modifiers.Spawners
 		[MinValue(-180), MaxValue(180)]
 		public Vector2 Rotation = new Vector2(-30.0f, 30.0f);
 
-		public IEnumerable<Transformation> GetPositions(Vector3 startPosition, Quaternion startRotation)
+		public IEnumerable<Location> GetLocations(Vector3 startPosition, Quaternion startRotation)
 		{
-			Transformation transformation = new Transformation(startPosition, startRotation);
+			Location location = new Location(startPosition, startRotation);
 
 			if (PositionX.x != 0 || PositionX.y != 0)
-				transformation.Position.x += UnityEngine.Random.Range(PositionX.x, PositionX.y);
+				location.Position.x += UnityEngine.Random.Range(PositionX.x, PositionX.y);
 
 			if (PositionY.x != 0 || PositionY.y != 0)
-				transformation.Position.y += UnityEngine.Random.Range(PositionY.x, PositionY.y);
+				location.Position.y += UnityEngine.Random.Range(PositionY.x, PositionY.y);
 
 			if (Rotation.x != 0 || Rotation.y != 0)
-				transformation.Rotation *= Quaternion.Euler(0, 0, UnityEngine.Random.Range(Rotation.x, Rotation.y));
+				location.Rotation *= Quaternion.Euler(0, 0, UnityEngine.Random.Range(Rotation.x, Rotation.y));
 
-			yield return transformation;
+			yield return location;
 		}
 	}
 }

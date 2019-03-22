@@ -1,8 +1,8 @@
-using System;
 using System.Collections.Generic;
+using System.Linq;
+using Engine;
 using Engine.Pooling;
 using Sirenix.OdinInspector;
-using UniRx;
 using UnityEngine;
 using Weapons.Modifiers;
 
@@ -10,18 +10,32 @@ namespace Weapons
 {
 	public class Weapon: SerializedMonoBehaviour
 	{
+		public const float RaycastDistance = 1.0f;
+
 		public Transform Prefab;
 		public List<ISpawn> Spawners = new List<ISpawn>();
 		public List<ISteer> Steerers = new List<ISteer>();
+		public List<IImpact> Impacters = new List<IImpact>();
+
+		[FoldoutGroup("Effects")]
+		public ParticleSystem FireEffect;
+		[FoldoutGroup("Effects")]
+		public ParticleSystem SpawnEffect;
+		[FoldoutGroup("Effects")]
+		public ParticleSystem ImpactEffect;
 
 		public List<Transform> Fireables { get; } = new List<Transform>();
-
 		protected new Transform transform;
 
 		protected void Awake()
 		{
 			transform = GetComponent<Transform>();
 			Pooler.GetOrCreatePool(Prefab).LimitAmount = int.MaxValue;
+		}
+
+		public void Fire()
+		{
+			Fire(transform.position, transform.rotation);
 		}
 
 		public void Fire(Vector3 startPosition, Quaternion startRotation)
@@ -33,27 +47,37 @@ namespace Weapons
 					break;
 
 				case 1:
-					foreach(Transformation position in Spawners[0].GetPositions(startPosition, startRotation))
-						Spawn(position.Position, position.Rotation);
+					foreach(Location location in Spawners[0].GetLocations(startPosition, startRotation))
+						Spawn(location.Position, location.Rotation);
 					break;
 
 				default:
-					var positions = new Queue<Transformation>();
-					positions.Enqueue(new Transformation(startPosition, startRotation));
+					var locations = new Queue<Location>();
+					locations.Enqueue(new Location(startPosition, startRotation));
 					foreach(ISpawn spawner in Spawners)
 					{
-						int count = positions.Count;
+						int count = locations.Count;
 						for (int i=0; i <count; i++)
 						{
-							Transformation previous = positions.Dequeue();
-							foreach (Transformation position in spawner.GetPositions(previous.Position, previous.Rotation))
-								positions.Enqueue(position);
+							Location previous = locations.Dequeue();
+							foreach (Location location in spawner.GetLocations(previous.Position, previous.Rotation))
+								locations.Enqueue(location);
 						}
 					}
-					foreach(Transformation position in positions)
-						Spawn(position.Position, position.Rotation);
+					foreach(Location location in locations)
+						Spawn(location.Position, location.Rotation);
 					break;
 			}
+			EffectsManager.Spawn(FireEffect, startPosition, startRotation);
+		}
+
+		public Transform Spawn(Vector3 position, Quaternion rotation)
+		{
+			Transform instance = Pooler.Instantiate(Prefab, position, rotation);
+			Fireables.Add(instance);
+			//Observable.Timer(TimeSpan.FromSeconds(10.0f)).Subscribe(l => Destroy(instance));
+			EffectsManager.Spawn(SpawnEffect, position, rotation);
+			return instance;
 		}
 
 		protected void Update()
@@ -78,12 +102,30 @@ namespace Weapons
 			bullet.rotation *= rotation;
 		}
 
-		public Transform Spawn(Vector3 position, Quaternion rotation)
+		protected void FixedUpdate()
 		{
-			Transform instance = Pooler.Instantiate(Prefab, position, rotation);
-			Fireables.Add(instance);
-			Observable.Timer(TimeSpan.FromSeconds(10.0f)).Subscribe(l => Destroy(instance));
-			return instance;
+			foreach (Transform fireable in ((IEnumerable<Transform>) Fireables).Reverse())
+				CheckForImpact(fireable);
+		}
+
+		protected void CheckForImpact(Transform fireable)
+		{
+			Vector3 origin = fireable.position;
+			Vector3 direction = fireable.up;
+			RaycastHit2D hit = Physics2D.Raycast(origin, direction, RaycastDistance);
+			if (!ReferenceEquals(hit.transform, null))
+				Impact(fireable, hit.transform, hit.point, hit.normal);
+		}
+
+		protected void Impact(Transform fireable, Transform impact, Vector3 position, Vector2 normal)
+		{
+			if (Impacters.Any(e => !e.OnImpact(fireable, impact, position, normal)))
+			{
+
+			}
+			else
+				Destroy(fireable);
+			EffectsManager.Spawn(ImpactEffect, position);
 		}
 
 		public void Destroy(Transform fireable)

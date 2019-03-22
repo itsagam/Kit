@@ -2,7 +2,7 @@ using UnityEngine;
 
 namespace Weapons.Modifiers.Steerers
 {
-	public class Rotating: ISteer
+	public class Rotate: ISteer
 	{
 		public float MoveSpeed = 20;
 		[Range(0, 2)]

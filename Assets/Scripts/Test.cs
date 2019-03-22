@@ -15,13 +15,12 @@ namespace Game
 
 		protected async UniTask KeepFiring()
 		{
-			Transform transform1 = Weapon.transform;
 			while (true)
 			{
 				if (Weapon == null)
 					break;
 
-				Weapon.Fire(transform1.position, transform1.rotation);
+				Weapon.Fire();
 				await UniTask.Delay(1000);
 			}
 		}

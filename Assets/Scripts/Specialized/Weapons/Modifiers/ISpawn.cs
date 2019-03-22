@@ -5,6 +5,6 @@ namespace Weapons.Modifiers
 {
 	public interface ISpawn
 	{
-		IEnumerable<Transformation> GetPositions(Vector3 startPosition, Quaternion startRotation);
+		IEnumerable<Location> GetLocations(Vector3 startPosition, Quaternion startRotation);
 	}
 }

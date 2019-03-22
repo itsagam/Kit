@@ -3,8 +3,11 @@ Make frame-rate independant
 Make world-space independant
 Directions/Speeds/Accelerations: Absolute/Relative/Sequential
 Effects: Nozzle, Impact
+Support Beams
+Support 3D
 Allow for Looping
 Allow for Nested Graphs
+Use Jobs System
 
 Bullet Node
 -------------------
@@ -14,8 +17,7 @@ Modifier Node
 -------------------
 
 Action Node
--------------------
-
+--------------------------------------
 Fire Action
 -------------------
 Bullet
@@ -42,21 +44,10 @@ Modifier
 
 
 
--------------------------------------------------
-Fireable
-- Projectile
-- Beam
-
 IUse
 ------------------
 Charging
 Detonating
-
-ISpawn
-------------------
-Twin
-Spread
-Multiple
 
 IDamage
 ------------------
@@ -66,8 +57,6 @@ Draining
 
 ISteer
 ------------------
-Straight
-Random
 Homing
 
 IImpact
@@ -82,4 +71,3 @@ Bouncing
 IEnd
 -----------------
 Bouncing
-Piercing

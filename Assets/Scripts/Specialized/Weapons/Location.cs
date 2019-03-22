@@ -2,12 +2,12 @@ using UnityEngine;
 
 namespace Weapons
 {
-	public struct Transformation
+	public struct Location
 	{
 		public Vector3 Position;
 		public Quaternion Rotation;
 
-		public Transformation(Vector3 position, Quaternion rotation)
+		public Location(Vector3 position, Quaternion rotation)
 		{
 			Position = position;
 			Rotation = rotation;

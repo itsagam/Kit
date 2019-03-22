@@ -9,11 +9,10 @@ namespace Weapons.Modifiers.Spawners
 		[Range(-180, 180)]
 		public float Rotation = 0.0f;
 
-		public IEnumerable<Transformation> GetPositions(Vector3 startPosition, Quaternion startRotation)
+		public IEnumerable<Location> GetLocations(Vector3 startPosition, Quaternion startRotation)
 		{
-			yield return new Transformation(
-											startPosition + (Vector3) Position,
-											startRotation * Quaternion.Euler(0, 0, Rotation));
+			yield return new Location(startPosition + (Vector3) Position,
+									  startRotation * Quaternion.Euler(0, 0, Rotation));
 
 		}
 	}
