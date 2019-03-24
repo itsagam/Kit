@@ -1,9 +1,14 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Engine;
 using Engine.Pooling;
 using Sirenix.OdinInspector;
+using UniRx;
+using UniRx.Triggers;
+using Unity.Jobs;
 using UnityEngine;
+using UnityEngine.Jobs;
 using Weapons.Modifiers;
 
 namespace Weapons
@@ -25,8 +30,13 @@ namespace Weapons
 		public ParticleSystem ImpactEffect;
 
 		public List<Transform> Fireables { get; } = new List<Transform>();
+
 		protected new Transform transform;
 		protected static readonly ContactFilter2D contactFilter = new ContactFilter2D().NoFilter();
+
+		protected TransformAccessArray fireables;
+		protected SteerJob steerJob;
+		protected JobHandle steerJobHandle;
 
 		protected void Awake()
 		{
@@ -69,25 +79,54 @@ namespace Weapons
 						Spawn(location.Position, location.Rotation);
 					break;
 			}
+			Allocate();
+
 			EffectsManager.Spawn(FireEffect, startPosition, startRotation);
 		}
 
 		public Transform Spawn(Vector3 position, Quaternion rotation)
 		{
 			Transform instance = Pooler.Instantiate(Prefab, position, rotation);
+
+			IDisposable subscription = null;
+			subscription = instance.OnBecameInvisibleAsObservable()
+								   .Subscribe(l =>
+											  {
+												  Destroy(instance);
+												  subscription.Dispose();
+											  });
 			Fireables.Add(instance);
-			//Observable.Timer(TimeSpan.FromSeconds(10.0f)).Subscribe(l => Destroy(instance));
+
 			EffectsManager.Spawn(SpawnEffect, position, rotation);
 			return instance;
 		}
 
+		protected void Allocate()
+		{
+			fireables = new TransformAccessArray(Fireables.Count);
+			foreach (Transform fireable in Fireables)
+				fireables.Add(fireable);
+		}
+
 		protected void Update()
 		{
-			foreach (Transform fireable in Fireables)
-			{
-				Steer(fireable);
-			}
+			Steer();
 		}
+
+		protected void Steer()
+		{
+			if (!fireables.isCreated)
+				return;
+
+			steerJob = new SteerJob { DeltaTime = Time.deltaTime };
+			steerJobHandle = steerJob.Schedule(fireables);
+		}
+
+		// protected void Steer()
+		// {
+		// 	foreach (Transform fireable in Fireables)
+		// 		Steer(fireable);
+		// }
 
 		protected void Steer(Transform bullet)
 		{
@@ -103,11 +142,16 @@ namespace Weapons
 			bullet.rotation *= rotation;
 		}
 
-		protected void FixedUpdate()
+		protected void LateUpdate()
 		{
-			for (int i=Fireables.Count-1; i>=0; i--)
-				CheckForImpact(Fireables[i]);
+			steerJobHandle.Complete();
 		}
+
+		// protected void FixedUpdate()
+		// {
+		// 	for (int i=Fireables.Count-1; i>=0; i--)
+		// 		CheckForImpact(Fireables[i]);
+		// }
 
 		protected void CheckForImpact(Transform fireable)
 		{
@@ -130,6 +174,11 @@ namespace Weapons
 		{
 			Fireables.Remove(fireable);
 			Pooler.Destroy(fireable);
+		}
+
+		protected void OnDestroy()
+		{
+			fireables.Dispose();
 		}
 	}
 }
