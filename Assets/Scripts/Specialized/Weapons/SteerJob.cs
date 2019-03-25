@@ -1,8 +1,10 @@
+using Unity.Burst;
 using UnityEngine;
 using UnityEngine.Jobs;
 
 namespace Weapons.Modifiers
 {
+	[BurstCompile]
 	public struct SteerJob : IJobParallelForTransform
 	{
 		public float DeltaTime;
