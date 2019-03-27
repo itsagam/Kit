@@ -1,14 +1,10 @@
-using System;
 using System.Collections.Generic;
-using System.Linq;
 using Engine;
-using Engine.Pooling;
 using Sirenix.OdinInspector;
-using UniRx;
-using UniRx.Triggers;
-using Unity.Jobs;
+using Unity.Entities;
+using Unity.Mathematics;
+using Unity.Transforms;
 using UnityEngine;
-using UnityEngine.Jobs;
 using Weapons.Modifiers;
 
 namespace Weapons
@@ -17,7 +13,10 @@ namespace Weapons
 	{
 		public const float RaycastDistance = 1.0f;
 
-		public Transform Prefab;
+		// MonoBehaviour/Jobs
+		//public Transform Prefab;
+		// ECS
+		public GameObject Prefab;
 		public List<ISpawn> Spawners = new List<ISpawn>();
 		public List<ISteer> Steerers = new List<ISteer>();
 		public List<IImpact> Impacters = new List<IImpact>();
@@ -29,19 +28,26 @@ namespace Weapons
 		[FoldoutGroup("Effects")]
 		public ParticleSystem ImpactEffect;
 
-		public List<Transform> Fireables { get; } = new List<Transform>();
+		//public List<Transform> Fireables { get; } = new List<Transform>();
 
 		protected new Transform transform;
 		protected static readonly ContactFilter2D contactFilter = new ContactFilter2D().NoFilter();
 
-		protected TransformAccessArray fireables;
-		protected SteerJob steerJob;
-		protected JobHandle steerJobHandle;
+		// Job-system
+		// protected TransformAccessArray fireables;
+		// protected SteerJob steerJob;
+		// protected JobHandle steerJobHandle;
+
+		// ECS
+		protected EntityManager entityManager;
+		protected Entity prefab;
 
 		protected void Awake()
 		{
 			transform = GetComponent<Transform>();
-			Pooler.GetOrCreatePool(Prefab).LimitAmount = int.MaxValue;
+			entityManager = World.Active.GetOrCreateManager<EntityManager>();
+			prefab = GameObjectConversionUtility.ConvertGameObjectHierarchy(Prefab, World.Active);
+			//Pooler.GetOrCreatePool(Prefab).LimitAmount = int.MaxValue;
 		}
 
 		public void Fire()
@@ -84,68 +90,85 @@ namespace Weapons
 			EffectsManager.Spawn(FireEffect, startPosition, startRotation);
 		}
 
-		public Transform Spawn(Vector3 position, Quaternion rotation)
+		// ECS
+		public void Spawn(Vector3 position, Quaternion rotation)
 		{
-			Transform instance = Pooler.Instantiate(Prefab, position, rotation);
-
-			IDisposable subscription = null;
-			subscription = instance.OnBecameInvisibleAsObservable()
-								   .Subscribe(l =>
-											  {
-												  Destroy(instance);
-												  subscription.Dispose();
-											  });
-			Fireables.Add(instance);
-
-			EffectsManager.Spawn(SpawnEffect, position, rotation);
-			return instance;
+			Entity entity = entityManager.Instantiate(prefab);
+			entityManager.SetComponentData(entity, new Translation { Value = new float3(position.x, position.y, position.z) });
+			entityManager.SetComponentData(entity, new Rotation { Value = new quaternion(rotation.x, rotation.y, rotation.z, rotation.w) });
 		}
 
+		// MonoBehaviour/Job-system
+		// public Transform Spawn(Vector3 position, Quaternion rotation)
+		// {
+		// 	Transform instance = Pooler.Instantiate(Prefab, position, rotation);
+		//
+		// 	IDisposable subscription = null;
+		// 	subscription = instance.OnBecameInvisibleAsObservable()
+		// 						   .Subscribe(l =>
+		// 									  {
+		// 										  Destroy(instance);
+		// 										  subscription.Dispose();
+		// 									  });
+		// 	Fireables.Add(instance);
+		//
+		// 	EffectsManager.Spawn(SpawnEffect, position, rotation);
+		// 	return instance;
+		// }
+
+		// MonoBehaviour/ECS
 		protected void Allocate()
 		{
-			fireables = new TransformAccessArray(Fireables.Count);
-			foreach (Transform fireable in Fireables)
-				fireables.Add(fireable);
 		}
 
-		protected void Update()
-		{
-			Steer();
-		}
+		// Job-system
+		// protected void Allocate()
+		// {
+		// 	fireables = new TransformAccessArray(Fireables.Count);
+		// 	foreach (Transform fireable in Fireables)
+		// 		fireables.Add(fireable);
+		// }
 
-		protected void Steer()
-		{
-			if (!fireables.isCreated)
-				return;
+		// protected void Update()
+		// {
+		// 	Steer();
+		// }
 
-			steerJob = new SteerJob { DeltaTime = Time.deltaTime };
-			steerJobHandle = steerJob.Schedule(fireables);
-		}
+		// // Job-system Steer
+		// protected void Steer()
+		// {
+		// 	if (!fireables.isCreated)
+		// 		return;
+		//
+		// 	steerJob = new SteerJob { DeltaTime = Time.deltaTime };
+		// 	steerJobHandle = steerJob.Schedule(fireables);
+		// }
 
+		// MonoBehaviour Steer
 		// protected void Steer()
 		// {
 		// 	foreach (Transform fireable in Fireables)
 		// 		Steer(fireable);
 		// }
 
-		protected void Steer(Transform bullet)
-		{
-			Vector3 position = Vector3.zero;
-			Quaternion rotation = Quaternion.identity;
-			foreach(ISteer steerer in Steerers)
-			{
-				position += steerer.GetPosition(bullet);
-				rotation *= steerer.GetRotation(bullet);
-			}
+		// protected void Steer(Transform bullet)
+		// {
+		// 	Vector3 position = Vector3.zero;
+		// 	Quaternion rotation = Quaternion.identity;
+		// 	foreach(ISteer steerer in Steerers)
+		// 	{
+		// 		position += steerer.GetPosition(bullet);
+		// 		rotation *= steerer.GetRotation(bullet);
+		// 	}
+		//
+		// 	bullet.position += position * Time.deltaTime;
+		// 	bullet.rotation *= rotation;
+		// }
 
-			bullet.position += position * Time.deltaTime;
-			bullet.rotation *= rotation;
-		}
-
-		protected void LateUpdate()
-		{
-			steerJobHandle.Complete();
-		}
+		// protected void LateUpdate()
+		// {
+		// 	steerJobHandle.Complete();
+		// }
 
 		// protected void FixedUpdate()
 		// {
@@ -153,32 +176,34 @@ namespace Weapons
 		// 		CheckForImpact(Fireables[i]);
 		// }
 
-		protected void CheckForImpact(Transform fireable)
-		{
-			Vector3 origin = fireable.position;
-			Vector3 direction = fireable.up;
-			Physics2D.defaultPhysicsScene.Raycast(origin, direction, RaycastDistance, contactFilter);
-			RaycastHit2D hit = Physics2D.Raycast(origin, direction, RaycastDistance);
-			if (!ReferenceEquals(hit.transform, null))
-				Impact(fireable, hit.transform, hit.point, hit.normal);
-		}
+		// protected void CheckForImpact(Transform fireable)
+		// {
+		// 	Vector3 origin = fireable.position;
+		// 	Vector3 direction = fireable.up;
+		// 	Physics2D.defaultPhysicsScene.Raycast(origin, direction, RaycastDistance, contactFilter);
+		// 	RaycastHit2D hit = Physics2D.Raycast(origin, direction, RaycastDistance);
+		// 	if (!ReferenceEquals(hit.transform, null))
+		// 		Impact(fireable, hit.transform, hit.point, hit.normal);
+		// }
+		//
+		// protected void Impact(Transform fireable, Transform impact, Vector3 position, Vector2 normal)
+		// {
+		// 	if (Impacters.All(e => e.OnImpact(fireable, impact, position, normal)))
+		// 		Destroy(fireable);
+		// 	EffectsManager.Spawn(ImpactEffect, position);
+		// }
 
-		protected void Impact(Transform fireable, Transform impact, Vector3 position, Vector2 normal)
-		{
-			if (Impacters.All(e => e.OnImpact(fireable, impact, position, normal)))
-				Destroy(fireable);
-			EffectsManager.Spawn(ImpactEffect, position);
-		}
+		// MonoBehaviour/Job-system
+		// public void Destroy(Transform fireable)
+		// {
+		// 	Fireables.Remove(fireable);
+		// 	Pooler.Destroy(fireable);
+		// }
 
-		public void Destroy(Transform fireable)
-		{
-			Fireables.Remove(fireable);
-			Pooler.Destroy(fireable);
-		}
-
-		protected void OnDestroy()
-		{
-			fireables.Dispose();
-		}
+		// Job System
+		// protected void OnDestroy()
+		// {
+		// 	fireables.Dispose();
+		// }
 	}
 }

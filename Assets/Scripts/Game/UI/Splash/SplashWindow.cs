@@ -1,10 +1,13 @@
 using System.Collections.Generic;
 using System.Linq;
-using Engine.Modding;
 using Engine.UI.Widgets;
 using UniRx.Async;
 using UnityEngine;
 using UnityEngine.UI;
+
+#if MODDING
+using Engine.Modding;
+#endif
 
 namespace Game.UI.Splash
 {

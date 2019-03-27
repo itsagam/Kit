@@ -8,9 +8,10 @@ namespace Game
 	{
 		public Weapon Weapon;
 
-		private void Awake()
+		protected void Start()
 		{
-			KeepFiring().Forget();
+			Weapon.Fire();
+			//KeepFiring().Forget();
 		}
 
 		protected async UniTask KeepFiring()
