@@ -10,8 +10,7 @@ namespace Game
 
 		protected void Start()
 		{
-			Weapon.Fire();
-			//KeepFiring().Forget();
+			KeepFiring().Forget();
 		}
 
 		protected async UniTask KeepFiring()

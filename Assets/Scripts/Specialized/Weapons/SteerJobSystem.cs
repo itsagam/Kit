@@ -10,13 +10,13 @@ namespace Weapons
 	public class SteerJobSystem : JobComponentSystem
 	{
 		[BurstCompile]
-		public struct SteerJobECS : IJobProcessComponentData<Translation, MoveSpeed>
+		public struct SteerJobECS : IJobProcessComponentData<Translation, Rotation, MoveSpeed>
 		{
 			public float DeltaTime;
 
-			public void Execute(ref Translation translation, ref MoveSpeed moveSpeed)
+			public void Execute(ref Translation translation, ref Rotation rotation, ref MoveSpeed moveSpeed)
 			{
-				translation.Value += math.up() * moveSpeed.Speed * DeltaTime;
+				translation.Value += math.rotate(rotation.Value, math.up()) * moveSpeed.Speed * DeltaTime;
 			}
 		}
 
