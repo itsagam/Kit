@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace Weapons.Modifiers.Impacters
+namespace Weapons.Impacters
 {
 	public class Deflect : IImpact
 	{

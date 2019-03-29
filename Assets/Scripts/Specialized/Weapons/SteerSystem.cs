@@ -7,16 +7,16 @@ using UnityEngine;
 
 namespace Weapons
 {
-	public class SteerJobSystem : JobComponentSystem
+	public class SteerSystem : JobComponentSystem
 	{
 		[BurstCompile]
-		public struct SteerJobECS : IJobProcessComponentData<Translation, Rotation, MoveSpeed>
+		private struct SteerJobECS : IJobProcessComponentData<Translation, Rotation, MoveSpeed>
 		{
 			public float DeltaTime;
 
 			public void Execute(ref Translation translation, ref Rotation rotation, ref MoveSpeed moveSpeed)
 			{
-				translation.Value += math.rotate(rotation.Value, math.up()) * moveSpeed.Speed * DeltaTime;
+				translation.Value += math.mul(rotation.Value, math.up()) * moveSpeed.Speed * DeltaTime;
 			}
 		}
 

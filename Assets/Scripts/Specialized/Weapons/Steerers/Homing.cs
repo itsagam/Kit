@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-namespace Weapons.Modifiers.Steerers
+namespace Weapons.Steerers
 {
 	public class Homing : ISteer
 	{

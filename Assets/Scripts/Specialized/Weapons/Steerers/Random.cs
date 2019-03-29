@@ -1,7 +1,7 @@
 using Sirenix.OdinInspector;
 using UnityEngine;
 
-namespace Weapons.Modifiers.Steerers
+namespace Weapons.Steerers
 {
 	public class Random : ISteer
 	{

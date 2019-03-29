@@ -8,10 +8,10 @@ namespace Weapons
 	{
 		public float Speed = 20;
 
-		public void Convert(Entity entity, EntityManager dstManager, GameObjectConversionSystem conversionSystem)
+		public void Convert(Entity entity, EntityManager entityManager, GameObjectConversionSystem conversionSystem)
 		{
 			MoveSpeed data = new MoveSpeed { Speed = Speed };
-			dstManager.AddComponentData(entity, data);
+			entityManager.AddComponentData(entity, data);
 		}
 	}
 }

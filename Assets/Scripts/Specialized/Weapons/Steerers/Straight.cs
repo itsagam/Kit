@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace Weapons.Modifiers.Steerers
+namespace Weapons.Steerers
 {
 	public class Straight: ISteer
 	{

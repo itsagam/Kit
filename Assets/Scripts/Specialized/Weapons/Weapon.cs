@@ -5,7 +5,6 @@ using Unity.Entities;
 using Unity.Mathematics;
 using Unity.Transforms;
 using UnityEngine;
-using Weapons.Modifiers;
 
 namespace Weapons
 {
@@ -40,13 +39,13 @@ namespace Weapons
 
 		// ECS
 		protected EntityManager entityManager;
-		protected Entity prefab;
+		protected Entity entityPrefab;
 
 		protected void Awake()
 		{
 			transform = GetComponent<Transform>();
 			entityManager = World.Active.GetOrCreateManager<EntityManager>();
-			prefab = GameObjectConversionUtility.ConvertGameObjectHierarchy(Prefab, World.Active);
+			entityPrefab = GameObjectConversionUtility.ConvertGameObjectHierarchy(Prefab, World.Active);
 			//Pooler.GetOrCreatePool(Prefab).LimitAmount = int.MaxValue;
 		}
 
@@ -55,7 +54,7 @@ namespace Weapons
 			Fire(transform.position, transform.rotation);
 		}
 
-		public void Fire(Vector3 startPosition, Quaternion startRotation)
+		public void Fire(float3 startPosition, quaternion startRotation)
 		{
 			switch (Spawners.Count)
 			{
@@ -91,11 +90,11 @@ namespace Weapons
 		}
 
 		// ECS
-		public void Spawn(Vector3 position, Quaternion rotation)
+		public void Spawn(float3 position, quaternion rotation)
 		{
-			Entity entity = entityManager.Instantiate(prefab);
-			entityManager.SetComponentData(entity, new Translation { Value = new float3(position.x, position.y, position.z) });
-			entityManager.SetComponentData(entity, new Rotation { Value = new quaternion(rotation.x, rotation.y, rotation.z, rotation.w) });
+			Entity entity = entityManager.Instantiate(entityPrefab);
+			entityManager.SetComponentData(entity, new Translation { Value = position });
+			entityManager.SetComponentData(entity, new Rotation { Value = rotation });
 		}
 
 		// MonoBehaviour/Job-system

@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace Weapons.Modifiers
+namespace Weapons
 {
 	public interface IImpact
 	{
