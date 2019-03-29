@@ -223,7 +223,7 @@ MonoBehaviour:
     SerializationNodes:
     - Name: Spawners
       Entry: 7
-      Data: 0|System.Collections.Generic.List`1[[Weapons.Modifiers.ISpawn, Assembly-CSharp]],
+      Data: 0|System.Collections.Generic.List`1[[Weapons.ISpawn, Assembly-CSharp]],
         mscorlib
     - Name: 
       Entry: 12
@@ -236,29 +236,7 @@ MonoBehaviour:
       Data: 
     - Name: Steerers
       Entry: 7
-      Data: 1|System.Collections.Generic.List`1[[Weapons.Modifiers.ISteer, Assembly-CSharp]],
-        mscorlib
-    - Name: 
-      Entry: 12
-      Data: 1
-    - Name: 
-      Entry: 7
-      Data: 2|Weapons.Modifiers.Steerers.Straight, Assembly-CSharp
-    - Name: Speed
-      Entry: 4
-      Data: 20
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 13
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: Impacters
-      Entry: 7
-      Data: 3|System.Collections.Generic.List`1[[Weapons.Modifiers.IImpact, Assembly-CSharp]],
+      Data: 1|System.Collections.Generic.List`1[[Weapons.ISteer, Assembly-CSharp]],
         mscorlib
     - Name: 
       Entry: 12
@@ -269,7 +247,20 @@ MonoBehaviour:
     - Name: 
       Entry: 8
       Data: 
-  Prefab: {fileID: 8628419015388609721, guid: 409fc1348f3649b44a7785a6070fd742, type: 3}
+    - Name: Impacters
+      Entry: 7
+      Data: 2|System.Collections.Generic.List`1[[Weapons.IImpact, Assembly-CSharp]],
+        mscorlib
+    - Name: 
+      Entry: 12
+      Data: 0
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+  Prefab: {fileID: 8628419015388609721, guid: 50edb4e8e1274a4e9b75d9810ed51425, type: 3}
   FireEffect: {fileID: 0}
   SpawnEffect: {fileID: 0}
   ImpactEffect: {fileID: 0}

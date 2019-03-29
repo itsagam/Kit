@@ -14,4 +14,6 @@ namespace Weapons
 			entityManager.AddComponentData(entity, data);
 		}
 	}
+
+	//public class MoveSpeedProxy : ComponentDataProxy<MoveSpeed> {}
 }

@@ -5,6 +5,7 @@ using Unity.Entities;
 using Unity.Mathematics;
 using Unity.Transforms;
 using UnityEngine;
+using Weapons.Rendering;
 
 namespace Weapons
 {
@@ -93,6 +94,16 @@ namespace Weapons
 		public void Spawn(float3 position, quaternion rotation)
 		{
 			Entity entity = entityManager.Instantiate(entityPrefab);
+
+			Sprite sprite = Prefab.GetComponent<SpriteRenderer>().sprite;
+			SpriteInstanceRenderer spriteRenderer = new SpriteInstanceRenderer
+											  {
+												  Sprite = sprite.texture,
+												  PixelsPerUnit = sprite.pixelsPerUnit,
+												  Pivot = sprite.pivot
+											  };
+			entityManager.AddSharedComponentData(entity, spriteRenderer);
+
 			entityManager.SetComponentData(entity, new Translation { Value = position });
 			entityManager.SetComponentData(entity, new Rotation { Value = rotation });
 		}
