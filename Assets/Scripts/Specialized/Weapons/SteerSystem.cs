@@ -13,7 +13,7 @@ namespace Weapons
 	{
 		public float Speed;
 	}
-	
+
 	public class SteerSystem : JobComponentSystem
 	{
 		[BurstCompile]

@@ -34,8 +34,6 @@ namespace Weapons
 	public class Weapon: SerializedMonoBehaviour
 	{
 		public Sprite Sprite;
-		public Mesh Mesh;
-		public Material Material;
 		public List<ISpawn> Spawners = new List<ISpawn>();
 		public List<ISteer> Steerers = new List<ISteer>();
 		public List<IImpact> Impacters = new List<IImpact>();
@@ -82,9 +80,7 @@ namespace Weapons
 		public Entity CreatePrefab()
 		{
 			Entity entity = entityManager.CreateEntity(ComponentType.ReadOnly<Prefab>(),
-													   ComponentType.ReadWrite<LocalToWorld>(),
-													   ComponentType.ReadWrite<Translation>(),
-			                                           ComponentType.ReadWrite<Rotation>());
+													   ComponentType.ReadWrite<LocalToWorld>());
 
 			#if USE_SPRITE_RENDERER
 			SpriteInstanceRenderer spriteRenderer = new SpriteInstanceRenderer
@@ -95,15 +91,23 @@ namespace Weapons
 													};
 			entityManager.AddSharedComponentData(entity, spriteRenderer);
 			#else
+
+			float size = math.max(Sprite.texture.width, Sprite.texture.height) / Sprite.pixelsPerUnit;
+			Vector2 pivot = Sprite.pivot / Sprite.pixelsPerUnit;
+			Mesh mesh = MeshHelper.GenerateQuad(size, pivot);
+			Material material = new Material(Shader.Find("Sprites/Instanced"))
+								{
+									mainTexture = Sprite.texture,
+									enableInstancing = true
+								};
 			RenderMesh meshRenderer = new RenderMesh
-			 					  {
-			 						  mesh = Mesh,
-			                          material = Material,
-			 						  castShadows = ShadowCastingMode.Off,
-			 						  receiveShadows = false
-			 					  };
+									  {
+										  mesh = mesh,
+										  material = material,
+										  castShadows = ShadowCastingMode.Off,
+										  receiveShadows = false
+									  };
 			entityManager.AddSharedComponentData(entity, meshRenderer);
-			entityManager.AddComponent(entity, ComponentType.ReadOnly<PerInstanceCullingTag>());
 			#endif
 
 			entityManager.AddComponentData(entity, new MoveSpeed { Speed = 20.0f });
@@ -167,8 +171,8 @@ namespace Weapons
 		public void Spawn(float3 position, quaternion rotation)
 		{
 			Entity entity = entityManager.Instantiate(prefab);
-			entityManager.SetComponentData(entity, new Translation { Value = position });
-			entityManager.SetComponentData(entity, new Rotation { Value = rotation });
+			entityManager.AddComponentData(entity, new Translation { Value = position });
+			entityManager.AddComponentData(entity, new Rotation { Value = rotation });
 		}
 
 #else

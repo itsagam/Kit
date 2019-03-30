@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Engine;
 using Unity.Collections.LowLevel.Unsafe;
 using Unity.Entities;
 using Unity.Mathematics;
@@ -63,10 +64,10 @@ namespace Weapons.Rendering
                 var transforms = instanceRendererGroup.GetComponentDataArray<LocalToWorld>();
 
 				float size = math.max(renderer.Sprite.width, renderer.Sprite.height) / renderer.PixelsPerUnit;
-                float2 meshPivot = renderer.Pivot * size;
+                float2 meshPivot = renderer.Pivot / renderer.PixelsPerUnit;
                 if (!meshCache.TryGetValue(renderer, out Mesh mesh))
                 {
-                    mesh = MeshUtils.GenerateQuad(size, meshPivot);
+                    mesh = MeshHelper.GenerateQuad(size, meshPivot);
                     meshCache.Add(renderer, mesh);
                 }
 
