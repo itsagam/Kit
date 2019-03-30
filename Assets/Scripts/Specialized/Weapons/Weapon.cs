@@ -1,22 +1,41 @@
+#define USE_ENTITY
+//#define USE_GAMEOBJECT
+//#define USE_JOBS
+//#define USE_SPRITE_RENDERER
+
+#if USE_JOBS
+using Unity.Jobs;
+using UnityEngine.Jobs;
+#endif
 using System.Collections.Generic;
 using Engine;
 using Sirenix.OdinInspector;
-using Unity.Entities;
 using Unity.Mathematics;
-using Unity.Transforms;
 using UnityEngine;
+#if USE_ENTITY
+using Unity.Entities;
+using Unity.Transforms;
+#else
+using System;
+using Engine.Pooling;
+using UniRx;
+using UniRx.Triggers;
+#endif
+
+#if USE_SPRITE_RENDERER
 using Weapons.Rendering;
+#else
+using UnityEngine.Rendering;
+using Unity.Rendering;
+#endif
 
 namespace Weapons
 {
 	public class Weapon: SerializedMonoBehaviour
 	{
-		public const float RaycastDistance = 1.0f;
-
-		// MonoBehaviour/Jobs
-		//public Transform Prefab;
-		// ECS
-		public GameObject Prefab;
+		public Sprite Sprite;
+		public Mesh Mesh;
+		public Material Material;
 		public List<ISpawn> Spawners = new List<ISpawn>();
 		public List<ISteer> Steerers = new List<ISteer>();
 		public List<IImpact> Impacters = new List<IImpact>();
@@ -28,27 +47,83 @@ namespace Weapons
 		[FoldoutGroup("Effects")]
 		public ParticleSystem ImpactEffect;
 
-		//public List<Transform> Fireables { get; } = new List<Transform>();
-
 		protected new Transform transform;
-		protected static readonly ContactFilter2D contactFilter = new ContactFilter2D().NoFilter();
 
-		// Job-system
-		// protected TransformAccessArray fireables;
-		// protected SteerJob steerJob;
-		// protected JobHandle steerJobHandle;
+#if USE_GAMEOBJECT
+		protected Transform prefab;
+		protected List<Transform> fireables = new List<Transform>();
+#endif
+#if USE_JOBS
+		protected Transform prefab;
 
-		// ECS
+		protected TransformAccessArray fireables;
+		protected SteerJob steerJob;
+		protected JobHandle steerJobHandle;
+#endif
+
+#if USE_ENTITY
 		protected EntityManager entityManager;
-		protected Entity entityPrefab;
+		protected Entity prefab;
+#endif
 
 		protected void Awake()
 		{
-			transform = GetComponent<Transform>();
+			transform = base.transform;
+#if USE_JOBS
+			fireables = new TransformAccessArray(0);
+#endif
+#if USE_ENTITY
 			entityManager = World.Active.GetOrCreateManager<EntityManager>();
-			entityPrefab = GameObjectConversionUtility.ConvertGameObjectHierarchy(Prefab, World.Active);
-			//Pooler.GetOrCreatePool(Prefab).LimitAmount = int.MaxValue;
+#endif
+			prefab = CreatePrefab();
 		}
+
+#if USE_ENTITY
+		public Entity CreatePrefab()
+		{
+			Entity entity = entityManager.CreateEntity(ComponentType.ReadOnly<Prefab>(),
+													   ComponentType.ReadWrite<LocalToWorld>(),
+													   ComponentType.ReadWrite<Translation>(),
+			                                           ComponentType.ReadWrite<Rotation>());
+
+			#if USE_SPRITE_RENDERER
+			SpriteInstanceRenderer spriteRenderer = new SpriteInstanceRenderer
+													{
+														Sprite = Sprite.texture,
+														PixelsPerUnit = Sprite.pixelsPerUnit,
+														Pivot = Sprite.pivot
+													};
+			entityManager.AddSharedComponentData(entity, spriteRenderer);
+			#else
+			RenderMesh meshRenderer = new RenderMesh
+			 					  {
+			 						  mesh = Mesh,
+			                          material = Material,
+			 						  castShadows = ShadowCastingMode.Off,
+			 						  receiveShadows = false
+			 					  };
+			entityManager.AddSharedComponentData(entity, meshRenderer);
+			entityManager.AddComponent(entity, ComponentType.ReadOnly<PerInstanceCullingTag>());
+			#endif
+
+			entityManager.AddComponentData(entity, new MoveSpeed { Speed = 20.0f });
+			return entity;
+		}
+#else
+		public Transform CreatePrefab()
+		{
+			GameObject prefabGameObject = new GameObject(name + "Fireable");
+			prefabGameObject.SetActive(false);
+
+			Transform prefabTransform = prefabGameObject.transform;
+			SpriteRenderer spriteRenderer = prefabGameObject.AddComponent<SpriteRenderer>();
+			spriteRenderer.sprite = Sprite;
+
+			Pooler.GetOrCreatePool(prefabTransform).LimitAmount = int.MaxValue;
+
+			return prefabTransform;
+		}
+#endif
 
 		public void Fire()
 		{
@@ -85,100 +160,85 @@ namespace Weapons
 						Spawn(location.Position, location.Rotation);
 					break;
 			}
-			Allocate();
-
 			EffectsManager.Spawn(FireEffect, startPosition, startRotation);
 		}
 
-		// ECS
+#if USE_ENTITY
 		public void Spawn(float3 position, quaternion rotation)
 		{
-			Entity entity = entityManager.Instantiate(entityPrefab);
-
-			Sprite sprite = Prefab.GetComponent<SpriteRenderer>().sprite;
-			SpriteInstanceRenderer spriteRenderer = new SpriteInstanceRenderer
-											  {
-												  Sprite = sprite.texture,
-												  PixelsPerUnit = sprite.pixelsPerUnit,
-												  Pivot = sprite.pivot
-											  };
-			entityManager.AddSharedComponentData(entity, spriteRenderer);
-
+			Entity entity = entityManager.Instantiate(prefab);
 			entityManager.SetComponentData(entity, new Translation { Value = position });
 			entityManager.SetComponentData(entity, new Rotation { Value = rotation });
 		}
 
-		// MonoBehaviour/Job-system
-		// public Transform Spawn(Vector3 position, Quaternion rotation)
-		// {
-		// 	Transform instance = Pooler.Instantiate(Prefab, position, rotation);
-		//
-		// 	IDisposable subscription = null;
-		// 	subscription = instance.OnBecameInvisibleAsObservable()
-		// 						   .Subscribe(l =>
-		// 									  {
-		// 										  Destroy(instance);
-		// 										  subscription.Dispose();
-		// 									  });
-		// 	Fireables.Add(instance);
-		//
-		// 	EffectsManager.Spawn(SpawnEffect, position, rotation);
-		// 	return instance;
-		// }
-
-		// MonoBehaviour/ECS
-		protected void Allocate()
+#else
+		public Transform Spawn(Vector3 position, Quaternion rotation)
 		{
+			Transform instance = Pooler.Instantiate(prefab, position, rotation);
+			instance.gameObject.SetActive(true);
+
+			IDisposable subscription = null;
+			subscription = instance.OnBecameInvisibleAsObservable()
+								   .Subscribe(l =>
+											  {
+												  Destroy(instance);
+												  subscription.Dispose();
+											  });
+
+#if USE_JOBS
+			fireables.capacity++;
+#endif
+			fireables.Add(instance);
+
+			EffectsManager.Spawn(SpawnEffect, position, rotation);
+			return instance;
+		}
+#endif
+
+#if USE_GAMEOBJECT || USE_JOBS
+		protected void Update()
+		{
+			Steer();
+		}
+#endif
+
+#if USE_GAMEOBJECT
+		protected void Steer()
+		{
+			foreach (Transform fireable in fireables)
+				Steer(fireable);
 		}
 
-		// Job-system
-		// protected void Allocate()
-		// {
-		// 	fireables = new TransformAccessArray(Fireables.Count);
-		// 	foreach (Transform fireable in Fireables)
-		// 		fireables.Add(fireable);
-		// }
+		protected void Steer(Transform bullet)
+		{
+			Vector3 position = Vector3.zero;
+			Quaternion rotation = Quaternion.identity;
+			foreach(ISteer steerer in Steerers)
+			{
+				position += steerer.GetPosition(bullet);
+				rotation *= steerer.GetRotation(bullet);
+			}
 
-		// protected void Update()
-		// {
-		// 	Steer();
-		// }
+			bullet.position += position * Time.deltaTime;
+			bullet.rotation *= rotation;
+		}
+#endif
 
-		// // Job-system Steer
-		// protected void Steer()
-		// {
-		// 	if (!fireables.isCreated)
-		// 		return;
-		//
-		// 	steerJob = new SteerJob { DeltaTime = Time.deltaTime };
-		// 	steerJobHandle = steerJob.Schedule(fireables);
-		// }
+#if USE_JOBS
+		protected void Steer()
+		{
+			if (!fireables.isCreated)
+				return;
 
-		// MonoBehaviour Steer
-		// protected void Steer()
-		// {
-		// 	foreach (Transform fireable in Fireables)
-		// 		Steer(fireable);
-		// }
+			steerJob = new SteerJob { DeltaTime = Time.deltaTime };
+			steerJobHandle = steerJob.Schedule(fireables);
+		}
 
-		// protected void Steer(Transform bullet)
-		// {
-		// 	Vector3 position = Vector3.zero;
-		// 	Quaternion rotation = Quaternion.identity;
-		// 	foreach(ISteer steerer in Steerers)
-		// 	{
-		// 		position += steerer.GetPosition(bullet);
-		// 		rotation *= steerer.GetRotation(bullet);
-		// 	}
-		//
-		// 	bullet.position += position * Time.deltaTime;
-		// 	bullet.rotation *= rotation;
-		// }
-
-		// protected void LateUpdate()
-		// {
-		// 	steerJobHandle.Complete();
-		// }
+		protected void LateUpdate()
+		{
+			steerJobHandle.Complete();
+		}
+#endif
 
 		// protected void FixedUpdate()
 		// {
@@ -203,17 +263,36 @@ namespace Weapons
 		// 	EffectsManager.Spawn(ImpactEffect, position);
 		// }
 
-		// MonoBehaviour/Job-system
-		// public void Destroy(Transform fireable)
-		// {
-		// 	Fireables.Remove(fireable);
-		// 	Pooler.Destroy(fireable);
-		// }
+#if USE_GAMEOBJECT
+		public void Destroy(Transform fireable)
+		{
+			fireables.Remove(fireable);
+			Pooler.Destroy(fireable);
+		}
+#endif
 
-		// Job System
-		// protected void OnDestroy()
-		// {
-		// 	fireables.Dispose();
-		// }
+#if USE_JOBS
+		public void Destroy(Transform fireable)
+		{
+			if (! fireables.isCreated)
+				return;
+
+			for (int i = 0; i < fireables.length; i++)
+				if (fireables[i] == fireable)
+				{
+					fireables.RemoveAtSwapBack(i);
+					break;
+				}
+
+			Pooler.Destroy(fireable);
+		}
+#endif
+
+#if USE_JOBS
+		protected void OnDestroy()
+		{
+			fireables.Dispose();
+		}
+#endif
 	}
 }

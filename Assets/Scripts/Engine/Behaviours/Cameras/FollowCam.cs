@@ -9,11 +9,11 @@ namespace Engine.Cameras
 		public float Distance = 10.0f;
 		public float Speed = 10.0f;
 
-		protected Transform transformCached;
+		protected new Transform transform;
 
 		protected void Awake()
 		{
-			transformCached = GetComponent<Transform>();
+			transform = base.transform;
 		}
 
 		public void Follow()
@@ -26,7 +26,7 @@ namespace Engine.Cameras
 			if (target == null)
 				return;
 
-			Follow(target, (target.position - transform.position).magnitude);
+			Follow(target, (target.position - ((Component) this).transform.position).magnitude);
 		}
 
 		public void Follow(Transform target, float distance)
@@ -47,8 +47,8 @@ namespace Engine.Cameras
 				Stop();
 
 			Vector3 target = Target.position;
-			Vector3 position = target - transformCached.forward * Distance;
-			transformCached.position = Vector3.Lerp(transformCached.position, position, Time.deltaTime * Speed);
+			Vector3 position = target - transform.forward * Distance;
+			transform.position = Vector3.Lerp(transform.position, position, Time.deltaTime * Speed);
 		}
 	}
 }

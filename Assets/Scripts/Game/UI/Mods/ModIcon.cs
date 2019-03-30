@@ -1,12 +1,10 @@
-﻿using DG.Tweening;
-using Engine;
-using Engine.UI;
+﻿using Engine.UI;
 using UnityEngine;
 using UnityEngine.UI;
+
 #if MODDING
 using Engine.Modding;
 #endif
-
 namespace Game.UI.Mods
 {
 	public class ModIcon : Icon
@@ -27,12 +25,12 @@ namespace Game.UI.Mods
 
 #if MODDING
 		protected ModWindow window;
-		protected Transform transformCached;
+		protected new Transform transform;
 
 		protected void Awake()
 		{
 			window = GetComponentInParent<ModWindow>();
-			transformCached = transform;
+			transform = base.transform;
 			EnableToggle.onValueChanged.AddListener(Toggle);
 			MoveUpButton.onClick.AddListener(MoveUp);
 			MoveDownButton.onClick.AddListener(MoveDown);
@@ -60,13 +58,13 @@ namespace Game.UI.Mods
 		protected void MoveUp()
 		{
 			ModManager.MoveModUp(Mod);
-			Move(transformCached.GetSiblingIndex() - 1);
+			Move(transform.GetSiblingIndex() - 1);
 		}
 
 		protected void MoveDown()
 		{
 			ModManager.MoveModDown(Mod);
-			Move(transformCached.GetSiblingIndex() + 1);
+			Move(transform.GetSiblingIndex() + 1);
 		}
 
 		protected void Move(int toIndex)
@@ -77,18 +75,18 @@ namespace Game.UI.Mods
 			window.IsAnimating = true;
 			window.IsDirty = true;
 
-			Transform toTransform = transformCached.parent.GetChild(toIndex);
-			int fromIndex = transformCached.GetSiblingIndex();
+			Transform toTransform = transform.parent.GetChild(toIndex);
+			int fromIndex = transform.GetSiblingIndex();
 
 			SetInteractable(toIndex);
 			toTransform.GetComponent<ModIcon>().SetInteractable(fromIndex);
 
 			Sequence sequence = DOTween.Sequence();
-			sequence.Insert(0, transformCached.DOMove(toTransform.position, ReorderTime));
-			sequence.Insert(0, toTransform.DOMove(transformCached.position, ReorderTime));
+			sequence.Insert(0, transform.DOMove(toTransform.position, ReorderTime));
+			sequence.Insert(0, toTransform.DOMove(transform.position, ReorderTime));
 			sequence.OnComplete(() =>
 								{
-									transformCached.SetSiblingIndex(toIndex);
+									transform.SetSiblingIndex(toIndex);
 									window.IsAnimating = false;
 								});
 		}
@@ -96,7 +94,7 @@ namespace Game.UI.Mods
 		public void SetInteractable(int index)
 		{
 			MoveUpButton.interactable = index != 0;
-			MoveDownButton.interactable = index < transformCached.parent.childCount - 1;
+			MoveDownButton.interactable = index < transform.parent.childCount - 1;
 		}
 
 		protected void Toggle(bool value)

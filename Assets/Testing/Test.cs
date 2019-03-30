@@ -10,6 +10,7 @@ namespace Game
 
 		protected void Start()
 		{
+			//Weapon.Fire();
 			KeepFiring().Forget();
 		}
 

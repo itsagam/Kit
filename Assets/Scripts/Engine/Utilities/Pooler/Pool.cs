@@ -97,14 +97,14 @@ namespace Engine.Pooling
 
 		protected LinkedList<Component> availableInstances = new LinkedList<Component>();
 		protected LinkedList<Component> usedInstances = new LinkedList<Component>();
-		protected Transform transformCached;
+		protected new Transform transform;
 		#endregion
 
 		#region Initialization
 		protected void Awake()
 		{
 			Pooler.CachePool(this);
-			transformCached = transform;
+			transform = base.transform;
 
 			if (Preload)
 				PreloadInstances().Forget();
@@ -112,7 +112,7 @@ namespace Engine.Pooling
 
 		protected void Start()
 		{
-			if (Persistent && transformCached.parent == null)
+			if (Persistent && transform.parent == null)
 				DontDestroyOnLoad(gameObject);
 		}
 
@@ -172,7 +172,7 @@ namespace Engine.Pooling
 			poolInstance.Component = instance;
 
 			if (Organize)
-				instance.transform.SetParent(transformCached);
+				instance.transform.SetParent(transform);
 
 			return instance;
 		}
@@ -385,7 +385,7 @@ namespace Engine.Pooling
 		}
 
 		private bool ShowGroup => Group                 != null;
-		private bool ShowPersistent => transform.parent == null;
+		private bool ShowPersistent => ((Component) this).transform.parent == null;
 		private int MaxPreloadAmount => Limit ? LimitAmount : UnlimitedMaxPreloadAmount;
 #endif
 		#endregion

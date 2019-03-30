@@ -1,3 +1,4 @@
+using System;
 using Unity.Burst;
 using Unity.Entities;
 using Unity.Jobs;
@@ -7,6 +8,12 @@ using UnityEngine;
 
 namespace Weapons
 {
+	[Serializable]
+	public struct MoveSpeed : IComponentData
+	{
+		public float Speed;
+	}
+	
 	public class SteerSystem : JobComponentSystem
 	{
 		[BurstCompile]

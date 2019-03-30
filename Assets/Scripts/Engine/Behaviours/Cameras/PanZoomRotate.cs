@@ -59,8 +59,8 @@ namespace Engine.Cameras
 		[MinValue(0.0f)]
 		public float RotateSpeed = 0.5f;
 
-		protected Camera cameraCached;
-		protected Transform transformCached;
+		protected new Camera camera;
+		protected new Transform transform;
 		protected MetaGesture gesture;
 		protected Bounds bounds;
 
@@ -78,14 +78,14 @@ namespace Engine.Cameras
 		#region Initialization
 		protected void Awake()
 		{
-			transformCached = GetComponent<Transform>();
-			cameraCached = GetComponent<Camera>();
+			transform = base.transform;
+			camera = GetComponent<Camera>();
 			gesture = GetComponent<MetaGesture>();
 			bounds = View.GetBounds();
-			forward = transformCached.forward;
+			forward = transform.forward;
 			forwardAbs = forward.Abs();
 			forwardSign = (int) Mathf.Sign(Vector3.Dot(Vector3.one, forward));
-			cameraRotation = SetForwardComponent(transformCached.rotation.eulerAngles, 0).ToQuaternion();
+			cameraRotation = SetForwardComponent(transform.rotation.eulerAngles, 0).ToQuaternion();
 			cameraRotationInv = Quaternion.Inverse(cameraRotation);
 		}
 
@@ -102,9 +102,9 @@ namespace Engine.Cameras
 
 		public void Refresh()
 		{
-			targetPosition = transformCached.position;
-			targetRotation = transformCached.rotation;
-			targetZoom = cameraCached.orthographic ? cameraCached.orthographicSize : GetForwardComponent(targetPosition);
+			targetPosition = transform.position;
+			targetRotation = transform.rotation;
+			targetZoom = camera.orthographic ? camera.orthographicSize : GetForwardComponent(targetPosition);
 			Clamp();
 		}
 		#endregion
@@ -145,19 +145,19 @@ namespace Engine.Cameras
 			float zoomFactor = PanZoomFactor > 1 ? GetZoomMapped(1, PanZoomFactor) : 1;
 
 			// Multiplying by zoomFactor so that panning is faster at higher zoom levels
-			targetPosition += transformCached.TransformDirection(delta * PanSpeed * zoomFactor);
+			targetPosition += transform.TransformDirection(delta * PanSpeed * zoomFactor);
 		}
 
 		protected void PinchZoom(Vector2 position1, Vector2 position2, Vector2 previousPosition1, Vector2 previousPosition2)
 		{
-			Vector2 viewSize = cameraCached.pixelRect.size;
+			Vector2 viewSize = camera.pixelRect.size;
 			float previousDeltaMagnitude = (previousPosition1 - previousPosition2).magnitude;
 			float deltaMagnitude = (position1                 - position2).magnitude;
 			float deltaMagnitudeDifference = previousDeltaMagnitude - deltaMagnitude;
 
 			float direction = 1;
 			float magnitude = 1;
-			if (!cameraCached.orthographic)
+			if (!camera.orthographic)
 			{
 				// In ortho increasing orthographicSize always zooms out, in perspective mode it depends on forward
 				// If forward is positive increasing forward component zooms in, if it's negative increasing forward component zooms out
@@ -176,8 +176,8 @@ namespace Engine.Cameras
 
 			float frustumHeight = GetFrustumHeight();
 			targetPosition = targetPosition
-						   + transformCached.TransformDirection((previousPosition1 + previousPosition2 - viewSize) * frustumHeight / viewSize.y) * direction * magnitude
-						   - transformCached.TransformDirection((position1 + position2 - viewSize) * (frustumHeight + delta) / viewSize.y) * direction * magnitude;
+						   + transform.TransformDirection((previousPosition1 + previousPosition2 - viewSize) * frustumHeight / viewSize.y) * direction * magnitude
+						   - transform.TransformDirection((position1 + position2 - viewSize) * (frustumHeight + delta) / viewSize.y) * direction * magnitude;
 		}
 
 		protected void TwistRotate(Vector2 position1, Vector2 position2, Vector2 previousPosition1, Vector2 previousPosition2)
@@ -192,7 +192,7 @@ namespace Engine.Cameras
 		#region Calculations
 		protected float GetFrustumHeight()
 		{
-			if (cameraCached.orthographic)
+			if (camera.orthographic)
 				return targetZoom;
 
 			// Will be origin if bounds are not provided and camera will try to focus (0, 0, 0) accordingly
@@ -202,7 +202,7 @@ namespace Engine.Cameras
 			float viewDistance = Math.Abs(GetForwardComponent(viewPosition - cameraPosition));
 
 			// Calculate frustum height from view distance (https://docs.unity3d.com/Manual/FrustumSizeAtDistance.html)
-			float frustumHeight = viewDistance * Mathf.Tan(cameraCached.fieldOfView * 0.5f * Mathf.Deg2Rad);
+			float frustumHeight = viewDistance * Mathf.Tan(camera.fieldOfView * 0.5f * Mathf.Deg2Rad);
 
 			return frustumHeight;
 		}
@@ -210,7 +210,7 @@ namespace Engine.Cameras
 		protected float GetZoomMapped(float min, float max)
 		{
 			// If in orthographic mode or if forward is negative, higher targetZoom means lower zoom, so we invert the output range
-			return cameraCached.orthographic || forwardSign < 0 ?
+			return camera.orthographic || forwardSign < 0 ?
 					   MathHelper.Map(targetZoom, ZoomMin, ZoomMax, max, min) :
 					   MathHelper.Map(targetZoom, ZoomMin, ZoomMax, min, max);
 		}
@@ -249,7 +249,7 @@ namespace Engine.Cameras
 				return;
 
 			float frustumHeight = GetFrustumHeight();
-			Vector2 frustum = new Vector2(frustumHeight * cameraCached.aspect, frustumHeight);
+			Vector2 frustum = new Vector2(frustumHeight * camera.aspect, frustumHeight);
 
 			// Calculate applied rotation by multiplying target rotation with inverse camera space
 			Quaternion rotation = targetRotation * cameraRotationInv;
@@ -273,13 +273,13 @@ namespace Engine.Cameras
 		protected void LateUpdate()
 		{
 			float fraction = Smoothing * Time.deltaTime;
-			if (cameraCached.orthographic)
-				cameraCached.orthographicSize = Mathf.Lerp(cameraCached.orthographicSize, targetZoom, fraction);
+			if (camera.orthographic)
+				camera.orthographicSize = Mathf.Lerp(camera.orthographicSize, targetZoom, fraction);
 			else
 				targetPosition = SetForwardComponent(targetPosition, targetZoom);
 
-			transformCached.position = Vector3.Lerp(transformCached.position, targetPosition, fraction);
-			transformCached.rotation = Quaternion.Slerp(transformCached.rotation, targetRotation, fraction);
+			transform.position = Vector3.Lerp(transform.position, targetPosition, fraction);
+			transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, fraction);
 		}
 		#endregion
 

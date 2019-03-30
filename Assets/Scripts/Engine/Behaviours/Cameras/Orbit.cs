@@ -15,12 +15,12 @@ namespace Engine.Cameras
 		public bool Y = true;
 
 		protected ScreenTransformGesture gesture;
-		protected Transform transformCached;
+		protected new Transform transform;
 
 		protected void Awake()
 		{
 			gesture = GetComponent<ScreenTransformGesture>();
-			transformCached = GetComponent<Transform>();
+			transform = base.transform;
 		}
 
 		protected void OnEnable()
@@ -42,17 +42,17 @@ namespace Engine.Cameras
 			{
 				Vector3 delta = gesture.DeltaPosition * RotateSpeed;
 				if (X)
-					transformCached.RotateAround(Target.position, transformCached.up, delta.x);
+					transform.RotateAround(Target.position, transform.up, delta.x);
 				if (Y)
-					transformCached.RotateAround(Target.position, transformCached.right, -delta.y);
+					transform.RotateAround(Target.position, transform.right, -delta.y);
 			}
 			else
 			{
-				Vector3 delta = transformCached.forward * (gesture.DeltaScale - 1f) * ZoomSpeed;
-				Vector3 newPosition = transformCached.position + delta;
+				Vector3 delta = transform.forward * (gesture.DeltaScale - 1f) * ZoomSpeed;
+				Vector3 newPosition = transform.position + delta;
 				float distance = (Target.position - newPosition).magnitude;
 				if (distance >= ZoomBounds.x && distance <= ZoomBounds.y)
-					transformCached.position = newPosition;
+					transform.position = newPosition;
 			}
 		}
 	}
