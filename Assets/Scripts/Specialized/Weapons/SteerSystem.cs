@@ -23,7 +23,7 @@ namespace Weapons
 
 			public void Execute(ref Translation translation, ref Rotation rotation, ref MoveSpeed moveSpeed)
 			{
-				translation.Value += math.mul(rotation.Value, math.up()) * moveSpeed.Speed * DeltaTime;
+				translation.Value += math.mul(rotation.Value, WeaponSystem.Up) * moveSpeed.Speed * DeltaTime;
 			}
 		}
 

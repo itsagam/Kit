@@ -1,5 +1,4 @@
 using Unity.Mathematics;
-using UnityEngine;
 
 namespace Weapons.Steerers
 {
@@ -7,14 +6,14 @@ namespace Weapons.Steerers
 	{
 		public float Speed = 20;
 
-		public float3 GetPosition(Transform bullet)
+		public float GetPosition(float3 position, quaternion rotation)
 		{
-			return math.mul(bullet.rotation, math.up()) * Speed;
+			return Speed;
 		}
 
-		public quaternion GetRotation(Transform bullet)
+		public float GetRotation(float3 position, quaternion rotation)
 		{
-			return quaternion.identity;
+			return 0;
 		}
 	}
 }

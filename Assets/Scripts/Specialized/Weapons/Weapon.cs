@@ -1,5 +1,5 @@
-#define USE_ENTITY
-//#define USE_GAMEOBJECT
+//#define USE_ENTITY
+#define USE_GAMEOBJECT
 //#define USE_JOBS
 //#define USE_SPRITE_RENDERER
 
@@ -25,8 +25,7 @@ using UniRx.Triggers;
 #if USE_SPRITE_RENDERER
 using Weapons.Rendering;
 #else
-using UnityEngine.Rendering;
-using Unity.Rendering;
+
 #endif
 
 namespace Weapons
@@ -215,16 +214,30 @@ namespace Weapons
 
 		protected void Steer(Transform bullet)
 		{
-			Vector3 position = Vector3.zero;
-			Quaternion rotation = Quaternion.identity;
+			Vector3 positionOldVector3 = bullet.position;
+			float3 positionOldFloat3 = positionOldVector3;
+			Quaternion rotationOldQuaternion = bullet.rotation;
+			quaternion rotationOldquaternion = rotationOldQuaternion;
+
+			float steerPosition = 0;
+			float steerRotation = 0;
 			foreach(ISteer steerer in Steerers)
 			{
-				position += steerer.GetPosition(bullet);
-				rotation *= steerer.GetRotation(bullet);
+				steerPosition += steerer.GetPosition(positionOldFloat3, rotationOldquaternion);
+				steerRotation += steerer.GetRotation(positionOldFloat3, rotationOldquaternion);
 			}
 
-			bullet.position += position * Time.deltaTime;
-			bullet.rotation *= rotation;
+			Quaternion rotationNew = rotationOldQuaternion * RotateZ(steerRotation);
+			bullet.rotation = rotationNew;
+
+			Vector3 steerPositionVector = rotationNew * Vector3.up * steerPosition;
+			bullet.position = positionOldVector3 + steerPositionVector * Time.deltaTime;
+		}
+
+		protected static Quaternion RotateZ(float angle)
+		{
+			float half = angle * 0.5f;
+			return new Quaternion(0.0f, 0.0f, Mathf.Sin(half), Mathf.Cos(half));
 		}
 #endif
 

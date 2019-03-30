@@ -1,21 +1,20 @@
 using Unity.Mathematics;
-using UnityEngine;
 
 namespace Weapons.Steerers
 {
 	public class Rotate: ISteer
 	{
 		public float MoveSpeed = 20;
-		public float RotateSpeed = 0.5f;
+		public float RotateSpeed = 0.01f;
 
-		public float3 GetPosition(Transform bullet)
+		public float GetPosition(float3 position, quaternion rotation)
 		{
-			return math.mul(bullet.rotation, math.up()) * MoveSpeed;
+			return MoveSpeed;
 		}
 
-		public quaternion GetRotation(Transform bullet)
+		public float GetRotation(float3 position, quaternion rotation)
 		{
-			return quaternion.RotateZ(RotateSpeed);
+			return RotateSpeed;
 		}
 	}
 }
