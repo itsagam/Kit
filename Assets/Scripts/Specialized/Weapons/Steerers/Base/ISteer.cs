@@ -1,10 +1,11 @@
+using Unity.Mathematics;
 using UnityEngine;
 
 namespace Weapons
 {
 	public interface ISteer
 	{
-		Vector3 GetPosition(Transform bullet);
-		Quaternion GetRotation(Transform bullet);
+		float3 GetPosition(Transform bullet);
+		quaternion GetRotation(Transform bullet);
 	}
 }

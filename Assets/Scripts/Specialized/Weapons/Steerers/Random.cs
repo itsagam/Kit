@@ -1,4 +1,5 @@
 using Sirenix.OdinInspector;
+using Unity.Mathematics;
 using UnityEngine;
 
 namespace Weapons.Steerers
@@ -7,17 +8,21 @@ namespace Weapons.Steerers
 	{
 		[MinValue(0)]
 		public float MoveSpeed = 20.0f;
-		[Range(0, 20)]
+		[MinValue(0)]
 		public float RotateSpeed = 5.0f;
 
-		public Vector3 GetPosition(Transform bullet)
+		public float3 GetPosition(Transform bullet)
 		{
-			return MoveSpeed > 0 ? bullet.up * UnityEngine.Random.Range(0, MoveSpeed) : Vector3.zero;
+			return MoveSpeed > 0 ?
+					   math.mul(bullet.rotation, math.up()) * WeaponSystem.Random.NextFloat(0, MoveSpeed) :
+					   float3.zero;
 		}
 
-		public Quaternion GetRotation(Transform bullet)
+		public quaternion GetRotation(Transform bullet)
 		{
-			return RotateSpeed > 0 ? Quaternion.Euler(0, 0, UnityEngine.Random.Range(-RotateSpeed, RotateSpeed)) : Quaternion.identity;
+			return RotateSpeed > 0 ?
+				       quaternion.RotateZ(WeaponSystem.Random.NextFloat(-RotateSpeed, RotateSpeed)) :
+					   quaternion.identity;
 		}
 	}
 }

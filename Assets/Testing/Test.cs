@@ -22,7 +22,7 @@ namespace Game
 					break;
 
 				Weapon.Fire();
-				await UniTask.Delay(1000);
+				await UniTask.Delay(500);
 			}
 		}
 	}

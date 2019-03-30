@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using Unity.Mathematics;
 using UnityEngine;
 
 namespace Weapons.Steerers
@@ -10,12 +11,12 @@ namespace Weapons.Steerers
 		public float RotateSpeed = 5;
 		public List<string> Tags = new List<string>();
 
-		public Vector3 GetPosition(Transform bullet)
+		public float3 GetPosition(Transform bullet)
 		{
-			return bullet.up * MoveSpeed;
+			return math.mul(bullet.rotation, math.up()) * MoveSpeed;
 		}
 
-		public Quaternion GetRotation(Transform bullet)
+		public quaternion GetRotation(Transform bullet)
 		{
 			GameObject target = null;
 			foreach (string tag in Tags)
@@ -30,12 +31,12 @@ namespace Weapons.Steerers
 			}
 
 			if (target == null)
-				return Quaternion.identity;
+				return quaternion.identity;
 
-			Vector3 direction = target.transform.position - bullet.position;
-			float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
+			float3 direction = target.transform.position - bullet.position;
+			float angle = math.degrees(math.atan2(direction.y, direction.x));
 			float previous = bullet.eulerAngles.z;
-			return Quaternion.Euler(0, 0, (angle - 90) * RotateSpeed - previous);
+			return quaternion.RotateZ(math.radians(angle - 90 * RotateSpeed - previous));
 		}
 	}
 }

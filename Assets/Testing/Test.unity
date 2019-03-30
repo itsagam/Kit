@@ -227,7 +227,22 @@ MonoBehaviour:
         mscorlib
     - Name: 
       Entry: 12
+      Data: 1
+    - Name: 
+      Entry: 7
+      Data: 1|Weapons.Spawners.Arc, Assembly-CSharp
+    - Name: Count
+      Entry: 3
+      Data: 1000
+    - Name: Rotation
+      Entry: 4
       Data: 0
+    - Name: Angle
+      Entry: 4
+      Data: 120
+    - Name: 
+      Entry: 8
+      Data: 
     - Name: 
       Entry: 13
       Data: 
@@ -236,14 +251,14 @@ MonoBehaviour:
       Data: 
     - Name: Steerers
       Entry: 7
-      Data: 1|System.Collections.Generic.List`1[[Weapons.ISteer, Assembly-CSharp]],
+      Data: 2|System.Collections.Generic.List`1[[Weapons.ISteer, Assembly-CSharp]],
         mscorlib
     - Name: 
       Entry: 12
       Data: 1
     - Name: 
       Entry: 7
-      Data: 2|Weapons.Steerers.Straight, Assembly-CSharp
+      Data: 3|Weapons.Steerers.Straight, Assembly-CSharp
     - Name: Speed
       Entry: 4
       Data: 20
@@ -258,7 +273,7 @@ MonoBehaviour:
       Data: 
     - Name: Impacters
       Entry: 7
-      Data: 3|System.Collections.Generic.List`1[[Weapons.IImpact, Assembly-CSharp]],
+      Data: 4|System.Collections.Generic.List`1[[Weapons.IImpact, Assembly-CSharp]],
         mscorlib
     - Name: 
       Entry: 12
@@ -270,8 +285,6 @@ MonoBehaviour:
       Entry: 8
       Data: 
   Sprite: {fileID: 21300000, guid: 15873cee77e44214197bb96a583f1158, type: 3}
-  Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
-  Material: {fileID: 10302, guid: 0000000000000000f000000000000000, type: 0}
   FireEffect: {fileID: 0}
   SpawnEffect: {fileID: 0}
   ImpactEffect: {fileID: 0}
@@ -639,7 +652,7 @@ Camera:
   far clip plane: 1000
   field of view: 60
   orthographic: 1
-  orthographic size: 20
+  orthographic size: 100
   m_Depth: 0
   m_CullingMask:
     serializedVersion: 2
@@ -663,7 +676,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 804776313}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: -1}
+  m_LocalPosition: {x: 0, y: 68.7, z: -1}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
