@@ -15,13 +15,12 @@ using LuaAPI = XLua.LuaDLL.Lua;
 using RealStatePtr = System.IntPtr;
 using LuaCSFunction = XLua.LuaDLL.lua_CSFunction;
 #endif
+using System;
+using System.IO;
+using System.Reflection;
 
 namespace XLua
 {
-    using System;
-    using System.IO;
-    using System.Reflection;
-
     public partial class StaticLuaCallbacks
     {
         internal LuaCSFunction GcMeta, ToStringMeta, EnumAndMeta, EnumOrMeta;
@@ -636,7 +635,7 @@ namespace XLua
         }
 #endif
 
-#if !UNITY_SWITCH || UNITY_EDITOR
+#if (!UNITY_SWITCH && !UNITY_WEBGL) || UNITY_EDITOR
         [MonoPInvokeCallback(typeof(LuaCSFunction))]
         internal static int LoadSocketCore(RealStatePtr L)
         {

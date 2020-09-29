@@ -1,7 +1,7 @@
 ﻿using System;
+using Cysharp.Threading.Tasks;
 using DG.Tweening;
 using Engine;
-using UniRx.Async;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
@@ -128,7 +128,7 @@ public static class SceneDirector
 
 		AsyncOperation load = SceneManager.LoadSceneAsync(nameOrPath, additive ? LoadSceneMode.Additive : LoadSceneMode.Single);
 		if (onProgress != null)
-			await load.ConfigureAwait(new Progress<float>(onProgress));
+			await load.ToUniTask(new Progress<float>(onProgress));
 		else
 			await load;
 		onComplete?.Invoke();
@@ -138,7 +138,7 @@ public static class SceneDirector
 
 	private static Image CreateFadeImage()
     {
-		GameObject gameObject = new GameObject(typeof(SceneManager).Name);
+		GameObject gameObject = new GameObject(nameof(SceneManager));
         Canvas canvas = gameObject.AddComponent<Canvas>();
         canvas.renderMode = RenderMode.ScreenSpaceOverlay;
         canvas.sortingOrder = 999;

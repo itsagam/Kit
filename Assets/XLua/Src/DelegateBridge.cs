@@ -15,10 +15,8 @@ using LuaAPI = XLua.LuaDLL.Lua;
 using RealStatePtr = System.IntPtr;
 using LuaCSFunction = XLua.LuaDLL.lua_CSFunction;
 #endif
-
 using System;
 using System.Collections.Generic;
-using System.Runtime.InteropServices;
 
 namespace XLua
 {
@@ -86,7 +84,7 @@ namespace XLua
 
     public static class HotfixDelegateBridge
     {
-#if UNITY_IPHONE && !UNITY_EDITOR
+#if (UNITY_IPHONE || UNITY_TVOS) && !UNITY_EDITOR
         [DllImport("__Internal", CallingConvention = CallingConvention.Cdecl)]
         public static extern bool xlua_get_hotfix_flag(int idx);
 
@@ -117,7 +115,7 @@ namespace XLua
                 DelegateBridge.DelegateBridgeList = newList;
             }
             DelegateBridge.DelegateBridgeList[idx] = val;
-#if UNITY_IPHONE && !UNITY_EDITOR
+#if (UNITY_IPHONE || UNITY_TVOS) && !UNITY_EDITOR
             xlua_set_hotfix_flag(idx, val != null);
 #endif
         }

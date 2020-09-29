@@ -18,7 +18,7 @@ Task-s are the same, except they don't print warnings
 Task.Run = Task.RunInSeparateThread
 UniTask.Run = UniTask.SwitchToThreadPool
 UniTask.Yield = UniTask.SwitchToMainThread
-UniTask.Yield !- Task.Yield (UniTask switches to Main-thread on yield)
+UniTask.Yield != Task.Yield (UniTask switches to Main-thread on yield)
 
 No Try-Catch
 ––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––

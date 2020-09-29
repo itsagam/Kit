@@ -2,10 +2,10 @@
 // Created: 2018/07/13
 
 #if true // MODULE_MARKER
+#if UNITY_5 || UNITY_2017_1_OR_NEWER
 using DG.Tweening.Core;
 using DG.Tweening.Plugins.Options;
 using UnityEngine;
-#if UNITY_5 || UNITY_2017_1_OR_NEWER
 using UnityEngine.Audio; // Required for AudioMixer
 #endif
 

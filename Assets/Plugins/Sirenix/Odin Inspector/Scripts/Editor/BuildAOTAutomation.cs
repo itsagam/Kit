@@ -1,19 +1,17 @@
-﻿#if UNITY_5_6_OR_NEWER
-
 //-----------------------------------------------------------------------
 // <copyright file="BuildAOTAutomation.cs" company="Sirenix IVS">
 // Copyright (c) Sirenix IVS. All rights reserved.
 // </copyright>
 //-----------------------------------------------------------------------
 
+using System.IO;
+using UnityEditor;
+using UnityEditor.Build;
+
+#if UNITY_EDITOR && UNITY_5_6_OR_NEWER
+
 namespace Sirenix.Serialization.Internal
 {
-    using Sirenix.Serialization;
-    using UnityEditor;
-    using UnityEditor.Build;
-    using System.IO;
-    using System;
-
 #if UNITY_2018_1_OR_NEWER
 
     using UnityEditor.Build.Reporting;
@@ -26,19 +24,11 @@ namespace Sirenix.Serialization.Internal
     public class PreBuildAOTAutomation : IPreprocessBuild
 #endif
     {
-        public int callbackOrder
-        {
-            get
-            {
-                return -1000;
-            }
-        }
+        public int callbackOrder { get { return -1000; } }
 
         public void OnPreprocessBuild(BuildTarget target, string path)
         {
-            if (AOTGenerationConfig.Instance.AutomateBeforeBuilds
-                && AOTGenerationConfig.Instance.AutomateForPlatforms != null
-                && AOTGenerationConfig.Instance.AutomateForPlatforms.Contains(target))
+            if (AOTGenerationConfig.Instance.ShouldAutomationGeneration(target))
             {
                 AOTGenerationConfig.Instance.ScanProject();
                 AOTGenerationConfig.Instance.GenerateDLL();
@@ -61,20 +51,11 @@ namespace Sirenix.Serialization.Internal
     public class PostBuildAOTAutomation : IPostprocessBuild
 #endif
     {
-        public int callbackOrder
-        {
-            get
-            {
-                return -1000;
-            }
-        }
+        public int callbackOrder { get { return -1000; } }
 
         public void OnPostprocessBuild(BuildTarget target, string path)
         {
-            if (AOTGenerationConfig.Instance.AutomateBeforeBuilds
-                && AOTGenerationConfig.Instance.AutomateForPlatforms != null
-                && AOTGenerationConfig.Instance.AutomateForPlatforms.Contains(target)
-                && AOTGenerationConfig.Instance.DeleteDllAfterBuilds)
+            if (AOTGenerationConfig.Instance.DeleteDllAfterBuilds && AOTGenerationConfig.Instance.ShouldAutomationGeneration(target))
             {
                 Directory.Delete(AOTGenerationConfig.Instance.AOTFolderPath, true);
                 File.Delete(AOTGenerationConfig.Instance.AOTFolderPath.TrimEnd('/', '\\') + ".meta");
@@ -93,4 +74,4 @@ namespace Sirenix.Serialization.Internal
     }
 }
 
-#endif
+#endif // UNITY_EDITOR && UNITY_5_6_OR_NEWER

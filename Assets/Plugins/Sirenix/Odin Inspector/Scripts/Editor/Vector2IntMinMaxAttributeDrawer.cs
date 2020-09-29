@@ -1,20 +1,19 @@
-﻿#if UNITY_2017_2_OR_NEWER
-//-----------------------------------------------------------------------
-// <copyright file="VectorIntDrawer.cs" company="Sirenix IVS">
+﻿//-----------------------------------------------------------------------
+// <copyright file="Vector2IntMinMaxAttributeDrawer.cs" company="Sirenix IVS">
 // Copyright (c) Sirenix IVS. All rights reserved.
 // </copyright>
 //-----------------------------------------------------------------------
 
+using System.Reflection;
+using Sirenix.Utilities;
+using Sirenix.Utilities.Editor;
+using UnityEditor;
+using UnityEngine;
+
+#if UNITY_EDITOR && UNITY_2017_2_OR_NEWER
+
 namespace Sirenix.OdinInspector.Editor.Drawers
 {
-    using Sirenix.OdinInspector;
-    using Sirenix.OdinInspector.Editor;
-    using Sirenix.Utilities;
-    using Sirenix.Utilities.Editor;
-    using System.Reflection;
-    using UnityEditor;
-    using UnityEngine;
-
     /// <summary>
     /// Draws Vector2Int properties marked with <see cref="MinMaxSliderAttribute"/>.
     /// </summary>
@@ -143,4 +142,4 @@ namespace Sirenix.OdinInspector.Editor.Drawers
         }
     }
 }
-#endif
+#endif // UNITY_EDITOR && UNITY_2017_2_OR_NEWER

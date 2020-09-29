@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using UniRx.Async;
+using Cysharp.Threading.Tasks;
 
 namespace Engine.Modding.Loaders
 {

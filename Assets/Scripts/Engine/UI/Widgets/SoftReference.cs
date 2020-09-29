@@ -60,7 +60,7 @@ namespace Engine.UI.Widgets
 		[AssetList]
 		[AssetsOnly]
 		[ValidateInput("Validate", "The asset must be under a \"Resources\" folder for it be to be loaded at runtime.",
-					ContiniousValidationCheck = true)]
+			ContinuousValidationCheck  = true)]
 		[OnValueChanged("Refresh")]
 		public T Asset;
 

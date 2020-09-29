@@ -11,12 +11,12 @@ using LuaAPI = UniLua.Lua;
 using RealStatePtr = UniLua.ILuaState;
 using LuaCSFunction = UniLua.CSharpFunctionDelegate;
 #else
-using System;
-using System.Collections.Generic;
 using LuaAPI = XLua.LuaDLL.Lua;
 using RealStatePtr = System.IntPtr;
 using LuaCSFunction = XLua.LuaDLL.lua_CSFunction;
 #endif
+using System;
+using System.Collections.Generic;
 
 
 namespace XLua
@@ -70,8 +70,8 @@ namespace XLua
 
 #if THREAD_SAFE || HOTFIX_ENABLE
             lock(luaEnvLock)
-            {
 #endif
+            {
                 LuaIndexes.LUA_REGISTRYINDEX = LuaAPI.xlua_get_registry_index();
 #if GEN_CODE_MINIMIZE
                 LuaAPI.xlua_set_csharp_wrapper_caller(InternalGlobals.CSharpWrapperCallerPtr);
@@ -110,7 +110,7 @@ namespace XLua
                 DoString(init_xlua, "Init");
                 init_xlua = null;
 
-#if !UNITY_SWITCH || UNITY_EDITOR
+#if (!UNITY_SWITCH && !UNITY_WEBGL) || UNITY_EDITOR
                 AddBuildin("socket.core", StaticLuaCallbacks.LoadSocketCore);
                 AddBuildin("socket", StaticLuaCallbacks.LoadSocketCore);
 #endif
@@ -183,9 +183,7 @@ namespace XLua
                 translator.CreateArrayMetatable(rawL);
                 translator.CreateDelegateMetatable(rawL);
                 translator.CreateEnumerablePairs(rawL);
-#if THREAD_SAFE || HOTFIX_ENABLE
             }
-#endif
         }
 
         private static List<Action<LuaEnv, ObjectTranslator>> initers = null;
@@ -410,7 +408,7 @@ namespace XLua
                 {
                     throw new InvalidOperationException("try to dispose a LuaEnv with C# callback!");
                 }
-
+                
                 ObjectTranslatorPool.Instance.Remove(L);
 
                 LuaAPI.lua_close(L);
@@ -461,7 +459,7 @@ namespace XLua
             }
         }
 
-        private string init_xlua = @"
+        private string init_xlua = @" 
             local metatable = {}
             local rawget = rawget
             local setmetatable = setmetatable
@@ -469,7 +467,7 @@ namespace XLua
             local import_generic_type = xlua.import_generic_type
             local load_assembly = xlua.load_assembly
 
-            function metatable:__index(key)
+            function metatable:__index(key) 
                 local fqn = rawget(self,'.fqn')
                 fqn = ((fqn and fqn .. '.') or '') .. key
 
@@ -580,7 +578,7 @@ namespace XLua
                 impl.UnderlyingSystemType = parent[name].UnderlyingSystemType
                 rawset(parent, name, impl)
             end
-
+            
             local base_mt = {
                 __index = function(t, k)
                     local csobj = t['__csobj']
@@ -617,9 +615,9 @@ namespace XLua
             buildin_initer.Add(name, initer);
         }
 
-        //The garbage-collector pause controls how long the collector waits before starting a new cycle.
-        //Larger values make the collector less aggressive. Values smaller than 100 mean the collector
-        //will not wait to start a new cycle. A value of 200 means that the collector waits for the total
+        //The garbage-collector pause controls how long the collector waits before starting a new cycle. 
+        //Larger values make the collector less aggressive. Values smaller than 100 mean the collector 
+        //will not wait to start a new cycle. A value of 200 means that the collector waits for the total 
         //memory in use to double before starting a new cycle.
         public int GcPause
         {
@@ -649,10 +647,10 @@ namespace XLua
             }
         }
 
-        //The step multiplier controls the relative speed of the collector relative to memory allocation.
-        //Larger values make the collector more aggressive but also increase the size of each incremental
-        //step. Values smaller than 100 make the collector too slow and can result in the collector never
-        //finishing a cycle. The default, 200, means that the collector runs at "twice" the speed of memory
+        //The step multiplier controls the relative speed of the collector relative to memory allocation. 
+        //Larger values make the collector more aggressive but also increase the size of each incremental 
+        //step. Values smaller than 100 make the collector too slow and can result in the collector never 
+        //finishing a cycle. The default, 200, means that the collector runs at "twice" the speed of memory 
         //allocation.
         public int GcStepmul
         {

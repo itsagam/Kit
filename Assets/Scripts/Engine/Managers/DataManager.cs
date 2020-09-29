@@ -1,6 +1,6 @@
-﻿using Game;
+﻿using Cysharp.Threading.Tasks;
+using Game;
 using UniRx;
-using UniRx.Async;
 
 namespace Engine
 {

@@ -1,5 +1,5 @@
 ﻿#if MODDING
-using UniRx.Async;
+using Cysharp.Threading.Tasks;
 
 namespace Engine.Modding
 {

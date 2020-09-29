@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Cysharp.Threading.Tasks;
 using Engine.UI;
-using UniRx.Async;
 using UnityEngine;
 using UnityEngine.UI;
 using Object = UnityEngine.Object;
@@ -175,6 +175,7 @@ namespace Engine
 			GameObject uiGO = new GameObject("Windows") {layer = LayerMask.NameToLayer("UI")};
 			Canvas canvas = uiGO.AddComponent<Canvas>();
 			canvas.renderMode = RenderMode.ScreenSpaceOverlay;
+			canvas.sortingOrder = 999;
 
 			uiGO.AddComponent<CanvasScaler>();
 			uiGO.AddComponent<GraphicRaycaster>();

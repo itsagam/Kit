@@ -1,15 +1,15 @@
-﻿#if UNITY_2017_2_OR_NEWER
-
-//-----------------------------------------------------------------------
+﻿//-----------------------------------------------------------------------
 // <copyright file="VectorIntPropertyResolvers.cs" company="Sirenix IVS">
 // Copyright (c) Sirenix IVS. All rights reserved.
 // </copyright>
 //-----------------------------------------------------------------------
 
+using UnityEngine;
+
+#if UNITY_EDITOR && UNITY_2017_2_OR_NEWER
+
 namespace Sirenix.OdinInspector.Editor.Drawers
 {
-    using UnityEngine;
-
     public sealed class Vector2IntResolver : BaseMemberPropertyResolver<Vector2Int>
     {
         protected override InspectorPropertyInfo[] GetPropertyInfos()
@@ -51,4 +51,4 @@ namespace Sirenix.OdinInspector.Editor.Drawers
     }
 }
 
-#endif
+#endif // UNITY_EDITOR && UNITY_2017_2_OR_NEWER

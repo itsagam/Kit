@@ -1,7 +1,7 @@
-using UniRx.Async;
+/*
+using Cysharp.Threading.Tasks;
 using Unity.Entities;
 using UnityEngine;
-using UnityEngine.Experimental.LowLevel;
 
 namespace Engine
 {
@@ -10,8 +10,9 @@ namespace Engine
 		[RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
 		public static void FixUniRxWithECS()
 		{
-			PlayerLoopSystem playerLoop = ScriptBehaviourUpdateOrder.CurrentPlayerLoop;
+			UnityEngine.LowLevel.PlayerLoopSystem playerLoop = ScriptBehaviourUpdateOrder.CurrentPlayerLoop;
 			PlayerLoopHelper.Initialize(ref playerLoop);
 		}
 	}
 }
+*/

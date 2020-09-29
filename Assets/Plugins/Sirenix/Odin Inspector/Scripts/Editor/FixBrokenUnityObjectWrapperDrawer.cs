@@ -1,16 +1,20 @@
-﻿#if UNITY_EDITOR && UNITY_2018_3_OR_NEWER
+﻿//-----------------------------------------------------------------------
+// <copyright file="FixBrokenUnityObjectWrapperDrawer.cs" company="Sirenix IVS">
+// Copyright (c) Sirenix IVS. All rights reserved.
+// </copyright>
+//-----------------------------------------------------------------------
+
+using System.Linq;
+using Sirenix.Utilities;
+using Sirenix.Utilities.Editor;
+using UnityEditor;
+using UnityEngine;
+
+#if UNITY_EDITOR && UNITY_2018_3_OR_NEWER
 #pragma warning disable
 
 namespace Sirenix.OdinInspector.Editor.Drawers
 {
-    using Sirenix.OdinInspector;
-    using Sirenix.OdinInspector.Editor;
-    using Sirenix.Utilities;
-    using Sirenix.Utilities.Editor;
-    using System.Linq;
-    using UnityEditor;
-    using UnityEngine;
-
     [DrawerPriority(0.001, 0, 0)]
     public class FixBrokenUnityObjectWrapperDrawer<T> : OdinValueDrawer<T>, IDefinesGenericMenuItems
         where T : UnityEngine.Component
@@ -178,7 +182,10 @@ namespace Sirenix.OdinInspector.Editor.Drawers
                     }
                 }
 
-                EditorApplication.delayCall += GUIHelper.CurrentWindow.Close;
+                if (GUIHelper.CurrentWindow) 
+                {
+                    EditorApplication.delayCall += GUIHelper.CurrentWindow.Close;
+                }
             }
 
             [HorizontalGroup, Button(ButtonSizes.Large)]
@@ -186,7 +193,11 @@ namespace Sirenix.OdinInspector.Editor.Drawers
             {
                 EditorPrefs.SetBool(AUTO_FIX_PREFS_KEY, true);
                 autoFix = true;
-                EditorApplication.delayCall += GUIHelper.CurrentWindow.Close;
+
+                if (GUIHelper.CurrentWindow) 
+                {
+                    EditorApplication.delayCall += GUIHelper.CurrentWindow.Close;
+                }
             }
         }
     }

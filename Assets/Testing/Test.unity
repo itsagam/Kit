@@ -255,31 +255,25 @@ MonoBehaviour:
         mscorlib
     - Name: 
       Entry: 12
-      Data: 1
+      Data: 2
     - Name: 
       Entry: 7
-      Data: 3|Weapons.Steerers.Homing, Assembly-CSharp
+      Data: 3|Weapons.Steerers.Straight, Assembly-CSharp
+    - Name: Speed
+      Entry: 4
+      Data: 20
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 4|Weapons.Steerers.Random, Assembly-CSharp
     - Name: MoveSpeed
       Entry: 4
       Data: 20
     - Name: RotateSpeed
       Entry: 4
-      Data: 1
-    - Name: Tags
-      Entry: 7
-      Data: 4|System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib
-    - Name: 
-      Entry: 12
-      Data: 1
-    - Name: 
-      Entry: 1
-      Data: Finish
-    - Name: 
-      Entry: 13
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
+      Data: 0.25
     - Name: 
       Entry: 8
       Data: 
