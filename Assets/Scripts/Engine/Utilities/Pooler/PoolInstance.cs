@@ -1,11 +1,11 @@
 ﻿using Sirenix.OdinInspector;
 using UnityEngine;
 
-// Component added to all instances so we can track the pool they came from
-// Used in Pooler.Destroy to de-activate instances without providing pool
 namespace Engine.Pooling
 {
-	public class PoolInstance : MonoBehaviour
+	// Component added to all instances so we can track the pool they came from
+	// Used in Pooler.Destroy to de-activate instances without providing pool
+	public class PoolInstance: MonoBehaviour
 	{
 		public Pool Pool;
 		public Component Component;
@@ -22,7 +22,6 @@ namespace Engine.Pooling
 
 #if UNITY_EDITOR
 		[PropertySpace]
-
 		[Button(ButtonSizes.Large)]
 		[ShowIf("IsValid")]
 		[LabelText("Move To Pool")]

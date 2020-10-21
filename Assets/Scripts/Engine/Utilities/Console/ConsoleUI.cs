@@ -4,7 +4,7 @@ using UnityEngine.UI;
 
 namespace Engine
 {
-	public class ConsoleUI : MonoBehaviour
+	public class ConsoleUI: MonoBehaviour
 	{
 		public Animator Animator;
 		public ScrollRect LogScroll;

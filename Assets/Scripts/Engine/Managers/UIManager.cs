@@ -36,6 +36,7 @@ namespace Engine
 	{
 		public const WindowConflictMode DefaultConflictMode = WindowConflictMode.ShowNew;
 		public const WindowHideMode DefaultHideMode = WindowHideMode.Auto;
+		public const int WindowCanvasOrder = 1000;
 
 		public static readonly List<Window> Windows = new List<Window>();
 
@@ -46,34 +47,31 @@ namespace Engine
 
 		private static Canvas lastCanvas = null;
 
-		// Workaround for CS4014: If call async methods, but not await them, C# warns that you should.
+		// Workaround for CS4014: If you call async methods, but not await them, C# warns that you should.
 		// Wrapping them in non-async methods prevents the warning.
-		public static UniTask<Window> Show(
-			string path,
-			object data = null,
-			Transform parent = default,
-			string animation = default,
-			WindowConflictMode conflictMode = DefaultConflictMode)
+		public static UniTask<Window> Show(string path,
+										   object data = null,
+										   Transform parent = default,
+										   string animation = default,
+										   WindowConflictMode conflictMode = DefaultConflictMode)
 		{
 			return ShowInternal(path, data, parent, animation, conflictMode);
 		}
 
-		public static UniTask<Window> Show(
-			Window prefab,
-			object data = null,
-			Transform parent = default,
-			string animation = default,
-			WindowConflictMode conflictMode = DefaultConflictMode)
+		public static UniTask<Window> Show(Window prefab,
+										   object data = null,
+										   Transform parent = default,
+										   string animation = default,
+										   WindowConflictMode conflictMode = DefaultConflictMode)
 		{
 			return ShowInternal(prefab, data, parent, animation, conflictMode);
 		}
 
-		private static async UniTask<Window> ShowInternal(
-			string path,
-			object data,
-			Transform parent,
-			string animation,
-			WindowConflictMode conflictMode)
+		private static async UniTask<Window> ShowInternal(string path,
+														  object data,
+														  Transform parent,
+														  string animation,
+														  WindowConflictMode conflictMode)
 		{
 			Window prefab = await ResourceManager.LoadAsync<Window>(ResourceFolder.Resources, path);
 			if (prefab == null)
@@ -82,19 +80,16 @@ namespace Engine
 			return await Show(prefab, data, parent, animation, conflictMode);
 		}
 
-		private static async UniTask<Window> ShowInternal(
-			Window prefab,
-			object data,
-			Transform parent,
-			string animation,
-			WindowConflictMode conflictMode)
+		private static async UniTask<Window> ShowInternal(Window prefab,
+														  object data,
+														  Transform parent,
+														  string animation,
+														  WindowConflictMode conflictMode)
 		{
-
 			if (conflictMode != WindowConflictMode.ShowNew)
 			{
 				Window previous = Find(prefab.name);
 				if (previous != null)
-				{
 					switch (conflictMode)
 					{
 						case WindowConflictMode.DontShow:
@@ -109,7 +104,6 @@ namespace Engine
 							previous.Data = data;
 							return previous;
 					}
-				}
 			}
 
 			if (parent == null)
@@ -131,10 +125,9 @@ namespace Engine
 			return instance;
 		}
 
-		public static UniTask<bool> Hide(
-			string name,
-			string animation = default,
-			WindowHideMode mode = DefaultHideMode)
+		public static UniTask<bool> Hide(string name,
+										 string animation = default,
+										 WindowHideMode mode = DefaultHideMode)
 		{
 			Window window = Find(name);
 			if (window != null)
@@ -172,10 +165,10 @@ namespace Engine
 
 		private static Canvas CreateCanvas()
 		{
-			GameObject uiGO = new GameObject("Windows") {layer = LayerMask.NameToLayer("UI")};
+			GameObject uiGO = new GameObject("Windows") { layer = LayerMask.NameToLayer("UI") };
 			Canvas canvas = uiGO.AddComponent<Canvas>();
 			canvas.renderMode = RenderMode.ScreenSpaceOverlay;
-			canvas.sortingOrder = 999;
+			canvas.sortingOrder = WindowCanvasOrder;
 
 			uiGO.AddComponent<CanvasScaler>();
 			uiGO.AddComponent<GraphicRaycaster>();

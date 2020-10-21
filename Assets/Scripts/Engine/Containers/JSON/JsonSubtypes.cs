@@ -15,8 +15,8 @@ using TypeInfo = System.Type;
 namespace Engine.Containers
 {
 	/// <summary>
-	/// Allows to create instances of subclasses depending on JSON.
-	/// See https://github.com/manuc66/JsonSubTypes.
+	///     Allows to create instances of subclasses depending on JSON.
+	///     See https://github.com/manuc66/JsonSubTypes.
 	/// </summary>
 
 	//  MIT License
@@ -40,11 +40,10 @@ namespace Engine.Containers
 	//  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 	//  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 	//  SOFTWARE.
-
-	public class JsonSubtypes : JsonConverter
+	public class JsonSubtypes: JsonConverter
 	{
 		[AttributeUsage(AttributeTargets.Class | AttributeTargets.Interface, AllowMultiple = true)]
-		public class KnownSubTypeAttribute : Attribute
+		public class KnownSubTypeAttribute: Attribute
 		{
 			public Type SubType { get; }
 			public object AssociatedValue { get; }
@@ -57,7 +56,7 @@ namespace Engine.Containers
 		}
 
 		[AttributeUsage(AttributeTargets.Class | AttributeTargets.Interface, AllowMultiple = true)]
-		public class KnownSubTypeWithPropertyAttribute : Attribute
+		public class KnownSubTypeWithPropertyAttribute: Attribute
 		{
 			public Type SubType { get; }
 			public string PropertyName { get; }
@@ -107,7 +106,9 @@ namespace Engine.Containers
 			throw new NotImplementedException();
 		}
 
-		public override object ReadJson(JsonReader reader, Type objectType, object existingValue,
+		public override object ReadJson(JsonReader reader,
+										Type objectType,
+										object existingValue,
 										JsonSerializer serializer)
 		{
 			return ReadJson(reader, objectType, serializer);
@@ -131,9 +132,9 @@ namespace Engine.Containers
 					value = ReadArray(reader, objectType, serializer);
 					break;
 				default:
-					var lineNumber = 0;
-					var linePosition = 0;
-					var lineInfo = reader as IJsonLineInfo;
+					int lineNumber = 0;
+					int linePosition = 0;
+					IJsonLineInfo lineInfo = reader as IJsonLineInfo;
 					if (lineInfo != null && lineInfo.HasLineInfo())
 					{
 						lineNumber = lineInfo.LineNumber;
@@ -148,29 +149,25 @@ namespace Engine.Containers
 
 		private IList ReadArray(JsonReader reader, Type targetType, JsonSerializer serializer)
 		{
-			var elementType = GetElementType(targetType);
+			Type elementType = GetElementType(targetType);
 
-			var list = CreateCompatibleList(targetType, elementType);
+			IList list = CreateCompatibleList(targetType, elementType);
 			while (reader.Read() && reader.TokenType != JsonToken.EndArray)
-			{
 				list.Add(ReadJson(reader, elementType, serializer));
-			}
 
 			if (!targetType.IsArray)
 				return list;
 
-			var array = Array.CreateInstance(targetType.GetElementType(), list.Count);
+			Array array = Array.CreateInstance(targetType.GetElementType(), list.Count);
 			list.CopyTo(array, 0);
 			return array;
 		}
 
 		private static IList CreateCompatibleList(Type targetContainerType, Type elementType)
 		{
-			var typeInfo = GetTypeInfo(targetContainerType);
+			TypeInfo typeInfo = GetTypeInfo(targetContainerType);
 			if (typeInfo.IsArray || typeInfo.IsAbstract)
-			{
 				return (IList) Activator.CreateInstance(typeof(List<>).MakeGenericType(elementType));
-			}
 
 			return (IList) Activator.CreateInstance(targetContainerType);
 		}
@@ -178,9 +175,7 @@ namespace Engine.Containers
 		private static Type GetElementType(Type arrayOrGenericContainer)
 		{
 			if (arrayOrGenericContainer.IsArray)
-			{
 				return arrayOrGenericContainer.GetElementType();
-			}
 
 			var genericTypeArguments = GetGenericTypeArguments(arrayOrGenericContainer);
 			return genericTypeArguments.FirstOrDefault();
@@ -188,16 +183,16 @@ namespace Engine.Containers
 
 		private object ReadObject(JsonReader reader, Type objectType, JsonSerializer serializer)
 		{
-			var jObject = JObject.Load(reader);
+			JObject jObject = JObject.Load(reader);
 
-			var targetType = GetType(jObject, objectType) ?? objectType;
+			Type targetType = GetType(jObject, objectType) ?? objectType;
 
 			return ThreadStaticReadObject(reader, serializer, jObject, targetType);
 		}
 
 		private static JsonReader CreateAnotherReader(JToken jToken, JsonReader reader)
 		{
-			var jObjectReader = jToken.CreateReader();
+			JsonReader jObjectReader = jToken.CreateReader();
 			jObjectReader.Culture = reader.Culture;
 			jObjectReader.CloseInput = reader.CloseInput;
 			jObjectReader.SupportMultipleContent = reader.SupportMultipleContent;
@@ -211,9 +206,7 @@ namespace Engine.Containers
 		private Type GetType(JObject jObject, Type parentType)
 		{
 			if (JsonDiscriminatorPropertyName == null)
-			{
 				return GetTypeByPropertyPresence(jObject, parentType);
-			}
 
 			return GetTypeFromDiscriminatorValue(jObject, parentType);
 		}
@@ -225,7 +218,7 @@ namespace Engine.Containers
 			return knownSubTypeAttributes
 				  .Select(knownType =>
 						  {
-							  if (TryGetValueInJson(jObject, knownType.PropertyName, out var _))
+							  if (TryGetValueInJson(jObject, knownType.PropertyName, out JToken _))
 								  return knownType.SubType;
 
 							  return null;
@@ -243,9 +236,7 @@ namespace Engine.Containers
 
 			var typeMapping = GetSubTypeMapping(parentType);
 			if (typeMapping.Any())
-			{
 				return GetTypeFromMapping(typeMapping, discriminatorValue);
-			}
 
 			return GetTypeByName(discriminatorValue.Value<string>(), parentType);
 		}
@@ -253,18 +244,16 @@ namespace Engine.Containers
 		private static bool TryGetValueInJson(IDictionary<string, JToken> jObject, string propertyName, out JToken value)
 		{
 			if (jObject.TryGetValue(propertyName, out value))
-			{
 				return true;
-			}
 
-			var matchingProperty = jObject
-								  .Keys
-								  .FirstOrDefault(jsonProperty => string.Equals(jsonProperty, propertyName, StringComparison.OrdinalIgnoreCase));
+			string matchingProperty = jObject
+									 .Keys
+									 .FirstOrDefault(jsonProperty => string.Equals(jsonProperty,
+																				   propertyName,
+																				   StringComparison.OrdinalIgnoreCase));
 
 			if (matchingProperty == null)
-			{
 				return false;
-			}
 
 			value = jObject[matchingProperty];
 			return true;
@@ -275,12 +264,12 @@ namespace Engine.Containers
 			if (typeName == null)
 				return null;
 
-			var insideAssembly = GetTypeInfo(parentType).Assembly;
+			Assembly insideAssembly = GetTypeInfo(parentType).Assembly;
 
-			var typeByName = insideAssembly.GetType(typeName);
+			Type typeByName = insideAssembly.GetType(typeName);
 			if (typeByName == null)
 			{
-				var searchLocation = parentType.FullName.Substring(0, parentType.FullName.Length - parentType.Name.Length);
+				string searchLocation = parentType.FullName.Substring(0, parentType.FullName.Length - parentType.Name.Length);
 				typeByName = insideAssembly.GetType(searchLocation + typeName, false, true);
 			}
 
@@ -289,8 +278,8 @@ namespace Engine.Containers
 
 		private static Type GetTypeFromMapping(Dictionary<object, Type> typeMapping, JToken discriminatorToken)
 		{
-			var targetlookupValueType = typeMapping.First().Key.GetType();
-			var lookupValue = discriminatorToken.ToObject(targetlookupValueType);
+			Type targetlookupValueType = typeMapping.First().Key.GetType();
+			object lookupValue = discriminatorToken.ToObject(targetlookupValueType);
 
 			if (typeMapping.TryGetValue(lookupValue, out Type targetType))
 				return targetType;
@@ -318,7 +307,7 @@ namespace Engine.Containers
 			}
 		}
 
-		private static IEnumerable<T> GetAttributes<T>(Type type) where T : Attribute
+		private static IEnumerable<T> GetAttributes<T>(Type type) where T: Attribute
 		{
 			return GetTypeInfo(type)
 				  .GetCustomAttributes(false)

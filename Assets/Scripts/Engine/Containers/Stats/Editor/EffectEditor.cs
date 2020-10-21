@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace Engine.Containers.Editor
 {
-	public class EffectDrawer : OdinValueDrawer<Effect>
+	public class EffectDrawer: OdinValueDrawer<Effect>
 	{
 		public const float EffectWidth = 120;
 
@@ -14,10 +14,11 @@ namespace Engine.Containers.Editor
 			Effect effect = ValueEntry.SmartValue;
 			effect.Stat = SirenixEditorGUI.DynamicPrimitiveField(label, effect.Stat);
 			string input = SirenixEditorGUI.DynamicPrimitiveField(null, Effect.Convert(effect), GUILayout.MaxWidth(EffectWidth));
-			try {
+			try
+			{
 				(effect.Type, effect.Value) = Effect.Parse(input);
 			}
-			catch {}
+			catch { }
 
 			ValueEntry.SmartValue = effect;
 			SirenixEditorGUI.EndIndentedHorizontal();

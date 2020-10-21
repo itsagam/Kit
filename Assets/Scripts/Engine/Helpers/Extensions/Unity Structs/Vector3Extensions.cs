@@ -187,8 +187,7 @@ namespace Engine
 
 		public static Vector3 Clamp(this Vector3 vector, Vector3 min, Vector3 max)
 		{
-			return new Vector3(
-							   MathHelper.Clamp(vector.x, min.x, max.x),
+			return new Vector3(MathHelper.Clamp(vector.x, min.x, max.x),
 							   MathHelper.Clamp(vector.y, min.y, max.y),
 							   MathHelper.Clamp(vector.z, min.z, max.z));
 		}

@@ -2,7 +2,7 @@
 
 namespace Engine.Behaviours
 {
-	public class DontDestroy : MonoBehaviour
+	public class DontDestroy: MonoBehaviour
 	{
 		protected void Awake()
 		{

@@ -4,8 +4,8 @@ using System.Collections.Generic;
 namespace Engine.Containers
 {
 	/// <summary>
-	/// This is a dictionary guaranteed to have only one of each value and key. 
-	/// It may be searched either by TFirst or by TSecond, giving a unique answer because it is 1 to 1.
+	///     This is a dictionary guaranteed to have only one of each value and key.
+	///     It may be searched either by TFirst or by TSecond, giving a unique answer because it is 1 to 1.
 	/// </summary>
 	/// <typeparam name="TFirst">The type of the "key"</typeparam>
 	/// <typeparam name="TSecond">The type of the "value"</typeparam>
@@ -17,8 +17,8 @@ namespace Engine.Containers
 		#region Exception throwing methods
 
 		/// <summary>
-		/// Tries to add the pair to the dictionary.
-		/// Throws an exception if either element is already in the dictionary
+		///     Tries to add the pair to the dictionary.
+		///     Throws an exception if either element is already in the dictionary
 		/// </summary>
 		/// <param name="first"></param>
 		/// <param name="second"></param>
@@ -32,8 +32,8 @@ namespace Engine.Containers
 		}
 
 		/// <summary>
-		/// Find the TSecond corresponding to the TFirst first
-		/// Throws an exception if first is not in the dictionary.
+		///     Find the TSecond corresponding to the TFirst first
+		///     Throws an exception if first is not in the dictionary.
 		/// </summary>
 		/// <param name="first">the key to search for</param>
 		/// <returns>the value corresponding to first</returns>
@@ -46,8 +46,8 @@ namespace Engine.Containers
 		}
 
 		/// <summary>
-		/// Find the TFirst corresponing to the Second second.
-		/// Throws an exception if second is not in the dictionary.
+		///     Find the TFirst corresponing to the Second second.
+		///     Throws an exception if second is not in the dictionary.
 		/// </summary>
 		/// <param name="second">the key to search for</param>
 		/// <returns>the value corresponding to second</returns>
@@ -60,8 +60,8 @@ namespace Engine.Containers
 		}
 
 		/// <summary>
-		/// Remove the record containing first.
-		/// If first is not in the dictionary, throws an Exception.
+		///     Remove the record containing first.
+		///     If first is not in the dictionary, throws an Exception.
 		/// </summary>
 		/// <param name="first">the key of the record to delete</param>
 		public void Remove(TFirst first)
@@ -74,8 +74,8 @@ namespace Engine.Containers
 		}
 
 		/// <summary>
-		/// Remove the record containing second.
-		/// If second is not in the dictionary, throws an Exception.
+		///     Remove the record containing second.
+		///     If second is not in the dictionary, throws an Exception.
 		/// </summary>
 		/// <param name="second">the key of the record to delete</param>
 		public void Remove(TSecond second)
@@ -86,12 +86,14 @@ namespace Engine.Containers
 			secondToFirst.Remove(second);
 			firstToSecond.Remove(first);
 		}
+
 		#endregion
 
 		#region Try methods
+
 		/// <summary>
-		/// Tries to add the pair to the dictionary.
-		/// Returns false if either element is already in the dictionary        
+		///     Tries to add the pair to the dictionary.
+		///     Returns false if either element is already in the dictionary
 		/// </summary>
 		/// <param name="first"></param>
 		/// <param name="second"></param>
@@ -107,8 +109,8 @@ namespace Engine.Containers
 		}
 
 		/// <summary>
-		/// Find the TSecond corresponding to the TFirst first.
-		/// Returns false if first is not in the dictionary.
+		///     Find the TSecond corresponding to the TFirst first.
+		///     Returns false if first is not in the dictionary.
 		/// </summary>
 		/// <param name="first">the key to search for</param>
 		/// <param name="second">the corresponding value</param>
@@ -119,8 +121,8 @@ namespace Engine.Containers
 		}
 
 		/// <summary>
-		/// Find the TFirst corresponding to the TSecond second.
-		/// Returns false if second is not in the dictionary.
+		///     Find the TFirst corresponding to the TSecond second.
+		///     Returns false if second is not in the dictionary.
 		/// </summary>
 		/// <param name="second">the key to search for</param>
 		/// <param name="first">the corresponding value</param>
@@ -131,7 +133,7 @@ namespace Engine.Containers
 		}
 
 		/// <summary>
-		/// Remove the record containing first, if there is one.
+		///     Remove the record containing first, if there is one.
 		/// </summary>
 		/// <param name="first"></param>
 		/// <returns> If first is not in the dictionary, returns false, otherwise true</returns>
@@ -146,7 +148,7 @@ namespace Engine.Containers
 		}
 
 		/// <summary>
-		/// Remove the record containing second, if there is one.
+		///     Remove the record containing second, if there is one.
 		/// </summary>
 		/// <param name="second"></param>
 		/// <returns> If second is not in the dictionary, returns false, otherwise true</returns>
@@ -159,6 +161,7 @@ namespace Engine.Containers
 			firstToSecond.Remove(first);
 			return true;
 		}
+
 		#endregion
 
 		public TSecond this[TFirst first]
@@ -174,12 +177,12 @@ namespace Engine.Containers
 		}
 
 		/// <summary>
-		/// The number of pairs stored in the dictionary
+		///     The number of pairs stored in the dictionary
 		/// </summary>
 		public int Count => firstToSecond.Count;
 
 		/// <summary>
-		/// Removes all items from the dictionary.
+		///     Removes all items from the dictionary.
 		/// </summary>
 		public void Clear()
 		{

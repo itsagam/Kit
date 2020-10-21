@@ -10,6 +10,10 @@ namespace Engine.Containers
 		ReactiveCollection<Upgrade> GetUpgrades();
 	}
 
+	public class UpgradeList: ReactiveCollection<Upgrade>
+	{
+	}
+
 	[Serializable]
 	public class Upgrade
 	{
@@ -25,7 +29,7 @@ namespace Engine.Containers
 			ID = id;
 		}
 
-		public Upgrade(string id, IEnumerable<Effect> effects) : this(id)
+		public Upgrade(string id, IEnumerable<Effect> effects): this(id)
 		{
 			AddEffects(effects);
 		}

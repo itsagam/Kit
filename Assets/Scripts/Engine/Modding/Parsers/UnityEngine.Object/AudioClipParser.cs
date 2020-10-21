@@ -1,7 +1,7 @@
 ﻿using System;
 using UnityEngine;
 
-// Use UnityWebRequest to decode audio data
+// TODO: Use UnityWebRequest to decode audio data
 // Solutions:	Derive DownloadHandlerAudioClip and override GetData method
 //				(https://github.com/Unity-Technologies/UnityCsReference/blob/master/Modules/UnityWebRequestAudio/Public/DownloadHandlerAudio.bindings.cs)
 //				Derive WWW, change to a custom Web Request and use GetAudioClip() to decode
@@ -14,7 +14,7 @@ using UnityEngine;
 
 namespace Engine.Parsers
 {
-	public class AudioClipParser : ResourceParser
+	public class AudioClipParser: ResourceParser
 	{
 		public override Type[] SupportedTypes { get; } = { typeof(AudioClip) };
 		public override string[] SupportedExtensions { get; } = { ".wav" };

@@ -5,13 +5,13 @@ using UniRx;
 
 namespace Engine.Containers
 {
-	[Serializable]
-	public class Stats : Dictionary<string, StatBaseProperty>, IDisposable
+	public class Stats: Dictionary<string, StatBaseProperty>, IDisposable
 	{
 		public IUpgradeable Upgradeable;
 
 		protected readonly Dictionary<string, ReadOnlyReactiveProperty<float>> currentProperties =
 			new Dictionary<string, ReadOnlyReactiveProperty<float>>();
+
 		protected readonly CompositeDisposable disposables = new CompositeDisposable();
 
 		public Stats()
@@ -109,7 +109,7 @@ namespace Engine.Containers
 		}
 
 		public static IEnumerable<(Upgrade upgrade, IEnumerable<Effect> effects)> GetEffectsAndUpgrades(IUpgradeable upgradeable,
-																										string stat)
+			string stat)
 		{
 			return upgradeable.GetUpgrades()
 							  .Where(u => u != null)
@@ -120,16 +120,15 @@ namespace Engine.Containers
 		public static IEnumerable<Effect> GetEffects(IUpgradeable upgradeable, string stat)
 		{
 			return upgradeable.GetUpgrades()
-			                  .Where(u => u != null)
-			                  .SelectMany(u => u.Effects)
-			                  .Where(e => e.Stat == stat);
+							  .Where(u => u != null)
+							  .SelectMany(u => u.Effects)
+							  .Where(e => e.Stat == stat);
 		}
 
 		public static (float, float, float) GetAggregates(IEnumerable<Effect> effects)
 		{
 			float valueSum = 0, percentSum = 100, multiplierSum = 1;
 			foreach (Effect effect in effects)
-			{
 				switch (effect.Type)
 				{
 					case EffectType.Value:
@@ -144,7 +143,7 @@ namespace Engine.Containers
 						multiplierSum *= effect.Value;
 						break;
 				}
-			}
+
 			return (valueSum, percentSum, multiplierSum);
 		}
 
@@ -155,10 +154,10 @@ namespace Engine.Containers
 	}
 
 	[Serializable]
-	public class StatBaseProperty : ReactiveProperty<float>
+	public class StatBaseProperty: ReactiveProperty<float>
 	{
 		public StatBaseProperty() { }
 
-		public StatBaseProperty(float initialValue) : base(initialValue) { }
+		public StatBaseProperty(float initialValue): base(initialValue) { }
 	}
 }

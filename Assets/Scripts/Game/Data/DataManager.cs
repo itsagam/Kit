@@ -1,10 +1,11 @@
 ﻿using Cysharp.Threading.Tasks;
+using Engine;
 using Game;
 using UniRx;
 
-namespace Engine
+namespace Game
 {
-	public class DataManager
+	public static class DataManager
 	{
 		public const ResourceFolder DataFolder = ResourceFolder.StreamingAssets;
 		public const string GameDataFile = "Data/GameData.json";
@@ -13,10 +14,14 @@ namespace Engine
 		public static GameData GameData;
 		public static GameState GameState;
 
+		// Makes sure GameData is always loaded in any scene in editor and dev builds
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
 		static DataManager()
 		{
-			Observable.OnceApplicationQuit().Subscribe(u => SaveGameState());
+			if (GameData == null)
+				GameData = ResourceManager.Load<GameData>(DataFolder, GameDataFile);
 		}
+#endif
 
 		public static async UniTask LoadData()
 		{

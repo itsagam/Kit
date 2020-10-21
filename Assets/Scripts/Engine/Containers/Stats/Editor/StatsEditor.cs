@@ -10,27 +10,29 @@ using UnityEngine;
 
 namespace Engine.Containers.Editor
 {
-	public class StatsProcessor : OdinAttributeProcessor<Stats>
+	public class StatsProcessor: OdinAttributeProcessor<Stats>
 	{
 		public override void ProcessSelfAttributes(InspectorProperty property, List<Attribute> attributes)
 		{
 			attributes.Add(new HideReferenceObjectPickerAttribute());
-			property.Info.GetEditableAttributesList().Add(new DictionaryDrawerSettings
-														  {
-															  KeyLabel = "Stat Name",
-															  ValueLabel = "Base Value"
-														  });
+			attributes.Add(new DictionaryDrawerSettings
+						   {
+							   KeyLabel = "Stat Name",
+							   ValueLabel = "Base Value"
+						   });
 		}
 	}
 
-	public class StatsDrawer : OdinValueDrawer<Stats>
+	public class StatsDrawer: OdinValueDrawer<Stats>
 	{
 		public const float FoldoutGap = 15;
 		public static readonly GUIStyle BaseValueStyle = new GUIStyle(SirenixGUIStyles.Label);
+
 		public static readonly GUIStyle CurrentValueStyle = new GUIStyle(SirenixGUIStyles.BoldTitle)
 															{
 																alignment = TextAnchor.MiddleRight
 															};
+
 		public static readonly GUIStyle EffectsStyle = new GUIStyle(SirenixGUIStyles.Label);
 
 		protected LocalPersistentContext<bool> toggled;
@@ -117,12 +119,15 @@ namespace Engine.Containers.Editor
 							DrawEffects(groups);
 							GUIHelper.PopIndentLevel();
 						}
+
 						SirenixEditorGUI.EndFadeGroup();
 					}
+
 					SirenixEditorGUI.EndBox();
 					i++;
 				}
 			}
+
 			SirenixEditorGUI.EndFadeGroup();
 			SirenixEditorGUI.EndIndentedVertical();
 		}
@@ -131,14 +136,17 @@ namespace Engine.Containers.Editor
 		{
 			if (upgradeable == null)
 			{
-				SirenixEditorGUI.WarningMessageBox($"The parent type {property.ParentType} doesn't implement IUpgradeable. Current values will not be available.");
+				SirenixEditorGUI
+				   .WarningMessageBox($"The parent type {property.ParentType} doesn't implement IUpgradeable. Current values will not be available.");
 				return true;
 			}
+
 			if (upgradeable.GetUpgrades() == null)
 			{
 				SirenixEditorGUI.WarningMessageBox("Trying to fetch upgrades returned null. Current values will not be available.");
 				return true;
 			}
+
 			return false;
 		}
 
@@ -152,7 +160,7 @@ namespace Engine.Containers.Editor
 		}
 	}
 
-	public class StatBasePropertyProcessor : OdinAttributeProcessor<StatBaseProperty>
+	public class StatBasePropertyProcessor: OdinAttributeProcessor<StatBaseProperty>
 	{
 		public override void ProcessSelfAttributes(InspectorProperty property, List<Attribute> attributes)
 		{
@@ -160,7 +168,7 @@ namespace Engine.Containers.Editor
 		}
 	}
 
-	public class StatBasePropertyDrawer : OdinValueDrawer<StatBaseProperty>
+	public class StatBasePropertyDrawer: OdinValueDrawer<StatBaseProperty>
 	{
 		protected override void DrawPropertyLayout(GUIContent label)
 		{

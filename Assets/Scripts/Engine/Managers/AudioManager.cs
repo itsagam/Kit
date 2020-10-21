@@ -12,6 +12,7 @@ namespace Engine
 	public static class AudioManager
 	{
 		#region Fields
+
 		public const string SoundGroup = "Sounds";
 		public const string MusicGroup = "Music";
 		public const string UIGroup = "UI";
@@ -21,9 +22,11 @@ namespace Engine
 		private static GameObject audioGameObject;
 		private static Transform audioTransform;
 		private static Dictionary<string, AudioSource> groupSources = new Dictionary<string, AudioSource>();
+
 		#endregion
 
 		#region Initialization
+
 		static AudioManager()
 		{
 			Initialize();
@@ -41,13 +44,15 @@ namespace Engine
 			BackgroundManager = bgSource.gameObject.AddComponent<AudioFader>();
 
 			CreateGroup(SoundGroup, true);
-			CreateGroup(UIGroup, true);
+			CreateGroup(UIGroup,    true);
 
 			Object.DontDestroyOnLoad(audioGameObject);
 		}
+
 		#endregion
 
 		#region Group management
+
 		public static AudioSource CreateGroup(string name, bool loadVolume = false)
 		{
 			GameObject gameObject = new GameObject(name);
@@ -94,9 +99,11 @@ namespace Engine
 		{
 			PreferenceManager.Set("Audio", name, "Volume", volume);
 		}
+
 		#endregion
 
 		#region Group playback
+
 		public static void Play(string group, AudioClip clip)
 		{
 			if (clip != null)
@@ -141,9 +148,11 @@ namespace Engine
 		{
 			Play(UIGroup, clip);
 		}
+
 		#endregion
 
 		#region AudioSource (Pooled) playback
+
 		public static AudioSource Play(AudioSource prefab)
 		{
 			if (prefab == null)
@@ -192,9 +201,11 @@ namespace Engine
 			if (!source.loop)
 				Observable.Timer(TimeSpan.FromSeconds(source.clip.length)).Subscribe(l => Pooler.Destroy(source));
 		}
+
 		#endregion
 
 		#region AudioClip (Unpooled) playback
+
 		public static AudioSource Play(AudioClip clip, bool loop = false, bool is3D = false)
 		{
 			return clip == null ? null : PlayDedicated(clip, loop, is3D);
@@ -245,26 +256,32 @@ namespace Engine
 			source.Play();
 
 			if (!loop)
-				Observable.Timer(TimeSpan.FromSeconds(clip.length)).Subscribe(l =>
-																			  {
-																				  if (gameObject != null)
-																					  gameObject.Destroy();
-																			  });
+				Observable.Timer(TimeSpan.FromSeconds(clip.length))
+						  .Subscribe(l =>
+									 {
+										 if (gameObject != null)
+											 gameObject.Destroy();
+									 });
 
 			return source;
 		}
+
 		#endregion
 
 		#region Public properties
+
 		public static AudioSource MusicSource => GetGroup(MusicGroup);
 		public static AudioSource SoundSource => GetGroup(SoundGroup);
 		public static AudioSource UISource => GetGroup(UIGroup);
+
 		public static float MusicFadeSpeed
 		{
 			get => BackgroundManager.Speed;
 			set => BackgroundManager.Speed = value;
 		}
+
 		public static bool IsMusicPlaying => BackgroundManager.IsPlaying;
+
 		#endregion
 	}
 }

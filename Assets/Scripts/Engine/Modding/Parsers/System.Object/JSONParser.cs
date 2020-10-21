@@ -3,7 +3,7 @@ using Newtonsoft.Json;
 
 namespace Engine.Parsers
 {
-	public class JSONParser : ResourceParser
+	public class JSONParser: ResourceParser
 	{
 		public override Type[] SupportedTypes { get; } = { };
 		public override string[] SupportedExtensions { get; } = { ".json" };

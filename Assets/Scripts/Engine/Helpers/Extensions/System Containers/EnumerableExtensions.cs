@@ -31,6 +31,7 @@ namespace Engine
 					return index;
 				index++;
 			}
+
 			return -1;
 		}
 
@@ -43,6 +44,7 @@ namespace Engine
 					return index;
 				index++;
 			}
+
 			return -1;
 		}
 

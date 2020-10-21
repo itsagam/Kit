@@ -9,7 +9,7 @@ using UnityEngine;
 
 namespace Engine.Containers.Editor
 {
-	public class BuffProcessor : OdinAttributeProcessor<Buff>
+	public class BuffProcessor: OdinAttributeProcessor<Buff>
 	{
 		public override void ProcessChildMemberAttributes(InspectorProperty parentProperty, MemberInfo member, List<Attribute> attributes)
 		{
@@ -34,7 +34,7 @@ namespace Engine.Containers.Editor
 		}
 	}
 
-	public class BuffDrawer : OdinValueDrawer<Buff>
+	public class BuffDrawer: OdinValueDrawer<Buff>
 	{
 		protected override void DrawPropertyLayout(GUIContent label)
 		{
@@ -42,12 +42,14 @@ namespace Engine.Containers.Editor
 
 			Buff buff = ValueEntry.SmartValue;
 			SirenixEditorGUI.BeginToolbarBox(label);
+
 			if (Application.isPlaying && buff.TimeLeft.Value > 0)
 			{
 				GUIHelper.PushGUIEnabled(false);
 				EditorGUILayout.LabelField("Time", $"{buff.TimeLeft.Value:0.##}s");
 				GUIHelper.PopGUIEnabled();
 			}
+
 			CallNextDrawer(null);
 			SirenixEditorGUI.EndToolbarBox();
 		}

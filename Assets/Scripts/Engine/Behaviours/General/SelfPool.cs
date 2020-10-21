@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace Engine.Behaviours
 {
-	public class SelfPool : MonoBehaviour
+	public class SelfPool: MonoBehaviour
 	{
 		public Component Component;
 		public float Time = 5.0f;

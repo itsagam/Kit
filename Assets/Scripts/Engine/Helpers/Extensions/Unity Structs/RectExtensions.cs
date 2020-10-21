@@ -31,9 +31,9 @@ namespace Engine
 
 		public static float SqrDistance(this Rect rect, Vector3 point)
 		{
-			float cx = point.x - Mathf.Max(Mathf.Min(point.x, rect.x + rect.width ), rect.x);
+			float cx = point.x - Mathf.Max(Mathf.Min(point.x, rect.x + rect.width),  rect.x);
 			float cy = point.y - Mathf.Max(Mathf.Min(point.y, rect.y + rect.height), rect.y);
-			return cx *cx + cy *cy;
+			return cx * cx + cy * cy;
 		}
 	}
 }

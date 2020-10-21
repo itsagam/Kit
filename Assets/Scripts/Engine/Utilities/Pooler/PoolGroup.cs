@@ -7,9 +7,10 @@ using UnityEngine;
 namespace Engine.Pooling
 {
 	[AddComponentMenu("Pooling/PoolGroup")]
-	public class PoolGroup : MonoBehaviour, IEnumerable<Component>
+	public class PoolGroup: MonoBehaviour, IEnumerable<Component>
 	{
 		#region Fields
+
 		[LabelText("Message")]
 		[OnValueChanged("ResetMessageMode")]
 		public PoolMessageMode MessageMode = PoolMessageMode.None;
@@ -21,16 +22,17 @@ namespace Engine.Pooling
 		public bool Persistent = false;
 
 		[PropertySpace]
-
 		[SceneObjectsOnly]
 		[InlineEditor]
 		[ListDrawerSettings(CustomAddFunction = "AddPool", CustomRemoveElementFunction = "DestroyPool")]
 		public List<Pool> Pools = new List<Pool>();
 
 		public bool IsDestroying { get; protected set; }
+
 		#endregion
 
 		#region Initialization
+
 		protected void Awake()
 		{
 			Pooler.CacheGroup(this);
@@ -47,9 +49,11 @@ namespace Engine.Pooling
 			IsDestroying = true;
 			Pooler.UncacheGroup(this);
 		}
+
 		#endregion
 
 		#region Pool management
+
 		public void AddPool(Pool pool)
 		{
 			Pools.Add(pool);
@@ -72,9 +76,11 @@ namespace Engine.Pooling
 			pool.transform.parent = null;
 			return Pools.Remove(pool);
 		}
+
 		#endregion
 
 		#region Helper methods
+
 		IEnumerator IEnumerable.GetEnumerator()
 		{
 			return Used.GetEnumerator();
@@ -84,9 +90,11 @@ namespace Engine.Pooling
 		{
 			return Used.GetEnumerator();
 		}
+
 		#endregion
 
 		#region Editor functionality
+
 #if UNITY_EDITOR
 		private void AddPool()
 		{
@@ -115,9 +123,11 @@ namespace Engine.Pooling
 
 		private bool ShowPersistent => transform.parent == null;
 #endif
+
 		#endregion
 
 		#region Public properties
+
 		public IEnumerable<Component> Available => Pools.SelectMany(p => p.Available);
 		public int AvailableCount => Pools.Sum(p => p.Available.Count);
 

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Cysharp.Threading.Tasks;
+using Engine.Containers;
 using Engine.Parsers;
 using UnityEngine;
 using UnityEngine.Networking;
@@ -37,12 +38,13 @@ namespace Engine
 			{ ResourceFolder.Resources, Application.dataPath                  + "/Resources/"}
 		};
 
-		public static readonly List<ResourceParser> Parsers = new List<ResourceParser> {
-			  new JSONParser(),
-			  new Texture2DParser(),
-			  new AudioClipParser(),
-			  new TextAssetParser()
-		};
+		public static readonly List<ResourceParser> Parsers = new List<ResourceParser>
+															  {
+																  new JSONParser(),
+																  new Texture2DParser(),
+																  new AudioClipParser(),
+																  new TextAssetParser()
+															  };
 
 		public static event Action<ResourceFolder, string, object, bool> ResourceLoaded;
 		public static event Action<ResourceFolder, string> ResourceUnloaded;
@@ -52,11 +54,13 @@ namespace Engine
 
 		private static Dictionary<(Type type, ResourceFolder folder, string file), WeakReference> cachedResources =
 			new Dictionary<(Type, ResourceFolder, string), WeakReference>();
+
 		#endregion
 
 		#region Loading
 
 		#region Load(folder, file)
+
 		public static T Load<T>(ResourceFolder folder, string file, bool modded = DefaultModding, bool merge = false)
 		{
 			Type type = typeof(T);
@@ -107,7 +111,11 @@ namespace Engine
 			return (T) await LoadUnmoddedAsync(type, folder, file);
 		}
 
-		public static async UniTask<object> LoadAsync(Type type, ResourceFolder folder, string file, bool modded = DefaultModding, bool merge = false)
+		public static async UniTask<object> LoadAsync(Type type,
+													  ResourceFolder folder,
+													  string file,
+													  bool modded = DefaultModding,
+													  bool merge = false)
 		{
 #if MODDING
 			if (modded)
@@ -196,9 +204,11 @@ namespace Engine
 			ResourceLoaded?.Invoke(folder, file, reference, true);
 			return reference;
 		}
+
 		#endregion
 
 		#region LoadMerged(folder, file)
+
 #if MODDING
 		public static T LoadMerged<T>(ResourceFolder folder, string file)
 		{
@@ -312,9 +322,11 @@ namespace Engine
 			return merged;
 		}
 #endif
+
 		#endregion
 
 		#region Load(fullPath)
+
 		public static T Load<T>(string fullPath)
 		{
 			return (T) LoadEx(typeof(T), fullPath).reference;
@@ -329,8 +341,7 @@ namespace Engine
 		{
 			string text = null;
 			byte[] bytes = null;
-			foreach (var (parser, _) in RankParsers(type, fullPath))
-			{
+			foreach ((ResourceParser parser, float _) in RankParsers(type, fullPath))
 				try
 				{
 					if (parser.ParseMode == ParseMode.Text)
@@ -341,23 +352,23 @@ namespace Engine
 							if (text == null)
 								return default;
 						}
+
 						return (parser.Read(type, text, fullPath), parser);
 					}
-					else
+
+					if (bytes == null)
 					{
+						bytes = ReadBytes(fullPath);
 						if (bytes == null)
-						{
-							bytes = ReadBytes(fullPath);
-							if (bytes == null)
-								return default;
-						}
-						return (parser.Read(type, bytes, fullPath), parser);
+							return default;
 					}
+
+					return (parser.Read(type, bytes, fullPath), parser);
 				}
 				catch (Exception)
 				{
 				}
-			}
+
 			return default;
 		}
 
@@ -375,8 +386,7 @@ namespace Engine
 		{
 			string text = null;
 			byte[] bytes = null;
-			foreach (var (parser, _) in RankParsers(type, fullPath))
-			{
+			foreach ((ResourceParser parser, float _) in RankParsers(type, fullPath))
 				try
 				{
 					if (parser.ParseMode == ParseMode.Text)
@@ -387,28 +397,30 @@ namespace Engine
 							if (text == null)
 								return default;
 						}
+
 						return (parser.Read(type, text, fullPath), parser);
 					}
-					else
+
+					if (bytes == null)
 					{
+						bytes = await ReadBytesAsync(fullPath);
 						if (bytes == null)
-						{
-							bytes = await ReadBytesAsync(fullPath);
-							if (bytes == null)
-								return default;
-						}
-						return (parser.Read(type, bytes, fullPath), parser);
+							return default;
 					}
+
+					return (parser.Read(type, bytes, fullPath), parser);
 				}
 				catch (Exception)
 				{
 				}
-			}
+
 			return default;
 		}
+
 		#endregion
 
 		#region Unload
+
 		public static bool Unload(object reference)
 		{
 #if MODDING
@@ -416,7 +428,7 @@ namespace Engine
 				return true;
 #endif
 
-			var key = cachedResources.FirstOrDefault(kvp => kvp.Value.Target == reference).Key;
+			(Type type, ResourceFolder folder, string file) key = cachedResources.FirstOrDefault(kvp => kvp.Value.Target == reference).Key;
 
 			if (reference is Object unityObject)
 			{
@@ -433,6 +445,7 @@ namespace Engine
 				ResourceUnloaded?.Invoke(key.folder, key.file);
 				return true;
 			}
+
 			return false;
 		}
 
@@ -443,13 +456,12 @@ namespace Engine
 
 		public static bool Unload(Type type, ResourceFolder folder, string file)
 		{
-
 #if MODDING
 			if (ModManager.Unload(type, folder, file))
 				return true;
 #endif
 
-			var key = (type, folder, file);
+			(Type type, ResourceFolder folder, string file) key = (type, folder, file);
 			if (!cachedResources.TryGetValue(key, out WeakReference weakReference))
 				return false;
 
@@ -471,15 +483,19 @@ namespace Engine
 			Resources.UnloadUnusedAssets();
 		}
 
-		public static void ClearCache()
+		public static void ClearCache(bool unload = false)
 		{
 			cachedResources.Clear();
+			if (unload)
+				UnloadUnused();
 		}
+
 		#endregion
 
 		#endregion
 
 		#region Reading
+
 		public static string ReadText(ResourceFolder folder, string file, bool modded = DefaultModding)
 		{
 #if MODDING
@@ -579,9 +595,11 @@ namespace Engine
 			UnityWebRequest request = UnityWebRequest.Get(LocalToURLPath(filePath));
 			return request.SendWebRequest();
 		}
+
 		#endregion
 
 		#region Saving/Deleting
+
 		public static bool Save(ResourceFolder folder, string file, object contents)
 		{
 			return Save(GetPath(folder, file), contents);
@@ -594,7 +612,7 @@ namespace Engine
 
 		public static bool Save(string fullPath, object contents)
 		{
-			foreach (var (parser, _) in RankParsers(contents.GetType(), fullPath))
+			foreach ((ResourceParser parser, float _) in RankParsers(contents.GetType(), fullPath))
 				try
 				{
 					object output = parser.Write(contents, fullPath);
@@ -612,7 +630,7 @@ namespace Engine
 
 		public static UniTask<bool> SaveAsync(string fullPath, object contents)
 		{
-			foreach (var (parser, _) in RankParsers(contents.GetType(), fullPath))
+			foreach ((ResourceParser parser, float _) in RankParsers(contents.GetType(), fullPath))
 				try
 				{
 					object output = parser.Write(contents, fullPath);
@@ -738,9 +756,11 @@ namespace Engine
 		{
 			return File.Exists(fullPath);
 		}
+
 		#endregion
 
 		#region Other
+
 		private static IEnumerable<(ResourceParser parser, float certainty)> RankParsers(Type type, string fullPath)
 		{
 			return Parsers.Select(parser => (parser, certainty: parser.CanParse(type, fullPath)))
@@ -788,6 +808,7 @@ namespace Engine
 				path = "file://" + path;
 			return path;
 		}
+
 		#endregion
 	}
 }

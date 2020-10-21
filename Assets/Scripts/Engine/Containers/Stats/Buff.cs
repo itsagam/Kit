@@ -12,11 +12,12 @@ namespace Engine.Containers
 		Keep,
 		Replace,
 		Longer,
-		Shorter,
+		Shorter
 	}
 
+	// Needs to be added through AddTo to the IUpgradeable to be use-able
 	[Serializable]
-	public class Buff : Upgrade
+	public class Buff: Upgrade
 	{
 		public float Duration;
 		public BuffMode Mode = BuffMode.Extend;
@@ -95,6 +96,7 @@ namespace Engine.Containers
 						previous.Duration = Duration;
 					break;
 			}
+
 			return this;
 		}
 

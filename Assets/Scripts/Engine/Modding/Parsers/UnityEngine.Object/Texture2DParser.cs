@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace Engine.Parsers
 {
-	public class Texture2DParser : ResourceParser
+	public class Texture2DParser: ResourceParser
 	{
 		public override Type[] SupportedTypes { get; } = { typeof(Texture2D) };
 		public override string[] SupportedExtensions { get; } = { ".jpg", ".jpeg", ".png" };

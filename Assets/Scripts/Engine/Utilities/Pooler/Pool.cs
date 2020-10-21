@@ -27,13 +27,14 @@ namespace Engine.Pooling
 	{
 		StopGiving,
 		ReuseFirst,
-		DestroyAfterUse,
+		DestroyAfterUse
 	}
 
 	[AddComponentMenu("Pooling/Pool")]
-	public class Pool : MonoBehaviour, IEnumerable<Component>
+	public class Pool: MonoBehaviour, IEnumerable<Component>
 	{
 		#region Fields
+
 		public const string InstantiateMessage = "AwakeFromPool";
 		public const string DestroyMessage = "OnDestroyIntoPool";
 		private const int UnlimitedMaxPreloadAmount = 250;
@@ -98,9 +99,11 @@ namespace Engine.Pooling
 		protected LinkedList<Component> availableInstances = new LinkedList<Component>();
 		protected LinkedList<Component> usedInstances = new LinkedList<Component>();
 		protected new Transform transform;
+
 		#endregion
 
 		#region Initialization
+
 		protected void Awake()
 		{
 			Pooler.CachePool(this);
@@ -159,12 +162,14 @@ namespace Engine.Pooling
 				availableInstances.AddLast(instance);
 			}
 		}
+
 		#endregion
 
 		#region Instantiate/Destroy
+
 		protected Component CreateInstance()
 		{
-			Component instance = GameObject.Instantiate(Prefab);
+			Component instance = Instantiate(Prefab);
 			instance.name = name;
 
 			PoolInstance poolInstance = instance.gameObject.AddComponent<PoolInstance>();
@@ -189,7 +194,6 @@ namespace Engine.Pooling
 			else
 			{
 				if (Limit && Overlimit)
-				{
 					switch (LimitMode)
 					{
 						case PoolLimitMode.StopGiving:
@@ -203,10 +207,10 @@ namespace Engine.Pooling
 							SendInstantiateMessage(instance);
 							return instance;
 					}
-				}
 
 				instance = CreateInstance();
 			}
+
 			usedInstances.AddLast(instance);
 			SendInstantiateMessage(instance);
 			return instance;
@@ -267,27 +271,27 @@ namespace Engine.Pooling
 			return (T) Instantiate();
 		}
 
-		public T Instantiate<T>(Transform parent, bool worldSpace = false) where T : Component
+		public T Instantiate<T>(Transform parent, bool worldSpace = false) where T: Component
 		{
 			return (T) Instantiate(parent, worldSpace);
 		}
 
-		public T Instantiate<T>(Vector3 position) where T : Component
+		public T Instantiate<T>(Vector3 position) where T: Component
 		{
 			return (T) Instantiate(position);
 		}
 
-		public T Instantiate<T>(Vector3 position, Quaternion rotation) where T : Component
+		public T Instantiate<T>(Vector3 position, Quaternion rotation) where T: Component
 		{
 			return (T) Instantiate(position, rotation);
 		}
 
-		public T Instantiate<T>(Vector3 position, Transform parent) where T : Component
+		public T Instantiate<T>(Vector3 position, Transform parent) where T: Component
 		{
 			return (T) Instantiate(position, parent);
 		}
 
-		public T Instantiate<T>(Vector3 position, Quaternion rotation, Transform parent) where T : Component
+		public T Instantiate<T>(Vector3 position, Quaternion rotation, Transform parent) where T: Component
 		{
 			return (T) Instantiate(position, rotation, parent);
 		}
@@ -300,6 +304,7 @@ namespace Engine.Pooling
 				instance.gameObject.Destroy();
 				return;
 			}
+
 			availableInstances.AddLast(instance);
 			instance.gameObject.SetActive(false);
 			SendDestroyMessage(instance);
@@ -310,9 +315,11 @@ namespace Engine.Pooling
 			foreach (Component instance in usedInstances.Reverse())
 				Destroy(instance);
 		}
+
 		#endregion
 
 		#region Helper methods
+
 		protected void SendInstantiateMessage(Component instance)
 		{
 			switch (MessageMode)
@@ -366,6 +373,7 @@ namespace Engine.Pooling
 		#endregion
 
 		#region Editor functionality
+
 #if UNITY_EDITOR
 		private IEnumerable<Component> GetComponents()
 		{
@@ -384,25 +392,28 @@ namespace Engine.Pooling
 				PreloadAmount = MaxPreloadAmount;
 		}
 
-		private bool ShowGroup => Group                 != null;
+		private bool ShowGroup => Group                                    != null;
 		private bool ShowPersistent => ((Component) this).transform.parent == null;
 		private int MaxPreloadAmount => Limit ? LimitAmount : UnlimitedMaxPreloadAmount;
 #endif
+
 		#endregion
 
 		#region Public properties
-		[PropertySpace]
 
+		[PropertySpace]
 		[EnableGUI]
 		[ShowInInspector]
 		[HideInInlineEditors]
 		public LinkedList<Component> Available => availableInstances;
+
 		public int AvailableCount => availableInstances.Count;
 
 		[EnableGUI]
 		[ShowInInspector]
 		[HideInInlineEditors]
 		public LinkedList<Component> Used => usedInstances;
+
 		public int UsedCount => usedInstances.Count;
 
 		#endregion

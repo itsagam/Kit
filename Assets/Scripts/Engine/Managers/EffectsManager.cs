@@ -90,7 +90,9 @@ namespace Engine
 			if (system.main.loop)
 				return;
 
-			Observable.EveryUpdate().First(l => !system.IsAlive(true)).CatchIgnore()
+			Observable.EveryUpdate()
+					  .First(l => !system.IsAlive(true))
+					  .CatchIgnore()
 					  .Subscribe(l => Pooler.Destroy(system));
 		}
 	}

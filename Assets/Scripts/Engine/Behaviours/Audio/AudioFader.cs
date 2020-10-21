@@ -5,7 +5,7 @@ using UnityEngine;
 namespace Engine.Audio
 {
 	[RequireComponent(typeof(AudioSource))]
-	public class AudioFader : MonoBehaviour
+	public class AudioFader: MonoBehaviour
 	{
 		public AudioSource Audio;
 		public float Speed = 0.5f;
@@ -70,12 +70,13 @@ namespace Engine.Audio
 				else
 					lastVolume = Audio.volume;
 
-				ChangeTo(0, () =>
-							{
-								Audio.clip = clip;
-								Audio.Play();
-								ChangeTo(lastVolume);
-							});
+				ChangeTo(0,
+						 () =>
+						 {
+							 Audio.clip = clip;
+							 Audio.Play();
+							 ChangeTo(lastVolume);
+						 });
 			}
 			else
 			{
@@ -129,7 +130,7 @@ namespace Engine.Audio
 				else
 					lastVolume = Audio.volume;
 
-				ChangeTo(0,  Audio.Stop);
+				ChangeTo(0, Audio.Stop);
 			}
 			else
 				Audio.Stop();

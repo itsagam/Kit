@@ -2,7 +2,7 @@
 
 namespace Engine.Behaviours
 {
-	public class FadeIn : MonoBehaviour
+	public class FadeIn: MonoBehaviour
 	{
 		protected void Awake()
 		{

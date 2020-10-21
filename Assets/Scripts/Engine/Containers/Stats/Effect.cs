@@ -52,6 +52,7 @@ namespace Engine.Containers
 				output.type = EffectType.Value;
 				output.value = System.Convert.ToSingle(str);
 			}
+
 			return output;
 		}
 
@@ -76,6 +77,7 @@ namespace Engine.Containers
 					output += effect.Value + "%";
 					break;
 			}
+
 			return output;
 		}
 	}

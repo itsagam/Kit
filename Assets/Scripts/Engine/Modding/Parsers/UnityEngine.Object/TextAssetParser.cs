@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace Engine.Parsers
 {
-	public class TextAssetParser : ResourceParser
+	public class TextAssetParser: ResourceParser
 	{
 		public override Type[] SupportedTypes { get; } = { typeof(TextAsset) };
 		public override string[] SupportedExtensions { get; } = { ".txt" };

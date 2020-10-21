@@ -9,7 +9,7 @@ using UnityEngine;
 
 namespace Engine.Containers.Editor
 {
-	public class StatProcessor : OdinAttributeProcessor<Stat>
+	public class StatProcessor: OdinAttributeProcessor<Stat>
 	{
 		public override void ProcessSelfAttributes(InspectorProperty property, List<Attribute> attributes)
 		{
@@ -17,9 +17,10 @@ namespace Engine.Containers.Editor
 		}
 	}
 
-	public class StatDrawer : OdinValueDrawer<Stat>
+	public class StatDrawer: OdinValueDrawer<Stat>
 	{
 		public const float FoldoutWidthCorrection = 4;
+
 		public static readonly GUIStyle CurrentValueStyle = new GUIStyle(SirenixGUIStyles.BoldTitle)
 															{
 																alignment = TextAnchor.MiddleRight,
@@ -83,9 +84,7 @@ namespace Engine.Containers.Editor
 				DrawField(null);
 			}
 			else
-			{
 				DrawField(label);
-			}
 
 			float currentValue = Stats.CalculateValue(stat.Upgradeable, stat.ID, stat.BaseValue);
 			GUI.Label(GUILayoutUtility.GetLastRect(), Mathf.RoundToInt(currentValue).ToString(), CurrentValueStyle);
@@ -98,6 +97,7 @@ namespace Engine.Containers.Editor
 					StatsDrawer.DrawEffects(groups);
 					GUIHelper.PopIndentLevel();
 				}
+
 				SirenixEditorGUI.EndFadeGroup();
 			}
 		}

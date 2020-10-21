@@ -27,43 +27,47 @@ namespace Engine
 		private const string NullString = "nil";
 		private const float GCInterval = 1.0f;
 
-		private static ConsoleUI instance = null;
+		private static ConsoleUI instance;
 		private static CompositeDisposable disposables = new CompositeDisposable();
 
 		#region Initialization
+
 		[RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
 		public static void Initialize()
 		{
 			if (!Enabled || instance != null)
 				return;
 
-			CreateUI();
-			InitializeUI();
-			RegisterLogging();
-			RegisterInput();
-			InitializeScripting();
+			if (CreateUI())
+			{
+				InitializeUI();
+				RegisterLogging();
+				RegisterInput();
+				InitializeScripting();
+			}
 		}
 
-		private static void CreateUI()
+		private static bool CreateUI()
 		{
 			ConsoleUI prefab = Resources.Load<ConsoleUI>(Prefab);
+			if (prefab == null)
+				return false;
 			instance = Object.Instantiate(prefab);
 			instance.name = prefab.name;
 			Object.DontDestroyOnLoad(instance.gameObject);
 			if (EventSystem.current == null)
 				new GameObject("EventSystem", typeof(EventSystem), typeof(StandaloneInputModule));
+			return true;
 		}
 
 		private static void RegisterInput()
 		{
 			if (!(Application.isMobilePlatform || Application.isConsolePlatform))
-			{
 				Observable
 				   .EveryUpdate()
 				   .Where(l => Input.GetKeyDown(KeyCode.BackQuote))
 				   .Subscribe(l => Toggle())
 				   .AddTo(disposables);
-			}
 			else
 			{
 				GameObject gameObject = instance.gameObject;
@@ -83,19 +87,21 @@ namespace Engine
 
 			const EventModifiers disregard = EventModifiers.FunctionKey | EventModifiers.Numeric | EventModifiers.CapsLock;
 			InputFieldEx input = instance.CommandInput;
-			input.AddKeyHandler(KeyCode.BackQuote,	() =>	{},											EventModifiers.None,	disregard);
-			input.AddKeyHandler(KeyCode.Return,				Submit,										EventModifiers.None,	disregard);
-			input.AddKeyHandler(KeyCode.Return,		() =>	input.SendKeyEvent(KeyCode.Return,'\n'),	EventModifiers.Shift,	disregard);
-			input.AddKeyHandler(KeyCode.UpArrow,			SelectPreviousCommand,						EventModifiers.None,	disregard);
-			input.AddKeyHandler(KeyCode.DownArrow,			SelectNextCommand,							EventModifiers.None,	disregard);
-			input.AddKeyHandler(KeyCode.UpArrow,	() =>	input.SendKeyEvent(KeyCode.UpArrow),		EventModifiers.Shift,	disregard);
-			input.AddKeyHandler(KeyCode.DownArrow,	() =>	input.SendKeyEvent(KeyCode.DownArrow),		EventModifiers.Shift,	disregard);
-			input.AddKeyHandler(KeyCode.LeftArrow,	() =>	input.SendKeyEvent(KeyCode.LeftArrow),		EventModifiers.Shift,	disregard);
-			input.AddKeyHandler(KeyCode.RightArrow,	() =>	input.SendKeyEvent(KeyCode.RightArrow),		EventModifiers.Shift,	disregard);
+			input.AddKeyHandler(KeyCode.BackQuote,  () => { },                                      EventModifiers.None,  disregard);
+			input.AddKeyHandler(KeyCode.Return,     Submit,                                         EventModifiers.None,  disregard);
+			input.AddKeyHandler(KeyCode.Return,     () => input.SendKeyEvent(KeyCode.Return, '\n'), EventModifiers.Shift, disregard);
+			input.AddKeyHandler(KeyCode.UpArrow,    SelectPreviousCommand,                          EventModifiers.None,  disregard);
+			input.AddKeyHandler(KeyCode.DownArrow,  SelectNextCommand,                              EventModifiers.None,  disregard);
+			input.AddKeyHandler(KeyCode.UpArrow,    () => input.SendKeyEvent(KeyCode.UpArrow),      EventModifiers.Shift, disregard);
+			input.AddKeyHandler(KeyCode.DownArrow,  () => input.SendKeyEvent(KeyCode.DownArrow),    EventModifiers.Shift, disregard);
+			input.AddKeyHandler(KeyCode.LeftArrow,  () => input.SendKeyEvent(KeyCode.LeftArrow),    EventModifiers.Shift, disregard);
+			input.AddKeyHandler(KeyCode.RightArrow, () => input.SendKeyEvent(KeyCode.RightArrow),   EventModifiers.Shift, disregard);
 		}
+
 		#endregion
 
 		#region Console
+
 		private static void InitializeUI()
 		{
 			instance.LogText.text = "";
@@ -140,9 +146,11 @@ namespace Engine
 					Hide();
 			}
 		}
+
 		#endregion
 
 		#region Log
+
 		public static readonly StringBuilder LogBuilder = new StringBuilder(Length);
 		private static string logEnd = Environment.NewLine;
 
@@ -168,6 +176,9 @@ namespace Engine
 
 		public static void Log(string line)
 		{
+			if (instance == null)
+				return;
+
 			StringBuilder log = LogBuilder;
 			int newLength = log.Length + line.Length;
 			if (newLength > Length)
@@ -176,6 +187,7 @@ namespace Engine
 				removeLength = log.IndexOf(logEnd, removeLength) + logEnd.Length;
 				log.Remove(0, removeLength);
 			}
+
 			log.AppendLine(line);
 			instance.LogText.text = log.ToString();
 		}
@@ -194,7 +206,8 @@ namespace Engine
 				bool first = true;
 				output.Append("{");
 				traversed.Add(table);
-				table.ForEach<object, object>((key, value) => {
+				table.ForEach<object, object>((key, value) =>
+											  {
 												  if (first)
 													  first = false;
 												  else
@@ -233,14 +246,13 @@ namespace Engine
 		public static void List(Type type)
 		{
 			var members = type.GetMembers(BindingFlags.Public | BindingFlags.DeclaredOnly | BindingFlags.Static | BindingFlags.Instance);
-			var extensions =  from t in type.Assembly.GetTypes().Union(Assembly.GetExecutingAssembly().GetTypes())
-							  //from t in AppDomain.CurrentDomain.GetAssemblies().SelectMany(a => a.GetTypes())
-							  where t.IsSealed && !t.IsGenericType() && !t.IsNested
-							  from method in t.GetMethods(BindingFlags.Static
-														| BindingFlags.Public | BindingFlags.NonPublic)
-							  where method.IsDefined(typeof(ExtensionAttribute), false)
-							  where method.GetParameters()[0].ParameterType == type
-							  select method;
+			var extensions = from t in type.Assembly.GetTypes().Union(Assembly.GetExecutingAssembly().GetTypes())
+							 //from t in AppDomain.CurrentDomain.GetAssemblies().SelectMany(a => a.GetTypes())
+							 where t.IsSealed && !t.IsGenericType() && !t.IsNested
+							 from method in t.GetMethods(BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic)
+							 where method.IsDefined(typeof(ExtensionAttribute), false)
+							 where method.GetParameters()[0].ParameterType == type
+							 select method;
 
 			var allMembers = members.Select(member => MemberToString(type, member))
 									.Union(extensions.Select(member => ExtensionToString(type, member)))
@@ -279,7 +291,7 @@ namespace Engine
 				case MemberTypes.Method:
 				{
 					MethodInfo method = (MethodInfo) member;
-					ParameterInfo[] parameters = method.GetParameters();
+					var parameters = method.GetParameters();
 					output.Append("(");
 					parameters.Select(p => p.ParameterType.Name).Join(output);
 					output.Append(")");
@@ -288,6 +300,7 @@ namespace Engine
 				}
 					break;
 			}
+
 			return output.ToString();
 		}
 
@@ -296,7 +309,7 @@ namespace Engine
 			StringBuilder output = new StringBuilder();
 			output.Append($"{type.FullName}.{method.Name}");
 
-			ParameterInfo[] parameters = method.GetParameters();
+			var parameters = method.GetParameters();
 			output.Append("(");
 			parameters.Select(p => p.ParameterType.Name).Join(output);
 			output.Append(")");
@@ -319,9 +332,11 @@ namespace Engine
 			LogBuilder.Clear();
 			instance.LogText.text = "";
 		}
+
 		#endregion
 
 		#region Command
+
 		private static void Submit()
 		{
 			string command = instance.CommandInput.text;
@@ -337,7 +352,7 @@ namespace Engine
 
 		private static string FormatCommand(string command)
 		{
-			string[] lines = command.Split('\n');
+			var lines = command.Split('\n');
 			lines[0] = CommandPrefix + lines[0];
 			string output = string.Join("\n  ", lines);
 			return "<b>" + output + "</b>";
@@ -349,9 +364,11 @@ namespace Engine
 			instance.CommandInput.Select();
 			instance.CommandInput.text = "";
 		}
+
 		#endregion
 
 		#region Execution
+
 		private static LuaEnv scriptEnv;
 
 		private static void InitializeScripting()
@@ -387,9 +404,11 @@ namespace Engine
 				results?.ForEach(Log);
 			}
 		}
+
 		#endregion
 
 		#region History
+
 		private static List<string> history = new List<string>();
 		private static int currentCommandIndex = 0;
 
@@ -425,6 +444,7 @@ namespace Engine
 				input.text = history[index];
 				currentCommandIndex = index;
 			}
+
 			input.MoveTextEnd(false);
 		}
 
@@ -432,9 +452,11 @@ namespace Engine
 		{
 			history.Clear();
 		}
+
 		#endregion
 
 		#region Destruction
+
 		public static void Destroy()
 		{
 			disposables.Dispose();
@@ -443,6 +465,7 @@ namespace Engine
 			instance.gameObject.Destroy();
 			instance = null;
 		}
+
 		#endregion
 	}
 }

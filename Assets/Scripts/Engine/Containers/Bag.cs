@@ -1,13 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Sirenix.OdinInspector;
 using UnityEngine;
 
 namespace Engine.Containers
 {
 	// To create nested inventories, create Bag<object> and add other bags
-	[Serializable]
-	public class Bag<T> : Dictionary<T, int>
+	[DictionaryDrawerSettings(KeyLabel = "Item", ValueLabel = "Amount")]
+	public class Bag<T>: Dictionary<T, int>
 	{
 		public event Action<T, int> Added;
 		public event Action<T, int> Changed;
@@ -16,7 +17,7 @@ namespace Engine.Containers
 		public IDictionary<T, int> Max;
 
 		// Every call ultimately reaches here
-		public new int this [T item]
+		public new int this[T item]
 		{
 			get => TryGetValue(item, out int value) ? value : 0;
 			set
@@ -198,11 +199,11 @@ namespace Engine.Containers
 		public T Item;
 		public int Amount;
 
-		public Bunch(KeyValuePair<T, int> pair) : this(pair.Key, pair.Value)
+		public Bunch(KeyValuePair<T, int> pair): this(pair.Key, pair.Value)
 		{
 		}
 
-		public Bunch(Bunch<T> field) : this(field.Item, field.Amount)
+		public Bunch(Bunch<T> field): this(field.Item, field.Amount)
 		{
 		}
 

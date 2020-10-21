@@ -3,8 +3,7 @@ using UniRx;
 
 namespace Engine.Containers
 {
-	[Serializable]
-	public class Stat : IDisposable
+	public class Stat: IDisposable
 	{
 		public IUpgradeable Upgradeable;
 		public string ID;
