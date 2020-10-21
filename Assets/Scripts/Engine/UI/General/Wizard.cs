@@ -6,27 +6,31 @@ using UnityEngine.Events;
 
 namespace Engine.UI
 {
-	public class Wizard : Window
+	public class Wizard: Window
 	{
 		[PropertyOrder(-99)]
 		public Window Default;
 
 		[FoldoutGroup("Animations")]
 		public string NextShowAnimation = "NextShow";
+
 		[FoldoutGroup("Animations")]
 		public string NextHideAnimation = "NextHide";
+
 		[FoldoutGroup("Animations")]
 		public string PreviousShowAnimation = "PreviousShow";
+
 		[FoldoutGroup("Animations")]
 		public string PreviousHideAnimation = "PreviousHide";
 
 		[FoldoutGroup("Events")]
 		public ChangeEvent Changing;
+
 		[FoldoutGroup("Events")]
 		public ChangeEvent Changed;
 
 		[Serializable]
-		public class ChangeEvent : UnityEvent<int, Window, int, Window>
+		public class ChangeEvent: UnityEvent<int, Window, int, Window>
 		{
 		}
 
@@ -74,6 +78,7 @@ namespace Engine.UI
 				Index = index;
 				await Hide();
 			}
+
 			return true;
 		}
 

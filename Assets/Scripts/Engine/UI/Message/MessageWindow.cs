@@ -3,7 +3,7 @@ using UnityEngine.UI;
 
 namespace Engine.UI.Message
 {
-	public class MessageWindow : Window
+	public class MessageWindow: Window
 	{
 		public Image IconImage;
 		public Text TitleText;

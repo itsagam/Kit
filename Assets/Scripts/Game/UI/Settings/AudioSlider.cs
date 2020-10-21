@@ -5,7 +5,7 @@ using UnityEngine.UI;
 namespace Game.UI.Settings
 {
 	[RequireComponent(typeof(Slider))]
-	public class AudioSlider : MonoBehaviour
+	public class AudioSlider: MonoBehaviour
 	{
 		public string Group = "Sounds";
 

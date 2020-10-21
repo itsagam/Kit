@@ -5,7 +5,7 @@ using UnityEngine.UI;
 
 namespace Engine.UI
 {
-	public class DragCursor : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler
+	public class DragCursor: MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler
 	{
 		public Icon Icon;
 		public float MoveSpeed = 750.0f;
@@ -26,7 +26,7 @@ namespace Engine.UI
 			canvas = graphic.canvas;
 		}
 
-		public virtual void OnBeginDrag (PointerEventData eventData)
+		public virtual void OnBeginDrag(PointerEventData eventData)
 		{
 			graphic.raycastTarget = false;
 			previousParent = ((Component) this).transform.parent;
@@ -46,7 +46,7 @@ namespace Engine.UI
 		public virtual void OnEndDrag(PointerEventData eventData)
 		{
 			float speed = canvas.IsScreenSpace() ? MoveSpeed : MoveSpeed * canvas.transform.localScale.Min() / canvas.scaleFactor;
-			((Component) this).transform.DOMove(previousPosition, speed).SetSpeedBased().OnComplete( MoveBack);
+			((Component) this).transform.DOMove(previousPosition, speed).SetSpeedBased().OnComplete(MoveBack);
 		}
 
 		public virtual void MoveBack()

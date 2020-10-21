@@ -23,6 +23,7 @@ namespace Engine
 				min = to;
 				max = from;
 			}
+
 			return number >= min && number <= max;
 		}
 
@@ -35,6 +36,7 @@ namespace Engine
 				min = to;
 				max = from;
 			}
+
 			return number >= min && number <= max;
 		}
 
@@ -47,6 +49,7 @@ namespace Engine
 				min = to;
 				max = from;
 			}
+
 			return Mathf.Clamp(value, min, max);
 		}
 
@@ -59,6 +62,7 @@ namespace Engine
 				min = to;
 				max = from;
 			}
+
 			return Mathf.Clamp(value, min, max);
 		}
 
@@ -80,7 +84,7 @@ namespace Engine
 		public static Vector3 GetPositionAtDistance(Vector3 destination, Vector3 origin, float distance)
 		{
 			Vector3 direction = (destination - origin).normalized;
-			return destination - (direction * distance);
+			return destination - direction * distance;
 		}
 
 		public static float DistanceToView(Camera from, float radius)
@@ -107,7 +111,7 @@ namespace Engine
 			if (delta > 180)
 				delta = 360 - delta;
 			else if (delta < -180)
-				delta = delta + 360;
+				delta += 360;
 			return delta;
 		}
 

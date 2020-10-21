@@ -7,7 +7,7 @@ using UnityEngine.UI;
 
 namespace Engine.UI.Widgets
 {
-	public class InputFieldEx : InputField
+	public class InputFieldEx: InputField
 	{
 		public struct KeyHandler
 		{
@@ -19,7 +19,10 @@ namespace Engine.UI.Widgets
 
 		protected List<KeyHandler> keyHandlers = new List<KeyHandler>();
 
-		public KeyHandler AddKeyHandler(KeyCode key, Action action, EventModifiers modifiers = EventModifiers.None, EventModifiers disregard = EventModifiers.None)
+		public KeyHandler AddKeyHandler(KeyCode key,
+										Action action,
+										EventModifiers modifiers = EventModifiers.None,
+										EventModifiers disregard = EventModifiers.None)
 		{
 			KeyHandler keyHandler = new KeyHandler
 									{
@@ -54,7 +57,7 @@ namespace Engine.UI.Widgets
 								 type = EventType.KeyDown,
 								 keyCode = key,
 								 character = character,
-								 modifiers = modifiers,
+								 modifiers = modifiers
 							 };
 			SendKeyEvent(keyEvent);
 		}
@@ -64,19 +67,20 @@ namespace Engine.UI.Widgets
 			bool consumedEvent = false;
 			Event e = new Event();
 			while (Event.PopEvent(e))
-			{
 				if (e.rawType == EventType.KeyDown)
 				{
 					consumedEvent = true;
-					var action = keyHandlers.FirstOrDefault(t => t.Key == e.keyCode && t.Modifiers == (e.modifiers & ~t.Disregard)).Action;
+					Action action = keyHandlers.FirstOrDefault(t => t.Key == e.keyCode && t.Modifiers == (e.modifiers & ~t.Disregard))
+											   .Action;
 					if (action != null)
 					{
 						action();
 						break;
 					}
+
 					KeyPressed(e);
 				}
-			}
+
 			if (consumedEvent)
 				UpdateLabel();
 			eventData.Use();

@@ -3,7 +3,7 @@
 // Give Element the size of this transform whenever it's resized
 namespace Engine.UI.Layout
 {
-	public class MatchSizeLayout : MonoBehaviour
+	public class MatchSizeLayout: MonoBehaviour
 	{
 		public RectTransform Element;
 		public Vector2 Padding;

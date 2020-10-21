@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace Engine.UI.Buttons
 {
-	public class WindowButton : ButtonBehaviour
+	public class WindowButton: ButtonBehaviour
 	{
 		public enum ShowHideMode
 		{
@@ -14,34 +14,26 @@ namespace Engine.UI.Buttons
 			Toggle
 		}
 
-#if UNITY_EDITOR
 		[LabelText("Soft Reference")]
 		[OnValueChanged("RefreshReference")]
-		[Tooltip("Whether to store just the path to the Window and load it at runtime using \"Resources.Load\".\n\n" +
+		[Tooltip("Whether to store just the path to the Window and load it at runtime using \"Resources.Load\".\n\n"                   +
 				 "If on, you cannot reference a Window from the scene and have to provide a prefab within a \"Resources\" folder.\n\n" +
 				 "If off, the Window will be hard-referenced and be loaded with this button, whether it is opened or not.")]
-#endif
 		public bool UseSoftReference = true;
 
-#if UNITY_EDITOR
 		[LabelText("Window")]
 		[HideIf("UseSoftReference")]
 		[Tooltip("Hard reference to the window.")]
-#endif
 		public Window HardReference;
 
-#if UNITY_EDITOR
 		[LabelText("Window")]
 		[Tooltip("Path to the window.")]
 		[ShowIf("UseSoftReference")]
-#endif
 		public WindowReference SoftReference;
 
-#if UNITY_EDITOR
-		[Tooltip("Whether to show, hide or toggle. \n\n" +
+		[Tooltip("Whether to show, hide or toggle. \n\n"                                      +
 				 "With a soft-reference, the filename will be matched to hide or toggle.\n\n" +
 				 "With a hard-reference to an asset, the prefab name.")]
-#endif
 		public ShowHideMode Action;
 
 		protected override void OnClick()
@@ -69,9 +61,7 @@ namespace Engine.UI.Buttons
 		protected void Show()
 		{
 			if (UseSoftReference)
-			{
 				UIManager.Show(SoftReference);
-			}
 			else
 			{
 				if (HardReference.IsPrefab())
@@ -131,13 +121,13 @@ namespace Engine.UI.Buttons
 		{
 			if (UseSoftReference)
 			{
-				SoftReference.Asset = HardReference != null && HardReference.IsPrefab() ? HardReference : null;
+				SoftReference.SetAsset_Editor(HardReference != null && HardReference.IsPrefab() ? HardReference : null);
 				HardReference = null;
 			}
 			else
 			{
-				HardReference = SoftReference.Asset;
-				SoftReference.Asset = null;
+				HardReference = SoftReference.LoadAsset_Editor();
+				SoftReference.SetAsset_Editor(null);
 			}
 		}
 #endif

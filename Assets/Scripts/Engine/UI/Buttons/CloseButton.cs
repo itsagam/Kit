@@ -1,6 +1,6 @@
 ﻿namespace Engine.UI.Buttons
 {
-	public class CloseButton : ButtonBehaviour
+	public class CloseButton: ButtonBehaviour
 	{
 		protected override void OnClick()
 		{

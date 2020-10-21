@@ -3,18 +3,19 @@ using UnityEngine.UI;
 #if UNITY_EDITOR
 using UnityEditor;
 using Sirenix.OdinInspector.Editor;
+
 #endif
 
 namespace Engine.UI.Layout
 {
 #if UNITY_EDITOR
 	[CustomEditor(typeof(ContentSizeFitterEx), false)]
-	public class ContentSizeFitterExEditor : OdinEditor
+	public class ContentSizeFitterExEditor: OdinEditor
 	{
 	}
 #endif
 
-	public class ContentSizeFitterEx : ContentSizeFitter
+	public class ContentSizeFitterEx: ContentSizeFitter
 	{
 		public Vector2 Padding;
 

@@ -15,37 +15,39 @@ namespace Engine.UI.Widgets
 	}
 
 	[Serializable]
+#if UNITY_EDITOR
 	public class SceneReference: SoftReference<SceneAsset>
+#else
+	public class SceneReference: SoftReference<Object>
+#endif
 	{
 #if UNITY_EDITOR
-		// Scenes do not need to be under a "Resources" folder for them to be loaded using their paths
-		// so we're turning off trimming and validation for them
-
-		protected override bool Validate(SceneAsset asset)
+		// Scenes do not need to be under a "Resources" folder for them to be loaded using their paths,
+		// so we're turning off validation for them
+		protected override bool OnValidate(SceneAsset asset)
 		{
 			return true;
-		}
-
-		protected override void Refresh()
-		{
-			path = Asset != null ? GetAssetPath() : string.Empty;
 		}
 #endif
 	}
 
 	[Serializable]
 	[InlineProperty]
-	public class SoftReference<T> : ISerializationCallbackReceiver where T: Object
+	public class SoftReference<T> where T: Object
 	{
-		[SerializeField]
-		[ReadOnly]
+		public const string ResourcesFolder = "/Resources/";
+
 		[HideLabel]
-		protected string path;
-		public string Path => path;
+		[ReadOnly]
+		[SerializeField]
+		protected string fullPath;
+
+		public string Path => TrimPath(fullPath);
+		public string FullPath => fullPath;
 
 		public override string ToString()
 		{
-			return path;
+			return Path;
 		}
 
 		public static implicit operator string(SoftReference<T> reference)
@@ -53,46 +55,46 @@ namespace Engine.UI.Widgets
 			return reference.Path;
 		}
 
+		private string TrimPath(string inputPath)
+		{
+			int resourcesIndex = inputPath.IndexOf(ResourcesFolder, StringComparison.Ordinal);
+			return resourcesIndex > 0 ? inputPath.Substring(resourcesIndex + ResourcesFolder.Length) : inputPath;
+		}
+
 #if UNITY_EDITOR
-		public const string ResourcesFolder = "Resources/";
+		[ShowInInspector]
+		[HideLabel]
+		[AssetsOnly, AssetList]
+		[OnInspectorGUI("OnDraw")]
+		[OnValueChanged("OnChanged")]
+		[ValidateInput("OnValidate", "The asset must be under a \"Resources\" folder for it be to be loaded at runtime.")]
+		protected T asset;
 
-		[SerializeField]
-		[AssetList]
-		[AssetsOnly]
-		[ValidateInput("Validate", "The asset must be under a \"Resources\" folder for it be to be loaded at runtime.",
-			ContinuousValidationCheck  = true)]
-		[OnValueChanged("Refresh")]
-		public T Asset;
-
-		public void OnBeforeSerialize()
+		protected virtual void OnDraw()
 		{
-			UnityEditorEventUtility.DelayAction(Refresh);
+			if (asset == null && fullPath != string.Empty)
+				UnityEditorEventUtility.DelayAction(() => asset = LoadAsset_Editor());
 		}
 
-		public void OnAfterDeserialize()
+		protected virtual void OnChanged()
 		{
-			UnityEditorEventUtility.DelayAction(Refresh);
+			SetAsset_Editor(asset);
 		}
 
-		protected virtual bool Validate(T asset)
+		protected virtual bool OnValidate(T newAsset)
 		{
-			return asset == null || AssetDatabase.GetAssetPath(asset).Contains(ResourcesFolder);
+			return newAsset == null || AssetDatabase.GetAssetPath(newAsset).Contains(ResourcesFolder);
 		}
 
-		protected virtual void Refresh()
+		public virtual void SetAsset_Editor(T newAsset)
 		{
-			path = Asset != null ? TrimResources(GetAssetPath()) : string.Empty;
+			asset = newAsset;
+			fullPath = newAsset != null ? AssetDatabase.GetAssetPath(newAsset) : string.Empty;
 		}
 
-		protected string TrimResources(string fullPath)
+		public virtual T LoadAsset_Editor()
 		{
-			int resourcesIndex = fullPath.IndexOf(ResourcesFolder, StringComparison.Ordinal);
-			return resourcesIndex > 0 ? fullPath.Substring(resourcesIndex + ResourcesFolder.Length) : fullPath;
-		}
-
-		protected string GetAssetPath()
-		{
-			return AssetDatabase.GetAssetPath(Asset);
+			return AssetDatabase.LoadAssetAtPath<T>(fullPath);
 		}
 #endif
 	}

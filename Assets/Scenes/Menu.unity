@@ -1375,8 +1375,7 @@ MonoBehaviour:
   UseSoftReference: 1
   HardReference: {fileID: 0}
   SoftReference:
-    path: Windows/ModWindow.prefab
-    Asset: {fileID: 1244094513969230672, guid: be16c1611b02fee44a1ff03476c94cc9, type: 3}
+    fullPath: Assets/Resources/Windows/ModWindow.prefab
   Action: 0
 --- !u!114 &758223933 stripped
 MonoBehaviour:
@@ -1485,8 +1484,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Reload: 0
   Scene:
-    path: Assets/Scenes/Game.unity
-    Asset: {fileID: 102900000, guid: 6e78a11eff0808540a015f0ea868515d, type: 3}
+    fullPath: Assets/Scenes/Game.unity
   FadeMode: 3
   FadeColor: {r: 0, g: 0, b: 0, a: 1}
   FadeTime: 1
@@ -1745,8 +1743,7 @@ MonoBehaviour:
   UseSoftReference: 1
   HardReference: {fileID: 0}
   SoftReference:
-    path: Windows/SettingsWindow.prefab
-    Asset: {fileID: 8105554666432306860, guid: 9dab6f24a1ec1c94796cb89c29d56420, type: 3}
+    fullPath: Assets/Resources/Windows/SettingsWindow.prefab
   Action: 0
 --- !u!1001 &1701196318
 PrefabInstance:

@@ -4,7 +4,7 @@ using UnityEngine.UI;
 
 namespace Engine.UI.Buttons
 {
-	public class StepButton : ButtonBehaviour
+	public class StepButton: ButtonBehaviour
 	{
 		public enum StepDirection
 		{

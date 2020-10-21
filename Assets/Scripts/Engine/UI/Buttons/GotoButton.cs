@@ -1,6 +1,6 @@
 ﻿namespace Engine.UI.Buttons
 {
-	public class GotoButton : ButtonBehaviour
+	public class GotoButton: ButtonBehaviour
 	{
 		public Wizard Wizard;
 		public Window Step;

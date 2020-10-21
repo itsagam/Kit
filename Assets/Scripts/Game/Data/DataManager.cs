@@ -1,7 +1,7 @@
 ﻿using Cysharp.Threading.Tasks;
 using Engine;
-using Game;
-using UniRx;
+using Engine.Parsers;
+using UnityEngine;
 
 namespace Game
 {
@@ -25,8 +25,10 @@ namespace Game
 
 		public static async UniTask LoadData()
 		{
-			GameData = await LoadGameData();
-			GameState = await LoadGameState();
+			if (GameData == null)
+				GameData = await LoadGameData();
+			if (GameState == null)
+				GameState = await LoadGameState();
 		}
 
 		public static UniTask<GameData> LoadGameData()

@@ -2,13 +2,14 @@
 using Engine.UI;
 using Engine.UI.Widgets;
 using UnityEngine.UI;
+
 #if MODDING
 using Engine.Modding;
 #endif
 
 namespace Game.UI.Mods
 {
-	public class ModWindow : Window
+	public class ModWindow: Window
 	{
 		public IconList ModList;
 		public Text CountText;

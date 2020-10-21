@@ -388,8 +388,7 @@ MonoBehaviour:
   MessageText: {fileID: 2097332714}
   ProgressImage: {fileID: 1618835993}
   NextScene:
-    path: Assets/Scenes/Menu.unity
-    Asset: {fileID: 102900000, guid: c82ece6a277ffbe4ebd54bc15df279b5, type: 3}
+    fullPath: Assets/Scenes/Menu.unity
 --- !u!81 &544145739
 AudioListener:
   m_ObjectHideFlags: 0

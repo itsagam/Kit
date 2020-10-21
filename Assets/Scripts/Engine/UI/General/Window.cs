@@ -6,24 +6,29 @@ using UnityEngine.Events;
 
 namespace Engine.UI
 {
-	public class Window : MonoBehaviour
+	public class Window: MonoBehaviour
 	{
 		[FoldoutGroup("Animations")]
 		public string ShowAnimation = "Show";
+
 		[FoldoutGroup("Animations")]
 		public string HideAnimation = "Hide";
 
 		[FoldoutGroup("Sounds")]
 		public AudioClip ShowSound;
+
 		[FoldoutGroup("Sounds")]
 		public AudioClip HideSound;
 
 		[FoldoutGroup("Events")]
 		public UnityEvent Showing;
+
 		[FoldoutGroup("Events")]
 		public UnityEvent Shown;
+
 		[FoldoutGroup("Events")]
 		public UnityEvent Hiding;
+
 		[FoldoutGroup("Events")]
 		public UnityEvent Hidden;
 
@@ -34,6 +39,7 @@ namespace Engine.UI
 		protected bool isInstance = false;
 
 		#region Functionality
+
 		protected virtual void Awake()
 		{
 			animator = GetComponent<Animator>();
@@ -124,7 +130,7 @@ namespace Engine.UI
 		{
 			State = WindowState.Hidden;
 			data = null;
-			if (mode == WindowHideMode.Destroy || (mode == WindowHideMode.Auto && isInstance))
+			if (mode == WindowHideMode.Destroy || mode == WindowHideMode.Auto && isInstance)
 				gameObject.Destroy();
 			else
 			{
@@ -145,16 +151,17 @@ namespace Engine.UI
 		{
 			UIManager.Windows.Remove(this);
 		}
+
 		#endregion
 
 		#region Extendable functions
+
 		protected virtual void OnShowing()
 		{
 		}
 
 		protected virtual void OnShown()
 		{
-
 		}
 
 		protected virtual void OnHiding()
@@ -163,15 +170,16 @@ namespace Engine.UI
 
 		protected virtual void OnHidden()
 		{
-
 		}
 
 		public virtual void Refresh()
 		{
 		}
+
 		#endregion
 
 		#region Public functions
+
 		public virtual bool IsBusy => State == WindowState.Showing || State == WindowState.Hiding;
 
 		public virtual bool IsShown => State == WindowState.Shown;
@@ -187,6 +195,7 @@ namespace Engine.UI
 				Refresh();
 			}
 		}
+
 		#endregion
 	}
 }

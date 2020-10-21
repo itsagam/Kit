@@ -5,7 +5,7 @@ namespace Engine.UI.Behaviours
 {
 	// Allows to set on/off color of a Toggle
 	[RequireComponent(typeof(Toggle))]
-	public class ToggleColor : ToggleBehaviour
+	public class ToggleColor: ToggleBehaviour
 	{
 		public Color OnColor = Color.white;
 		public Color OffColor = Color.grey;

@@ -2,7 +2,7 @@
 
 namespace Engine.UI.Buttons
 {
-	public class AudioButton : ButtonBehaviour
+	public class AudioButton: ButtonBehaviour
 	{
 		public AudioClip Audio;
 

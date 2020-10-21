@@ -4,7 +4,7 @@ using UniRx;
 
 namespace Engine.UI
 {
-	public class TimedWindow : Window
+	public class TimedWindow: Window
 	{
 		[PropertyOrder(-99)]
 		[SuffixLabel("seconds", true)]
@@ -21,10 +21,12 @@ namespace Engine.UI
 		protected void QueueHide()
 		{
 			observable?.Dispose();
-			observable = Observable.Timer(TimeSpan.FromSeconds(Time)).Subscribe(t => {
-																					observable = null;
-																					Hide();
-																				});
+			observable = Observable.Timer(TimeSpan.FromSeconds(Time))
+								   .Subscribe(t =>
+											  {
+												  observable = null;
+												  Hide();
+											  });
 		}
 	}
 }

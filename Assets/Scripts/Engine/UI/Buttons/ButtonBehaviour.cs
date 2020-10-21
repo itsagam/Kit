@@ -4,7 +4,7 @@ using UnityEngine.UI;
 
 namespace Engine.UI.Buttons
 {
-	public abstract class ButtonBehaviour : MonoBehaviour, IPointerClickHandler
+	public abstract class ButtonBehaviour: MonoBehaviour, IPointerClickHandler
 	{
 		protected abstract void OnClick();
 		protected Button button;

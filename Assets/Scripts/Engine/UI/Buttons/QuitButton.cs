@@ -1,10 +1,11 @@
 ﻿using Sirenix.OdinInspector;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.Events;
 
 namespace Engine.UI.Buttons
 {
-	public class QuitButton : ButtonBehaviour
+	public class QuitButton: ButtonBehaviour
 	{
 		[ToggleGroup("Fade")]
 		public bool Fade = true;
@@ -31,7 +32,7 @@ namespace Engine.UI.Buttons
 			Application.Quit();
 			Completed.Invoke();
 #if UNITY_EDITOR
-			UnityEditor.EditorApplication.isPlaying = false;
+			EditorApplication.isPlaying = false;
 #endif
 		}
 	}

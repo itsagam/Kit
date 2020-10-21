@@ -8,7 +8,7 @@ using UnityEngine.UI;
 namespace Engine.UI.Widgets
 {
 	[RequireComponent(typeof(HorizontalLayoutGroup))]
-	public class RatingPicker : MonoBehaviour
+	public class RatingPicker: MonoBehaviour
 	{
 		protected Button[] buttons;
 
@@ -98,16 +98,17 @@ namespace Engine.UI.Widgets
 			int index = rect.GetSiblingIndex();
 			if (allowHalf)
 			{
-				if (!RectTransformUtility.ScreenPointToLocalPointInRectangle(rect, data.pressPosition, data.pressEventCamera, out Vector2 point))
+				if (!RectTransformUtility.ScreenPointToLocalPointInRectangle(rect,
+																			 data.pressPosition,
+																			 data.pressEventCamera,
+																			 out Vector2 point))
 					return;
 
 				float decimalPart = point.x < 0 ? 0.5f : 1.0f;
 				SetRating(index + decimalPart);
 			}
 			else
-			{
 				SetRating(index + 1);
-			}
 		}
 
 		protected void SetRating(float newRating)
@@ -160,6 +161,7 @@ namespace Engine.UI.Widgets
 					DestroyButtons();
 					SpawnButtons();
 				}
+
 				RefreshRating();
 			}
 		}

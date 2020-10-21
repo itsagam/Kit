@@ -12,7 +12,7 @@ using Engine.Modding;
 
 namespace Game.UI.Splash
 {
-	public class SplashWindow : MonoBehaviour
+	public class SplashWindow: MonoBehaviour
 	{
 		public Text MessageText;
 		public Image ProgressImage;
@@ -21,13 +21,16 @@ namespace Game.UI.Splash
 		private readonly Queue<SplashTask> tasks = new Queue<SplashTask>();
 
 		#region Initalization
+
 		private void Awake()
 		{
 			SceneDirector.FadeIn();
 		}
+
 		#endregion
 
 		#region Task execution
+
 		private void Start()
 		{
 			QueueTasks();
@@ -72,17 +75,27 @@ namespace Game.UI.Splash
 		{
 			return SceneDirector.LoadScene(NextScene);
 		}
+
 		#endregion
 
 		#region Tasks
+
 		private void QueueTasks()
 		{
+			QueueDataTasks();
+#if MODDING
 			QueueModTasks();
+#endif
 		}
 
+		private void QueueDataTasks()
+		{
+			QueueTask("Loading data...", DataManager.LoadData(), 10);
+		}
+
+#if MODDING
 		private void QueueModTasks()
 		{
-#if MODDING
 			var modPaths = ModManager.GetModPathsByGroup();
 			int totalMods = modPaths.Sum(kvp => kvp.Value.Length);
 			if (totalMods <= 0)
@@ -90,8 +103,9 @@ namespace Game.UI.Splash
 
 			QueueTask("Loading mods",   ModManager.LoadModsAsync(modPaths), totalMods);
 			QueueTask("Executing mods", ModManager.ExecuteScriptsAsync(),   totalMods);
-#endif
 		}
+#endif
+
 		#endregion
 	}
 }

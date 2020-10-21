@@ -5,7 +5,7 @@ namespace Engine.UI.Behaviours
 {
 	// Allows to set on/off sprite of a Toggle
 	[RequireComponent(typeof(Toggle))]
-	public class ToggleSprite : ToggleBehaviour
+	public class ToggleSprite: ToggleBehaviour
 	{
 		public Sprite OnSprite;
 		public Sprite OffSprite;

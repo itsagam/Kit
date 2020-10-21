@@ -6,7 +6,7 @@ using UnityEngine.Events;
 
 namespace Engine.UI.Buttons
 {
-	public class SceneButton : ButtonBehaviour
+	public class SceneButton: ButtonBehaviour
 	{
 		public bool Reload;
 
@@ -41,10 +41,15 @@ namespace Engine.UI.Buttons
 				return;
 
 			enabled = false;
-			SceneDirector.LoadScene(scene, FadeMode, FadeColor, FadeTime, false,
-									progress => LoadProgressed.Invoke(), LoadCompleted.Invoke,
+			SceneDirector.LoadScene(scene,
+									FadeMode,
+									FadeColor,
+									FadeTime,
+									false,
+									progress => LoadProgressed.Invoke(),
+									LoadCompleted.Invoke,
 									Completed.Invoke)
-			             .Forget();
+						 .Forget();
 		}
 	}
 }

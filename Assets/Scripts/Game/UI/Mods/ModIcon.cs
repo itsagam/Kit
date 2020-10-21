@@ -1,15 +1,15 @@
-﻿using Engine;
+﻿using DG.Tweening;
+using Engine;
 using Engine.UI;
 using UnityEngine;
 using UnityEngine.UI;
-using DG.Tweening;
 
 #if MODDING
 using Engine.Modding;
 #endif
 namespace Game.UI.Mods
 {
-	public class ModIcon : Icon
+	public class ModIcon: Icon
 	{
 		public Toggle EnableToggle;
 
