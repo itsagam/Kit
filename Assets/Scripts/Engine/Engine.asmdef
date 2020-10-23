@@ -1,0 +1,23 @@
+{
+    "name": "Engine",
+    "references": [
+        "GUID:f51ebe6a0ceec4240a699833d6309b23",
+        "GUID:029c1c1b674aaae47a6841a0b89ad80e",
+        "GUID:560b04d1a97f54a4e82edc0cbbb69285",
+        "GUID:e2144c1c1d71dee4798fd790eb724893",
+        "GUID:d1cfdd7122133154f9ab0e86aea61175",
+        "GUID:793b932fa0b33d040ab0a0f2d8d8774d"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [
+        "ODIN_INSPECTOR",
+        "UNITASK_DOTWEEN_SUPPORT"
+    ],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

@@ -18,7 +18,7 @@ namespace Engine
 {
 	public static class Console
 	{
-		public static bool Enabled = false;
+		public static bool Enabled = true;
 		public static int Length = 10000;
 		public static int Depth = 2;
 		private const string Prefab = "Console/Console";
@@ -111,6 +111,7 @@ namespace Engine
 		public static void Show()
 		{
 			instance.Animator.Play("Show");
+			instance.CommandInput.gameObject.SetActive(true);
 			instance.CommandInput.ActivateInputField();
 			instance.CommandInput.Select();
 			Observable.NextFrame().Subscribe(t => ScrollToBottom());
@@ -120,6 +121,7 @@ namespace Engine
 		{
 			instance.Animator.Play("Hide");
 			instance.CommandInput.DeactivateInputField();
+			instance.CommandInput.gameObject.SetActive(false);
 		}
 
 		public static void Toggle()
@@ -248,7 +250,7 @@ namespace Engine
 			var members = type.GetMembers(BindingFlags.Public | BindingFlags.DeclaredOnly | BindingFlags.Static | BindingFlags.Instance);
 			var extensions = from t in type.Assembly.GetTypes().Union(Assembly.GetExecutingAssembly().GetTypes())
 							 //from t in AppDomain.CurrentDomain.GetAssemblies().SelectMany(a => a.GetTypes())
-							 where t.IsSealed && !t.IsGenericType() && !t.IsNested
+							 where t.IsSealed && !t.IsGenericType && !t.IsNested
 							 from method in t.GetMethods(BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic)
 							 where method.IsDefined(typeof(ExtensionAttribute), false)
 							 where method.GetParameters()[0].ParameterType == type
