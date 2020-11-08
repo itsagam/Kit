@@ -4,56 +4,96 @@ using TouchScript.Gestures;
 using TouchScript.Pointers;
 using UnityEngine;
 
-namespace Engine.Cameras
+namespace Engine.Behaviours
 {
+	/// <summary>
+	/// Provides a robust gesture-oriented Pan/Zoom/Rotate functionality for a camera. Supports both orthographic and perspective modes.
+	/// </summary>
 	[RequireComponent(typeof(Camera))]
 	[RequireComponent(typeof(MetaGesture))]
-	public class PanZoomRotate : MonoBehaviour
+	public class PanZoomRotateCam : MonoBehaviour
 	{
 		#region Fields
-		[Tooltip("Area/bounds to focus on – it can be a transform, a renderer or a collider; will be origin if not provided.")]
+		/// <summary>
+		/// Area/bounds to focus on, be it a transform, renderer or collider.
+		/// </summary>
+		/// <remarks>Will be origin if not provided.</remarks>
+		[Tooltip("Area/bounds to focus on, be it a transform, renderer or collider; will be origin if not provided.")]
 		[SceneObjectsOnly]
 		public Component View;
 
+		/// <summary>
+		/// Smoothing to apply while Lerp-ing.
+		/// </summary>
+		/// <remarks>Applies to position, rotation and orthographicSize.</remarks>
 		[Tooltip("Smoothing to apply while Lerp-ing. Applies to position, rotation and orthographicSize.")]
 		[MinValue(0.0f)]
 		public float Smoothing = 10f;
 
 
+		/// <summary>
+		/// Whether to allow panning.
+		/// </summary>
 		[ToggleGroup("Pan")]
 		public bool Pan = true;
 
+		/// <summary>
+		/// Panning speed.
+		/// </summary>
+		/// <remarks>Depends on world scale.</remarks>
 		[ToggleGroup("Pan")]
 		[Tooltip("Panning speed. Depends on world scale.")]
 		[MinValue(0.0f)]
 		public float PanSpeed = 5.0f;
 
+		/// <summary>
+		/// Order of magnitude zoom level affects panning speed.
+		/// </summary>
 		[ToggleGroup("Pan")]
 		[Tooltip("Order of magnitude zoom level affects panning speed.")]
 		[MinValue(1.0f)]
 		public float PanZoomFactor = 1.5f;
 
 
+		/// <summary>
+		/// Whether to allow zooming.
+		/// </summary>
 		[ToggleGroup("Zoom")]
 		public bool Zoom = true;
 
+		/// <summary>
+		/// Zooming speed.
+		/// </summary>
+		/// <remarks>Depends on world scale in perspective mode.</remarks>
 		[ToggleGroup("Zoom")]
 		[Tooltip("Zooming speed. Depends on world scale in perspective mode.")]
 		[MinValue(0.0f)]
 		public float ZoomSpeed = 0.025f;
 
+		/// <summary>
+		/// Minimum orthographicSize if camera is orthographic, camera position in forward axis otherwise.
+		/// </summary>
 		[ToggleGroup("Zoom")]
 		[Tooltip("Minimum orthographicSize if camera is orthographic, camera position in forward axis otherwise.")]
 		public float ZoomMin = 1;
 
+		/// <summary>
+		/// Maximum orthographicSize if camera is orthographic, camera position in forward axis otherwise.
+		/// </summary>
 		[ToggleGroup("Zoom")]
 		[Tooltip("Maximum orthographicSize if camera is orthographic, camera position in forward axis otherwise.")]
 		public float ZoomMax = 10;
 
 
+		/// <summary>
+		/// Whether to allow rotation.
+		/// </summary>
 		[ToggleGroup("Rotate")]
 		public bool Rotate = false;
 
+		/// <summary>
+		/// The rotation speed.
+		/// </summary>
 		[ToggleGroup("Rotate")]
 		[Tooltip("Rotation speed.")]
 		[MinValue(0.0f)]

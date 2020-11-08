@@ -7,7 +7,7 @@ namespace Engine
 	{
 		public static Bounds Rotate(this Bounds bounds, Quaternion rotation)
 		{
-			var points = bounds.Points();
+			var points = bounds.GetPoints();
 			for (int i = 0; i < points.Length; i++)
 				points[i] = rotation * points[i];
 			Bounds rotated = new Bounds
@@ -18,7 +18,7 @@ namespace Engine
 			return rotated;
 		}
 
-		public static Vector3[] Points(this Bounds bounds)
+		public static Vector3[] GetPoints(this Bounds bounds)
 		{
 			var points = new Vector3[8];
 			points[0] = bounds.min;
@@ -32,13 +32,13 @@ namespace Engine
 			return points;
 		}
 
-		public static Vector3 Random(this Bounds bounds)
+		public static Vector3 GetRandomPoint(this Bounds bounds)
 		{
 			Vector3 min = bounds.min;
 			Vector3 max = bounds.max;
-			return new Vector3(UnityEngine.Random.Range(min.x, max.x),
-							   UnityEngine.Random.Range(min.y, max.y),
-							   UnityEngine.Random.Range(min.z, max.z));
+			return new Vector3(Random.Range(min.x, max.x),
+							   Random.Range(min.y, max.y),
+							   Random.Range(min.z, max.z));
 		}
 
 		public static bool Overlaps(this Bounds boundsA, Bounds boundsB)
@@ -53,7 +53,7 @@ namespace Engine
 				   bottomRightA.z > topLeftB.z;
 		}
 
-		public static float Distance(this Bounds bounds, Vector3 point)
+		public static float GetDistance(this Bounds bounds, Vector3 point)
 		{
 			return Mathf.Sqrt(bounds.SqrDistance(point));
 		}

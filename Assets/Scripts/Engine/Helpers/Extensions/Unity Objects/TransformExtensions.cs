@@ -32,5 +32,15 @@ namespace Engine
 		{
 			return transform.GetChild(transform.childCount - 1);
 		}
+
+		public static void Face(this Transform transform, Transform other)
+		{
+			transform.rotation = Quaternion.LookRotation(other.position - transform.position);
+		}
+
+		public static void Face(this Transform transform, Vector3 position)
+		{
+			transform.rotation = Quaternion.LookRotation(position - transform.position);
+		}
 	}
 }

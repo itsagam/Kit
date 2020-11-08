@@ -1,9 +1,18 @@
+using Sirenix.OdinInspector;
 using UnityEngine;
 
 namespace Engine.Behaviours
 {
+	/// <summary>
+	/// Marks the GameObject for destruction after a specified time.
+	/// </summary>
 	public class SelfDestroy: MonoBehaviour
 	{
+		/// <summary>
+		/// Time to hold out for in seconds before destroying.
+		/// </summary>
+		[Tooltip("The time to hold out for before destroying.")]
+		[SuffixLabel("seconds", true)]
 		public float Time = 5.0f;
 
 		protected void Start()

@@ -2,15 +2,44 @@
 using DG.Tweening;
 using UnityEngine;
 
-namespace Engine.Audio
+namespace Engine
 {
+	/// <summary>
+	/// Attach it a GameObject with an AudioSource and this component will allow you to Play/Pause/Stop/Change Volume or Clip with
+	/// volume fading in/out.
+	/// </summary>
+	/// <remarks>Just attaching it to a AudioSource with playOnAwake true will fade the audio in on Awake.</remarks>
 	[RequireComponent(typeof(AudioSource))]
 	public class AudioFader: MonoBehaviour
 	{
+		/// <summary>
+		/// AudioSource to fade.
+		/// </summary>
+		/// <remarks>Will use the one on the same GameObject by default.</remarks>
+		[Tooltip("AudioSource to fade. Will use the one on the same GameObject by default.")]
 		public AudioSource Audio;
+
+		/// <summary>
+		/// How fast to fade the audio.
+		/// </summary>
+		[Tooltip("How fast to fade the audio.")]
 		public float Speed = 0.5f;
+
+		/// <summary>
+		/// Should the audio automatically fade in/out when the scene changes with SceneDirector?
+		/// </summary>
+		/// <remarks>True by default.</remarks>
+		[Tooltip("Should the audio automatically fade in/out when the scene changes with SceneDirector?")]
 		public bool FadeOnSceneChange = true;
+
+		/// <summary>
+		/// Should the audio automatically fade in/out with the scene when you use SceneDirector?
+		/// </summary>
+		/// <remarks>False by default.</remarks>
+		[Tooltip("Should the audio automatically fade in/out with the scene when you use SceneDirector?")]
 		public bool FadeWithScreen = false;
+
+		/// <summary>Returns whether the audio is fading (in or out).</summary>
 		public bool IsBusy { get; protected set; }
 
 		protected float lastVolume;
@@ -18,10 +47,15 @@ namespace Engine.Audio
 
 		protected void Awake()
 		{
-			Audio = GetComponent<AudioSource>();
-			lastVolume = Audio.volume;
-			if (Audio.clip != null && Audio.playOnAwake)
-				ChangeFromTo(0, lastVolume);
+			if (Audio == null)
+				Audio = GetComponent<AudioSource>();
+
+			if (Audio != null)
+			{
+				lastVolume = Audio.volume;
+				if (Audio.clip != null && Audio.playOnAwake)
+					ChangeFromTo(0, lastVolume);
+			}
 		}
 
 		protected void OnEnable()
@@ -58,6 +92,10 @@ namespace Engine.Audio
 				Play();
 		}
 
+		/// <summary>
+		/// Play an AudioClip.
+		/// </summary>
+		/// <remarks>Fades-out the audio before fading-in if an AudioClip is already playing.</remarks>
 		public void Play(AudioClip clip)
 		{
 			if (clip == null)
@@ -85,6 +123,9 @@ namespace Engine.Audio
 			}
 		}
 
+		/// <summary>
+		/// Play and fade-in the AudioClip.
+		/// </summary>
 		public void Play()
 		{
 			lastPlaying = true;
@@ -104,6 +145,9 @@ namespace Engine.Audio
 			}
 		}
 
+		/// <summary>
+		/// Pause and fade-out the AudioClip.
+		/// </summary>
 		public void Pause()
 		{
 			lastPlaying = false;
@@ -120,6 +164,9 @@ namespace Engine.Audio
 				Audio.Pause();
 		}
 
+		/// <summary>
+		/// Stop and fade out the AudioClip.
+		/// </summary>
 		public void Stop()
 		{
 			lastPlaying = false;
@@ -160,6 +207,9 @@ namespace Engine.Audio
 									});
 		}
 
+		/// <summary>
+		/// Returns the AudioClip currently playing or allows to change the AudioClip with fading.
+		/// </summary>
 		public AudioClip Clip
 		{
 			get => Audio.clip;
@@ -172,6 +222,9 @@ namespace Engine.Audio
 			}
 		}
 
+		/// <summary>
+		/// Returns the current volume or allows to set it with fading.
+		/// </summary>
 		public float Volume
 		{
 			get => Audio.volume;
@@ -182,6 +235,9 @@ namespace Engine.Audio
 			}
 		}
 
+		/// <summary>
+		/// Returns whether an AudioClip is currently playing or allows to Play/Pause the audio with fading.
+		/// </summary>
 		public bool IsPlaying
 		{
 			get => Audio.isPlaying;
