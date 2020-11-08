@@ -3,7 +3,10 @@ using UnityEngine;
 
 namespace Engine.Algorithms
 {
-	public struct SphericalCoordinates: IEquatable<SphericalCoordinates>
+	/// <summary>
+	/// Represents a points on a sphere, and allows to do math on it.
+	/// </summary>
+	public struct SphericalCoordinate: IEquatable<SphericalCoordinate>
 	{
 		private float radius, polar, elevation;
 		private float minRadius, maxRadius;
@@ -11,7 +14,10 @@ namespace Engine.Algorithms
 		private float minElevation, maxElevation;
 		private bool loopPolar, loopElevation;
 
-		public SphericalCoordinates(float radius, float polar, float elevation,
+		/// <summary>
+		/// Create a spherical coordinate with the given radius, polar and elevation angles.
+		/// </summary>
+		public SphericalCoordinate(float radius, float polar, float elevation,
 			float minRadius = 0, float maxRadius = float.PositiveInfinity,
 			float minPolar = 0, float maxPolar = Mathf.PI * 2f,
 			float minElevation = 0, float maxElevation = Mathf.PI * 2f,
@@ -32,7 +38,10 @@ namespace Engine.Algorithms
 			Elevation = elevation;
 		}
 
-		public SphericalCoordinates(Vector3 cartesian,
+		/// <summary>
+		/// Convert a cartesian coordinate to spherical coordinates.
+		/// </summary>
+		public SphericalCoordinate(Vector3 cartesian,
 			float minRadius = 0, float maxRadius = float.PositiveInfinity,
 			float minPolar = 0, float maxPolar = Mathf.PI * 2f,
 			float minElevation = 0, float maxElevation = Mathf.PI * 2f,
@@ -56,13 +65,23 @@ namespace Engine.Algorithms
 			Elevation = Mathf.Asin(cartesian.y / Radius);
 		}
 
-		public float DistanceTo(SphericalCoordinates other)
+		/// <summary>
+		/// Calculates the distance from a point on a sphere to another point on a sphere.
+		/// </summary>
+		/// <param name="other">The other point.</param>
+		/// <returns>Distance between this and the other point.</returns>
+		public float DistanceTo(SphericalCoordinate other)
 		{
 			return DistanceTo(other, Radius);
 		}
 
+		/// <summary>
+		/// Calculates the distance from a point on a sphere to another point on a sphere at a given radius.
+		/// </summary>
+		/// <param name="other">The other point.</param>
+		/// <returns>Distance between this and the other point at the radius specified.</returns>
 		// Haversine Formula
-		public float DistanceTo(SphericalCoordinates other, float atRadius)
+		public float DistanceTo(SphericalCoordinate other, float atRadius)
 		{
 			float dLat = other.Elevation - Elevation;
 			float dLon =  other.Polar - Polar;
@@ -72,19 +91,28 @@ namespace Engine.Algorithms
 			return atRadius * c;
 		}
 
-		public SphericalCoordinates Translate(float byRadius)
+		/// <summary>
+		/// Moves the point inward or outward by a given radius.
+		/// </summary>
+		public SphericalCoordinate Translate(float byRadius)
 		{
 			Radius += byRadius;
 			return this;
 		}
 
-		public SphericalCoordinates Rotate(float byPolar /*haha!*/, float byElevation)
+		/// <summary>
+		/// Moves the point in a given direction.
+		/// </summary>
+		public SphericalCoordinate Rotate(float byPolar /*haha!*/, float byElevation)
 		{
 			Polar += byPolar;
 			Elevation += byElevation;
 			return this;
 		}
 
+		/// <summary>
+		/// Converts the spherical coordinates to cartesian coordinates.
+		/// </summary>
 		public Vector3 ToCartesian
 		{
 			get
@@ -94,12 +122,18 @@ namespace Engine.Algorithms
 			}
 		}
 
+		/// <summary>
+		/// The radius of the coordinates (how much inward or outward are the coordinates from origin).
+		/// </summary>
 		public float Radius
 		{
 			get => radius;
 			set => radius = Mathf.Clamp(value, MinRadius, MaxRadius);
 		}
 
+		/// <summary>
+		/// The vertical angle of the coordinates (at what latitude do the coordinates lie on a sphere).
+		/// </summary>
 		public float Polar
 		{
 			get => polar;
@@ -107,6 +141,9 @@ namespace Engine.Algorithms
 							   : Mathf.Clamp(value, MinPolar, MaxPolar);
 		}
 
+		/// <summary>
+		/// The horizontal angle of the coordinates (at what longitude do the coordinates lie on a sphere).
+		/// </summary>
 		public float Elevation
 		{
 			get => elevation;
@@ -114,6 +151,9 @@ namespace Engine.Algorithms
 								   : Mathf.Clamp(value, MinElevation, MaxElevation);
 		}
 
+		/// <summary>
+		/// Minimum radius.
+		/// </summary>
 		public float MinRadius
 		{
 			get => minRadius;
@@ -124,6 +164,9 @@ namespace Engine.Algorithms
 			}
 		}
 
+		/// <summary>
+		/// Maximum radius.
+		/// </summary>
 		public float MaxRadius
 		{
 			get => maxRadius;
@@ -134,6 +177,10 @@ namespace Engine.Algorithms
 			}
 		}
 
+		/// <summary>
+		/// Minimum polar angle.
+		/// </summary>
+		/// <remarks>0 by default.</remarks>
 		public float MinPolar
 		{
 			get => minPolar;
@@ -144,6 +191,10 @@ namespace Engine.Algorithms
 			}
 		}
 
+		/// <summary>
+		/// Maximum polar angle.
+		/// </summary>
+		/// <remarks>2π/360° by default.</remarks>
 		public float MaxPolar
 		{
 			get => maxPolar;
@@ -154,6 +205,10 @@ namespace Engine.Algorithms
 			}
 		}
 
+		/// <summary>
+		/// Minimum elevation angle.
+		/// </summary>
+		/// <remarks>0 by default.</remarks>
 		public float MinElevation
 		{
 			get => minElevation;
@@ -164,6 +219,10 @@ namespace Engine.Algorithms
 			}
 		}
 
+		/// <summary>
+		/// Maximum elevation angle.
+		/// </summary>
+		/// <remarks>2π/360° by default.</remarks>
 		public float MaxElevation
 		{
 			get => maxElevation;
@@ -174,6 +233,10 @@ namespace Engine.Algorithms
 			}
 		}
 
+		/// <summary>
+		/// Should loop around the polar angle if it goes out of range?
+		/// </summary>
+		/// <remarks>True by default.</remarks>
 		public bool LoopPolar
 		{
 			get => loopPolar;
@@ -184,6 +247,10 @@ namespace Engine.Algorithms
 			}
 		}
 
+		/// <summary>
+		/// Should loop around the elevation angle if it goes out of range?
+		/// </summary>
+		/// <remarks>True by default.</remarks>
 		public bool LoopElevation
 		{
 			get => loopElevation;
@@ -194,22 +261,22 @@ namespace Engine.Algorithms
 			}
 		}
 
-		public static bool operator ==(SphericalCoordinates a, SphericalCoordinates b)
+		public static bool operator ==(SphericalCoordinate a, SphericalCoordinate b)
 		{
 			return a.Radius == b.Radius && a.Polar == b.Polar && a.Elevation == b.Elevation;
 		}
 
-		public static bool operator !=(SphericalCoordinates a, SphericalCoordinates b)
+		public static bool operator !=(SphericalCoordinate a, SphericalCoordinate b)
 		{
 			return a.Radius != b.Radius || a.Polar != b.Polar || a.Elevation == b.Elevation;
 		}
 
 		public override bool Equals(object obj)
 		{
-			return obj is SphericalCoordinates coord && this == coord;
+			return obj is SphericalCoordinate coord && this == coord;
 		}
 
-		public bool Equals(SphericalCoordinates other)
+		public bool Equals(SphericalCoordinate other)
 		{
 			return this == other;
 		}

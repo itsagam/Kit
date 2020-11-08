@@ -2,6 +2,10 @@ using UnityEngine;
 
 namespace Engine
 {
+	/// <summary>
+	/// MonoBehaviours that create just one instance can inherit from this class for global access.
+	/// </summary>
+	/// <remarks>Should be used very sparingly.</remarks>
 	public class Singleton<T> : MonoBehaviour where T : MonoBehaviour
 	{
 		protected static T instance;

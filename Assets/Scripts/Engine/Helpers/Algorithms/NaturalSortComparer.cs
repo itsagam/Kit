@@ -4,6 +4,9 @@ using System.Text.RegularExpressions;
 
 namespace Engine.Algorithms
 {
+	/// <summary>
+	/// A natural sort (human-friendly) comparer for sorting names.
+	/// </summary>
 	public class NaturalSortComparer: IComparer<string>, IDisposable
 	{
 		public readonly bool IsAscending;

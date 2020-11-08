@@ -9,12 +9,11 @@ using Object = UnityEngine.Object;
 
 namespace Engine.Containers
 {
-	/// <inheritdoc />
 	/// <summary>
-	///     Instantiates a prefab whenever a MonoBehaviour is encountered and populates the
-	///     instance with a state provided in JSON. You have to provide path to the prefab.
-	///     Anything enclosed with {} in the prefab path is replaced with the actual value of
-	///     a property, so you can instantiate different prefabs depending on the state.
+	///     Instantiates a prefab for each object encountered while reading a Json and populates
+	///     the instances with the states provided. You have to provide the path to a prefab and
+	///     anything enclosed with {} in the prefab path is replaced with the value of a property,
+	/// 	so you can instantiate different prefabs depending on the state.
 	///
 	///     There are three ways to use this class – Mono-only, State-Mono or JObject-Mono method:
 	///
@@ -23,9 +22,9 @@ namespace Engine.Containers
 	///     you use the actual MonoBehaviour type in the GameState object. Whenever the Json is
 	///     loaded, the converter will instantiate objects and assign them in the GameState. This
 	///     way, the MonoBehaviours will be strongly bound to the GameState. The advantage of this
-	///     is that you can change MonoBehaviours and they'll automatically be reflected. The
-	///     disadvantage being if MonoBehaviours are destroyed, they'll become null or inaccessible
-	///     in the GameState.
+	///     is that any changes in the MonoBehaviours will be automatically be reflected in the
+	/// 	state. The disadvantage being if MonoBehaviours are destroyed, they'll become null or
+	/// 	inaccessible in the GameState.
 	///
 	///     2) In the State-Mono mode, you put JsonPrefab attribute on a separate class denoting a
 	///     MonoBehaviour's state and use that in the GameState. The Json will be loaded normally,
@@ -43,7 +42,6 @@ namespace Engine.Containers
 	///     by providing it the prefab path and JObjects to instantiate directly. This is the faster
 	///     method and doesn't have problems like having to use JsonSubtypes to create the correct
 	///     State-object type.
-	///
 	/// </summary>
 	/// <example>
 	///     The following will all instantiate two prefabs, "Building/ProducerBuilding" and
@@ -125,75 +123,52 @@ namespace Engine.Containers
 	///  JsonPrefab.Instantiate&lt;Building&lt;("Buildings/{Type}", GameState.Buildings);
 	///  </code>
 	/// </example>
-	public class JsonPrefabConverter: JsonConverter
-	{
-		public readonly string Path;
-
-		public JsonPrefabConverter(string path)
-		{
-			Path = path;
-		}
-
-		public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
-		{
-			JToken jObject = JToken.ReadFrom(reader);
-			string path = JsonPrefab.ReplaceValues(Path, jObject);
-
-			Object prefab = Resources.Load(path, objectType);
-			if (prefab == null)
-				return null;
-
-			Object instance = Object.Instantiate(prefab);
-			instance.name = prefab.name;
-			using (JsonReader jObjectReader = jObject.CreateReader())
-				serializer.Populate(jObjectReader, instance);
-
-			return instance;
-		}
-
-		public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
-		{
-			throw new NotImplementedException();
-		}
-
-		public override bool CanConvert(Type objectType)
-		{
-			return typeof(MonoBehaviour).IsAssignableFrom(objectType);
-		}
-
-		public override bool CanWrite => false;
-	}
-
 	public static class JsonPrefab
 	{
 		private static JsonSerializer serializer = JsonSerializer.CreateDefault();
 
-		public static List<T> Instantiate<T>(IEnumerable stateObjects, bool saveOnDestroy = true) where T: MonoBehaviour
+		/// <summary>
+		/// Instantiate MonoBehaviours based on a list of objects and populate them.
+		/// </summary>
+		/// <param name="stateObjects">List of objects to instantiate MonoBehaviours of.</param>
+		/// <param name="saveOnDestroy">Should it save back the state when a MonoBehaviour is destroyed?</param>
+		/// <typeparam name="T">Type of MonoBehaviours to instantiate.</typeparam>
+		/// <returns>List of MonoBehaviours instantiated.</returns>
+		public static IEnumerable<T> Instantiate<T>(IEnumerable stateObjects, bool saveOnDestroy = true) where T: MonoBehaviour
 		{
-			var list = new List<T>();
 			foreach (object stateObject in stateObjects)
 			{
 				T instance = Instantiate<T>(stateObject, saveOnDestroy);
 				if (instance != null)
-					list.Add(instance);
+					yield return instance;
 			}
-
-			return list;
 		}
 
-		public static List<T> Instantiate<T>(string path, IEnumerable<JObject> jObjects, bool saveOnDestroy = true) where T: MonoBehaviour
+		/// <summary>
+		/// Instantiate MonoBehaviours based on a list of JObjects and populate them.
+		/// </summary>
+		/// <param name="path">Path to the prefab(s). Anything enclosed in {} gets replaced with the value of a property.</param>
+		/// <param name="jObjects">List of JObjects to instantiate instances of.</param>
+		/// <param name="saveOnDestroy">Should it save back the state when a MonoBehaviour is destroyed?</param>
+		/// <typeparam name="T">Type of MonoBehaviours to instantiate.</typeparam>
+		/// <returns>List of MonoBehaviours instantiated.</returns>
+		public static IEnumerable<T> Instantiate<T>(string path, IEnumerable<JObject> jObjects, bool saveOnDestroy = true) where T: MonoBehaviour
 		{
-			var list = new List<T>();
 			foreach (JObject jObject in jObjects)
 			{
 				T instance = Instantiate<T>(path, jObject, saveOnDestroy);
 				if (instance != null)
-					list.Add(instance);
+					yield return instance;
 			}
-
-			return list;
 		}
 
+		/// <summary>
+		/// Instantiate a MonoBehaviour based on an object and populates it.
+		/// </summary>
+		/// <param name="stateObject">The object to instantiate a MonoBehaviour of.</param>
+		/// <param name="saveOnDestroy">Should it save back the state when the MonoBehaviour is destroyed?</param>
+		/// <typeparam name="T">Type of MonoBehaviour to instantiate.</typeparam>
+		/// <returns>MonoBehaviour instance instantiated, or null.</returns>
 		public static T Instantiate<T>(object stateObject, bool saveOnDestroy = true) where T: MonoBehaviour
 		{
 			Type type = stateObject.GetType();
@@ -216,6 +191,14 @@ namespace Engine.Containers
 			return instance;
 		}
 
+		/// <summary>
+		/// Instantiate a MonoBehaviour based on an JObject and populates it.
+		/// </summary>
+		/// <param name="path">Path to the prefab. Anything enclosed in {} gets replaced with the value of a property.</param>
+		/// <param name="jObject">The JObject to instantiate a MonoBehaviour of.</param>
+		/// <param name="saveOnDestroy">Should it save back the state when the MonoBehaviour is destroyed?</param>
+		/// <typeparam name="T">Type of MonoBehaviour to instantiate.</typeparam>
+		/// <returns>MonoBehaviour instance instantiated, or null.</returns>
 		public static T Instantiate<T>(string path, JObject jObject, bool saveOnDestroy = true) where T: MonoBehaviour
 		{
 			T instance = InstantiateInternal<T>(path, jObject);
@@ -244,6 +227,12 @@ namespace Engine.Containers
 			return instance;
 		}
 
+		/// <summary>
+		/// Save the current values of a list of MonoBehaviours back to their states.
+		/// </summary>
+		/// <param name="monoObjects">The list of MonoBehaviours to save values of.</param>
+		/// <param name="stateObjects">The list of objects to save values to.</param>
+		/// <typeparam name="T">Type of MonoBehaviours to save.</typeparam>
 		public static void Save<T>(List<T> monoObjects, List<object> stateObjects) where T: MonoBehaviour
 		{
 			if (monoObjects.Count != stateObjects.Count)
@@ -253,6 +242,12 @@ namespace Engine.Containers
 				Save(monoObjects[i], stateObjects[i]);
 		}
 
+		/// <summary>
+		/// Save the current values of a list of MonoBehaviours back to their JObjects.
+		/// </summary>
+		/// <param name="monoObjects">The list of MonoBehaviours to save values of.</param>
+		/// <param name="jObjects">The list of JObjects to save values to.</param>
+		/// <typeparam name="T">Type of MonoBehaviours to save.</typeparam>
 		public static void Save<T>(List<T> monoObjects, List<JObject> jObjects) where T: MonoBehaviour
 		{
 			if (monoObjects.Count != jObjects.Count)
@@ -262,6 +257,11 @@ namespace Engine.Containers
 				Save(monoObjects[i], jObjects[i]);
 		}
 
+		/// <summary>
+		/// Save the current values of a MonoBehaviour back to its state.
+		/// </summary>
+		/// <param name="monoObject">The MonoBehaviour to save values of.</param>
+		/// <param name="stateObject">The object to save values to.</param>
 		public static void Save(MonoBehaviour monoObject, object stateObject)
 		{
 			JObject jObject = JObject.FromObject(monoObject);
@@ -269,6 +269,11 @@ namespace Engine.Containers
 				serializer.Populate(jObjectReader, stateObject);
 		}
 
+		/// <summary>
+		/// Save the current values of a MonoBehaviour back to its JObject.
+		/// </summary>
+		/// <param name="monoObject">The MonoBehaviour to save values of.</param>
+		/// <param name="jObject">The JObject to save values to.</param>
 		public static void Save(MonoBehaviour monoObject, JObject jObject)
 		{
 			JObject newJObject = JObject.FromObject(monoObject);
@@ -301,6 +306,44 @@ namespace Engine.Containers
 
 			return currentPath;
 		}
+	}
+
+	public class JsonPrefabConverter: JsonConverter
+	{
+		public readonly string Path;
+
+		public JsonPrefabConverter(string path)
+		{
+			Path = path;
+		}
+
+		public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
+		{
+			JToken jObject = JToken.ReadFrom(reader);
+			string path = JsonPrefab.ReplaceValues(Path, jObject);
+
+			Object prefab = Resources.Load(path, objectType);
+			if (prefab == null)
+				return null;
+
+			Object instance = Object.Instantiate(prefab);
+			instance.name = prefab.name;
+			using (JsonReader jObjectReader = jObject.CreateReader())
+				serializer.Populate(jObjectReader, instance);
+
+			return instance;
+		}
+
+		public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
+		{
+		}
+
+		public override bool CanConvert(Type objectType)
+		{
+			return typeof(MonoBehaviour).IsAssignableFrom(objectType);
+		}
+
+		public override bool CanWrite => false;
 	}
 
 	[AttributeUsage(AttributeTargets.Class | AttributeTargets.Interface)]

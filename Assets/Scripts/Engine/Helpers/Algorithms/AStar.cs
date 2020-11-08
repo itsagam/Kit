@@ -5,6 +5,51 @@ using System.Linq;
 
 namespace Engine.Algorithms
 {
+	/// <summary>
+	/// A generic implementation of the A-Star algorithm.
+	/// </summary>
+	public class AStar
+	{
+		/// <summary>
+		/// Find the shortest path from start to destination.
+		/// </summary>
+		/// <param name="start">The initial node.</param>
+		/// <param name="destination">The final node.</param>
+		/// <param name="distance">A function that should return the distance between two nodes.</param>
+		/// <param name="estimate">A function that should return an estimate between a node and the destination.</param>
+		/// <param name="links">A function that should return all the nodes linked with a given one.</param>
+		/// <typeparam name="T">The type of a node.</typeparam>
+		/// <returns></returns>
+		public static Path<T> FindPath<T>(T start, T destination,
+										  Func<T, T, int> distance,
+										  Func<T, int> estimate,
+										  Func<T, IEnumerable<T>> links)
+		{
+			var closed = new HashSet<T>();
+			var queue = new PriorityQueue<Path<T>>();
+			queue.Enqueue(0, new Path<T>(start));
+			while (!queue.IsEmpty)
+			{
+				var path = queue.Dequeue();
+				if (closed.Contains(path.LastStep))
+					continue;
+				if (path.LastStep.Equals(destination))
+					return path;
+				closed.Add(path.LastStep);
+				foreach (T n in links(path.LastStep))
+				{
+					int d = distance(path.LastStep, n);
+					if (d >= int.MaxValue)
+						continue;
+					var newPath = path.AddStep(n, d);
+					queue.Enqueue(newPath.TotalCost + estimate(n), newPath);
+				}
+			}
+
+			return null;
+		}
+	}
+
 	public class Path<T>: IEnumerable<T>
 	{
 		public T LastStep { get; }
@@ -56,47 +101,13 @@ namespace Engine.Algorithms
 
 		public T Dequeue()
 		{
-			// will throw if there isn’t any first element!
 			(int key, var value) = list.First();
 			T v = value.Dequeue();
-			if (value.Count == 0) // nothing left of the top priority.
+			if (value.Count == 0)
 				list.Remove(key);
 			return v;
 		}
 
 		public bool IsEmpty => !list.Any();
-	}
-
-	public class AStar
-	{
-		public static Path<T> FindPath<T>(T start,
-										  T destination,
-										  Func<T, T, int> distance,
-										  Func<T, int> estimate,
-										  Func<T, IEnumerable<T>> links)
-		{
-			var closed = new HashSet<T>();
-			var queue = new PriorityQueue<Path<T>>();
-			queue.Enqueue(0, new Path<T>(start));
-			while (!queue.IsEmpty)
-			{
-				var path = queue.Dequeue();
-				if (closed.Contains(path.LastStep))
-					continue;
-				if (path.LastStep.Equals(destination))
-					return path;
-				closed.Add(path.LastStep);
-				foreach (T n in links(path.LastStep))
-				{
-					int d = distance(path.LastStep, n);
-					if (d >= int.MaxValue)
-						continue;
-					var newPath = path.AddStep(n, d);
-					queue.Enqueue(newPath.TotalCost + estimate(n), newPath);
-				}
-			}
-
-			return null;
-		}
 	}
 }
