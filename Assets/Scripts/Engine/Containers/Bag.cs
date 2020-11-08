@@ -6,19 +6,42 @@ using UnityEngine;
 
 namespace Engine.Containers
 {
-	// To create nested inventories, create Bag<object> and add other bags
+	/// <summary>
+	/// A generic class that holds how much of a particular item you carry. Can be used to create things like Inventories or Wallets.
+	/// </summary>
+	/// <remarks>To create nested inventories, create Bag&lt;object&gt; and add other bags.</remarks>
+	/// <typeparam name="T">Type of items.</typeparam>
 	[DictionaryDrawerSettings(KeyLabel = "Item", ValueLabel = "Amount")]
 	public class Bag<T>: Dictionary<T, int>
 	{
+		/// <summary>
+		/// Event called whenever a new item is added.
+		/// </summary>
 		public event Action<T, int> Added;
+
+		/// <summary>
+		/// Event called whenever an item's amount is changed.
+		/// </summary>
 		public event Action<T, int> Changed;
+
+		/// <summary>
+		/// Event called whenever an item is removed.
+		/// </summary>
 		public event Action<T, int> Removed;
 
+		/// <summary>
+		/// A dictionary that tells the maximum amount of items of different types can be there. The amount of those types will not go
+		/// beyond this number if it is specified. Ignored if null.
+		/// </summary>
 		public IDictionary<T, int> Max;
 
-		// Every call ultimately reaches here
+		/// <summary>
+		/// Returns the current amount of an item.
+		/// </summary>
+		/// <param name="item"></param>
 		public new int this[T item]
 		{
+
 			get => TryGetValue(item, out int value) ? value : 0;
 			set
 			{
@@ -40,27 +63,42 @@ namespace Engine.Containers
 			}
 		}
 
+		/// <summary>
+		/// Adds the amount of items.
+		/// </summary>
 		public new void Add(T item, int amount = 1)
 		{
 			this[item] += amount;
 		}
 
+		/// <summary>
+		/// Adds the amount of items.
+		/// </summary>
 		public void Add(KeyValuePair<T, int> kvp)
 		{
 			Add(kvp.Key, kvp.Value);
 		}
 
+		/// <summary>
+		/// Adds the amount of items.
+		/// </summary>
 		public void Add(Bunch<T> bunch)
 		{
 			Add(bunch.Item, bunch.Amount);
 		}
 
+		/// <summary>
+		/// Adds the amount of items from another dictionary.
+		/// </summary>
 		public void Add(IDictionary<T, int> bag)
 		{
 			foreach (var field in bag)
 				Add(field);
 		}
 
+		/// <summary>
+		/// Removes the amount of items.
+		/// </summary>
 		public bool Remove(T item, int amount = 1)
 		{
 			if (!Contains(item, amount))
@@ -71,37 +109,25 @@ namespace Engine.Containers
 			return true;
 		}
 
-		public bool RemoveAll(T item)
-		{
-			if (!ContainsKey(item))
-				return false;
-
-			this[item] = 0;
-
-			return true;
-		}
-
-		public bool RemoveAll(IEnumerable<T> items)
-		{
-			bool success = true;
-			foreach (T item in items)
-				if (ContainsKey(item))
-					this[item] = 0;
-				else
-					success = false;
-			return success;
-		}
-
+		/// <summary>
+		/// Removes the amount of items.
+		/// </summary>
 		public bool Remove(KeyValuePair<T, int> kvp)
 		{
 			return Remove(kvp.Key, kvp.Value);
 		}
 
+		/// <summary>
+		/// Removes the amount of items.
+		/// </summary>
 		public bool Remove(Bunch<T> bunch)
 		{
 			return Remove(bunch.Item, bunch.Amount);
 		}
 
+		/// <summary>
+		/// Removes the amount of items from another dictionary.
+		/// </summary>
 		public bool Remove(IDictionary<T, int> bag)
 		{
 			if (!Contains(bag))
@@ -113,21 +139,61 @@ namespace Engine.Containers
 			return true;
 		}
 
+		/// <summary>
+		/// Sets the amount of specified items to 0.
+		/// </summary>
+		public bool RemoveAll(T item)
+		{
+			if (!ContainsKey(item))
+				return false;
+
+			this[item] = 0;
+
+			return true;
+		}
+
+		/// <summary>
+		/// Sets the amount of specified items to 0.
+		/// </summary>
+		public bool RemoveAll(IEnumerable<T> items)
+		{
+			bool success = true;
+			foreach (T item in items)
+				if (ContainsKey(item))
+					this[item] = 0;
+				else
+					success = false;
+			return success;
+		}
+
+
+		/// <summary>
+		/// Returns whether it contains the specified amount of an item.
+		/// </summary>
 		public bool Contains(T item, int amount)
 		{
 			return this[item] >= amount;
 		}
 
+		/// <summary>
+		/// Returns whether it contains the specified amount of an item.
+		/// </summary>
 		public bool Contains(Bunch<T> bunch)
 		{
 			return Contains(bunch.Item, bunch.Amount);
 		}
 
+		/// <summary>
+		/// Returns whether it contains the specified amount of an item.
+		/// </summary>
 		public bool Contains(KeyValuePair<T, int> kvp)
 		{
 			return Contains(kvp.Key, kvp.Value);
 		}
 
+		/// <summary>
+		/// Returns whether it contains the specified amounts of items.
+		/// </summary>
 		public bool Contains(IDictionary<T, int> bag)
 		{
 			return bag.All(Contains);
@@ -181,22 +247,38 @@ namespace Engine.Containers
 			return bag;
 		}
 
+		/// <summary>
+		/// Convert the dictionary to a enumerable of Bunches.
+		/// </summary>
 		public IEnumerable<Bunch<T>> AsBunches()
 		{
 			return this.Select(kvp => new Bunch<T>(kvp));
 		}
 
+		/// <summary>
+		/// Convert the dictionary to a List of Bunches.
+		/// </summary>
 		public List<Bunch<T>> ToBunches()
 		{
 			return AsBunches().ToList();
 		}
 	}
 
-	// Bunch<T> is just KeyValuePair<T, int> with operators (would've just derived from KeyValuePair but that's struct)
+	/// <summary>
+	/// Bunch&lt;<typeparamref name="T"/>&gt; is just KeyValuePair&lt;<typeparamref name="T"/>, int&gt; with operators for use with Bags
+	/// (would've just derived from KeyValuePair but you can't inherit structs).
+	/// </summary>
 	[Serializable]
 	public struct Bunch<T>
 	{
+		/// <summary>
+		/// The item in question.
+		/// </summary>
 		public T Item;
+
+		/// <summary>
+		/// The number of items.
+		/// </summary>
 		public int Amount;
 
 		public Bunch(KeyValuePair<T, int> pair): this(pair.Key, pair.Value)
@@ -273,6 +355,9 @@ namespace Engine.Containers
 			return new Bunch<T>(bunch1.Item, bunch1.Amount - bunch2.Amount);
 		}
 
+		/// <summary>
+		/// Convert to KeyValuePair&lt;<typeparamref name="T" />, int&gt;.
+		/// </summary>
 		public KeyValuePair<T, int> ToKVP()
 		{
 			return new KeyValuePair<T, int>(Item, Amount);

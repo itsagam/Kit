@@ -5,8 +5,17 @@ using UniRx;
 
 namespace Engine.Containers
 {
+	/// <summary>
+	/// Represents the base and current values of stats of an entity as a dictionary. Can be used with both POCO objects or MonoBehaviours
+	/// with Odin's SerializedMonoBehaviour.
+	/// </summary>
+	/// <remarks>The class is highly optimized as the current values are only updated when the IUpgradeable adds or removes an Upgrade
+	/// or the base value of a property changes.</remarks>
 	public class Stats: Dictionary<string, StatBaseProperty>, IDisposable
 	{
+		/// <summary>
+		/// The IUpgradeable to use for calculating current values.
+		/// </summary>
 		public IUpgradeable Upgradeable;
 
 		protected readonly Dictionary<string, ReadOnlyReactiveProperty<float>> currentProperties =
@@ -23,32 +32,50 @@ namespace Engine.Containers
 			Upgradeable = upgradeable;
 		}
 
+		/// <summary>
+		/// Returns the current value of a stat or allow to set the base value.
+		/// </summary>
 		public new float this[string stat]
 		{
 			get => GetCurrentValue(stat);
 			set => SetBaseValue(stat, value);
 		}
 
+		/// <summary>
+		/// Set the base value of a stat.
+		/// </summary>
 		public void Add(string stat, float value)
 		{
 			SetBaseValue(stat, value);
 		}
 
+		/// <summary>
+		/// Get the base value property of a stat.
+		/// </summary>
 		public StatBaseProperty GetBaseProperty(string stat)
 		{
 			return this.GetOrDefault(stat);
 		}
 
+		/// <summary>
+		/// Set the base value property of a stat.
+		/// </summary>
 		public void SetBaseProperty(string stat, StatBaseProperty value)
 		{
 			base[stat] = value;
 		}
 
+		/// <summary>
+		/// Get the base value of a stat.
+		/// </summary>
 		public float GetBaseValue(string stat)
 		{
 			return GetBaseProperty(stat).Value;
 		}
 
+		/// <summary>
+		/// Set the base value of a stat.
+		/// </summary>
 		public void SetBaseValue(string stat, float value)
 		{
 			if (TryGetValue(stat, out StatBaseProperty property))
@@ -60,6 +87,9 @@ namespace Engine.Containers
 			}
 		}
 
+		/// <summary>
+		/// Get the current value property of a stat.
+		/// </summary>
 		public ReadOnlyReactiveProperty<float> GetCurrentProperty(string stat)
 		{
 			if (currentProperties.TryGetValue(stat, out var property))
@@ -73,6 +103,10 @@ namespace Engine.Containers
 			return currentProperty;
 		}
 
+
+		/// <summary>
+		/// Get the current value of a stat.
+		/// </summary>
 		public float GetCurrentValue(string stat)
 		{
 			return GetCurrentProperty(stat).Value;
@@ -131,7 +165,7 @@ namespace Engine.Containers
 			foreach (Effect effect in effects)
 				switch (effect.Type)
 				{
-					case EffectType.Value:
+					case EffectType.Constant:
 						valueSum += effect.Value;
 						break;
 

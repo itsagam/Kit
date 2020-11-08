@@ -4,24 +4,54 @@ using System.Collections.Generic;
 namespace Engine.Containers
 {
 	/// <summary>
-	///     This is a dictionary guaranteed to have only one of each value and key.
-	///     It may be searched either by TFirst or by TSecond, giving a unique answer because it is 1 to 1.
+	/// A 1-to-1 dictionary that can be used to lookup with either item as key.
 	/// </summary>
-	/// <typeparam name="TFirst">The type of the "key"</typeparam>
-	/// <typeparam name="TSecond">The type of the "value"</typeparam>
+	/// <typeparam name="TFirst">First type.</typeparam>
+	/// <typeparam name="TSecond">Second type.</typeparam>
 	public class BiDictionary<TFirst, TSecond>
 	{
 		private IDictionary<TFirst, TSecond> firstToSecond = new Dictionary<TFirst, TSecond>();
 		private IDictionary<TSecond, TFirst> secondToFirst = new Dictionary<TSecond, TFirst>();
 
-		#region Exception throwing methods
+		#region Common
+		/// <summary>
+		/// Gets or sets the value of second item.
+		/// </summary>
+		public TSecond this[TFirst first]
+		{
+			get => Get(first);
+			set => Add(first, value);
+		}
 
 		/// <summary>
-		///     Tries to add the pair to the dictionary.
-		///     Throws an exception if either element is already in the dictionary
+		/// Gets or sets the value of first item.
 		/// </summary>
-		/// <param name="first"></param>
-		/// <param name="second"></param>
+		public TFirst this[TSecond second]
+		{
+			get => Get(second);
+			set => Add(value, second);
+		}
+
+		/// <summary>
+		/// The number of pairs stored in the dictionary.
+		/// </summary>
+		public int Count => firstToSecond.Count;
+
+		/// <summary>
+		/// Removes all items from the dictionary.
+		/// </summary>
+		public void Clear()
+		{
+			firstToSecond.Clear();
+			secondToFirst.Clear();
+		}
+		#endregion
+
+		#region Exception-throwing methods
+		/// <summary>
+		/// Tries to add a pair to the dictionary.
+		/// </summary>
+		/// <exception cref="ArgumentException">Throws an exception if either element is already in the dictionary.</exception>
 		public void Add(TFirst first, TSecond second)
 		{
 			if (firstToSecond.ContainsKey(first) || secondToFirst.ContainsKey(second))
@@ -32,11 +62,9 @@ namespace Engine.Containers
 		}
 
 		/// <summary>
-		///     Find the TSecond corresponding to the TFirst first
-		///     Throws an exception if first is not in the dictionary.
+		/// Find the TSecond corresponding to a TFirst.
 		/// </summary>
-		/// <param name="first">the key to search for</param>
-		/// <returns>the value corresponding to first</returns>
+		/// <exception cref="ArgumentException">Throws an exception if the TFirst is not in the dictionary.</exception>
 		public TSecond Get(TFirst first)
 		{
 			if (!firstToSecond.TryGetValue(first, out TSecond second))
@@ -46,11 +74,9 @@ namespace Engine.Containers
 		}
 
 		/// <summary>
-		///     Find the TFirst corresponing to the Second second.
-		///     Throws an exception if second is not in the dictionary.
+		/// Find the TFirst corresponding to a TSecond.
 		/// </summary>
-		/// <param name="second">the key to search for</param>
-		/// <returns>the value corresponding to second</returns>
+		/// <exception cref="ArgumentException">Throws an exception if the TSecond is not in the dictionary.</exception>
 		public TFirst Get(TSecond second)
 		{
 			if (!secondToFirst.TryGetValue(second, out TFirst first))
@@ -60,10 +86,9 @@ namespace Engine.Containers
 		}
 
 		/// <summary>
-		///     Remove the record containing first.
-		///     If first is not in the dictionary, throws an Exception.
+		///  Remove the pair corresponding to a TFirst.
 		/// </summary>
-		/// <param name="first">the key of the record to delete</param>
+		/// <exception cref="ArgumentException">Throws an exception if the TFirst is not in the dictionary.</exception>
 		public void Remove(TFirst first)
 		{
 			if (!firstToSecond.TryGetValue(first, out TSecond second))
@@ -74,10 +99,9 @@ namespace Engine.Containers
 		}
 
 		/// <summary>
-		///     Remove the record containing second.
-		///     If second is not in the dictionary, throws an Exception.
+		/// Remove the pair corresponding to a TSecond.
 		/// </summary>
-		/// <param name="second">the key of the record to delete</param>
+		/// <exception cref="ArgumentException">Throws an exception if the TSecond is not in the dictionary.</exception>
 		public void Remove(TSecond second)
 		{
 			if (!secondToFirst.TryGetValue(second, out TFirst first))
@@ -92,12 +116,9 @@ namespace Engine.Containers
 		#region Try methods
 
 		/// <summary>
-		///     Tries to add the pair to the dictionary.
-		///     Returns false if either element is already in the dictionary
+		/// Tries to add the pair to the dictionary.
 		/// </summary>
-		/// <param name="first"></param>
-		/// <param name="second"></param>
-		/// <returns>true if successfully added, false if either element are already in the dictionary</returns>
+		/// <returns>true if successfully added, false if either element is already in the dictionary.</returns>
 		public bool TryAdd(TFirst first, TSecond second)
 		{
 			if (firstToSecond.ContainsKey(first) || secondToFirst.ContainsKey(second))
@@ -109,34 +130,27 @@ namespace Engine.Containers
 		}
 
 		/// <summary>
-		///     Find the TSecond corresponding to the TFirst first.
-		///     Returns false if first is not in the dictionary.
+		/// Find the TSecond corresponding to the TFirst first.
 		/// </summary>
-		/// <param name="first">the key to search for</param>
-		/// <param name="second">the corresponding value</param>
-		/// <returns>true if first is in the dictionary, false otherwise</returns>
+		/// <returns>true if first is in the dictionary, false otherwise.</returns>
 		public bool TryGet(TFirst first, out TSecond second)
 		{
 			return firstToSecond.TryGetValue(first, out second);
 		}
 
 		/// <summary>
-		///     Find the TFirst corresponding to the TSecond second.
-		///     Returns false if second is not in the dictionary.
+		/// Find the TFirst corresponding to the TSecond second.
 		/// </summary>
-		/// <param name="second">the key to search for</param>
-		/// <param name="first">the corresponding value</param>
-		/// <returns>true if second is in the dictionary, false otherwise</returns>
+		/// <returns>true if second is in the dictionary, false otherwise.</returns>
 		public bool TryGet(TSecond second, out TFirst first)
 		{
 			return secondToFirst.TryGetValue(second, out first);
 		}
 
 		/// <summary>
-		///     Remove the record containing first, if there is one.
+		/// Remove the pair containing a TFirst, if there is one.
 		/// </summary>
-		/// <param name="first"></param>
-		/// <returns> If first is not in the dictionary, returns false, otherwise true</returns>
+		/// <returns> If first is not in the dictionary, returns false, otherwise true.</returns>
 		public bool TryRemove(TFirst first)
 		{
 			if (!firstToSecond.TryGetValue(first, out TSecond second))
@@ -148,10 +162,9 @@ namespace Engine.Containers
 		}
 
 		/// <summary>
-		///     Remove the record containing second, if there is one.
+		/// Remove the pair containing a TSecond, if there is one.
 		/// </summary>
-		/// <param name="second"></param>
-		/// <returns> If second is not in the dictionary, returns false, otherwise true</returns>
+		/// <returns> If second is not in the dictionary, returns false, otherwise true.</returns>
 		public bool TryRemove(TSecond second)
 		{
 			if (!secondToFirst.TryGetValue(second, out TFirst first))
@@ -164,30 +177,6 @@ namespace Engine.Containers
 
 		#endregion
 
-		public TSecond this[TFirst first]
-		{
-			get => Get(first);
-			set => Add(first, value);
-		}
 
-		public TFirst this[TSecond second]
-		{
-			get => Get(second);
-			set => Add(value, second);
-		}
-
-		/// <summary>
-		///     The number of pairs stored in the dictionary
-		/// </summary>
-		public int Count => firstToSecond.Count;
-
-		/// <summary>
-		///     Removes all items from the dictionary.
-		/// </summary>
-		public void Clear()
-		{
-			firstToSecond.Clear();
-			secondToFirst.Clear();
-		}
 	}
 }

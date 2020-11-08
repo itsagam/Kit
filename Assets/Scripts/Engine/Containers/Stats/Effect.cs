@@ -2,26 +2,69 @@
 
 namespace Engine.Containers
 {
+	/// <summary>
+	/// Represents how an Effect affects the value.
+	/// </summary>
 	public enum EffectType
 	{
-		Value,
+		/// <summary>
+		/// It adds or subtracts a constant.
+		/// </summary>
+		Constant,
+
+		/// <summary>
+		/// It adds or subtracts a certain percentage.
+		/// </summary>
 		Percentage,
+
+		/// <summary>
+		/// It multiplies by a certain number.
+		/// </summary>
 		Multiplier
 	}
 
+	/// <summary>
+	/// Denotes a change in the value of a stat.
+	/// </summary>
 	[Serializable]
 	public struct Effect
 	{
+		/// <summary>
+		/// The stat to which the change should apply.
+		/// </summary>
 		public string Stat;
+
+		/// <summary>
+		/// How does it change the value?
+		/// </summary>
 		public EffectType Type;
+
+		/// <summary>
+		/// The amount of change.
+		/// </summary>
 		public float Value;
 
+		/// <summary>
+		/// Create a new Effect.
+		/// </summary>
+		/// <param name="stat">The ID of the stat.</param>
+		/// <param name="value">The Type and Value represented as a string.</param>
+		/// <remarks>See the Parse function.</remarks>
+		/// <example>new Effect("Health", "+50%")</example>
+		/// <example>new Effect("Damage", "x2")</example>
 		public Effect(string stat, string value)
 		{
 			Stat = stat;
 			(Type, Value) = Parse(value);
 		}
 
+		/// <summary>
+		/// Create a new Effect.
+		/// </summary>
+		/// <param name="stat">The ID of the stat.</param>
+		/// <param name="type">The effect type.</param>
+		/// <param name="value">The amount of the effect.</param>
+		/// <example>new Effect("Ammo", EffectType.Constant, +5)</example>
 		public Effect(string stat, EffectType type, float value)
 		{
 			Stat = stat;
@@ -34,6 +77,20 @@ namespace Engine.Containers
 			return Stat + ": " + Convert(this);
 		}
 
+		/// <summary>
+		///
+		/// <para>
+		/// Converts a string to EffectType and value.
+		/// </para>
+		///
+		/// <para>
+		/// "x" at the beginning of a string translates to EffectType.Multiplier, a string ending with "%" means Percentage, while
+		/// neither of those means Constant. Rest of the string should be a number denoting the value.
+		/// </para>
+		///
+		/// </summary>
+		///
+		/// <returns>The EffectType and value in the form of a tuple.</returns>
 		public static (EffectType, float) Parse(string str)
 		{
 			(EffectType type, float value) output;
@@ -49,13 +106,17 @@ namespace Engine.Containers
 			}
 			else
 			{
-				output.type = EffectType.Value;
+				output.type = EffectType.Constant;
 				output.value = System.Convert.ToSingle(str);
 			}
 
 			return output;
 		}
 
+		/// <summary>
+		/// Converts the EffectType and value to a human-readable string.
+		/// </summary>
+		/// <remarks>Conversion is same as the Parse function, except in reverse.</remarks>
 		public static string Convert(Effect effect)
 		{
 			string output = "";
@@ -65,7 +126,7 @@ namespace Engine.Containers
 
 			switch (effect.Type)
 			{
-				case EffectType.Value:
+				case EffectType.Constant:
 					output += effect.Value;
 					break;
 

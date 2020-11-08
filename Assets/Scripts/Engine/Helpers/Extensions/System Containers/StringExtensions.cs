@@ -22,7 +22,7 @@ namespace Engine
 		}
 
 		/// <summary>
-		/// Returns a substring starting at a specified index and ending at the end.
+		/// Returns a substring starting at a specified index going till the end.
 		/// </summary>
 		public static string Slice(this string str, int startIndex)
 		{
@@ -54,7 +54,7 @@ namespace Engine
 		}
 
 		/// <summary>
-		/// Returns whether a part of the string compares to another.
+		/// Returns whether a part of the string is equal to another string.
 		/// </summary>
 		public static bool IsSlice(this string str, int startIndex, string compare)
 		{
@@ -62,7 +62,7 @@ namespace Engine
 		}
 
 		/// <summary>
-		/// Splits and trims the strings by the specified delimiters.
+		/// Splits the strings by the specified delimiters and trims each one.
 		/// </summary>
 		public static string[] SplitAndTrim(this string str, params char[] separators)
 		{

@@ -95,14 +95,14 @@ namespace Engine.Containers
 	///  [JsonPrefab("Buildings/{Type}")]
 	///  public class GameState
 	///  {
-	/// 		public List&lt;BuildingState&lt; Buildings;
+	/// 		public List&lt;BuildingState&gt; Buildings;
 	///  }
 	///  public class BuildingState
 	///  {
 	/// 		public string Type;
 	/// 		public Vector2 Position;
 	///  }
-	///  JsonPrefab.Instantiate&lt;Building&lt;(GameState.Buildings);
+	///  JsonPrefab.Instantiate&lt;Building&gt;(GameState.Buildings);
 	///  </code>
 	///
 	///     C# (JObject-Mono method):
@@ -118,9 +118,9 @@ namespace Engine.Containers
 	///  }
 	///  public class GameState
 	///  {
-	/// 		public List&lt;JObject&lt; Buildings;
+	/// 		public List&lt;JObject&gt; Buildings;
 	///  }
-	///  JsonPrefab.Instantiate&lt;Building&lt;("Buildings/{Type}", GameState.Buildings);
+	///  JsonPrefab.Instantiate&lt;Building&gt;("Buildings/{Type}", GameState.Buildings);
 	///  </code>
 	/// </example>
 	public static class JsonPrefab
