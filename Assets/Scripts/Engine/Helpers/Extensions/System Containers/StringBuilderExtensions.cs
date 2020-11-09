@@ -4,7 +4,10 @@ namespace Engine
 {
 	public static class StringBuilderExtensions
 	{
-		public static int IndexOf(this StringBuilder sb, char value, int startIndex)
+		/// <summary>
+		/// Returns the index of a specified character.
+		/// </summary>
+		public static int IndexOf(this StringBuilder sb, char value, int startIndex = 0)
 		{
 			for (int i = startIndex; i < sb.Length; i++)
 				if (sb[i] == value)
@@ -12,7 +15,10 @@ namespace Engine
 			return -1;
 		}
 
-		public static int IndexOf(this StringBuilder sb, string value, int startIndex)
+		/// <summary>
+		/// Returns the index of a specified substring.
+		/// </summary>
+		public static int IndexOf(this StringBuilder sb, string value, int startIndex = 0)
 		{
 			int length = value.Length;
 			int maxSearchLength = sb.Length - length + 1;

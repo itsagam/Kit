@@ -6,22 +6,34 @@ namespace Engine
 {
 	public static class EnumerableExtensions
 	{
+		/// <summary>
+		/// Return just the one item specified.
+		/// </summary>
 		public static IEnumerable<T> One<T>(T item)
 		{
 			yield return item;
 		}
 
+		/// <summary>
+		/// Perform an action on a enumerable of items.
+		/// </summary>
 		public static void ForEach<T>(this IEnumerable<T> enumerable, Action<T> action)
 		{
 			foreach (T obj in enumerable)
 				action(obj);
 		}
 
+		/// <summary>
+		/// Log all the items in enumerable to the Console.
+		/// </summary>
 		public static void Log<T>(this IEnumerable<T> enumerable, bool serialize = false)
 		{
 			enumerable.ForEach(o => Debugger.Log(o, serialize));
 		}
 
+		/// <summary>
+		/// Return the index of an item.
+		/// </summary>
 		public static int IndexOf<T>(this IEnumerable<T> source, T value)
 		{
 			int index = 0;
@@ -35,6 +47,9 @@ namespace Engine
 			return -1;
 		}
 
+		/// <summary>
+		/// Return the index of an item.
+		/// </summary>
 		public static int IndexOf<T>(this IEnumerable<T> source, T value, IEqualityComparer<T> comparer)
 		{
 			int index = 0;
@@ -48,11 +63,17 @@ namespace Engine
 			return -1;
 		}
 
+		/// <summary>
+		/// Combine a enumerable of strings separated by a delimiter.
+		/// </summary>
 		public static string Join(this IEnumerable<string> source, string separator = ", ")
 		{
 			return string.Join(separator, source);
 		}
 
+		/// <summary>
+		/// Combine a enumerable of strings separated by a delimiter and append them to a StringBuilder.
+		/// </summary>
 		public static void Join(this IEnumerable<string> source, StringBuilder builder, string separator = ", ")
 		{
 			bool first = true;

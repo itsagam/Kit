@@ -5,6 +5,10 @@ namespace Engine
 {
 	public class NetworkHelper
 	{
+		/// <summary>
+		/// Returns whether the device is connected to the internet.
+		/// </summary>
+		/// <param name="quick">Should do a quick check or a thorough one?</param>
 		public static bool IsConnectedToInternet(bool quick = true)
 		{
 			if (quick)

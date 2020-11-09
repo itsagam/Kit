@@ -4,17 +4,33 @@ namespace Engine
 {
 	public static class RaycastHelper
 	{
-		public static RaycastHit2D ScreenRaycast2D(Camera camera, Vector2 screenPoint, int layerMask = -5)
-		{
-			return Physics2D.GetRayIntersection(camera.ScreenPointToRay(screenPoint), float.PositiveInfinity, layerMask);
-		}
-
+		/// <summary>
+		/// Cast a 2D ray from the mouse position.
+		/// </summary>
 		public static RaycastHit2D ScreenRaycast2D(Camera camera, int layerMask = -5)
 		{
 			return ScreenRaycast2D(camera, Input.mousePosition, layerMask);
 		}
 
+		/// <summary>
+		/// Cast a 2D ray from a certain point on the screen.
+		/// </summary>
+		public static RaycastHit2D ScreenRaycast2D(Camera camera, Vector2 screenPoint, int layerMask = -5)
+		{
+			return Physics2D.GetRayIntersection(camera.ScreenPointToRay(screenPoint), float.PositiveInfinity, layerMask);
+		}
 
+		/// <summary>
+		/// Cast a ray from the mouse position.
+		/// </summary>
+		public static bool ScreenRaycast(Camera camera, out RaycastHit hit, int layerMask = -5)
+		{
+			return ScreenRaycast(camera, Input.mousePosition, out hit, layerMask);
+		}
+
+		/// <summary>
+		/// Cast a ray from a certain point on the screen.
+		/// </summary>
 		public static bool ScreenRaycast(Camera camera, Vector2 screenPoint, out RaycastHit hit, int layerMask = -5)
 		{
 			Ray ray = camera.ScreenPointToRay(screenPoint);
@@ -23,22 +39,23 @@ namespace Engine
 			return result;
 		}
 
-		public static bool ScreenRaycast(Camera camera, out RaycastHit hit, int layerMask = -5)
+		/// <summary>
+		/// Cast a ray from the mouse position towards a plane.
+		/// </summary>
+		public static Vector3? ScreenRaycastAtPlane(Camera camera, Plane plane)
 		{
-			return ScreenRaycast(camera, Input.mousePosition, out hit, layerMask);
+			return ScreenRaycastAtPlane(camera, Input.mousePosition, plane);
 		}
 
-
-		public static Vector3 ScreenRaycastAtPlane(Camera camera, Vector3 screenPoint, Vector3 direction)
+		/// <summary>
+		/// Cast a ray from a certain point on the screen towards a plane.
+		/// </summary>
+		public static Vector3? ScreenRaycastAtPlane(Camera camera, Vector3 screenPoint, Plane plane)
 		{
 			Ray ray = camera.ScreenPointToRay(screenPoint);
-			Plane plane = new Plane(direction, Vector3.zero);
-			return plane.Raycast(ray, out float distance) ? ray.GetPoint(distance) : Vector3.zero;
-		}
-
-		public static Vector3 ScreenRaycastAtPlane(Camera camera, Vector3? direction = null)
-		{
-			return ScreenRaycastAtPlane(camera, Input.mousePosition, direction ?? Vector3.forward);
+			if (plane.Raycast(ray, out float distance))
+				return ray.GetPoint(distance);
+			return null;
 		}
 	}
 }

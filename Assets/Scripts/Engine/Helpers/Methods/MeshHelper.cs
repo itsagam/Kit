@@ -4,6 +4,11 @@ namespace Engine
 {
 	public static class MeshHelper
 	{
+		/// <summary>
+		/// Generates a new Mesh with four vertices.
+		/// </summary>
+		/// <param name="size">Size of the mesh.</param>
+		/// <param name="pivot">Center of the mesh.</param>
 		public static Mesh GenerateQuad(float size, Vector2 pivot)
 		{
 			Vector3[] vertices =
