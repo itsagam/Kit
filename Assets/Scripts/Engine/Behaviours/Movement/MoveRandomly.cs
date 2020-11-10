@@ -16,10 +16,6 @@ namespace Engine.Behaviours
         [Tooltip("The area to move around in; could be a collider, renderer or transform.")]
         public Component Area;
 
-
-
-       // public bool Axis;
-
         /// <summary>
         /// Move around in the X-axis?
         /// </summary>

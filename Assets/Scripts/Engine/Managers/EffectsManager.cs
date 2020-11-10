@@ -4,10 +4,20 @@ using UnityEngine;
 
 namespace Engine
 {
+	/// <summary>
+	/// Handles Spawning/De-spawning and Pooling of particle effects.
+	/// </summary>
 	public static class EffectsManager
 	{
+		/// <summary>
+		/// The pooling group name to use for effects.
+		/// </summary>
 		public const string Group = "Effects";
 
+		/// <summary>
+		/// Spawn a ParticleSystem and pool it after it finishes.
+		/// </summary>
+		/// <returns>The pool instance.</returns>
 		public static ParticleSystem Spawn(ParticleSystem prefab, Vector3 position)
 		{
 			if (prefab == null)
@@ -18,6 +28,10 @@ namespace Engine
 			return particleSystem;
 		}
 
+		/// <summary>
+		/// Spawn a ParticleSystem and pool it after it finishes.
+		/// </summary>
+		/// <returns>The pool instance.</returns>
 		public static ParticleSystem Spawn(ParticleSystem prefab, Vector3 position, Quaternion rotation)
 		{
 			if (prefab == null)
@@ -28,6 +42,10 @@ namespace Engine
 			return particleSystem;
 		}
 
+		/// <summary>
+		/// Spawn a ParticleSystem and pool it after it finishes.
+		/// </summary>
+		/// <returns>The pool instance.</returns>
 		public static ParticleSystem Spawn(ParticleSystem prefab, Transform parent, bool worldSpace = false)
 		{
 			if (prefab == null)
@@ -38,6 +56,10 @@ namespace Engine
 			return particleSystem;
 		}
 
+		/// <summary>
+		/// Spawn a ParticleSystem and pool it after it finishes.
+		/// </summary>
+		/// <returns>The pool instance.</returns>
 		public static ParticleSystem Spawn(ParticleSystem prefab, Transform parent, Vector3 position)
 		{
 			if (prefab == null)
@@ -51,6 +73,10 @@ namespace Engine
 			return particleSystem;
 		}
 
+		/// <summary>
+		/// Spawn a ParticleSystem and pool it after it finishes.
+		/// </summary>
+		/// <returns>The pool instance.</returns>
 		public static ParticleSystem Spawn(ParticleSystem prefab, Transform parent, Vector3 position, Quaternion rotation)
 		{
 			if (prefab == null)
@@ -65,21 +91,37 @@ namespace Engine
 			return particleSystem;
 		}
 
+		/// <summary>
+		/// Manually de-spawn a particle effect.
+		/// </summary>
+		/// <returns>Whether the instance was successfully de-spawned.</returns>
 		public static bool Despawn(Component instance)
 		{
 			return Pooler.Destroy(instance);
 		}
 
+		/// <summary>
+		/// De-spawn all instances of a particular effect.
+		/// </summary>
+		/// <returns>Whether instances existed and were successfully de-spawned.</returns>
 		public static bool DespawnAll(Component prefab)
 		{
 			return Pooler.DestroyAll(prefab);
 		}
 
+		/// <summary>
+		/// De-spawn all instances of a particular effect by name.
+		/// </summary>
+		/// <returns>Whether instances existed and were successfully de-spawned.</returns>
 		public static bool DespawnAll(string name)
 		{
 			return Pooler.DestroyAll(name);
 		}
 
+		/// <summary>
+		/// De-spawn all particle effects.
+		/// </summary>
+		/// <returns>Whether instances existed and were successfully de-spawned.</returns>
 		public static bool DespawnAll()
 		{
 			return Pooler.DestroyAllInGroup(Group);

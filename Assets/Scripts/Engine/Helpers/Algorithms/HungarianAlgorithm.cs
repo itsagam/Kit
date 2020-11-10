@@ -2,7 +2,6 @@
 
 namespace Engine.Algorithms
 {
-
     // Copyright (c) 2010 Alex Regueiro
     // Licensed under MIT license, available at <http://www.opensource.org/licenses/mit-license.php>.
     // Published originally at <http://blog.noldorin.com/2009/09/hungarian-algorithm-in-csharp/>.
@@ -10,7 +9,6 @@ namespace Engine.Algorithms
     // Version 1.3, released 22nd May 2010.
     public static class HungarianAlgorithm
     {
-
         /// <summary>
         /// Given a matrix of worker costs and tasks, find the optimal allocation of workers such that the total cost is minimized.
         /// </summary>

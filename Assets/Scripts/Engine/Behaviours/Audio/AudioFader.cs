@@ -5,7 +5,7 @@ using UnityEngine;
 namespace Engine
 {
 	/// <summary>
-	/// Attach it a GameObject with an AudioSource and this component will allow you to Play/Pause/Stop/Change Volume or Clip with
+	/// Attach it to a GameObject with an AudioSource and this component will allow you to Play/Pause/Stop/Change Volume or Clip with
 	/// volume fading in/out.
 	/// </summary>
 	/// <remarks>Just attaching it to a AudioSource with playOnAwake true will fade the audio in on Awake.</remarks>
@@ -15,7 +15,7 @@ namespace Engine
 		/// <summary>
 		/// AudioSource to fade.
 		/// </summary>
-		/// <remarks>Will use the one on the same GameObject by default.</remarks>
+		/// <remarks>Will use the one on the same GameObject if not specified.</remarks>
 		[Tooltip("AudioSource to fade. Will use the one on the same GameObject by default.")]
 		public AudioSource Audio;
 

@@ -194,7 +194,7 @@ namespace Engine.Modding
 			if (!mod.Group.Deactivatable)
 				return;
 
-			PreferenceManager.Set(mod.Group.Name.ToString(), mod.Metadata.Name, "Enabled", value);
+			SettingsManager.Set(mod.Group.Name.ToString(), mod.Metadata.Name, "Enabled", value);
 			RefreshActiveMods();
 		}
 
@@ -203,7 +203,7 @@ namespace Engine.Modding
 			if (!mod.Group.Deactivatable)
 				return true;
 
-			return PreferenceManager.Get(mod.Group.Name.ToString(), mod.Metadata.Name, "Enabled", true);
+			return SettingsManager.Get(mod.Group.Name.ToString(), mod.Metadata.Name, "Enabled", true);
 		}
 
 		public static int GetModOrder(Mod mod)
@@ -258,7 +258,7 @@ namespace Engine.Modding
 				if (group.Reorderable)
 					group.Mods = group.Mods.AsEnumerable()
 									  .Reverse()
-									  .OrderBy(mod => PreferenceManager.Get(group.Name.ToString(),
+									  .OrderBy(mod => SettingsManager.Get(group.Name.ToString(),
 																			 mod.Metadata.Name,
 																			 "Order", -1))
 									  .ToList();
@@ -271,7 +271,7 @@ namespace Engine.Modding
 					for (int order = 0; order < group.Mods.Count; order++)
 					{
 						Mod mod = group.Mods[order];
-						PreferenceManager.Set(group.Name.ToString(), mod.Metadata.Name, "Order", order);
+						SettingsManager.Set(group.Name.ToString(), mod.Metadata.Name, "Order", order);
 					}
 		}
 

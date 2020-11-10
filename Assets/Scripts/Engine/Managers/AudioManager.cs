@@ -8,15 +8,32 @@ using Random = UnityEngine.Random;
 
 namespace Engine
 {
+	/// <summary>
+	/// Allows to play & pool sounds and group them into AudioSources. Handles background music.
+	/// </summary>
 	public static class AudioManager
 	{
 		#region Fields
 
+		/// <summary>
+		/// The group name to use for general sounds.
+		/// </summary>
 		public const string SoundGroup = "Sounds";
+
+		/// <summary>
+		/// The group name to use for background music.
+		/// </summary>
 		public const string MusicGroup = "Music";
+
+		/// <summary>
+		/// The group name to use for UI sounds.
+		/// </summary>
 		public const string UIGroup = "UI";
 
-		public static AudioFader BackgroundManager { get; private set; }
+		/// <summary>
+		/// Handler for music since we're always fading it.
+		/// </summary>
+		public static AudioFader MusicManager { get; private set; }
 
 		private static GameObject audioGameObject;
 		private static Transform audioTransform;
@@ -31,6 +48,9 @@ namespace Engine
 			Initialize();
 		}
 
+		/// <summary>
+		/// Initializes the manager and creates audio groups for general sounds, UI and music.
+		/// </summary>
 		public static void Initialize()
 		{
 			if (audioGameObject != null)
@@ -39,8 +59,8 @@ namespace Engine
 			audioGameObject = new GameObject("Audio");
 			audioTransform = audioGameObject.transform;
 
-			AudioSource bgSource = CreateGroup(MusicGroup, true);
-			BackgroundManager = bgSource.gameObject.AddComponent<AudioFader>();
+			AudioSource musicSource = CreateGroup(MusicGroup, true);
+			MusicManager = musicSource.gameObject.AddComponent<AudioFader>();
 
 			CreateGroup(SoundGroup, true);
 			CreateGroup(UIGroup,    true);
@@ -52,6 +72,12 @@ namespace Engine
 
 		#region Group management
 
+		/// <summary>
+		/// Create a new AudioSource for a sound group.
+		/// </summary>
+		/// <param name="name">Name of the group.</param>
+		/// <param name="loadVolume">Whether to load the group's volume from settings.</param>
+		/// <returns>AudioSource created for the group.</returns>
 		public static AudioSource CreateGroup(string name, bool loadVolume = false)
 		{
 			GameObject gameObject = new GameObject(name);
@@ -63,16 +89,25 @@ namespace Engine
 			return source;
 		}
 
+		/// <summary>
+		/// Get the AudioSource for a group.
+		/// </summary>
 		public static AudioSource GetGroup(string name)
 		{
 			return groupSources.GetOrDefault(name);
 		}
 
+		/// <summary>
+		/// Get the AudioSource for a group and create a new one for it if it doesn't exist.
+		/// </summary>
 		public static AudioSource GetOrCreateGroup(string name)
 		{
 			return groupSources.TryGetValue(name, out AudioSource source) ? source : CreateGroup(name);
 		}
 
+		/// <summary>
+		/// Destroy the AudioSource for a group.
+		/// </summary>
 		public static bool RemoveGroup(string name)
 		{
 			AudioSource source = GetGroup(name);
@@ -84,65 +119,112 @@ namespace Engine
 			return true;
 		}
 
+		/// <summary>
+		/// Returns all AudioSources.
+		/// </summary>
 		public static IEnumerable<AudioSource> GetAllGroups()
 		{
 			return groupSources.Values;
 		}
 
+		/// <summary>
+		/// Returns the volume saved in the settings for a group.
+		/// </summary>
 		public static float LoadGroupVolume(string name)
 		{
-			return PreferenceManager.Get("Audio", name, "Volume", 1.0f);
+			return SettingsManager.Get("Audio", name, "Volume", 1.0f);
 		}
 
+		/// <summary>
+		/// Saves the current volume of a group in settings.
+		/// </summary>
+		public static bool SaveGroupVolume(string name)
+		{
+			AudioSource source = GetGroup(name);
+			if (source == null)
+				return false;
+
+			SaveGroupVolume(name, source.volume);
+			return true;
+		}
+
+		/// <summary>
+		/// Saves a volume of a group in settings.
+		/// </summary>
 		public static void SaveGroupVolume(string name, float volume)
 		{
-			PreferenceManager.Set("Audio", name, "Volume", volume);
+			SettingsManager.Set("Audio", name, "Volume", volume);
 		}
 
 		#endregion
 
 		#region Group playback
 
+		/// <summary>
+		/// Play an audio with a group's AudioSource. Create the group if it doesn't exist.
+		/// </summary>
 		public static void Play(string group, AudioClip clip)
 		{
 			if (clip != null)
 				GetOrCreateGroup(group).PlayOneShot(clip);
 		}
 
+		/// <summary>
+		/// Set and play background music.
+		/// </summary>
 		public static void PlayMusic(AudioClip clip)
 		{
-			BackgroundManager.Play(clip);
+			MusicManager.Play(clip);
 		}
 
+		/// <summary>
+		/// Play the background music.
+		/// </summary>
 		public static void PlayMusic()
 		{
-			BackgroundManager.Play();
+			MusicManager.Play();
 		}
 
+		/// <summary>
+		/// Pause the background music.
+		/// </summary>
 		public static void PauseMusic()
 		{
-			BackgroundManager.Pause();
+			MusicManager.Pause();
 		}
 
+		/// <summary>
+		/// Stop the background music.
+		/// </summary>
 		public static void StopMusic()
 		{
-			BackgroundManager.Stop();
+			MusicManager.Stop();
 		}
 
+		/// <summary>
+		/// Play an audio with the general sounds group.
+		/// </summary>
 		public static void PlaySound(AudioClip clip)
 		{
 			Play(SoundGroup, clip);
 		}
 
-		public static void PlaySound(AudioClip[] clips)
+		/// <summary>
+		/// Play a random audio from a list.
+		/// </summary>
+		/// <param name="clips"></param>
+		public static void PlaySound(IReadOnlyList<AudioClip> clips)
 		{
-			if (clips == null || clips.Length <= 0)
+			if (clips == null || clips.Count <= 0)
 				return;
 
-			int randomIndex = Random.Range(0, clips.Length);
+			int randomIndex = Random.Range(0, clips.Count);
 			PlaySound(clips[randomIndex]);
 		}
 
+		/// <summary>
+		/// Play an audio with the UI sounds group.
+		/// </summary>
 		public static void PlayUI(AudioClip clip)
 		{
 			Play(UIGroup, clip);
@@ -152,6 +234,10 @@ namespace Engine
 
 		#region AudioSource (Pooled) playback
 
+		/// <summary>
+		/// Spawn an AudioSource and pool it after the sound ends.
+		/// </summary>
+		/// <returns>The pool instance.</returns>
 		public static AudioSource Play(AudioSource prefab)
 		{
 			if (prefab == null)
@@ -162,6 +248,10 @@ namespace Engine
 			return source;
 		}
 
+		/// <summary>
+		/// Spawn an AudioSource and pool it after the sound ends.
+		/// </summary>
+		/// <returns>The pool instance.</returns>
 		public static AudioSource Play(AudioSource prefab, Transform parent, bool worldSpace = false)
 		{
 			if (prefab == null)
@@ -172,6 +262,10 @@ namespace Engine
 			return source;
 		}
 
+		/// <summary>
+		/// Spawn an AudioSource and pool it after the sound ends.
+		/// </summary>
+		/// <returns>The pool instance.</returns>
 		public static AudioSource Play(AudioSource prefab, Vector3 position)
 		{
 			if (prefab == null)
@@ -182,6 +276,10 @@ namespace Engine
 			return source;
 		}
 
+		/// <summary>
+		/// Spawn an AudioSource and pool it after the sound ends.
+		/// </summary>
+		/// <returns>The pool instance.</returns>
 		public static AudioSource Play(AudioSource prefab, Transform parent, Vector3 position)
 		{
 			if (prefab == null)
@@ -205,11 +303,19 @@ namespace Engine
 
 		#region AudioClip (Unpooled) playback
 
+		/// <summary>
+		/// Play an audio with a dedicated AudioSource and destroy it after it ends (if it's not looping).
+		/// </summary>
+		/// <returns>The AudioSource instantiated.</returns>
 		public static AudioSource Play(AudioClip clip, bool loop = false, bool is3D = false)
 		{
 			return clip == null ? null : PlayDedicated(clip, loop, is3D);
 		}
 
+		/// <summary>
+		/// Play an audio with a dedicated AudioSource and destroy it after it ends (if it's not looping).
+		/// </summary>
+		/// <returns>The AudioSource instantiated.</returns>
 		public static AudioSource Play(AudioClip clip, Vector3 position, bool loop = false, bool is3D = true)
 		{
 			if (clip == null)
@@ -220,6 +326,10 @@ namespace Engine
 			return source;
 		}
 
+		/// <summary>
+		/// Play an audio with a dedicated AudioSource and destroy it after it ends (if it's not looping).
+		/// </summary>
+		/// <returns>The AudioSource instantiated.</returns>
 		public static AudioSource Play(AudioClip clip, Transform parent, bool loop = false, bool is3D = true)
 		{
 			if (clip == null)
@@ -230,6 +340,10 @@ namespace Engine
 			return source;
 		}
 
+		/// <summary>
+		/// Play an audio with a dedicated AudioSource and destroy it after it ends (if it's not looping).
+		/// </summary>
+		/// <returns>The AudioSource instantiated.</returns>
 		public static AudioSource Play(AudioClip clip, Transform parent, Vector3 position, bool loop = false, bool is3D = true)
 		{
 			if (clip == null)
@@ -269,17 +383,34 @@ namespace Engine
 
 		#region Public properties
 
+		/// <summary>
+		/// The AudioSource for background music.
+		/// </summary>
 		public static AudioSource MusicSource => GetGroup(MusicGroup);
+
+		/// <summary>
+		/// The AudioSource for general sounds group.
+		/// </summary>
 		public static AudioSource SoundSource => GetGroup(SoundGroup);
+
+		/// <summary>
+		/// The AudioSource for UI sounds group.
+		/// </summary>
 		public static AudioSource UISource => GetGroup(UIGroup);
 
+		/// <summary>
+		/// Gets or sets fast to fade the background music.
+		/// </summary>
 		public static float MusicFadeSpeed
 		{
-			get => BackgroundManager.Speed;
-			set => BackgroundManager.Speed = value;
+			get => MusicManager.Speed;
+			set => MusicManager.Speed = value;
 		}
 
-		public static bool IsMusicPlaying => BackgroundManager.IsPlaying;
+		/// <summary>
+		/// Returns whether a background music is playing.
+		/// </summary>
+		public static bool IsMusicPlaying => MusicManager.IsPlaying;
 
 		#endregion
 	}

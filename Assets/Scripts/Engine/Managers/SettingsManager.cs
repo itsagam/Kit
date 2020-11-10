@@ -4,8 +4,19 @@ using UnityEngine;
 
 namespace Engine
 {
-	public static class PreferenceManager
+	/// <summary>
+	/// Allows to save/load device-specific app-wide settings (with PlayerPrefs as back-end). Supports organization, more types, and is
+	/// easier-to-use.
+	/// </summary>
+	public static class SettingsManager
 	{
+		/// <summary>
+		/// Set the value of a setting.
+		/// </summary>
+		/// <param name="category">Category/system the setting is for.</param>
+		/// <param name="entity">Object/entity the setting is for.</param>
+		/// <param name="property">Name of the setting.</param>
+		/// <param name="value">Value of the setting.</param>
 		public static void Set(string category, string entity, string property, object value)
 		{
 			string key = GetKey(category, entity, property);
@@ -61,6 +72,13 @@ namespace Engine
 			}
 		}
 
+		/// <summary>
+		/// Return the value of a setting, or default value if doesn't exist.
+		/// </summary>
+		/// <param name="category">Category/system the setting is for.</param>
+		/// <param name="entity">Object/entity the setting is for.</param>
+		/// <param name="property">Name of the setting.</param>
+		/// <param name="defaultValue">Default value to use if the setting doesn't exist yet.</param>
 		public static T Get<T>(string category, string entity, string property, T defaultValue)
 		{
 			string key = GetKey(category, entity, property);
@@ -109,11 +127,23 @@ namespace Engine
 			}
 		}
 
+		/// <summary>
+		/// Delete a setting.
+		/// </summary>
+		/// <param name="category">Category/system the setting is for.</param>
+		/// <param name="entity">Object/entity the setting is for.</param>
+		/// <param name="property">Name of the setting.</param>
 		public static void Delete(string category, string entity, string property)
 		{
 			PlayerPrefs.DeleteKey(GetKey(category, entity, property));
 		}
 
+		/// <summary>
+		/// Returns whether a setting exists.
+		/// </summary>
+		/// <param name="category">Category/system the setting is for.</param>
+		/// <param name="entity">Object/entity the setting is for.</param>
+		/// <param name="property">Name of the setting.</param>
 		public static bool Exists(string category, string entity, string property)
 		{
 			return PlayerPrefs.HasKey(GetKey(category, entity, property));
@@ -124,11 +154,17 @@ namespace Engine
 			return $"{category}/{entity}.{property}";
 		}
 
+		/// <summary>
+		/// Delete all settings.
+		/// </summary>
 		public static void Clear()
 		{
 			PlayerPrefs.DeleteAll();
 		}
 
+		/// <summary>
+		/// Save settings.
+		/// </summary>
 		public static void Save()
 		{
 			PlayerPrefs.Save();

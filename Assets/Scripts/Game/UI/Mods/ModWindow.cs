@@ -37,7 +37,7 @@ namespace Game.UI.Mods
 			if (!IsDirty)
 				return;
 
-			PreferenceManager.Save();
+			SettingsManager.Save();
 			UIManager.Show(MessageWindow, "Some changes will not be reflected until you restart the application.");
 		}
 #endif

@@ -7,7 +7,7 @@ namespace Game.UI.Settings
 	{
 		protected override void OnHidden()
 		{
-			PreferenceManager.Save();
+			SettingsManager.Save();
 		}
 	}
 }

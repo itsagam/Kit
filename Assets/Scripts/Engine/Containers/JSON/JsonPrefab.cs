@@ -308,6 +308,9 @@ namespace Engine.Containers
 		}
 	}
 
+	/// <summary>
+	/// JsonConverter to use for the Mono-only mode.
+	/// </summary>
 	public class JsonPrefabConverter: JsonConverter
 	{
 		public readonly string Path;
@@ -346,6 +349,9 @@ namespace Engine.Containers
 		public override bool CanWrite => false;
 	}
 
+	/// <summary>
+	/// Attribute to use for the State-Mono mode.
+	/// </summary>
 	[AttributeUsage(AttributeTargets.Class | AttributeTargets.Interface)]
 	public class JsonPrefabAttribute: Attribute
 	{
@@ -357,6 +363,9 @@ namespace Engine.Containers
 		}
 	}
 
+	/// <summary>
+	/// Component added to instances created in State-Mono mode. Saves state on destruction.
+	/// </summary>
 	public class JsonSaveStateOnDestroy: MonoBehaviour
 	{
 		public MonoBehaviour MonoObject;
@@ -368,6 +377,9 @@ namespace Engine.Containers
 		}
 	}
 
+	/// <summary>
+	/// Component added to instances created in JObject-Mono mode. Saves state on destruction.
+	/// </summary>
 	public class JsonSaveJObjectOnDestroy: MonoBehaviour
 	{
 		public MonoBehaviour MonoObject;
