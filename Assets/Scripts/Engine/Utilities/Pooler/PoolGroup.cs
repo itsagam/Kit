@@ -6,25 +6,46 @@ using UnityEngine;
 
 namespace Engine.Pooling
 {
+	/// <summary>
+	/// A PoolGroup represents a collection of Pools grouped by name. Can be used to group together pools of different types and
+	/// components, or configure them together.
+	/// </summary>
 	[AddComponentMenu("Pooling/PoolGroup")]
 	public class PoolGroup: MonoBehaviour, IEnumerable<Component>
 	{
 		#region Fields
 
+		/// <summary>
+		/// <see cref="Pool.MessageMode"/> of pools added to this group.
+		/// </summary>
+		/// <seealso cref="Pool"/>
 		[LabelText("Message")]
+		[Tooltip("MessageMode of pools added to this group.")]
 		[OnValueChanged("ResetMessageMode")]
 		public PoolMessageMode MessageMode = PoolMessageMode.None;
 
+		/// <summary>
+		/// Whether to organize groups, pools, and instances for a cleaner scene hierarchy?
+		/// </summary>
+		[Tooltip("Whether to organize groups, pools, and instances for a cleaner scene hierarchy?")]
 		[OnValueChanged("ResetOrganize")]
 		public bool Organize = true;
 
+		/// <summary>
+		/// Keep pools under this group persistent across scenes.
+		/// </summary>
+		[Tooltip("Keep pools under this group persistent across scenes.")]
 		[ShowIf("ShowPersistent")]
 		public bool Persistent = false;
 
+		/// <summary>
+		/// List of pools associated with this group.
+		/// </summary>
 		[PropertySpace]
 		[SceneObjectsOnly]
 		[InlineEditor]
 		[ListDrawerSettings(CustomAddFunction = "AddPool", CustomRemoveElementFunction = "DestroyPool")]
+		[Tooltip("List of pools associated with this group.")]
 		public List<Pool> Pools = new List<Pool>();
 
 		public bool IsDestroying { get; protected set; }
@@ -54,6 +75,9 @@ namespace Engine.Pooling
 
 		#region Pool management
 
+		/// <summary>
+		/// Add a pool to this group.
+		/// </summary>
 		public void AddPool(Pool pool)
 		{
 			Pools.Add(pool);
@@ -65,16 +89,27 @@ namespace Engine.Pooling
 			pool.Persistent = false;
 		}
 
+		/// <summary>
+		/// Return whether a pool is a part of this group.
+		/// </summary>
 		public bool ContainsPool(Pool pool)
 		{
 			return Pools.Contains(pool);
 		}
 
+		/// <summary>
+		/// Remove a pool from this group.
+		/// </summary>
+		/// <returns>Whether the pool was successfully removed.</returns>
 		public bool RemovePool(Pool pool)
 		{
-			pool.Group = null;
-			pool.transform.parent = null;
-			return Pools.Remove(pool);
+			bool result = Pools.Remove(pool);
+			if (result)
+			{
+				pool.Group = null;
+				pool.transform.parent = null;
+			}
+			return result;
 		}
 
 		#endregion
@@ -128,10 +163,24 @@ namespace Engine.Pooling
 
 		#region Public properties
 
+		/// <summary>
+		/// All the instances available for re-use in this group.
+		/// </summary>
 		public IEnumerable<Component> Available => Pools.SelectMany(p => p.Available);
+
+		/// <summary>
+		/// Total number of instances available for re-use in this group.
+		/// </summary>
 		public int AvailableCount => Pools.Sum(p => p.Available.Count);
 
+		/// <summary>
+		/// All the instances being used by pools in this group.
+		/// </summary>
 		public IEnumerable<Component> Used => Pools.SelectMany(p => p.Used);
+
+		/// <summary>
+		/// Total number of instances being used by pools in this group.
+		/// </summary>
 		public int UsedCount => Pools.Sum(p => p.Used.Count);
 
 		#endregion

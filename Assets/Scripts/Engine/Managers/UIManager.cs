@@ -282,7 +282,7 @@ namespace Engine
 		}
 
 		/// <summary>
-		/// Register a window in the system. Called internally.
+		/// Register a window in the system. Called automatically.
 		/// </summary>
 		public static void Register(Window instance)
 		{

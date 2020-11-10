@@ -192,7 +192,7 @@ namespace Engine
 		}
 
 		/// <summary>
-		/// Log an object on the Console
+		/// Log an object on the Console.
 		/// </summary>
 		public static void Log(object obj)
 		{
@@ -200,7 +200,7 @@ namespace Engine
 		}
 
 		/// <summary>
-		/// Log a line on the Console
+		/// Log a line on the Console.
 		/// </summary>
 		public static void Log(string line)
 		{
@@ -349,7 +349,7 @@ namespace Engine
 		}
 
 		/// <summary>
-		/// Scroll the console log to the bottom.
+		/// Scroll the Console log to the bottom.
 		/// </summary>
 		public static void ScrollToBottom()
 		{

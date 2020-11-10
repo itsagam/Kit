@@ -3,11 +3,22 @@ using UnityEngine;
 
 namespace Engine.Pooling
 {
-	// Component added to all instances so we can track the pool they came from
-	// Used in Pooler.Destroy to de-activate instances without providing pool
+	/// <summary>
+	/// Component added to all instances so we can track the Pool they came from. Used in <seealso cref="Pooler.Destroy"/> to de-activate
+	/// instances without providing pool.
+	/// </summary>
 	public class PoolInstance: MonoBehaviour
 	{
+		/// <summary>
+		/// Pool this instance belong to.
+		/// </summary>
+		[Tooltip("Pool this instance belong to.")]
 		public Pool Pool;
+
+		/// <summary>
+		/// The particular component being pooled.
+		/// </summary>
+		[Tooltip("The particular component being pooled.")]
 		public Component Component;
 
 		// Instances should not destroy under normal circumstances, but are handled gracefully for fault-tolerance
@@ -20,6 +31,9 @@ namespace Engine.Pooling
 				Pool.Available.Remove(Component);
 		}
 
+		/// <summary>
+		/// Pool the instance.
+		/// </summary>
 #if UNITY_EDITOR
 		[PropertySpace]
 		[Button(ButtonSizes.Large)]
@@ -31,6 +45,9 @@ namespace Engine.Pooling
 			Pool.Destroy(Component);
 		}
 
+		/// <summary>
+		/// Is the instance properly configured?
+		/// </summary>
 		public bool IsValid => Pool != null && Component != null;
 	}
 }
