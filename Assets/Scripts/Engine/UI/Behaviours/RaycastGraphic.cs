@@ -11,17 +11,20 @@ namespace Engine.UI.Behaviours
 	}
 #endif
 
-	/// A concrete subclass of the Unity UI `Graphic` class that just skips drawing.
-	/// Useful for providing a raycast target without actually drawing anything.
+	/// <summary>
+	/// A sub-class of the Unity UI Graphic class that just skips drawing. Useful for providing a raycast target without actually drawing
+	/// anything.
+	/// </summary>
 	public class RaycastGraphic: Graphic
 	{
 		public override void SetMaterialDirty() { }
 		public override void SetVerticesDirty() { }
 
-		/// Probably not necessary since the chain of calls `Rebuild()`->`UpdateGeometry()`->`DoMeshGeneration()`->`OnPopulateMesh()` won't happen; so here really just as a fail-safe.
-		protected override void OnPopulateMesh(VertexHelper vh)
+		/// Probably not necessary since the chain of calls Rebuild()->UpdateGeometry()->DoMeshGeneration()->OnPopulateMesh() won't happen,
+		/// but here really just as a fail-safe.
+		protected override void OnPopulateMesh(VertexHelper vertexHelper)
 		{
-			vh.Clear();
+			vertexHelper.Clear();
 		}
 	}
 }

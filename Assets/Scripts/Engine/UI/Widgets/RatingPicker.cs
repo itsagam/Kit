@@ -7,6 +7,9 @@ using UnityEngine.UI;
 
 namespace Engine.UI.Widgets
 {
+	/// <summary>
+	/// A rating picker/display widget.
+	/// </summary>
 	[RequireComponent(typeof(HorizontalLayoutGroup))]
 	public class RatingPicker: MonoBehaviour
 	{
@@ -148,7 +151,11 @@ namespace Engine.UI.Widgets
 			return maxRating;
 		}
 
+		/// <summary>
+		/// Get or set the maximum rating you can pick or show.
+		/// </summary>
 		[ShowInInspector]
+		[PropertyTooltip("The maximum rating you can pick or show.")]
 		[PropertyRange(1, 10)]
 		public int MaxRating
 		{
@@ -166,7 +173,11 @@ namespace Engine.UI.Widgets
 			}
 		}
 
+		/// <summary>
+		/// Get or set the current rating.
+		/// </summary>
 		[ShowInInspector]
+		[PropertyTooltip("The current rating.")]
 		[PropertyRange(0, "GetMaxRatingAsFloat")]
 		public float Rating
 		{
@@ -174,7 +185,11 @@ namespace Engine.UI.Widgets
 			set => SetRating(value);
 		}
 
+		/// <summary>
+		/// Whether to allow half-point ratings.
+		/// </summary>
 		[ShowInInspector]
+		[PropertyTooltip("Whether to allow half-point ratings.")]
 		public bool AllowHalf
 		{
 			get => allowHalf;
@@ -185,7 +200,11 @@ namespace Engine.UI.Widgets
 			}
 		}
 
+		/// <summary>
+		/// Whether to allow to pick a rating or just display it.
+		/// </summary>
 		[ShowInInspector]
+		[PropertyTooltip("Whether to allow to pick a rating or just display it.")]
 		public bool IsReadonly
 		{
 			get => isReadonly;
@@ -199,8 +218,12 @@ namespace Engine.UI.Widgets
 			}
 		}
 
+		/// <summary>
+		/// The sprite to use for a zero point of rating.
+		/// </summary>
 		[ShowInInspector]
 		[FoldoutGroup("Sprites")]
+		[PropertyTooltip("The sprite to use for a zero point of rating.")]
 		public Sprite ZeroSprite
 		{
 			get => zeroSprite;
@@ -211,9 +234,13 @@ namespace Engine.UI.Widgets
 			}
 		}
 
+		/// <summary>
+		/// The sprite to use for half a point of rating.
+		/// </summary>
 		[ShowInInspector]
 		[ShowIf("allowHalf")]
 		[FoldoutGroup("Sprites")]
+		[PropertyTooltip("The sprite to use for half a point of rating.")]
 		public Sprite HalfSprite
 		{
 			get => halfSprite;
@@ -224,8 +251,12 @@ namespace Engine.UI.Widgets
 			}
 		}
 
+		/// <summary>
+		/// The sprite to use for a full point of rating.
+		/// </summary>
 		[ShowInInspector]
 		[FoldoutGroup("Sprites")]
+		[PropertyTooltip("The sprite to use for a full point of rating.")]
 		public Sprite OneSprite
 		{
 			get => oneSprite;
@@ -236,8 +267,12 @@ namespace Engine.UI.Widgets
 			}
 		}
 
+		/// <summary>
+		/// The color of buttons when they're highlighted.
+		/// </summary>
 		[ShowInInspector]
 		[FoldoutGroup("Appearance")]
+		[PropertyTooltip("The color of buttons when they're highlighted.")]
 		public Color HighlightedColor
 		{
 			get => highlightedColor;
@@ -251,8 +286,12 @@ namespace Engine.UI.Widgets
 			}
 		}
 
+		/// <summary>
+		/// The color of buttons when they're pressed.
+		/// </summary>
 		[ShowInInspector]
 		[FoldoutGroup("Appearance")]
+		[PropertyTooltip("The color of buttons when they're pressed.")]
 		public Color PressedColor
 		{
 			get => pressedColor;

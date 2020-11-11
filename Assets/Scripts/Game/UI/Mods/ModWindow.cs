@@ -11,7 +11,7 @@ namespace Game.UI.Mods
 {
 	public class ModWindow: Window
 	{
-		public IconList ModList;
+		public ItemList ModList;
 		public Text CountText;
 		public WindowReference MessageWindow;
 
@@ -23,7 +23,7 @@ namespace Game.UI.Mods
 		{
 			var mods = ModManager.GetModsByGroup(ModType.Mod);
 			CountText.text = $"{mods.Count} mod(s) found";
-			ModList.Items = mods;
+			ModList.Data = mods;
 			IsDirty = false;
 		}
 

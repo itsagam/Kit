@@ -1,59 +1,79 @@
-﻿using UnityEngine.EventSystems;
+﻿using UnityEngine;
+using UnityEngine.EventSystems;
 
 namespace Engine.UI
 {
-	public class Slot: Icon, IDropHandler
+	/// <summary>
+	/// A UI element that can hold an <see cref="Item"/> inside it.
+	/// </summary>
+	public class Slot: MonoBehaviour, IDropHandler
 	{
-		public Icon Prefab;
-		public Icon Icon { get; protected set; }
+		/// <summary>
+		/// The prefab to use for showing data in this slot.
+		/// </summary>
+		[Tooltip("The prefab to use for showing data in this slot.")]
+		public Item Prefab;
+
+		/// <summary>
+		/// The <see cref="Item"/> fitted in this slot.
+		/// </summary>
+		public Item Item { get; protected set; }
 
 		public virtual void OnDrop(PointerEventData eventData)
 		{
-			if (HasIcon)
+			if (HasItem)
 				return;
 
 			DragCursor cursor = eventData.pointerDrag.GetComponent<DragCursor>();
-			if (cursor == null || cursor.Icon == null)
+			if (cursor == null || cursor.Item == null)
 				return;
 
-			if (!CanReceive(cursor.Icon))
+			if (!CanReceive(cursor.Item))
 				return;
 
-			Receive(cursor.Icon);
+			Receive(cursor.Item);
 		}
 
-		public virtual bool CanReceive(Icon icon)
+		/// <summary>
+		/// Decides whether this slot can receive a particular item. To be overriden in child classes.
+		/// </summary>
+		public virtual bool CanReceive(Item item)
 		{
 			return true;
 		}
 
-		public virtual void Receive(Icon icon)
+		/// <summary>
+		/// Fit an item into this slot.
+		/// </summary>
+		public virtual void Receive(Item newItem)
 		{
-			Data = icon.Data;
-			icon.gameObject.Destroy();
-		}
-
-		public virtual void Clear()
-		{
-			Data = null;
-		}
-
-		public override void Refresh()
-		{
-			if (HasIcon)
+			if (newItem == null)
 			{
-				Icon.gameObject.Destroy();
-				Icon = null;
+				Clear();
+				return;
 			}
 
-			if (Data == null)
-				return;
+			if (!HasItem)
+				Item = Instantiate(Prefab, transform, false);
 
-			Icon instance = Instantiate(Prefab, transform, false);
-			instance.Data = Data;
-			Icon = instance;
+			Item.Data = newItem.Data;
 		}
 
-		public virtual bool HasIcon => Icon != null;
+		/// <summary>
+		/// Clear this slot.
+		/// </summary>
+		public virtual void Clear()
+		{
+			if (!HasItem)
+				return;
+
+			Item.gameObject.Destroy();
+			Item = null;
+		}
+
+		/// <summary>
+		/// Returns whether this slot is filled.
+		/// </summary>
+		public virtual bool HasItem => Item != null;
 	}
 }

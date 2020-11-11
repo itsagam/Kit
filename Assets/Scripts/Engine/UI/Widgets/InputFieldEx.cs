@@ -7,18 +7,47 @@ using UnityEngine.UI;
 
 namespace Engine.UI.Widgets
 {
+	/// <summary>
+	/// An enhanced <see cref="UnityEngine.UI.InputField"/> that allows you to hook into key presses on or manually send key events to it.
+	/// </summary>
 	public class InputFieldEx: InputField
 	{
+		/// <summary>
+		/// Defines a combination of keys and the action to take with it.
+		/// </summary>
 		public struct KeyHandler
 		{
+			/// <summary>
+			/// The basic key to handle.
+			/// </summary>
 			public KeyCode Key;
+
+			/// <summary>
+			/// Key modifiers that should be pressed with it.
+			/// </summary>
 			public EventModifiers Modifiers;
+
+			/// <summary>
+			/// Key modifiers that should be dis-regarded.
+			/// </summary>
 			public EventModifiers Disregard;
+
+			/// <summary>
+			/// Method to call when the combination is pressed.
+			/// </summary>
 			public Action Action;
 		}
 
 		protected List<KeyHandler> keyHandlers = new List<KeyHandler>();
 
+		/// <summary>
+		/// Hook into a key combination.
+		/// </summary>
+		/// <param name="key">The basic key to handle.</param>
+		/// <param name="action">Method to call when the combination is pressed.</param>
+		/// <param name="modifiers">Key modifiers that should be pressed with it.</param>
+		/// <param name="disregard">Key modifiers that should be dis-regarded.</param>
+		/// <returns></returns>
 		public KeyHandler AddKeyHandler(KeyCode key,
 										Action action,
 										EventModifiers modifiers = EventModifiers.None,
@@ -35,21 +64,33 @@ namespace Engine.UI.Widgets
 			return keyHandler;
 		}
 
+		/// <summary>
+		/// Hook into a key combination.
+		/// </summary>
 		public void AddKeyHandler(KeyHandler keyHandler)
 		{
 			keyHandlers.Add(keyHandler);
 		}
 
+		/// <summary>
+		/// Unhook a key combination.
+		/// </summary>
 		public void RemoveKeyHandler(KeyHandler keyHandler)
 		{
 			keyHandlers.Remove(keyHandler);
 		}
 
-		public virtual void SendKeyEvent(Event e)
+		/// <summary>
+		/// Manually send a key event to the input field.
+		/// </summary>
+		public virtual void SendKeyEvent(Event keyEvent)
 		{
-			KeyPressed(e);
+			KeyPressed(keyEvent);
 		}
 
+		/// <summary>
+		/// Manually send a key event to the input field.
+		/// </summary>
 		public virtual void SendKeyEvent(KeyCode key, char character = default, EventModifiers modifiers = default)
 		{
 			Event keyEvent = new Event

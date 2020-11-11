@@ -1,14 +1,22 @@
 ﻿using System;
 using Sirenix.OdinInspector;
 using UniRx;
+using UnityEngine;
 
 namespace Engine.UI
 {
+	/// <summary>
+	/// A window that hides itself automatically after a specified time.
+	/// </summary>
 	public class TimedWindow: Window
 	{
+		/// <summary>
+		/// Duration to display the window for in seconds.
+		/// </summary>
 		[PropertyOrder(-99)]
 		[SuffixLabel("seconds", true)]
 		[MinValue(0)]
+		[Tooltip("Duration to display the window for.")]
 		public float Time = 3.0f;
 
 		protected IDisposable observable;
@@ -18,7 +26,7 @@ namespace Engine.UI
 			QueueHide();
 		}
 
-		protected void QueueHide()
+		protected virtual void QueueHide()
 		{
 			observable?.Dispose();
 			observable = Observable.Timer(TimeSpan.FromSeconds(Time))
@@ -27,6 +35,12 @@ namespace Engine.UI
 												  observable = null;
 												  Hide();
 											  });
+		}
+
+		protected override void OnDestroy()
+		{
+			base.OnDestroy();
+			observable?.Dispose();
 		}
 	}
 }

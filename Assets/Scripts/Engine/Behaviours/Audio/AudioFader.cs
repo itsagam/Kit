@@ -8,7 +8,7 @@ namespace Engine
 	/// Attach it to a GameObject with an AudioSource and this component will allow you to Play/Pause/Stop/Change Volume or Clip with
 	/// volume fading in/out.
 	/// </summary>
-	/// <remarks>Just attaching it to a AudioSource with playOnAwake true will fade the audio in on Awake.</remarks>
+	/// <remarks>Just attaching it to an AudioSource with playOnAwake true will fade the audio in on Awake.</remarks>
 	[RequireComponent(typeof(AudioSource))]
 	public class AudioFader: MonoBehaviour
 	{
@@ -93,9 +93,9 @@ namespace Engine
 		}
 
 		/// <summary>
-		/// Play an AudioClip.
+		/// Play an audio.
 		/// </summary>
-		/// <remarks>Fades-out the audio before fading-in if an AudioClip is already playing.</remarks>
+		/// <remarks>Fades-out the audio before fading-in if an audio is already playing.</remarks>
 		public void Play(AudioClip clip)
 		{
 			if (clip == null)
@@ -124,7 +124,7 @@ namespace Engine
 		}
 
 		/// <summary>
-		/// Play and fade-in the AudioClip.
+		/// Play and fade-in the audio.
 		/// </summary>
 		public void Play()
 		{
@@ -146,7 +146,7 @@ namespace Engine
 		}
 
 		/// <summary>
-		/// Pause and fade-out the AudioClip.
+		/// Pause and fade-out the audio.
 		/// </summary>
 		public void Pause()
 		{
@@ -165,7 +165,7 @@ namespace Engine
 		}
 
 		/// <summary>
-		/// Stop and fade out the AudioClip.
+		/// Stop and fade out the audio.
 		/// </summary>
 		public void Stop()
 		{
@@ -208,7 +208,7 @@ namespace Engine
 		}
 
 		/// <summary>
-		/// Returns the AudioClip currently playing or allows to change the AudioClip with fading.
+		/// Returns the audio currently playing or allows to change the AudioClip with fading.
 		/// </summary>
 		public AudioClip Clip
 		{
@@ -223,7 +223,7 @@ namespace Engine
 		}
 
 		/// <summary>
-		/// Returns the current volume or allows to set it with fading.
+		/// Returns the current volume or allows to set it while fading.
 		/// </summary>
 		public float Volume
 		{
@@ -236,7 +236,7 @@ namespace Engine
 		}
 
 		/// <summary>
-		/// Returns whether an AudioClip is currently playing or allows to Play/Pause the audio with fading.
+		/// Returns whether an audio is currently playing or allows to Play/Pause the audio.
 		/// </summary>
 		public bool IsPlaying
 		{

@@ -4,36 +4,75 @@ using UnityEngine.UI;
 
 namespace Engine.UI.Buttons
 {
+	/// <summary>
+	/// Button that goes to the next/previous screen in a <see cref="Wizard"/>.
+	/// </summary>
 	public class StepButton: ButtonBehaviour
 	{
+		/// <summary>
+		/// The direction to move.
+		/// </summary>
 		public enum StepDirection
 		{
 			Next,
 			Previous
 		}
 
+		/// <summary>
+		/// What to do when there are no further screens?
+		/// </summary>
 		public enum StepMode
 		{
+			/// <summary>
+			/// Do nothing. Keep the button as is.
+			/// </summary>
 			Nothing,
+
+			/// <summary>
+			/// Change the button's text.
+			/// </summary>
 			Change,
+
+			/// <summary>
+			/// Disable the button.
+			/// </summary>
 			Disable,
+
+			/// <summary>
+			/// Hide the button.
+			/// </summary>
 			Hide
 		}
 
-		[Tooltip("Wizard to move next/previous")]
+		/// <summary>
+		/// The wizard this button interacts with.
+		/// </summary>
+		[Tooltip("The wizard this button interacts with.")]
 		public Wizard Wizard;
 
-		[Tooltip("Direction to move")]
+		/// <summary>
+		/// Direction to move.
+		/// </summary>
+		[Tooltip("Direction to move.")]
 		public StepDirection Direction = StepDirection.Next;
 
-		[Tooltip("What to do when it is no longer possible to use the button")]
+		/// <summary>
+		/// What to do when it is no longer possible to use the button?
+		/// </summary>
+		[Tooltip("What to do when it is no longer possible to use the button?")]
 		public StepMode Mode = StepMode.Nothing;
 
-		[Tooltip("Text-field to use when changing text")]
+		/// <summary>
+		/// Text-field to use when changing text.
+		/// </summary>
+		[Tooltip("Text-field to use when changing text.")]
 		[ShowIf("Mode", StepMode.Change)]
 		public Text Text;
 
-		[Tooltip("Text to change to")]
+		/// <summary>
+		/// Text to change to.
+		/// </summary>
+		[Tooltip("Text to change to.")]
 		[ShowIf("Mode", StepMode.Change)]
 		public string Change;
 
@@ -80,6 +119,9 @@ namespace Engine.UI.Buttons
 			}
 		}
 
+		/// <summary>
+		/// Returns whether the button can no longer do something.
+		/// </summary>
 		public bool IsEdgeCase => Direction == StepDirection.Previous && Wizard.Index <= 0 ||
 								  Direction == StepDirection.Next     && Wizard.Index >= Wizard.Count - 1;
 

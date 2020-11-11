@@ -7,7 +7,7 @@ using UnityEditor;
 using Sirenix.OdinInspector.Editor;
 #endif
 
-namespace Engine.UI.Widgets
+namespace Engine.UI
 {
 	[Serializable]
 	public class WindowReference: SoftReference<Window>

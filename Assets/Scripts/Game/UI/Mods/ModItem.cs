@@ -9,7 +9,7 @@ using Engine.Modding;
 #endif
 namespace Game.UI.Mods
 {
-	public class ModIcon: Icon
+	public class ModItem: Item
 	{
 		public Toggle EnableToggle;
 
@@ -81,7 +81,7 @@ namespace Game.UI.Mods
 			int fromIndex = transform.GetSiblingIndex();
 
 			SetInteractable(toIndex);
-			toTransform.GetComponent<ModIcon>().SetInteractable(fromIndex);
+			toTransform.GetComponent<ModItem>().SetInteractable(fromIndex);
 
 			Sequence sequence = DOTween.Sequence();
 			sequence.Insert(0, transform.DOMove(toTransform.position, ReorderTime));

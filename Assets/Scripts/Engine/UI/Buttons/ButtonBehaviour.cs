@@ -4,6 +4,9 @@ using UnityEngine.UI;
 
 namespace Engine.UI.Buttons
 {
+	/// <summary>
+	/// Parent class for behaviours that want to react to a <see cref="UnityEngine.UI.Button" /> or UI element's click.
+	/// </summary>
 	public abstract class ButtonBehaviour: MonoBehaviour, IPointerClickHandler
 	{
 		protected abstract void OnClick();

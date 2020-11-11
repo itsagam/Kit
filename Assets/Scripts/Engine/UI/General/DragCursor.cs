@@ -5,9 +5,21 @@ using UnityEngine.UI;
 
 namespace Engine.UI
 {
+	/// <summary>
+	/// A UI element that provides the cursor functionality for drag-and-drop operations.
+	/// </summary>
 	public class DragCursor: MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler
 	{
-		public Icon Icon;
+		/// <summary>
+		/// The <see cref="Item"/> for which this cursor is created.
+		/// </summary>
+		[Tooltip("The Item for which this cursor is created.")]
+		public Item Item;
+
+		/// <summary>
+		/// How fast does the cursor move back to its initial position?
+		/// </summary>
+		[Tooltip("How fast does the cursor move back to its initial position?")]
 		public float MoveSpeed = 750.0f;
 
 		protected new Transform transform;
@@ -29,31 +41,31 @@ namespace Engine.UI
 		public virtual void OnBeginDrag(PointerEventData eventData)
 		{
 			graphic.raycastTarget = false;
-			previousParent = ((Component) this).transform.parent;
+			previousParent = transform.parent;
 			previousLocalPosition = transform.localPosition;
 			previousPosition = transform.position;
-			previousIndex = ((Component) this).transform.GetSiblingIndex();
-			((Component) this).transform.SetParent(canvas.transform, true);
-			((Component) this).transform.SetAsLastSibling();
+			previousIndex = transform.GetSiblingIndex();
+			transform.SetParent(canvas.transform, true);
+			transform.SetAsLastSibling();
 			OnDrag(eventData);
 		}
 
 		public virtual void OnDrag(PointerEventData eventData)
 		{
-			((Component) this).transform.position = canvas.IsScreenSpace() ? (Vector3) eventData.position : ToWorld(eventData.position);
+			transform.position = canvas.IsScreenSpace() ? (Vector3) eventData.position : ToWorld(eventData.position);
 		}
 
 		public virtual void OnEndDrag(PointerEventData eventData)
 		{
 			float speed = canvas.IsScreenSpace() ? MoveSpeed : MoveSpeed * canvas.transform.localScale.Min() / canvas.scaleFactor;
-			((Component) this).transform.DOMove(previousPosition, speed).SetSpeedBased().OnComplete(MoveBack);
+			transform.DOMove(previousPosition, speed).SetSpeedBased().OnComplete(PutBack);
 		}
 
-		public virtual void MoveBack()
+		protected virtual void PutBack()
 		{
-			((Component) this).transform.SetParent(previousParent, true);
+			transform.SetParent(previousParent, true);
 			transform.localPosition = previousLocalPosition;
-			((Component) this).transform.SetSiblingIndex(previousIndex);
+			transform.SetSiblingIndex(previousIndex);
 			graphic.raycastTarget = true;
 		}
 

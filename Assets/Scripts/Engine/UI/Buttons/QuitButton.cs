@@ -5,6 +5,9 @@ using UnityEngine.Events;
 
 namespace Engine.UI.Buttons
 {
+	/// <summary>
+	/// Button that quits the application.
+	/// </summary>
 	public class QuitButton: ButtonBehaviour
 	{
 		[ToggleGroup("Fade")]

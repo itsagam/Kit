@@ -80,7 +80,7 @@ namespace Engine
 
 		#region Logging
 		/// <summary>
-		/// The string to display for null objects.
+		/// The string to display for <see langword="null" /> objects.
 		/// </summary>
 		public const string NullString = "Null";
 

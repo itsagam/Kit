@@ -199,7 +199,7 @@ namespace Engine
 		/// <param name="additive">Whether to load the scene additively.</param>
 		/// <param name="onLoadProgress">Method to call when loading progresses.</param>
 		/// <param name="onLoadComplete">Method to call when loading completes.</param>
-		/// <param name="onComplete">Method to call when loading and fading completes.</param>
+		/// <param name="onComplete">Method to call when loading and fading (if applicable) completes.</param>
 		/// <returns>A UniTask that emits when fading's done.</returns>
 		/// <remarks>Can be await-ed upon.</remarks>
 		public static UniTask ReloadScene(FadeMode fadeMode = DefaultFadeMode,
@@ -223,7 +223,7 @@ namespace Engine
 		/// <param name="additive">Whether to load the scene additively.</param>
 		/// <param name="onLoadProgress">Method to call when loading progresses.</param>
 		/// <param name="onLoadComplete">Method to call when loading completes.</param>
-		/// <param name="onComplete">Method to call when loading and fading completes.</param>
+		/// <param name="onComplete">Method to call when loading and fading (if applicable) completes.</param>
 		/// <returns>A UniTask that emits when fading's done.</returns>
 		/// <remarks>Can be await-ed upon.</remarks>
 		public static async UniTask LoadScene(string nameOrPath,
