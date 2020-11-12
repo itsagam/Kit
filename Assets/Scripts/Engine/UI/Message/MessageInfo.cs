@@ -13,11 +13,6 @@ namespace Engine.UI.Message
 		public MessageType Type;
 
 		/// <summary>
-		/// Buttons to show with the message.
-		/// </summary>
-		public MessageButtons Buttons;
-
-		/// <summary>
 		/// Title of the window.
 		/// </summary>
 		public string Title;
@@ -31,6 +26,11 @@ namespace Engine.UI.Message
 		/// The message to show.
 		/// </summary>
 		public string Message;
+
+		/// <summary>
+		/// Buttons to show with the message.
+		/// </summary>
+		public MessageButtons Buttons;
 
 		/// <summary>
 		/// What to do when the Okay button is pressed?

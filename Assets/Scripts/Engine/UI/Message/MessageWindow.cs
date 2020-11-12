@@ -1,4 +1,6 @@
-﻿using UnityEngine;
+﻿using System;
+using Cysharp.Threading.Tasks;
+using UnityEngine;
 using UnityEngine.UI;
 
 namespace Engine.UI.Message
@@ -73,6 +75,80 @@ namespace Engine.UI.Message
 		/// </summary>
 		[Tooltip("The sprite to use for questions.")]
 		public Sprite QuestionSprite;
+
+		/// <summary>
+		/// Show a message window.
+		/// </summary>
+		/// <remarks>Can be awaited-upon.</remarks>
+		/// <param name="prefab">Path to the prefab to use for displaying the message.</param>
+		/// <param name="title">Title of the window.</param>
+		/// <param name="message">The message to show.</param>
+		/// <param name="type">Type of message to show – determines the icon.</param>
+		/// <param name="buttons">Buttons to show with the message.</param>
+		/// <param name="subtitle">Sub-title to go along with the title.</param>
+		/// <param name="okayAction">Callback for the Okay button.</param>
+		/// <param name="cancelAction">Callback for the Cancel button.</param>
+		/// <param name="yesAction">>Callback for the Yes button.</param>
+		/// <param name="noAction">>Callback for the No button.</param>
+		/// <returns>Instance of the window created.</returns>
+		public static UniTask<Window> Show(string prefab,
+										   string title,
+										   string message,
+										   MessageType type = MessageType.Info,
+										   MessageButtons buttons = MessageButtons.OK,
+										   string subtitle = "",
+										   Action okayAction = null,
+										   Action cancelAction = null,
+										   Action yesAction = null,
+										   Action noAction = null)
+		{
+			MessageInfo info = new MessageInfo()
+							   {
+								   Type = type,
+								   Title = title, Subtitle = subtitle,
+								   Message = message,
+								   Buttons = buttons,
+								   OkayAction = okayAction, CancelAction = cancelAction,
+								   YesAction = yesAction, NoAction = noAction
+							   };
+			return UIManager.Show(prefab, info);
+		}
+
+		/// <summary>
+		/// Show a message window.
+		/// </summary>
+		/// <remarks>Can be awaited-upon.</remarks>
+		/// <param name="prefab">The prefab to use for displaying the message.</param>
+		/// <param name="title">Title of the window.</param>
+		/// <param name="message">The message to show.</param>
+		/// <param name="type">Type of message to show – determines the icon.</param>
+		/// <param name="buttons">Buttons to show with the message.</param>
+		/// <param name="subtitle">Sub-title to go along with the title.</param>
+		/// <param name="okayAction">Callback for the Okay button.</param>
+		/// <param name="cancelAction">Callback for the Cancel button.</param>
+		/// <param name="yesAction">>Callback for the Yes button.</param>
+		/// <param name="noAction">>Callback for the No button.</param>
+		/// <returns>Instance of the window created.</returns>
+		public static UniTask<Window> Show(MessageWindow prefab,
+												  string title,
+												  string message,
+												  MessageType type = MessageType.Info,
+												  MessageButtons buttons = MessageButtons.OK,
+												  string subtitle = "",
+												  Action okayAction = null, Action cancelAction = null,
+												  Action yesAction = null, Action noAction = null)
+		{
+			MessageInfo info = new MessageInfo()
+							   {
+								   Type = type,
+								   Title = title, Subtitle = subtitle,
+								   Message = message,
+								   Buttons = buttons,
+								   OkayAction = okayAction, CancelAction = cancelAction,
+								   YesAction = yesAction, NoAction = noAction
+							   };
+			return UIManager.Show(prefab, info);
+		}
 
 		protected override void Awake()
 		{

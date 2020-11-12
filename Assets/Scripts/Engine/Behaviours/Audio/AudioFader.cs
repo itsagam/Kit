@@ -28,14 +28,14 @@ namespace Engine
 		/// <summary>
 		/// Should the audio automatically fade in/out when the scene changes with SceneDirector?
 		/// </summary>
-		/// <remarks>True by default.</remarks>
+		/// <remarks><see langword="true"/> by default.</remarks>
 		[Tooltip("Should the audio automatically fade in/out when the scene changes with SceneDirector?")]
 		public bool FadeOnSceneChange = true;
 
 		/// <summary>
 		/// Should the audio automatically fade in/out with the scene when you use SceneDirector?
 		/// </summary>
-		/// <remarks>False by default.</remarks>
+		/// <remarks><see langword="false"/> by default.</remarks>
 		[Tooltip("Should the audio automatically fade in/out with the scene when you use SceneDirector?")]
 		public bool FadeWithScreen = false;
 

@@ -102,8 +102,8 @@ namespace Game.UI.Splash
 			if (totalMods <= 0)
 				return;
 
-			QueueTask("Loading mods",   ModManager.LoadModsAsync(modPaths), totalMods);
-			QueueTask("Executing mods", ModManager.ExecuteScriptsAsync(),   totalMods);
+			QueueTask("Loading mods...",   ModManager.LoadModsAsync(modPaths), totalMods);
+			QueueTask("Executing mods...", ModManager.ExecuteScriptsAsync(),   totalMods);
 		}
 #endif
 
