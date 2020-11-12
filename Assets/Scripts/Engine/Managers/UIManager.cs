@@ -83,7 +83,8 @@ namespace Engine
 	}
 
 	/// <summary>
-	/// Global access to UI and window management.
+	/// Global access to UI and window management. Your screens need to derive from <see cref="Window"/> which you can then show by calling
+	/// UIManager.Show on prefabs. You can you also call Show/Hide on them directly if they are in the scene.
 	/// </summary>
 	public static class UIManager
 	{

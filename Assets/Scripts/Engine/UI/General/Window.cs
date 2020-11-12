@@ -14,15 +14,15 @@ namespace Engine.UI
 		/// <summary>
 		/// The animation state to play when showing the screen.
 		/// </summary>
-		[Toggle("The animation state to play when showing the screen.")]
 		[FoldoutGroup("Animations")]
+		[Tooltip("The animation state to play when showing the screen.")]
 		public string ShowAnimation = "Show";
 
 		/// <summary>
 		/// The animation state to play when hiding the screen.
 		/// </summary>
-		[Toggle("The animation state to play when hiding the screen.")]
 		[FoldoutGroup("Animations")]
+		[Tooltip("The animation state to play when hiding the screen.")]
 		public string HideAnimation = "Hide";
 
 		/// <summary>
