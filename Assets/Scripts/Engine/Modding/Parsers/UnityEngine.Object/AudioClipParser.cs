@@ -1,7 +1,7 @@
 ﻿using System;
 using UnityEngine;
 
-// TODO: Use UnityWebRequest to decode audio data
+// TODO: Use UnityWebRequest to decode audio data instead of WavUtility
 // Solutions:	Derive DownloadHandlerAudioClip and override GetData method
 //				(https://github.com/Unity-Technologies/UnityCsReference/blob/master/Modules/UnityWebRequestAudio/Public/DownloadHandlerAudio.bindings.cs)
 //				Derive WWW, change to a custom Web Request and use GetAudioClip() to decode
@@ -9,7 +9,7 @@ using UnityEngine;
 //				Derive UnityWebRequest and find a way to use custom data
 //				(https://github.com/Unity-Technologies/UnityCsReference/blob/master/Modules/UnityWebRequest/Public/UnityWebRequest.bindings.cs)
 // Problems:	DownloadHandlerAudioClip is sealed, so you can't derive from it
-//				WWW._uwr is private so you cannot change to a custom web request with custom download handler
+//				WWW._uwr is private so you cannot change to a custom web request with a custom download handler
 //				All data downloading and posting is done internally from C++ and passed to DownloadHandler.ReceiveData which is protected
 
 namespace Engine.Parsers

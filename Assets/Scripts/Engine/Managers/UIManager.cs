@@ -306,12 +306,12 @@ namespace Engine
 		}
 
 		/// <summary>
-		/// Returns the first window shown.
+		/// Returns the first window shown, or null if none are.
 		/// </summary>
 		public static Window First => Windows.FirstOrDefault();
 
 		/// <summary>
-		/// Returns the last window shown.
+		/// Returns the last window shown, or null if none are.
 		/// </summary>
 		public static Window Last => Windows.LastOrDefault();
 	}

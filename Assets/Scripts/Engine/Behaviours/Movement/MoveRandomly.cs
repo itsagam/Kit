@@ -41,7 +41,7 @@ namespace Engine.Behaviours
         public float Speed = 5.0f;
 
         /// <summary>
-        /// The easing to apply for the each cycle.
+        /// The easing to apply for each cycle.
         /// </summary>
         [Tooltip("The easing to apply for each cycle.")]
         public Ease Easing = Ease.Linear;

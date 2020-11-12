@@ -44,7 +44,7 @@ namespace Engine.Containers
 	/// <summary>
 	/// Represents an Upgrade that is only applicable for a specified duration, and gets removed afterwards.
 	/// </summary>
-	/// <remarks>Needs to be added through AddTo to an IUpgradeable.</remarks>
+	/// <remarks>Needs to be added through <see cref="AddTo(Engine.Containers.IUpgradeable)"/> to an <see cref="IUpgradeable" />.</remarks>
 	[Serializable]
 	public class Buff: Upgrade
 	{

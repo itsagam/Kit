@@ -87,6 +87,7 @@ namespace Engine.UI.Widgets
 			colors.pressedColor = pressedColor;
 			button.colors = colors;
 
+			//button.OnPointerClickAsObservable().Subscribe(OnClick);
 			button.OnPointerUpAsObservable().Subscribe(OnClick);
 
 			buttons[index] = button;
@@ -146,11 +147,6 @@ namespace Engine.UI.Widgets
 			SetRating(rating);
 		}
 
-		protected float GetMaxRatingAsFloat()
-		{
-			return maxRating;
-		}
-
 		/// <summary>
 		/// Get or set the maximum rating you can pick or show.
 		/// </summary>
@@ -178,7 +174,7 @@ namespace Engine.UI.Widgets
 		/// </summary>
 		[ShowInInspector]
 		[PropertyTooltip("The current rating.")]
-		[PropertyRange(0, "GetMaxRatingAsFloat")]
+		[PropertyRange(0, "MaxRating")]
 		public float Rating
 		{
 			get => rating;
