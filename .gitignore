@@ -47,5 +47,5 @@ Assets/StreamingAssets/crashlytics-build.properties
 Assets/Plugins/Editor/JetBrains/
 Assets/Plugins/Editor/JetBrains.meta
 
-#XLua generated code
+# XLua generated code
 Assets/XLua/Gen/

@@ -310,7 +310,7 @@ namespace Engine
 			var members = type.GetMembers(BindingFlags.Public | BindingFlags.DeclaredOnly | BindingFlags.Static | BindingFlags.Instance);
 			var extensions = from t in type.Assembly.GetTypes().Union(Assembly.GetExecutingAssembly().GetTypes())
 							 //from t in AppDomain.CurrentDomain.GetAssemblies().SelectMany(a => a.GetTypes())
-							 where t.IsSealed && !t.IsGenericType && !t.IsNested
+							 where t.IsSealed() && !t.IsGenericType() && !t.IsNested
 							 from method in t.GetMethods(BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic)
 							 where method.IsDefined(typeof(ExtensionAttribute), false)
 							 where method.GetParameters()[0].ParameterType == type
