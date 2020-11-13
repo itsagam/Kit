@@ -265,7 +265,7 @@ namespace Engine.Containers
 	}
 
 	/// <summary>
-	/// Bunch&lt;<typeparamref name="T"/>&gt; is just KeyValuePair&lt;<typeparamref name="T"/>, int&gt; with operators for use with Bags
+	/// <see cref="Bunch{T}"/> is just KeyValuePair&lt;<typeparamref name="T"/>, int&gt; with operators for use with Bags
 	/// (would've just derived from KeyValuePair but you can't inherit structs).
 	/// </summary>
 	[Serializable]

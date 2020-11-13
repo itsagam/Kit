@@ -2,7 +2,7 @@
 using DG.Tweening;
 using UnityEngine;
 
-namespace Engine
+namespace Engine.Behaviours
 {
 	/// <summary>
 	/// Attach it to a GameObject with an AudioSource and this component will allow you to Play/Pause/Stop/Change Volume or Clip with

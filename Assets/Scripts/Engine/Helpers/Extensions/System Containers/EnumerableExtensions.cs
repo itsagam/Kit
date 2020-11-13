@@ -32,7 +32,7 @@ namespace Engine
 		}
 
 		/// <summary>
-		/// Return the index of an item.
+		/// Return the index of an item, or -1 if not found.
 		/// </summary>
 		public static int IndexOf<T>(this IEnumerable<T> source, T value)
 		{
@@ -48,7 +48,7 @@ namespace Engine
 		}
 
 		/// <summary>
-		/// Return the index of an item.
+		/// Return the index of an item, or -1 if not found.
 		/// </summary>
 		public static int IndexOf<T>(this IEnumerable<T> source, T value, IEqualityComparer<T> comparer)
 		{

@@ -4,7 +4,7 @@ using UnityEngine;
 namespace Engine.Algorithms
 {
 	/// <summary>
-	/// Represents a points on a sphere, and allows to do math on it.
+	/// Represents a point on a sphere, and allows to do math on it.
 	/// </summary>
 	public struct SphericalCoordinate: IEquatable<SphericalCoordinate>
 	{
@@ -39,7 +39,7 @@ namespace Engine.Algorithms
 		}
 
 		/// <summary>
-		/// Convert a cartesian coordinate to spherical coordinates.
+		/// Convert a cartesian-coordinate to spherical-coordinates.
 		/// </summary>
 		public SphericalCoordinate(Vector3 cartesian,
 			float minRadius = 0, float maxRadius = float.PositiveInfinity,
@@ -76,11 +76,11 @@ namespace Engine.Algorithms
 		}
 
 		/// <summary>
-		/// Calculates the distance from a point on a sphere to another point on a sphere at a given radius.
+		/// Calculates the distance from a point on a sphere to another point at a given radius.
 		/// </summary>
+		/// <remarks>Uses <see href="https://en.wikipedia.org/wiki/Haversine_formula">Haversine Formula</see>.</remarks>
 		/// <param name="other">The other point.</param>
 		/// <returns>Distance between this and the other point at the radius specified.</returns>
-		// Haversine Formula
 		public float DistanceTo(SphericalCoordinate other, float atRadius)
 		{
 			float dLat = other.Elevation - Elevation;

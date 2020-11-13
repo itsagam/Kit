@@ -9,11 +9,18 @@ using Sirenix.OdinInspector.Editor;
 
 namespace Engine.UI
 {
+	/// <summary>
+	/// A <see cref="SoftReference{T}"/> (path-only) to a <see cref="Window"/>. Here because Unity can be picky about serializing generic
+	/// variables.
+	/// </summary>
 	[Serializable]
 	public class WindowReference: SoftReference<Window>
 	{
 	}
 
+	/// <summary>
+	/// A <see cref="SoftReference{T}"/> (path) to a scene.
+	/// </summary>
 	[Serializable]
 #if UNITY_EDITOR
 	public class SceneReference: SoftReference<SceneAsset>
@@ -31,6 +38,12 @@ namespace Engine.UI
 #endif
 	}
 
+	/// <summary>
+	/// A class that allows one to select assets in the inspector without hard-referencing them. It saves their path instead which can
+	/// later be loaded with <see cref="Load"/>.
+	/// </summary>
+	/// <remarks>Can be used directly as a string without needing to call <see cref="ToString"/>.</remarks>
+	/// <typeparam name="T">Type of the unity object. Used to filter assets.</typeparam>
 	[Serializable]
 	[InlineProperty]
 	public class SoftReference<T> where T: Object
@@ -44,6 +57,11 @@ namespace Engine.UI
 
 		public string Path => TrimPath(fullPath);
 		public string FullPath => fullPath;
+
+		public T Load()
+		{
+			return ResourceManager.Load<T>(ResourceFolder.Resources, fullPath);
+		}
 
 		public override string ToString()
 		{

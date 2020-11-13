@@ -52,7 +52,7 @@ namespace Engine.Pooling
 	}
 
 	/// <summary>
-	/// What to do when a pool group reaches its limit?
+	/// What to do when a pool reaches its limit?
 	/// </summary>
 	public enum PoolLimitMode
 	{

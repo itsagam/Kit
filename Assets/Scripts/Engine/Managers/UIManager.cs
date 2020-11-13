@@ -233,7 +233,7 @@ namespace Engine
 		/// </summary>
 		/// <param name="name">The window (prefab/GameObject) name to hide.</param>
 		/// <param name="animation">The animation state to play when hiding.</param>
-		/// <param name="mode">How to hide the window?</param>
+		/// <param name="mode">Whether to de-activate or destroy the instance.</param>
 		/// <returns>Whether the said window existed was successfully hidden.</returns>
 		/// <remarks>Can be await-ed upon.</remarks>
 		public static UniTask<bool> Hide(string name,
@@ -247,7 +247,7 @@ namespace Engine
 		}
 
 		/// <summary>
-		/// Find a shown window when by providing a name.
+		/// Find a shown window by providing a name.
 		/// </summary>
 		/// <param name="name">The window (prefab/GameObject) name.</param>
 		/// <returns>Reference to the window.</returns>
@@ -266,7 +266,7 @@ namespace Engine
 		}
 
 		/// <summary>
-		/// Returns whether a window of a particular name is shown.
+		/// Returns whether a window with a particular name is shown.
 		/// </summary>
 		/// <param name="name">The window (prefab/GameObject) name.</param>
 		public static bool IsShown(string name)

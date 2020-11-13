@@ -87,7 +87,7 @@ namespace Engine.UI.Widgets
 			colors.pressedColor = pressedColor;
 			button.colors = colors;
 
-			//button.OnPointerClickAsObservable().Subscribe(OnClick);
+			// OnPointerClickAsObservable doesn't register the selection if the press is released somewhere else
 			button.OnPointerUpAsObservable().Subscribe(OnClick);
 
 			buttons[index] = button;

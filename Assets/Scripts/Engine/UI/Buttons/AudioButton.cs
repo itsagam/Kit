@@ -7,6 +7,10 @@ namespace Engine.UI.Buttons
 	/// </summary>
 	public class AudioButton: ButtonBehaviour
 	{
+		/// <summary>
+		/// Audio to play when the button is clicked.
+		/// </summary>
+		[Tooltip("Audio to play when the button is clicked.")]
 		public AudioClip Audio;
 
 		protected override void OnClick()
