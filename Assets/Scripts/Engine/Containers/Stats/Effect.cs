@@ -50,8 +50,10 @@ namespace Engine.Containers
 		/// <param name="stat">The ID of the stat.</param>
 		/// <param name="value">The Type and Value represented as a string.</param>
 		/// <see cref="Parse"/>
-		/// <example><code>new Effect("Health", "+50%")</code></example>
-		/// <example><code>new Effect("Damage", "x2")</code></example>
+		/// <example>
+		/// <code>new Effect("Health", "+50%")</code>
+		/// <code>new Effect("Damage", "x2")</code>
+		/// </example>
 		public Effect(string stat, string value)
 		{
 			Stat = stat;

@@ -9,7 +9,7 @@ namespace Engine.UI
 {
 	/// <summary>
 	/// An in-game wizard where each screen is a <see cref="Window"/> (this is so each screen can have their own animations, events
-	/// & data if desired).
+	/// and data if desired).
 	/// </summary>
 	public class Wizard: Window
 	{

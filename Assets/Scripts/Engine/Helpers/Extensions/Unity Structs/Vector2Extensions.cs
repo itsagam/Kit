@@ -98,7 +98,7 @@ namespace Engine
 		}
 
 		/// <summary>
-		/// Swap the X & Y components and return the vector.
+		/// Swap the X &amp; Y components and return the vector.
 		/// </summary>
 		public static Vector2 Swap(this Vector2 vector)
 		{

@@ -204,6 +204,9 @@ namespace Engine
 
 		#region Log
 
+		/// <summary>
+		/// <see cref="StringBuilder"/> for the entire log.
+		/// </summary>
 		public static readonly StringBuilder LogBuilder = new StringBuilder(Length);
 		private static string logEnd = Environment.NewLine;
 

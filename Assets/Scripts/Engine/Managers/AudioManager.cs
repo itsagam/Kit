@@ -10,7 +10,7 @@ using Random = UnityEngine.Random;
 namespace Engine
 {
 	/// <summary>
-	/// Allows to play & pool sounds and group them into <see cref="AudioSource"/>s. Handles background music.
+	/// Allows to play &amp; pool sounds and group them into <see cref="AudioSource"/>s. Handles background music.
 	/// </summary>
 	public static class AudioManager
 	{

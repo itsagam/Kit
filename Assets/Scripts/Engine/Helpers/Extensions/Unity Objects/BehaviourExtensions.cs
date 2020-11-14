@@ -8,7 +8,7 @@ namespace Engine
 	public static class BehaviourExtensions
 	{
 		/// <summary>
-		/// Set the enabled property to <see langword="true" />.
+		/// Set the <see cref="Behaviour.enabled"/> property to <see langword="true" />.
 		/// </summary>
 		public static void Enable(this Behaviour behaviour)
 		{
@@ -16,7 +16,7 @@ namespace Engine
 		}
 
 		/// <summary>
-		/// Set the enabled property to <see langword="false" />.
+		/// Set the <see cref="Behaviour.enabled"/> property to <see langword="false" />.
 		/// </summary>
 		public static void Disable(this Behaviour behaviour)
 		{

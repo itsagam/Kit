@@ -6,7 +6,7 @@ using UnityEngine;
 namespace Engine.Behaviours
 {
 	/// <summary>
-	/// Orbits & zooms in/out a <see cref="Transform"/> around another one with gestures.
+	/// Orbits and zooms in/out a <see cref="Transform" /> around another one with gestures.
 	/// </summary>
 	[RequireComponent(typeof(ScreenTransformGesture))]
 	public class OrbitCam: MonoBehaviour

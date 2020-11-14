@@ -15,7 +15,7 @@ namespace Engine.Behaviours
 	{
 		#region Fields
 		/// <summary>
-		/// <para>Area/bounds to focus on, be it a transform, renderer or collider.</para>
+		/// <para>Area/bounds to focus on, be it a <see cref="Transform"/>, <see cref="Renderer"/> or <see cref="Collider"/>.</para>
 		/// <para>Will be origin if not provided.</para>
 		/// </summary>
 		[Tooltip("Area/bounds to focus on, be it a transform, renderer or collider; will be origin if not provided.")]
@@ -24,7 +24,7 @@ namespace Engine.Behaviours
 
 		/// <summary>
 		/// <para>Smoothing to apply while Lerp-ing.</para>
-		/// <para>Applies to position, rotation and orthographicSize.</para>
+		/// <para>Applies to position, rotation and <see cref="Camera.orthographicSize"/>.</para>
 		/// </summary>
 		[Tooltip("Smoothing to apply while Lerp-ing. Applies to position, rotation and orthographicSize.")]
 		[MinValue(0.0f)]
@@ -70,14 +70,14 @@ namespace Engine.Behaviours
 		public float ZoomSpeed = 0.025f;
 
 		/// <summary>
-		/// Minimum orthographicSize if camera is orthographic, camera position in forward axis otherwise.
+		/// Minimum <see cref="Camera.orthographicSize"/> if camera is orthographic, camera position in forward axis otherwise.
 		/// </summary>
 		[ToggleGroup("Zoom")]
 		[Tooltip("Minimum orthographicSize if camera is orthographic, camera position in forward axis otherwise.")]
 		public float ZoomMin = 1;
 
 		/// <summary>
-		/// Maximum orthographicSize if camera is orthographic, camera position in forward axis otherwise.
+		/// Maximum <see cref="Camera.orthographicSize"/> if camera is orthographic, camera position in forward axis otherwise.
 		/// </summary>
 		[ToggleGroup("Zoom")]
 		[Tooltip("Maximum orthographicSize if camera is orthographic, camera position in forward axis otherwise.")]
@@ -139,6 +139,9 @@ namespace Engine.Behaviours
 			gesture.PointerUpdated -= OnMoved;
 		}
 
+		/// <summary>
+		/// Reset values.
+		/// </summary>
 		public void Refresh()
 		{
 			targetPosition = transform.position;

@@ -8,6 +8,14 @@ namespace Engine.UI.Message
 	/// <summary>
 	/// A pre-made <see cref="Window"/> for showing general game messages.
 	/// </summary>
+	/// <example>
+	/// <code>
+	/// MessageWindow.Show(windowPrefab,
+	/// 		"Quit?", "Are you sure you want to quit the game?",
+	/// 		MessageType.Question, MessageButtons.YesNo,
+	/// 		yesAction: Application.Quit);
+	/// </code>
+	/// </example>
 	public class MessageWindow: Window
 	{
 		/// <summary>

@@ -6,11 +6,12 @@ namespace Engine.Pooling
 	/// <summary>
 	/// A robust and easy-to-use GameObject pooler. Supports grouping, limiting and pre-loading.
 	/// </summary>
-	/// <remarks>
-	/// Replace GameObject.<see cref="GameObject.Instantiate(Object)"/> calls with Pooler.<see cref="Pooler.Instantiate(Component)"/>
-	/// &amp; GameObject.<see cref="GameObject.Destroy(Object)"/> with Pooler.<see cref="Pooler.Destroy(Component)"/>, and you're good
-	/// to go.
-	/// </remarks>
+	/// <example>
+	/// Replace <see cref="GameObject"/>.<see cref="Object.Instantiate(Object)"/> calls with
+	/// <see cref="Pooler"/>.<see cref="Pooler.Instantiate(Component)"/> &amp;
+	/// <see cref="GameObject"/>.<see cref="Object.Destroy(Object)"/> with <see cref="Pooler"/>.<see cref="Pooler.Destroy(Component)"/>,
+	/// and you're good to go.
+	/// </example>
 	public static class Pooler
 	{
 		#region Fields

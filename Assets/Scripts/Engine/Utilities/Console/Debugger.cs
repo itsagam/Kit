@@ -127,7 +127,7 @@ namespace Engine
 		[Conditional("UNITY_EDITOR")] [Conditional("DEVELOPMENT_BUILD")]
 		public static void Log(string category, string line, LogType type = LogType.Log)
 		{
-			Log("[" + category + "] " + line, type);
+			Log("<b>[" + category + "]</b> " + line, type);
 		}
 
 		/// <summary>

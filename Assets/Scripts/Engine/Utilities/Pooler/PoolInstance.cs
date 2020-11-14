@@ -4,7 +4,7 @@ using UnityEngine;
 namespace Engine.Pooling
 {
 	/// <summary>
-	/// Component added to all instances so we can track the Pool they came from. Used in <seealso cref="Pooler.Destroy"/> to de-activate
+	/// Component added to all instances so we can track the Pool they came from. Used in <see cref="Pooler.Destroy"/> to de-activate
 	/// instances without providing pool.
 	/// </summary>
 	public class PoolInstance: MonoBehaviour

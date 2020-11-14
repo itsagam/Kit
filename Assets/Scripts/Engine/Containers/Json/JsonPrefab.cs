@@ -63,8 +63,7 @@ namespace Engine.Containers
 	/// <example>
 	///     The following will all instantiate two prefabs, "Building/ProducerBuilding" and
 	///     "Building/BankBuilding", with Position (1, 1) and (2, 2) respectively.
-	///  	Json:
-	///  <code language="JavaScript">
+	///  <code language="JavaScript" title="Json">
 	///  {
 	/// 		"Buildings":
 	/// 		[
@@ -80,8 +79,7 @@ namespace Engine.Containers
 	///  }
 	///  </code>
 	///
-	///  	Mono-only mode:
-	///  <code>
+	///  <code title ="Mono-only">
 	///  [JsonConverter(typeof(JsonPrefabConverter), "Buildings/{Type}")]
 	///  [JsonObject(MemberSerialization.OptIn)]
 	///  public class Building: MonoBehaviour
@@ -98,8 +96,7 @@ namespace Engine.Containers
 	///  }
 	///  </code>
 	///
-	///  	State-Mono method:
-	///  <code>
+	///  <code title="State-Mono">
 	///  [JsonObject(MemberSerialization.OptIn)]
 	///  public class Building: MonoBehaviour
 	///  {
@@ -122,8 +119,7 @@ namespace Engine.Containers
 	///  JsonPrefab.Instantiate&lt;Building&gt;(GameState.Buildings);
 	///  </code>
 	///
-	///  	JObject-Mono method:
-	///  <code>
+	///  <code title="JObject-Mono">
 	///  [JsonObject(MemberSerialization.OptIn)]
 	///  public class Building: MonoBehaviour
 	///  {

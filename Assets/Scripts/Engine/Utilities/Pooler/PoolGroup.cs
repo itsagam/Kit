@@ -7,8 +7,8 @@ using UnityEngine;
 namespace Engine.Pooling
 {
 	/// <summary>
-	/// A PoolGroup represents a collection of Pools grouped by name. Can be used to group together pools of different types and
-	/// components, or configure them together.
+	/// A PoolGroup represents a collection of <see cref="Pool"/> grouped by name. Can be used to group together pools of different types
+	/// and components, or configure them together.
 	/// </summary>
 	[AddComponentMenu("Pooling/PoolGroup")]
 	public class PoolGroup: MonoBehaviour, IEnumerable<Component>
@@ -18,7 +18,6 @@ namespace Engine.Pooling
 		/// <summary>
 		/// <see cref="Pool.MessageMode"/> of pools added to this group.
 		/// </summary>
-		/// <seealso cref="Pool"/>
 		[LabelText("Message")]
 		[Tooltip("MessageMode of pools added to this group.")]
 		[OnValueChanged("ResetMessageMode")]

@@ -43,7 +43,7 @@ namespace Engine
 		}
 
 		/// <summary>
-		/// Copy the X & Y components and return the vector.
+		/// Copy the X &amp; Y components and return the vector.
 		/// </summary>
 		public static Vector3 CopyXY(this Vector3 vector, Vector3 from)
 		{
@@ -53,7 +53,7 @@ namespace Engine
 		}
 
 		/// <summary>
-		/// Copy the X & Z components and return the vector.
+		/// Copy the X &amp; Z components and return the vector.
 		/// </summary>
 		public static Vector3 CopyXZ(this Vector3 vector, Vector3 from)
 		{
@@ -63,7 +63,7 @@ namespace Engine
 		}
 
 		/// <summary>
-		/// Copy the Y & Z components and return the vector.
+		/// Copy the Y &amp; Z components and return the vector.
 		/// </summary>
 		public static Vector3 CopyYZ(this Vector3 vector, Vector3 from)
 		{
@@ -165,7 +165,7 @@ namespace Engine
 		}
 
 		/// <summary>
-		/// Swap the X & Y components and return the vector.
+		/// Swap the X &amp; Y components and return the vector.
 		/// </summary>
 		public static Vector3 SwapXY(this Vector3 vector)
 		{
@@ -173,7 +173,7 @@ namespace Engine
 		}
 
 		/// <summary>
-		/// Swap the Y & Z components and return the vector.
+		/// Swap the Y &amp; Z components and return the vector.
 		/// </summary>
 		public static Vector3 SwapYZ(this Vector3 vector)
 		{
@@ -181,7 +181,7 @@ namespace Engine
 		}
 
 		/// <summary>
-		/// Swap the X & Z components and return the vector.
+		/// Swap the X &amp; Z components and return the vector.
 		/// </summary>
 		public static Vector3 SwapXZ(this Vector3 vector)
 		{
@@ -225,7 +225,7 @@ namespace Engine
 		}
 
 		/// <summary>
-		/// Return the smaller of the X & Y components.
+		/// Return the smaller of the X &amp; Y components.
 		/// </summary>
 		public static float MinXY(this Vector3 vector)
 		{
@@ -233,7 +233,7 @@ namespace Engine
 		}
 
 		/// <summary>
-		/// Return the smaller of the Y & Z components.
+		/// Return the smaller of the Y &amp; Z components.
 		/// </summary>
 		public static float MinYZ(this Vector3 vector)
 		{
@@ -241,7 +241,7 @@ namespace Engine
 		}
 
 		/// <summary>
-		/// Return the smaller of the X & Z components.
+		/// Return the smaller of the X &amp; Z components.
 		/// </summary>
 		public static float MinXZ(this Vector3 vector)
 		{
@@ -258,7 +258,7 @@ namespace Engine
 		}
 
 		/// <summary>
-		/// Return the larger of the X & Y components.
+		/// Return the larger of the X &amp; Y components.
 		/// </summary>
 		public static float MaxXY(this Vector3 vector)
 		{
@@ -266,7 +266,7 @@ namespace Engine
 		}
 
 		/// <summary>
-		/// Return the larger of the Y & Z components.
+		/// Return the larger of the Y &amp; Z components.
 		/// </summary>
 		public static float MaxYZ(this Vector3 vector)
 		{
@@ -274,7 +274,7 @@ namespace Engine
 		}
 
 		/// <summary>
-		/// Return the larger of the X & Z components.
+		/// Return the larger of the X &amp; Z components.
 		/// </summary>
 		public static float MaxXZ(this Vector3 vector)
 		{

@@ -49,10 +49,26 @@ namespace Engine.Algorithms
 		}
 	}
 
+	/// <summary>
+	/// <para>Represents a linked-list of nodes and a running total of cost.</para>
+	/// <para>Result spited out by the <see cref="AStar"/> algorithm.</para>
+	/// </summary>
+	/// <typeparam name="T">The type of a node.</typeparam>
 	public class Path<T>: IEnumerable<T>
 	{
+		/// <summary>
+		/// Reference to the last node.
+		/// </summary>
 		public T LastStep { get; }
+
+		/// <summary>
+		/// A <see cref="Path{T}"/> to all the previous nodes.
+		/// </summary>
 		public Path<T> PreviousSteps { get; }
+
+		/// <summary>
+		/// Total cost of this <see cref="Path{T}"/>.
+		/// </summary>
 		public int TotalCost { get; }
 
 		private Path(T lastStep, Path<T> previousSteps, int totalCost)

@@ -188,6 +188,9 @@ namespace Engine.Containers
 		}
 	}
 
+	/// <summary>
+	/// A more inspector-friendly <see cref="ReactiveProperty{T}"/> for use in <see cref="Stats"/>.
+	/// </summary>
 	[Serializable]
 	public class StatBaseProperty: ReactiveProperty<float>
 	{
