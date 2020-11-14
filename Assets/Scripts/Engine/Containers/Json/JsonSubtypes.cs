@@ -15,8 +15,8 @@ using TypeInfo = System.Type;
 namespace Engine.Containers
 {
 	/// <summary>
-	///     Allows to create instances of subclasses depending on JSON.
-	///     See https://github.com/manuc66/JsonSubTypes.
+	///     <para>Allows to create instances of subclasses depending on JSON.</para>
+	///     <para>See <see href="https://github.com/manuc66/JsonSubTypes" />.</para>
 	/// </summary>
 
 	//  MIT License

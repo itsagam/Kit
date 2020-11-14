@@ -42,7 +42,7 @@ namespace Engine.Containers
 	}
 
     /// <summary>
-    /// <para>Represents an Upgrade that is only applicable for a specified duration, and gets removed afterwards.</para>
+    /// <para>Represents an <see cref="Upgrade"/> that is only applicable for a specified duration, and gets removed afterwards.</para>
     /// <para>Needs to be added through <see cref="AddTo(IUpgradeable)"/> to an <see cref="IUpgradeable" /> for the timer to start.</para>
     /// </summary>
     /// <example>

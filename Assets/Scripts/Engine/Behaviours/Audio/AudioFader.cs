@@ -5,8 +5,8 @@ using UnityEngine;
 namespace Engine.Behaviours
 {
     /// <summary>
-    /// Attach it to a GameObject with an <see cref="AudioSource" /> and this component will allow you to play, pause, stop, and
-    /// change volume or clip with the volume fading in/out.
+    /// Attach it to a <see cref="GameObject"/> with an <see cref="AudioSource" /> and this component will allow you to play, pause,
+    /// stop, and change volume or clip with the volume fading in/out.
     /// </summary>
     /// <remarks>
     /// Just attaching it to an <see cref="AudioSource" /> with <see cref="AudioSource.playOnAwake" /> <see langword="true" /> will
@@ -17,8 +17,8 @@ namespace Engine.Behaviours
 	public class AudioFader: MonoBehaviour
 	{
         /// <summary>
-        /// <para>AudioSource to fade.</para>
-		/// <para>Will use the one on the same GameObject if not specified.</para>
+        /// <para><see cref="AudioSource" /> to fade.</para>
+		/// <para>Will use the one on the same <see cref="GameObject"/> if not specified.</para>
         /// </summary>
 		[Tooltip("AudioSource to fade. Will use the one on the same GameObject by default.")]
 		public AudioSource Audio;

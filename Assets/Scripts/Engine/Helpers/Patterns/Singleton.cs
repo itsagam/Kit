@@ -3,10 +3,13 @@ using UnityEngine;
 namespace Engine
 {
 	/// <summary>
-	/// MonoBehaviours that create just one instance can inherit from this class for global access.
+	/// <see cref="MonoBehaviour"/>s that create just one instance can inherit from this class for global access.
 	/// </summary>
-	/// <remarks>Should be used very sparingly as the class uses FindObjectOfType if an instance is not found, which is costly.
-	/// An over-use of singletons also suggests design issues.</remarks>
+	/// <remarks>
+	/// Should be used very sparingly as the class uses <see cref="Object.FindObjectOfType{T}()"/> if an instance is not
+	/// found, which is costly.
+	/// An over-use of singletons also suggests design issues.
+	/// </remarks>
 	public class Singleton<T> : MonoBehaviour where T : MonoBehaviour
 	{
 		protected static T instance;
