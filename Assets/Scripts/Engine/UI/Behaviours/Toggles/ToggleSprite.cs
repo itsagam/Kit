@@ -9,7 +9,16 @@ namespace Engine.UI.Behaviours
 	[RequireComponent(typeof(Toggle))]
 	public class ToggleSprite: ToggleBehaviour
 	{
+		/// <summary>
+		/// <see cref="Sprite"/> to use for the On state.
+		/// </summary>
+		[Tooltip("Sprite to use for the On state.")]
 		public Sprite OnSprite;
+
+		/// <summary>
+		/// <see cref="Sprite"/> to use for the Off state.
+		/// </summary>
+		[Tooltip("Sprite to use for the Off state.")]
 		public Sprite OffSprite;
 
 		protected override void OnValueChanged(bool value)

@@ -6,74 +6,74 @@ using UnityEngine.UI;
 namespace Engine.UI.Message
 {
 	/// <summary>
-	/// A pre-made Window for showing general game messages.
+	/// A pre-made <see cref="Window"/> for showing general game messages.
 	/// </summary>
 	public class MessageWindow: Window
 	{
 		/// <summary>
-		/// The Image to use for showing the icon.
+		/// The <see cref="Image"/> to use for showing the icon.
 		/// </summary>
 		[Tooltip("The Image to use for showing the icon.")]
 		public Image IconImage;
 
 		/// <summary>
-		/// The Text to use for showing title.
+		/// The <see cref="Text"/> to use for showing title.
 		/// </summary>
 		[Tooltip("The Text to use for showing title.")]
 		public Text TitleText;
 
 		/// <summary>
-		/// The game object associated with sub-title (optional). Gets hidden if there isn't a subtitle in the message.
+		/// The object associated with sub-title (optional). Gets hidden if there isn't a subtitle in the message.
 		/// </summary>
-		[Tooltip("The game object associated with sub-title (optional). Gets hidden if there isn't a subtitle in the message.")]
+		[Tooltip("The object associated with sub-title (optional). Gets hidden if there isn't a subtitle in the message.")]
 		public GameObject SubtitleSeparator;
 
 		/// <summary>
-		/// The Text to use for showing sub-title (optional).
+		/// The <see cref="Text"/> to use for showing sub-title (optional).
 		/// </summary>
 		[Tooltip("The Text to use for showing sub-title (optional).")]
 		public Text SubtitleText;
 
 		/// <summary>
-		/// The Text to use for showing the message.
+		/// The <see cref="Text"/> to use for showing the message.
 		/// </summary>
 		[Tooltip("The Text to use for showing the message.")]
 		public Text MessageText;
 
 		/// <summary>
-		/// References to the three buttons to use for message options.
+		/// References to three <see cref="Button"/>s to use for message options.
 		/// </summary>
 		[Tooltip("References to the three buttons to use for message options.")]
 		public Button[] Buttons;
 
 		/// <summary>
-		/// References to the three texts to that go with the buttons.
+		/// References to three <see cref="Text"/>s to that go with the buttons.
 		/// </summary>
 		[Tooltip("References to the three texts to that go with the buttons.")]
 		public Text[] ButtonTexts;
 
 		/// <summary>
-		/// Reference to the button that closes the message window.
+		/// Reference to the <see cref="Button"/> that closes the message window.
 		/// </summary>
 		[Tooltip("Reference to the button that closes the message window.")]
 		public Button CloseButton;
 
 		/// <summary>
-		/// The sprite to use for alerts.
+		/// The icon to use for alerts.
 		/// </summary>
-		[Tooltip("The sprite to use for alerts.")]
+		[Tooltip("The icon to use for alerts.")]
 		public Sprite AlertSprite;
 
 		/// <summary>
-		/// The sprite to use for info-boxes.
+		/// The icon to use for info-boxes.
 		/// </summary>
-		[Tooltip("The sprite to use for info-boxes.")]
+		[Tooltip("The icon to use for info-boxes.")]
 		public Sprite InfoSprite;
 
 		/// <summary>
-		/// The sprite to use for questions.
+		/// The icon to use for questions.
 		/// </summary>
-		[Tooltip("The sprite to use for questions.")]
+		[Tooltip("The icon to use for questions.")]
 		public Sprite QuestionSprite;
 
 		/// <summary>

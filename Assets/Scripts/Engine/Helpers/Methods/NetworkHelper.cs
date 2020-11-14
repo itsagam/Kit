@@ -3,6 +3,9 @@ using UnityEngine;
 
 namespace Engine
 {
+	/// <summary>
+	/// Helper functions for connectivity.
+	/// </summary>
 	public class NetworkHelper
 	{
 		/// <summary>

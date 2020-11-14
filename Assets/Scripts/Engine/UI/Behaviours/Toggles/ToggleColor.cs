@@ -9,7 +9,16 @@ namespace Engine.UI.Behaviours
 	[RequireComponent(typeof(Toggle))]
 	public class ToggleColor: ToggleBehaviour
 	{
+		/// <summary>
+		/// Color to use for the On state.
+		/// </summary>
+		[Tooltip("Color to use for the On state.")]
 		public Color OnColor = Color.white;
+
+		/// <summary>
+		/// Color to use for the Off state.
+		/// </summary>
+		[Tooltip("Color to use for the Off state.")]
 		public Color OffColor = Color.grey;
 
 		protected override void OnValueChanged(bool value)

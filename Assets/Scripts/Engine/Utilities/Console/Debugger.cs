@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Text;
 using Engine.Parsers;
-using Newtonsoft.Json;
 using UniRx;
 using UnityEngine;
 using UnityEngine.Profiling;
@@ -84,12 +83,14 @@ namespace Engine
 		/// </summary>
 		public const string NullString = "Null";
 
+
+		// Conditionals make calls to these methods not be compiled in Release builds.
+
 		/// <summary>
 		/// Log a line.
 		/// </summary>
 		/// <param name="line">The line to log.</param>
 		/// <param name="type">Type of log.</param>
-		// Conditionals make calls to these methods not be compiled in Release builds
 		[Conditional("UNITY_EDITOR")] [Conditional("DEVELOPMENT_BUILD")]
 		public static void Log(string line, LogType type = LogType.Log)
 		{
@@ -157,7 +158,7 @@ namespace Engine
 		/// </summary>
 		/// <param name="obj">The object to convert.</param>
 		/// <param name="serialize">Whether to serialize the object if it's a class.</param>
-		/// <param name="nullString">The string to use for null objects.</param>
+		/// <param name="nullString">The string to use for <see langword="null" /> objects.</param>
 		public static string ObjectToString(object obj, bool serialize, string nullString = NullString)
 		{
 			if (obj == null)
@@ -167,12 +168,12 @@ namespace Engine
 		}
 
 		/// <summary>
-		/// Convert an object to a string and append it to a StringBuilder.
+		/// Convert an object to a string and append it to a <see cref="StringBuilder"/>.
 		/// </summary>
-		/// <param name="output">The StringBuilder to append the result to.</param>
+		/// <param name="output">The <see cref="StringBuilder"/> to append the result to.</param>
 		/// <param name="obj">The object to convert.</param>
 		/// <param name="serialize">Whether to serialize the object if it's a class.</param>
-		/// <param name="nullString">The string to use for null objects.</param>
+		/// <param name="nullString">The string to use for <see langword="null" /> objects.</param>
 		public static void ObjectToString(StringBuilder output, object obj, bool serialize, string nullString)
 		{
 			output.Append(ObjectToString(obj, serialize, nullString));

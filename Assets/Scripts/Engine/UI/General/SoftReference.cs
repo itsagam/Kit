@@ -39,8 +39,8 @@ namespace Engine.UI
 	}
 
 	/// <summary>
-	/// A class that allows one to select assets in the inspector without hard-referencing them. It saves their path instead which can
-	/// later be loaded with <see cref="Load"/>.
+	/// A class that allows one to select assets in the inspector without hard-referencing them. Saves their path instead which can
+	/// later be used to load with <see cref="Load"/> or manually with <see cref="ResourceManager" /> or <see cref="Resources"/>.
 	/// </summary>
 	/// <remarks>Can be used directly as a string without needing to call <see cref="ToString"/>.</remarks>
 	/// <typeparam name="T">Type of the unity object. Used to filter assets.</typeparam>

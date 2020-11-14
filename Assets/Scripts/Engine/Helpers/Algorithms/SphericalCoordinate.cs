@@ -4,7 +4,7 @@ using UnityEngine;
 namespace Engine.Algorithms
 {
 	/// <summary>
-	/// Represents a point on a sphere, and allows to do math on it.
+	/// Represents a point on a sphere, and allows to do calculations with it.
 	/// </summary>
 	public struct SphericalCoordinate: IEquatable<SphericalCoordinate>
 	{
@@ -178,9 +178,8 @@ namespace Engine.Algorithms
 		}
 
 		/// <summary>
-		/// Minimum polar angle.
+		/// Minimum polar angle. 0 by default.
 		/// </summary>
-		/// <remarks>0 by default.</remarks>
 		public float MinPolar
 		{
 			get => minPolar;
@@ -192,9 +191,8 @@ namespace Engine.Algorithms
 		}
 
 		/// <summary>
-		/// Maximum polar angle.
+		/// Maximum polar angle. 2π/360° by default.
 		/// </summary>
-		/// <remarks>2π/360° by default.</remarks>
 		public float MaxPolar
 		{
 			get => maxPolar;
@@ -206,9 +204,8 @@ namespace Engine.Algorithms
 		}
 
 		/// <summary>
-		/// Minimum elevation angle.
+		/// Minimum elevation angle. 0 by default.
 		/// </summary>
-		/// <remarks>0 by default.</remarks>
 		public float MinElevation
 		{
 			get => minElevation;
@@ -220,9 +217,8 @@ namespace Engine.Algorithms
 		}
 
 		/// <summary>
-		/// Maximum elevation angle.
+		/// Maximum elevation angle. 2π/360° by default.
 		/// </summary>
-		/// <remarks>2π/360° by default.</remarks>
 		public float MaxElevation
 		{
 			get => maxElevation;
@@ -234,9 +230,8 @@ namespace Engine.Algorithms
 		}
 
 		/// <summary>
-		/// Should loop around the polar angle if it goes out of range?
+		/// Should loop around the polar angle if it goes out of range? <see langword="true"/> by default.
 		/// </summary>
-		/// <remarks>True by default.</remarks>
 		public bool LoopPolar
 		{
 			get => loopPolar;
@@ -248,9 +243,8 @@ namespace Engine.Algorithms
 		}
 
 		/// <summary>
-		/// Should loop around the elevation angle if it goes out of range?
+		/// Should loop around the elevation angle if it goes out of range? <see langword="true"/> by default.
 		/// </summary>
-		/// <remarks>True by default.</remarks>
 		public bool LoopElevation
 		{
 			get => loopElevation;

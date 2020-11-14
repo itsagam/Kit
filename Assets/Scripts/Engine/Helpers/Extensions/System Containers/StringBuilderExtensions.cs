@@ -2,6 +2,9 @@
 
 namespace Engine
 {
+	/// <summary>
+	/// <see cref="StringBuilder"/> extensions.
+	/// </summary>
 	public static class StringBuilderExtensions
 	{
 		/// <summary>

@@ -2,6 +2,9 @@ using System.Collections.Generic;
 
 namespace Engine
 {
+	/// <summary>
+	/// Dictionary extensions.
+	/// </summary>
 	public static class DictionaryExtensions
 	{
 		/// <summary>
@@ -14,7 +17,7 @@ namespace Engine
 		}
 
 		/// <summary>
-		/// Return the value of a given key if it exists or the default value (null for reference types) if not.
+		/// Return the value of a given key if it exists or the default value (<see langword="null"/> for reference types) if not.
 		/// </summary>
 		public static TValue GetOrDefault<TKey, TValue>(this Dictionary<TKey, TValue> dictionary, TKey key)
 		{

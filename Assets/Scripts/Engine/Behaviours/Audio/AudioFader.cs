@@ -4,18 +4,22 @@ using UnityEngine;
 
 namespace Engine.Behaviours
 {
-	/// <summary>
-	/// Attach it to a GameObject with an AudioSource and this component will allow you to Play/Pause/Stop/Change Volume or Clip with
-	/// volume fading in/out.
-	/// </summary>
-	/// <remarks>Just attaching it to an AudioSource with playOnAwake true will fade the audio in on Awake.</remarks>
-	[RequireComponent(typeof(AudioSource))]
+    /// <summary>
+    /// Attach it to a GameObject with an <see cref="AudioSource" /> and this component will allow you to play, pause, stop, and
+    /// change volume or clip with the volume fading in/out.
+    /// </summary>
+    /// <remarks>
+    /// Just attaching it to an <see cref="AudioSource" /> with <see cref="AudioSource.playOnAwake" /> <see langword="true" /> will
+    /// fade the audio in on Awake.
+    /// </remarks>
+    /// <seealso cref="SceneDirector"/>
+    [RequireComponent(typeof(AudioSource))]
 	public class AudioFader: MonoBehaviour
 	{
-		/// <summary>
-		/// AudioSource to fade.
-		/// </summary>
-		/// <remarks>Will use the one on the same GameObject if not specified.</remarks>
+        /// <summary>
+        /// <para>AudioSource to fade.</para>
+		/// <para>Will use the one on the same GameObject if not specified.</para>
+        /// </summary>
 		[Tooltip("AudioSource to fade. Will use the one on the same GameObject by default.")]
 		public AudioSource Audio;
 
@@ -26,16 +30,16 @@ namespace Engine.Behaviours
 		public float Speed = 0.5f;
 
 		/// <summary>
-		/// Should the audio automatically fade in/out when the scene changes with SceneDirector?
+		/// Should the audio automatically fade in/out when the scene changes with <see cref="SceneDirector" />
 		/// </summary>
-		/// <remarks><see langword="true"/> by default.</remarks>
+		/// <returns><see langword="true"/> by default.</returns>
 		[Tooltip("Should the audio automatically fade in/out when the scene changes with SceneDirector?")]
 		public bool FadeOnSceneChange = true;
 
 		/// <summary>
-		/// Should the audio automatically fade in/out with the scene when you use SceneDirector?
+		/// Should the audio automatically fade in/out with the scene when you use <see cref="SceneDirector" />?
 		/// </summary>
-		/// <remarks><see langword="false"/> by default.</remarks>
+		/// <returns><see langword="false"/> by default.</returns>
 		[Tooltip("Should the audio automatically fade in/out with the scene when you use SceneDirector?")]
 		public bool FadeWithScreen = false;
 
@@ -208,7 +212,7 @@ namespace Engine.Behaviours
 		}
 
 		/// <summary>
-		/// Returns the audio currently playing or allows to change the AudioClip with fading.
+		/// Returns the audio currently playing or allows to change it while fading.
 		/// </summary>
 		public AudioClip Clip
 		{
@@ -236,7 +240,7 @@ namespace Engine.Behaviours
 		}
 
 		/// <summary>
-		/// Returns whether an audio is currently playing or allows to Play/Pause the audio.
+		/// Returns whether an audio is currently playing or allows to play or pause it.
 		/// </summary>
 		public bool IsPlaying
 		{

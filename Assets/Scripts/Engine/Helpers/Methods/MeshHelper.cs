@@ -2,6 +2,9 @@ using UnityEngine;
 
 namespace Engine
 {
+	/// <summary>
+	/// Helper functions for mesh operations.
+	/// </summary>
 	public static class MeshHelper
 	{
 		/// <summary>

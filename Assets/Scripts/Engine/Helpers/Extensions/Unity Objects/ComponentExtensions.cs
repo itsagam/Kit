@@ -2,10 +2,13 @@ using UnityEngine;
 
 namespace Engine
 {
+	/// <summary>
+	/// <see cref="Component"/> extensions.
+	/// </summary>
 	public static class ComponentExtensions
 	{
 		/// <summary>
-		/// Returns whether the component is a part of a prefab.
+		/// Returns whether the <see cref="Component"/> is a part of a prefab.
 		/// </summary>
 		public static bool IsPrefab(this Component component)
 		{
@@ -13,9 +16,10 @@ namespace Engine
 		}
 
 		/// <summary>
-		/// Returns the bounds of the component.
+		/// <para>Returns the bounds of the <see cref="Component"/>.</para>
+		/// <para>Works directly for <see cref="Renderer"/>s and <see cref="Collider"/>s, otherwise returns bounds of the
+		/// <see cref="Transform"/>.</para>
 		/// </summary>
-		/// <remarks>Works directly for Renderers and Colliders, otherwise returns the bounds of the transform.</remarks>
 		public static Bounds GetBounds(this Component component)
 		{
 			switch (component)

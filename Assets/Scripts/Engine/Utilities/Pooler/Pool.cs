@@ -73,7 +73,7 @@ namespace Engine.Pooling
 	}
 
 	/// <summary>
-	/// A Pool represents all the instances of a particular component (and its GameObject).
+	/// A Pool represents all the instances of a particular component (and its <see cref="GameObject"/>).
 	/// </summary>
 	[AddComponentMenu("Pooling/Pool")]
 	public class Pool: MonoBehaviour, IEnumerable<Component>

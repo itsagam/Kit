@@ -41,11 +41,18 @@ namespace Engine.Containers
 		Shorter
 	}
 
-	/// <summary>
-	/// Represents an Upgrade that is only applicable for a specified duration, and gets removed afterwards.
-	/// </summary>
-	/// <remarks>Needs to be added through <see cref="AddTo(Engine.Containers.IUpgradeable)"/> to an <see cref="IUpgradeable" />.</remarks>
-	[Serializable]
+    /// <summary>
+    /// <para>Represents an Upgrade that is only applicable for a specified duration, and gets removed afterwards.</para>
+    /// <para>Needs to be added through <see cref="AddTo(IUpgradeable)"/> to an <see cref="IUpgradeable" /> for the timer to start.</para>
+    /// </summary>
+    /// <example>
+    /// <code>
+    /// float buffTime = 10.0f;
+    /// Buff damageBuff = new Buff("DamagePickup", new [] { new Effect("Damage", "x2") }, buffTime);
+    /// damageBuff.AddTo(ship);
+    /// </code>
+    /// </example>
+    [Serializable]
 	public class Buff: Upgrade
 	{
 		/// <summary>

@@ -19,7 +19,6 @@ namespace Engine.Algorithms
 		/// <param name="estimate">A function that should return an estimate between a node and the destination.</param>
 		/// <param name="links">A function that should return all the nodes linked with a given one.</param>
 		/// <typeparam name="T">The type of a node.</typeparam>
-		/// <returns></returns>
 		public static Path<T> FindPath<T>(T start, T destination,
 										  Func<T, T, int> distance,
 										  Func<T, int> estimate,

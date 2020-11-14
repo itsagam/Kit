@@ -5,7 +5,7 @@ using UnityEngine;
 namespace Engine.Behaviours
 {
 	/// <summary>
-	/// Pools the GameObject after a specified time.
+	/// Pools the <see cref="GameObject"/> after a specified time.
 	/// </summary>
 	public class SelfPool: MonoBehaviour
 	{

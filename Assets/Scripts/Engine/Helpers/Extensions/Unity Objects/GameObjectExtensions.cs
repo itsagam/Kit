@@ -2,10 +2,13 @@ using UnityEngine;
 
 namespace Engine
 {
+	/// <summary>
+	/// <see cref="GameObject"/> extensions.
+	/// </summary>
 	public static class GameObjectExtensions
 	{
 		/// <summary>
-		/// Returns whether a GameObject is a prefab.
+		/// Returns whether a <see cref="GameObject"/> is a prefab.
 		/// </summary>
 		public static bool IsPrefab(this GameObject go)
 		{

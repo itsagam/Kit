@@ -2,10 +2,13 @@
 
 namespace Engine
 {
+	/// <summary>
+	/// <see cref="Canvas"/> extensions.
+	/// </summary>
 	public static class CanvasExtensions
 	{
 		/// <summary>
-		/// Returns whether the Canvas is rendering in Screen-Space.
+		/// Returns whether the <see cref="Canvas"/> is rendering in screen-space.
 		/// </summary>
 		public static bool IsScreenSpace(this Canvas canvas)
 		{

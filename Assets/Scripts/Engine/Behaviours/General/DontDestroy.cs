@@ -3,7 +3,7 @@
 namespace Engine.Behaviours
 {
 	/// <summary>
-	/// Marks the GameObject to be persistent across scenes.
+	/// Marks the <see cref="GameObject"/> to be persistent across scenes.
 	/// </summary>
 	public class DontDestroy: MonoBehaviour
 	{

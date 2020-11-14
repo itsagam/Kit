@@ -2,6 +2,9 @@
 
 namespace Engine
 {
+	/// <summary>
+	/// <see cref="UnityEngine.Object"/> extensions.
+	/// </summary>
 	public static class UnityObjectExtensions
 	{
 		/// <summary>

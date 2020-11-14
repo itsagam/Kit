@@ -87,7 +87,7 @@ namespace Engine.UI
 		/// </summary>
 		/// <param name="data">Data to pass to the window.</param>
 		/// <returns>Whether the window was successfully shown.</returns>
-		/// <remarks>Can be await-ed upon.</remarks>
+		/// <remarks>Can be <c>await</c>-ed upon.</remarks>
 		public UniTask<bool> Show(object data = null)
 		{
 			return Show(ShowAnimation, data);
@@ -99,7 +99,7 @@ namespace Engine.UI
 		/// <param name="animation">Play this animation state instead of the one set in <see cref="ShowAnimation"/>.</param>
 		/// <param name="data">Data to pass to the window.</param>
 		/// <returns>Whether the window was successfully shown.</returns>
-		/// <remarks>Can be await-ed upon.</remarks>
+		/// <remarks>Can be <c>await</c>-ed upon.</remarks>
 		public async UniTask<bool> Show(string animation, object data = null)
 		{
 			if (IsBusy)
@@ -138,7 +138,7 @@ namespace Engine.UI
 		/// </summary>
 		/// <param name="mode">How to hide the window?</param>
 		/// <returns>Whether the window was successfully hidden.</returns>
-		/// <remarks>Can be await-ed upon.</remarks>
+		/// <remarks>Can be <c>await</c>-ed upon.</remarks>
 		public UniTask<bool> Hide(WindowHideMode mode = UIManager.DefaultHideMode)
 		{
 			return Hide(HideAnimation, mode);
@@ -150,7 +150,7 @@ namespace Engine.UI
 		/// <param name="animation">Play this animation state instead of the one set in <see cref="HideAnimation"/>.</param>
 		/// <param name="mode">How to hide the window?</param>
 		/// <returns>Whether the window was successfully hidden.</returns>
-		/// <remarks>Can be await-ed upon.</remarks>
+		/// <remarks>Can be <c>await</c>-ed upon.</remarks>
 		public async UniTask<bool> Hide(string animation, WindowHideMode mode = UIManager.DefaultHideMode)
 		{
 			if (IsBusy)

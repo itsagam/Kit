@@ -3,6 +3,9 @@ using System.Collections.ObjectModel;
 
 namespace Engine
 {
+	/// <summary>
+	/// Array extensions.
+	/// </summary>
 	public static class ArrayExtensions
 	{
 		/// <summary>

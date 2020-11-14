@@ -25,34 +25,36 @@ namespace Engine
 		Data,
 
 		/// <summary>
+		/// <para>
 		/// The streaming assets folder where assets that should not be packaged can be stored.
-		/// </summary>
+		/// </para>
 		///
-		/// <remarks>
+		/// <para>
 		/// Windows/Linux: (Game)\StreamingAssets <br />
 		/// macOS: (Game)/Resources/Data/StreamingAssets <br />
 		/// iOS: (Game)/Raw <br />
 		/// Android: jar:file://(Game)!/assets
-		/// </remarks>
+		/// </para>
+		/// </summary>
 		StreamingAssets,
 
 		/// <summary>
+		/// <para>
 		/// The persistent data folder where local data can be stored.
-		/// </summary>
+		/// </para>
 		///
-		/// <remarks>
+		/// <para>
 		///	Windows: (User)\AppData\LocalLow\(Company)\(Product) <br />
 		/// macOS: (User)/Library/Application Support/(Company)/(Product) <br />
 		/// iOS: /var/mobile/Containers/Data/Application/(GUID)/Documents <br />
 		/// Android: /storage/emulated/0/Android/data/(Package)/files
-		/// </remarks>
+		/// </para>
+		/// </summary>
 		PersistentData,
 
 		/// <summary>
-		/// Folder(s) for in-game assets that want to be loaded dynamically.
+		/// Folder(s) for in-game assets that want to be loaded dynamically. Get packaged with the game.
 		/// </summary>
-		///
-		/// <remarks>Get packaged with the game.</remarks>
 		Resources
 	}
 
@@ -64,6 +66,14 @@ namespace Engine
 	/// Can handle file-names without extensions from <see cref="ResourceFolder.Resources" />. Otherwise you have to provide it, as you
 	/// can't enumerate and match files in <see cref="ResourceFolder.StreamingAssets"/> on platforms like Android.
 	/// </remarks>
+	/// <example>
+	/// <code>
+	/// ResourceManager.Load&lt;Texture&gt;(ResourceFolder.Resources, "Textures/Background");
+	/// </code>
+	/// <code>
+	/// ResourceManager.LoadAsync&lt;GameState&gt;(ResourceFolder.PersistentData, "GameState.json");
+	/// </code>
+	/// </example>
 	public static class ResourceManager
 	{
 		#region Fields
@@ -90,20 +100,24 @@ namespace Engine
 															  };
 
 		/// <summary>
+		/// <para>
 		/// Event fired when when any resource is loaded.
-		/// </summary>
-		/// <remarks>
+		/// </para>
+		/// <para>
 		/// Returns the folder, path, reference to the resource and whether the resource was actually loaded (true) or re-used from
 		/// cache (false).
-		/// </remarks>
+		/// </para>
+		/// </summary>
 		public static event Action<ResourceFolder, string, object, bool> ResourceLoaded;
 
 		/// <summary>
+		/// <para>
 		/// Event fired when when any resource is unloaded.
-		/// </summary>
-		/// <remarks>
+		/// </para>
+		/// <para>
 		/// Returns the folder and path to the resource unloaded.
-		/// </remarks>
+		/// </para>
+		/// </summary>
 		public static event Action<ResourceFolder, string> ResourceUnloaded;
 
 		/// <summary>
@@ -123,12 +137,14 @@ namespace Engine
 		#region Loading
 
 		/// <summary>
+		///	<para>
 		/// Load and cache a resource.
-		/// </summary>
-		/// <remarks>
+		/// </para>
+		/// <para>
 		/// If <paramref name="folder"/> is <see cref="ResourceFolder.Resources" /> the asset is loaded with
 		/// Resources.<see cref="Resources.Load(string)" />. If it's not, it's parsed manually with the list of parsers registered.
-		/// </remarks>
+		/// </para>
+		/// </summary>
 		/// <param name="folder">The folder to load the resource from.</param>
 		/// <param name="file">The path and file-name relative to the <paramref name="folder"/>.</param>
 		/// <param name="modded">Whether to allow mods to load their version of the asset instead. Useful if you want to allow some assets
@@ -157,12 +173,14 @@ namespace Engine
 		}
 
 		/// <summary>
+		/// <para>
 		/// Load and cache a resource.
-		/// </summary>
-		/// <remarks>
+		/// </para>
+		/// <para>
 		/// If <paramref name="folder"/> is <see cref="ResourceFolder.Resources" /> the asset is loaded with
 		/// Resources.<see cref="Resources.Load(string)" />. If it's not, it's parsed manually with the list of parsers registered.
-		/// </remarks>
+		/// </para>
+		/// </summary>
 		/// <param name="type">Type of the resource expected.</param>
 		/// <param name="folder">The folder to load the resource from.</param>
 		/// <param name="file">The path and file-name relative to the <paramref name="folder"/>.</param>
@@ -188,12 +206,14 @@ namespace Engine
 		}
 
 		/// <summary>
-		/// Load and cache a resource. Can be await-ed.
-		/// </summary>
-		/// <remarks>
+		/// <para>
+		/// Load and cache a resource. Can be <c>await</c>-ed.
+		/// </para>
+		/// <para>
 		/// If <paramref name="folder"/> is <see cref="ResourceFolder.Resources" /> the asset is loaded with
 		/// Resources.<see cref="Resources.Load(string)" />. If it's not, it's parsed manually with the list of parsers registered.
-		/// </remarks>
+		/// </para>
+		/// </summary>
 		/// <param name="folder">The folder to load the resource from.</param>
 		/// <param name="file">The path and file-name relative to the <paramref name="folder"/>.</param>
 		/// <param name="modded">Whether to allow mods to load their version of the asset instead. Useful if you want to allow some assets
@@ -220,12 +240,14 @@ namespace Engine
 		}
 
 		/// <summary>
-		/// Load and cache a resource. Can be await-ed.
-		/// </summary>
-		/// <remarks>
+		/// <para>
+		/// Load and cache a resource. Can be <c>await</c>-ed.
+		/// </para>
+		/// <para>
 		/// If <paramref name="folder"/> is <see cref="ResourceFolder.Resources" /> the asset is loaded with
 		/// Resources.<see cref="Resources.Load(string)" />. If it's not, it's parsed manually with the list of parsers registered.
-		/// </remarks>
+		/// </para>
+		/// </summary>
 		/// <param name="type">Type of the resource expected.</param>
 		/// <param name="folder">The folder to load the resource from.</param>
 		/// <param name="file">The path and file-name relative to the <paramref name="folder"/>.</param>
@@ -268,12 +290,14 @@ namespace Engine
 		}
 
 		/// <summary>
+		/// <para>
 		/// Load and cache a resource without regarding mods.
-		/// </summary>
-		/// <remarks>
+		/// </para>
+		/// <para>
 		/// If <paramref name="folder"/> is <see cref="ResourceFolder.Resources" /> the asset is loaded with
 		/// Resources.<see cref="Resources.Load(string)" />. If it's not, it's parsed manually with the list of parsers registered.
-		/// </remarks>
+		/// </para>
+		/// </summary>
 		/// <param name="folder">The folder to load the resource from.</param>
 		/// <param name="file">The path and file-name relative to the <paramref name="folder"/>.</param>
 		/// <typeparam name="T">Type of the resource expected.</typeparam>
@@ -284,12 +308,14 @@ namespace Engine
 		}
 
 		/// <summary>
+		/// <para>
 		/// Load and cache a resource without regarding mods.
-		/// </summary>
-		/// <remarks>
+		/// </para>
+		/// <para>
 		/// If <paramref name="folder"/> is <see cref="ResourceFolder.Resources" /> the asset is loaded with
 		/// Resources.<see cref="Resources.Load(string)" />. If it's not, it's parsed manually with the list of parsers registered.
-		/// </remarks>
+		/// </para>
+		/// </summary>
 		/// <param name="type">Type of the resource expected.</param>
 		/// <param name="folder">The folder to load the resource from.</param>
 		/// <param name="file">The path and file-name relative to the <paramref name="folder"/>.</param>
@@ -322,12 +348,14 @@ namespace Engine
 
 
 		/// <summary>
-		/// Load and cache a resource without regarding mods. Can be await-ed.
-		/// </summary>
-		/// <remarks>
+		/// <para>
+		/// Load and cache a resource without regarding mods. Can be <c>await</c>-ed.
+		/// </para>
+		/// <para>
 		/// If <paramref name="folder"/> is <see cref="ResourceFolder.Resources" /> the asset is loaded with
 		/// Resources.<see cref="Resources.Load(string)" />. If it's not, it's parsed manually with the list of parsers registered.
-		/// </remarks>
+		/// </para>
+		/// </summary>
 		/// <param name="folder">The folder to load the resource from.</param>
 		/// <param name="file">The path and file-name relative to the <paramref name="folder"/>.</param>
 		/// <typeparam name="T">Type of the resource expected.</typeparam>
@@ -339,12 +367,14 @@ namespace Engine
 
 
 		/// <summary>
-		/// Load and cache a resource without regarding mods. Can be await-ed.
-		/// </summary>
-		/// <remarks>
+		/// <para>
+		/// Load and cache a resource without regarding mods. Can be <c>await</c>-ed.
+		/// </para>
+		/// <para>
 		/// If <paramref name="folder"/> is <see cref="ResourceFolder.Resources" /> the asset is loaded with
 		/// Resources.<see cref="Resources.Load(string)" />. If it's not, it's parsed manually with the list of parsers registered.
-		/// </remarks>
+		/// </para>
+		/// </summary>
 		/// <param name="type">Type of the resource expected.</param>
 		/// <param name="folder">The folder to load the resource from.</param>
 		/// <param name="file">The path and file-name relative to the <paramref name="folder"/>.</param>
@@ -380,13 +410,15 @@ namespace Engine
 
 #if MODDING
 		/// <summary>
+		/// <para>
 		/// Load a resource merging the game version with all the mod versions and cache it. Useful to allow modding of configuration files
 		/// like Json.
-		/// </summary>
-		/// <remarks>
+		/// </para>
+		/// <para>
 		/// If <paramref name="folder"/> is <see cref="ResourceFolder.Resources" /> the base asset is loaded with
 		/// Resources.<see cref="Resources.Load(string)" />. If it's not, it's parsed manually with the list of parsers registered.
-		/// </remarks>
+		/// </para>
+		/// </summary>
 		/// <param name="folder">The folder to load the resource from.</param>
 		/// <param name="file">The path and file-name relative to the <paramref name="folder"/>.</param>
 		/// <typeparam name="T">Type of the resource expected.</typeparam>
@@ -397,13 +429,15 @@ namespace Engine
 		}
 
 		/// <summary>
+		/// <para>
 		/// Load a resource merging the game version with all the mod versions and cache it. Useful to allow modding of configuration files
 		/// like Json.
-		/// </summary>
-		/// <remarks>
+		/// </para>
+		/// <para>
 		/// If <paramref name="folder"/> is <see cref="ResourceFolder.Resources" /> the base asset is loaded with
 		/// Resources.<see cref="Resources.Load(string)" />. If it's not, it's parsed manually with the list of parsers registered.
-		/// </remarks>
+		/// </para>
+		/// </summary>
 		/// <param name="type">Type of the resource expected.</param>
 		/// <param name="folder">The folder to load the resource from.</param>
 		/// <param name="file">The path and file-name relative to the <paramref name="folder"/>.</param>
@@ -460,13 +494,15 @@ namespace Engine
 		}
 
 		/// <summary>
+		/// <para>
 		/// Load a resource merging the game version with all the mod versions and cache it. Useful to allow modding of configuration files
-		/// like Json. Can be await-ed upon.
-		/// </summary>
-		/// <remarks>
+		/// like Json. Can be <c>await</c>-ed upon.
+		/// </para>
+		/// <para>
 		/// If <paramref name="folder"/> is <see cref="ResourceFolder.Resources" /> the base asset is loaded with
 		/// Resources.<see cref="Resources.Load(string)" />. If it's not, it's parsed manually with the list of parsers registered.
-		/// </remarks>
+		/// </para>
+		/// </summary>
 		/// <param name="folder">The folder to load the resource from.</param>
 		/// <param name="file">The path and file-name relative to the <paramref name="folder"/>.</param>
 		/// <typeparam name="T">Type of the resource expected.</typeparam>
@@ -477,13 +513,15 @@ namespace Engine
 		}
 
 		/// <summary>
+		/// <para>
 		/// Load a resource merging the game version with all the mod versions and cache it. Useful to allow modding of configuration files
-		/// like Json. Can be await-ed upon.
-		/// </summary>
-		/// <remarks>
+		/// like Json. Can be <c>await</c>-ed upon.
+		/// </para>
+		/// <para>
 		/// If <paramref name="folder"/> is <see cref="ResourceFolder.Resources" /> the base asset is loaded with
 		/// Resources.<see cref="Resources.Load(string)" />. If it's not, it's parsed manually with the list of parsers registered.
-		/// </remarks>
+		/// </para>
+		/// </summary>
 		/// <param name="type">Type of the resource expected.</param>
 		/// <param name="folder">The folder to load the resource from.</param>
 		/// <param name="file">The path and file-name relative to the <paramref name="folder"/>.</param>
@@ -608,7 +646,7 @@ namespace Engine
 		}
 
 		/// <summary>
-		/// Load a resource from an absolute path with the list of parsers registered. Does not cache. Can be await-ed.
+		/// Load a resource from an absolute path with the list of parsers registered. Does not cache. Can be <c>await</c>-ed.
 		/// </summary>
 		/// <param name="fullPath">Absolute path to the resource.</param>
 		/// <typeparam name="T">Type of the resource expected.</typeparam>
@@ -619,7 +657,7 @@ namespace Engine
 		}
 
 		/// <summary>
-		/// Load a resource from an absolute path with the list of parsers registered. Does not cache. Can be await-ed.
+		/// Load a resource from an absolute path with the list of parsers registered. Does not cache. Can be <c>await</c>-ed.
 		/// </summary>
 		/// <param name="type">Type of the resource expected.</param>
 		/// <param name="fullPath">Absolute path to the resource.</param>
@@ -630,7 +668,7 @@ namespace Engine
 		}
 
 		/// <summary>
-		/// Load a resource from an absolute path with the list of parsers registered. Does not cache. Can be await-ed.
+		/// Load a resource from an absolute path with the list of parsers registered. Does not cache. Can be <c>await</c>-ed.
 		/// </summary>
 		/// <param name="type">Type of the resource expected.</param>
 		/// <param name="fullPath">Absolute path to the resource.</param>
@@ -765,7 +803,7 @@ namespace Engine
 		}
 
 		/// <summary>
-		/// Clear the cache and (optionally) unload assets not in use. Can be await-ed.
+		/// Clear the cache and (optionally) unload assets not in use. Can be <c>await</c>-ed.
 		/// </summary>
 		/// <param name="unload">Whether to unload assets.</param>
 		public static async UniTask ClearCacheAsync(bool unload = false)
@@ -803,7 +841,7 @@ namespace Engine
 		}
 
 		/// <summary>
-		/// Read the contents of a file in text mode. Can be await-ed.
+		/// Read the contents of a file in text mode. Can be <c>await</c>-ed.
 		/// </summary>
 		/// <param name="folder">The folder to read the file from.</param>
 		/// <param name="file">The path and file-name relative to the <paramref name="folder"/>.</param>
@@ -845,7 +883,7 @@ namespace Engine
 		}
 
 		/// <summary>
-		/// Read the contents of a file in binary mode. Can be await-ed.
+		/// Read the contents of a file in binary mode. Can be <c>await</c>-ed.
 		/// </summary>
 		/// <param name="folder">The folder to read the file from.</param>
 		/// <param name="file">The path and file-name relative to the <paramref name="folder"/>.</param>
@@ -884,7 +922,7 @@ namespace Engine
 		}
 
 		/// <summary>
-		/// Read the contents of a file in text mode. Can be await-ed.
+		/// Read the contents of a file in text mode. Can be <c>await</c>-ed.
 		/// </summary>
 		/// <param name="fullPath">Absolute path to the file.</param>
 		/// <returns>Contents of the file as a string.</returns>
@@ -915,7 +953,7 @@ namespace Engine
 		}
 
 		/// <summary>
-		/// Read the contents of a file in binary mode. Can be await-ed.
+		/// Read the contents of a file in binary mode. Can be <c>await</c>-ed.
 		/// </summary>
 		/// <param name="fullPath">Absolute path to the file.</param>
 		/// <returns>Contents of the file as a byte array.</returns>
@@ -953,7 +991,7 @@ namespace Engine
 		}
 
 		/// <summary>
-		/// Save the contents of an object to a file. Can be await-ed.
+		/// Save the contents of an object to a file. Can be <c>await</c>-ed.
 		/// </summary>
 		/// <remarks>
 		/// A parser is chosen based on the type of the object to serialize it.
@@ -996,7 +1034,7 @@ namespace Engine
 		}
 
 		/// <summary>
-		/// Save the contents of an object to a file. Can be await-ed.
+		/// Save the contents of an object to a file. Can be <c>await</c>-ed.
 		/// </summary>
 		/// <remarks>
 		/// A parser is chosen based on the type of the object to serialize it.
@@ -1035,7 +1073,7 @@ namespace Engine
 		}
 
 		/// <summary>
-		/// Save text content to a file. Can be await-ed.
+		/// Save text content to a file. Can be <c>await</c>-ed.
 		/// </summary>
 		/// <param name="folder">The folder where the file should exist.</param>
 		/// <param name="file">The path and file-name relative to the <paramref name="folder"/>.</param>
@@ -1059,7 +1097,7 @@ namespace Engine
 		}
 
 		/// <summary>
-		/// Save binary content to a file. Can be await-ed.
+		/// Save binary content to a file. Can be <c>await</c>-ed.
 		/// </summary>
 		/// <param name="folder">The folder where the file should exist.</param>
 		/// <param name="file">The path and file-name relative to the <paramref name="folder"/>.</param>
@@ -1092,7 +1130,7 @@ namespace Engine
 		}
 
 		/// <summary>
-		/// Save text content to a file. Can be await-ed.
+		/// Save text content to a file. Can be <c>await</c>-ed.
 		/// </summary>
 		/// <param name="fullPath">Absolute path to the file.</param>
 		/// <param name="contents">The string to save.</param>
@@ -1135,7 +1173,7 @@ namespace Engine
 		}
 
 		/// <summary>
-		/// Save binary content to a file. Can be await-ed.
+		/// Save binary content to a file. Can be <c>await</c>-ed.
 		/// </summary>
 		/// <param name="fullPath">Absolute path to the file.</param>
 		/// <param name="bytes">The byte array to save.</param>

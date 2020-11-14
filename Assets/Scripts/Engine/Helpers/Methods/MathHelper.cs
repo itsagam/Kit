@@ -2,6 +2,9 @@ using UnityEngine;
 
 namespace Engine
 {
+	/// <summary>
+	/// Helper functions for doing math.
+	/// </summary>
 	public static class MathHelper
 	{
 		/// <summary>
@@ -23,9 +26,9 @@ namespace Engine
 		}
 
 		/// <summary>
-		/// Returns whether a number is between two other numbers.
+		/// <para>Returns whether a number is between two other numbers.</para>
+		/// <para>Respects <paramref name="from"/> being larger than <paramref name="to"/>.</para>
 		/// </summary>
-		/// <remarks>Respects <paramref name="from"/> being larger than <paramref name="to"/>.</remarks>
 		public static bool IsInRange(float number, float from, float to)
 		{
 			float min = from;
@@ -40,9 +43,9 @@ namespace Engine
 		}
 
 		/// <summary>
-		/// Returns whether a number is between two other numbers.
+		/// <para>Returns whether a number is between two other numbers.</para>
+		/// <para>Respects <paramref name="from"/> being larger than <paramref name="to"/>.</para>
 		/// </summary>
-		/// <remarks>Respects <paramref name="from"/> being larger than <paramref name="to"/>.</remarks>
 		public static bool IsInRange(int number, int from, int to)
 		{
 			int min = from;
@@ -73,9 +76,9 @@ namespace Engine
 		}
 
 		/// <summary>
-		/// Limits a number between two other numbers.
+		/// <para>Limits a number between two other numbers.</para>
+		/// <para>Respects <paramref name="from"/> being larger than <paramref name="to"/>.</para>
 		/// </summary>
-		/// <remarks>Respects <paramref name="from"/> being larger than <paramref name="to"/>.</remarks>
 		public static int Clamp(int value, int from, int to)
 		{
 			int min = from;
@@ -97,7 +100,6 @@ namespace Engine
 		/// <param name="inMax">The input maximum value.</param>
 		/// <param name="outMin">The output minimum value.</param>
 		/// <param name="outMax">The output maximum value.</param>
-		///
 		public static float Map(float value, float inMin, float inMax, float outMin, float outMax)
 		{
 			return (value - inMin) * (outMax - outMin) / (inMax - inMin) + outMin;
@@ -131,7 +133,6 @@ namespace Engine
 		/// <param name="destination">The target point.</param>
 		/// <param name="origin">Current position.</param>
 		/// <param name="distance">Distance to maintain.</param>
-		/// <returns></returns>
 		public static Vector3 GetPositionAtDistance(Vector3 destination, Vector3 origin, float distance)
 		{
 			Vector3 direction = (destination - origin).normalized;
@@ -143,7 +144,6 @@ namespace Engine
 		/// </summary>
 		/// <param name="from">The camera to use.</param>
 		/// <param name="radius">Radius of the area.</param>
-		/// <returns></returns>
 		public static float DistanceToView(Camera from, float radius)
 		{
 			return radius / Mathf.Sin(from.fieldOfView * Mathf.Deg2Rad / 2f);
@@ -169,8 +169,9 @@ namespace Engine
 			return new Vector2(point.x * cos - point.y * sin, point.x * sin + point.y * cos);
 		}
 
-
+		/// <summary>
 		/// Loop an angle around within a -180° to +180° range.
+		/// </summary>
 		public static float ClampDeltaAngle(float delta)
 		{
 			if (delta > 180)
@@ -193,9 +194,9 @@ namespace Engine
 		}
 
 		/// <summary>
-		/// Loop an angle around within a -360° to +360° range and limit it between two values.
+		/// <para>Loop an angle around within a -360° to +360° range and limit it between two values.</para>
+		/// <para>Respects <paramref name="from"/> being larger than <paramref name="to"/>.</para>
 		/// </summary>
-		/// <remarks>Respects <paramref name="from"/> being larger than <paramref name="to"/>.</remarks>
 		public static float ClampAngle(float angle, float from, float to)
 		{
 			return Clamp(ClampAngle(angle), from, to);

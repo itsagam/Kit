@@ -10,9 +10,9 @@ namespace Engine.Behaviours
     public class MoveRandomly : MonoBehaviour
     {
         /// <summary>
-        /// The area to move around in.
+        /// <para>The area to move around in.</para>
+        /// <para>Could be a collider, renderer or transform.</para>
         /// </summary>
-        /// <remarks></remarks>
         [Tooltip("The area to move around in; could be a collider, renderer or transform.")]
         public Component Area;
 

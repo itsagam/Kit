@@ -3,10 +3,13 @@ using UnityEngine;
 
 namespace Engine
 {
+	/// <summary>
+	/// <see cref="Bounds"/> extensions.
+	/// </summary>
 	public static class BoundsExtensions
 	{
 		/// <summary>
-		/// Rotate the bounds.
+		/// Rotate the <see cref="Bounds"/>.
 		/// </summary>
 		public static Bounds Rotate(this Bounds bounds, Quaternion rotation)
 		{
@@ -22,7 +25,7 @@ namespace Engine
 		}
 
 		/// <summary>
-		/// Get all the vertices on the bounds.
+		/// Get all the vertices on the <see cref="Bounds"/>.
 		/// </summary>
 		public static Vector3[] GetPoints(this Bounds bounds)
 		{
@@ -39,7 +42,7 @@ namespace Engine
 		}
 
 		/// <summary>
-		/// Get a random point within the bounds.
+		/// Get a random point within the <see cref="Bounds"/>.
 		/// </summary>
 		public static Vector3 GetRandomPoint(this Bounds bounds)
 		{
@@ -51,7 +54,7 @@ namespace Engine
 		}
 
 		/// <summary>
-		/// Returns whether it overlaps with another bounds.
+		/// Returns whether it overlaps with another <see cref="Bounds"/>.
 		/// </summary>
 		public static bool Overlaps(this Bounds boundsA, Bounds boundsB)
 		{

@@ -215,7 +215,7 @@ namespace Engine.UI.Widgets
 		}
 
 		/// <summary>
-		/// The sprite to use for a zero point of rating.
+		/// The <see cref="Sprite"/> to use for a zero point of rating.
 		/// </summary>
 		[ShowInInspector]
 		[FoldoutGroup("Sprites")]
@@ -231,7 +231,7 @@ namespace Engine.UI.Widgets
 		}
 
 		/// <summary>
-		/// The sprite to use for half a point of rating.
+		/// The <see cref="Sprite"/> to use for half a point of rating.
 		/// </summary>
 		[ShowInInspector]
 		[ShowIf("allowHalf")]
@@ -248,7 +248,7 @@ namespace Engine.UI.Widgets
 		}
 
 		/// <summary>
-		/// The sprite to use for a full point of rating.
+		/// The <see cref="Sprite"/> to use for a full point of rating.
 		/// </summary>
 		[ShowInInspector]
 		[FoldoutGroup("Sprites")]

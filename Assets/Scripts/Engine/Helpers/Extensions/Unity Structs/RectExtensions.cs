@@ -2,10 +2,13 @@
 
 namespace Engine
 {
+	/// <summary>
+	/// <see cref="Rect"/> extensions.
+	/// </summary>
 	public static class RectExtensions
 	{
 		/// <summary>
-		/// Returns the top-left point of a Rect.
+		/// Returns the top-left point of a <see cref="Rect"/>.
 		/// </summary>
 		public static Vector2 TopLeft(this Rect rect)
 		{
@@ -13,7 +16,7 @@ namespace Engine
 		}
 
 		/// <summary>
-		/// Returns the top-right point of a Rect.
+		/// Returns the top-right point of a <see cref="Rect"/>.
 		/// </summary>
 		public static Vector2 TopRight(this Rect rect)
 		{
@@ -21,7 +24,7 @@ namespace Engine
 		}
 
 		/// <summary>
-		/// Returns the bottom-left point of a Rect.
+		/// Returns the bottom-left point of a <see cref="Rect"/>.
 		/// </summary>
 		public static Vector2 BottomLeft(this Rect rect)
 		{
@@ -29,7 +32,7 @@ namespace Engine
 		}
 
 		/// <summary>
-		/// Returns the bottom-right point of a Rect.
+		/// Returns the bottom-right point of a <see cref="Rect"/>.
 		/// </summary>
 		public static Vector2 BottomRight(this Rect rect)
 		{

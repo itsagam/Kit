@@ -15,7 +15,7 @@ namespace Engine
 		public const string Group = "Effects";
 
 		/// <summary>
-		/// Spawn a ParticleSystem and pool it after it finishes.
+		/// Spawn a <see cref="ParticleSystem"/> and pool it after it finishes.
 		/// </summary>
 		/// <returns>The pool instance.</returns>
 		public static ParticleSystem Spawn(ParticleSystem prefab, Vector3 position)
@@ -29,7 +29,7 @@ namespace Engine
 		}
 
 		/// <summary>
-		/// Spawn a ParticleSystem and pool it after it finishes.
+		/// Spawn a <see cref="ParticleSystem"/> and pool it after it finishes.
 		/// </summary>
 		/// <returns>The pool instance.</returns>
 		public static ParticleSystem Spawn(ParticleSystem prefab, Vector3 position, Quaternion rotation)
@@ -43,7 +43,7 @@ namespace Engine
 		}
 
 		/// <summary>
-		/// Spawn a ParticleSystem and pool it after it finishes.
+		/// Spawn a <see cref="ParticleSystem"/> and pool it after it finishes.
 		/// </summary>
 		/// <returns>The pool instance.</returns>
 		public static ParticleSystem Spawn(ParticleSystem prefab, Transform parent, bool worldSpace = false)
@@ -57,7 +57,7 @@ namespace Engine
 		}
 
 		/// <summary>
-		/// Spawn a ParticleSystem and pool it after it finishes.
+		/// Spawn a <see cref="ParticleSystem"/> and pool it after it finishes.
 		/// </summary>
 		/// <returns>The pool instance.</returns>
 		public static ParticleSystem Spawn(ParticleSystem prefab, Transform parent, Vector3 position)
@@ -74,7 +74,7 @@ namespace Engine
 		}
 
 		/// <summary>
-		/// Spawn a ParticleSystem and pool it after it finishes.
+		/// Spawn a <see cref="ParticleSystem"/> and pool it after it finishes.
 		/// </summary>
 		/// <returns>The pool instance.</returns>
 		public static ParticleSystem Spawn(ParticleSystem prefab, Transform parent, Vector3 position, Quaternion rotation)

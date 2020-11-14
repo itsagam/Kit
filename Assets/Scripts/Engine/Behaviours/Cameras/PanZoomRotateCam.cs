@@ -15,21 +15,20 @@ namespace Engine.Behaviours
 	{
 		#region Fields
 		/// <summary>
-		/// Area/bounds to focus on, be it a transform, renderer or collider.
+		/// <para>Area/bounds to focus on, be it a transform, renderer or collider.</para>
+		/// <para>Will be origin if not provided.</para>
 		/// </summary>
-		/// <remarks>Will be origin if not provided.</remarks>
 		[Tooltip("Area/bounds to focus on, be it a transform, renderer or collider; will be origin if not provided.")]
 		[SceneObjectsOnly]
 		public Component View;
 
 		/// <summary>
-		/// Smoothing to apply while Lerp-ing.
+		/// <para>Smoothing to apply while Lerp-ing.</para>
+		/// <para>Applies to position, rotation and orthographicSize.</para>
 		/// </summary>
-		/// <remarks>Applies to position, rotation and orthographicSize.</remarks>
 		[Tooltip("Smoothing to apply while Lerp-ing. Applies to position, rotation and orthographicSize.")]
 		[MinValue(0.0f)]
 		public float Smoothing = 10f;
-
 
 		/// <summary>
 		/// Whether to allow panning.

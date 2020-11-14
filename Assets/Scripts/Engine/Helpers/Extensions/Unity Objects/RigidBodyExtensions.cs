@@ -2,6 +2,9 @@ using UnityEngine;
 
 namespace Engine
 {
+	/// <summary>
+	/// <see cref="Rigidbody"/>/<see cref="Rigidbody2D"/> extensions.
+	/// </summary>
 	public static class RigidBodyExtensions
 	{
 		/// <summary>

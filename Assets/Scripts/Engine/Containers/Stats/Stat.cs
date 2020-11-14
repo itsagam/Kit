@@ -4,14 +4,13 @@ using UniRx;
 namespace Engine.Containers
 {
 	/// <summary>
-	/// Represents the base and current value of a single stat.
+	/// <para> Represents the base and current value of a single stat. </para>
+	/// <para>Multiple instances of this class be used instead of the Stats class if access through individual variables is desired.</para>
 	/// </summary>
-	/// <remarks>Multiple instances of this class be used instead of the Stats class if access through individual variables is
-	/// desired.</remarks>
 	public class Stat: IDisposable
 	{
 		/// <summary>
-		/// The IUpgradeable to use for calculating current value.
+		/// The <see cref="IUpgradeable"/> to use for calculating current value.
 		/// </summary>
 		public IUpgradeable Upgradeable;
 
@@ -30,6 +29,7 @@ namespace Engine.Containers
 		public Stat()
 		{
 		}
+
 
 		public Stat(IUpgradeable upgradeable, string id)
 		{

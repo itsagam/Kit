@@ -81,7 +81,7 @@ namespace Engine.UI
 		}
 
 		/// <summary>
-		/// Returns the UI element at a particular index, or null if <paramref name="index"/> is out-of-bounds.
+		/// Returns the UI element at a particular index, or <see langword="null" /> if <paramref name="index"/> is out-of-bounds.
 		/// </summary>
 		public virtual T GetItem<T>(int index) where T: Item
 		{
@@ -124,7 +124,7 @@ namespace Engine.UI
 		}
 
 		/// <summary>
-		/// Returns the UI element at a particular index, or null if <paramref name="index"/> is out-of-bounds.
+		/// Returns the UI element at a particular index, or <see langword="null" /> if <paramref name="index"/> is out-of-bounds.
 		/// </summary>
 		public virtual Item this[int index] => GetItem(index);
 

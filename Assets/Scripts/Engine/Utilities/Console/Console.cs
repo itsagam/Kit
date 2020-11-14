@@ -17,7 +17,7 @@ using Object = UnityEngine.Object;
 namespace Engine
 {
 	/// <summary>
-	/// In-game Lua console. Press Tilde (~) on PC or flick-down on mobile to show.
+	/// In-game Lua console. Press tilde (~) on PC or flick-down on mobile to show.
 	/// </summary>
 	public static class Console
 	{
@@ -42,7 +42,7 @@ namespace Engine
 		public static int Depth = 2;
 
 		/// <summary>
-		/// Color to use for showing Debug.Log messages.
+		/// Color to use for showing <see cref="Debug.Log(object)"/> messages.
 		/// </summary>
 		public static string LogColor = "#7EF9FF";
 
@@ -57,7 +57,7 @@ namespace Engine
 		private const string CommandPrefix = "> ";
 
 		/// <summary>
-		/// Text to display for null objects.
+		/// Text to display for <see langword="null" /> objects.
 		/// </summary>
 		private const string NullString = "nil";
 

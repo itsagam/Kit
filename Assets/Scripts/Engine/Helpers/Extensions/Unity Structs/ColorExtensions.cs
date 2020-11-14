@@ -2,10 +2,13 @@ using UnityEngine;
 
 namespace Engine
 {
+	/// <summary>
+	/// <see cref="Color"/> extensions.
+	/// </summary>
 	public static class ColorExtensions
 	{
 		/// <summary>
-		/// Copy values from another instance and return the Color.
+		/// Copy values from another instance and return the <see cref="Color"/>.
 		/// </summary>
 		public static Color Copy(this Color color)
 		{
@@ -13,7 +16,7 @@ namespace Engine
 		}
 
 		/// <summary>
-		/// Copy red component and return the Color.
+		/// Copy red component and return the <see cref="Color"/>.
 		/// </summary>
 		public static Color CopyRed(this Color color, Color from)
 		{
@@ -22,7 +25,7 @@ namespace Engine
 		}
 
 		/// <summary>
-		/// Copy green component and return the Color.
+		/// Copy green component and return the <see cref="Color"/>.
 		/// </summary>
 		public static Color CopyGreen(this Color color, Color from)
 		{
@@ -31,7 +34,7 @@ namespace Engine
 		}
 
 		/// <summary>
-		/// Copy blue component and return the Color.
+		/// Copy blue component and return the <see cref="Color"/>.
 		/// </summary>
 		public static Color CopyBlue(this Color color, Color from)
 		{
@@ -40,7 +43,7 @@ namespace Engine
 		}
 
 		/// <summary>
-		/// Copy alpha component and return the Color.
+		/// Copy alpha component and return the <see cref="Color"/>.
 		/// </summary>
 		public static Color CopyAlpha(this Color color, Color from)
 		{
@@ -49,7 +52,7 @@ namespace Engine
 		}
 
 		/// <summary>
-		/// Set red component and return the Color.
+		/// Set red component and return the <see cref="Color"/>.
 		/// </summary>
 		public static Color SetRed(this Color color, float r)
 		{
@@ -58,7 +61,7 @@ namespace Engine
 		}
 
 		/// <summary>
-		/// Set green component and return the Color.
+		/// Set green component and return the <see cref="Color"/>.
 		/// </summary>
 		public static Color SetGreen(this Color color, float g)
 		{
@@ -67,7 +70,7 @@ namespace Engine
 		}
 
 		/// <summary>
-		/// Set blue component and return the Color.
+		/// Set blue component and return the <see cref="Color"/>.
 		/// </summary>
 		public static Color SetBlue(this Color color, float b)
 		{
@@ -76,7 +79,7 @@ namespace Engine
 		}
 
 		/// <summary>
-		/// Set alpha component and return the Color.
+		/// Set alpha component and return the <see cref="Color"/>.
 		/// </summary>
 		public static Color SetAlpha(this Color color, float alpha)
 		{

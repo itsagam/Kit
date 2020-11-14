@@ -72,19 +72,25 @@ namespace Engine
 		Auto,
 
 		/// <summary>
-		/// Deactivate the window GameObject.
+		/// Deactivate the window <see cref="GameObject"/>.
 		/// </summary>
 		Deactivate,
 
 		/// <summary>
-		/// Destroy the window GameObject.
+		/// Destroy the window <see cref="GameObject"/>.
 		/// </summary>
 		Destroy
 	}
 
 	/// <summary>
+	/// <para>
 	/// Global access to UI and window management. Your screens need to derive from <see cref="Window"/> which you can then show by calling
-	/// UIManager.Show on prefabs. You can you also call Show/Hide on them directly if they are in the scene.
+	/// <see cref="UIManager.Show(Window, object, Transform, string, WindowConflictMode)" /> on prefabs.
+	/// </para>
+	/// <para>
+	/// You can you also call <see cref="Window.Show(object)"/>Show/<see cref="Window.Hide(WindowHideMode)"/> on them directly if they are
+	/// in the scene, for example.
+	/// </para>
 	/// </summary>
 	public static class UIManager
 	{
@@ -99,7 +105,7 @@ namespace Engine
 		public const WindowHideMode DefaultHideMode = WindowHideMode.Auto;
 
 		/// <summary>
-		/// The sort order of the canvas that's used for newly-created windows.
+		/// The sort order of the <see cref="Canvas" /> that's used for newly-created windows.
 		/// </summary>
 		public const int WindowCanvasOrder = 1000;
 
@@ -131,7 +137,8 @@ namespace Engine
 		private static Canvas lastCanvas = null;
 
 		/// <summary>
-		/// Show a window from a path.
+		/// <para>Show a window from a path.</para>
+		/// <para>Can be <c>await</c>-ed upon.</para>
 		/// </summary>
 		/// <param name="path">The path to window (should be in a Resources folder).</param>
 		/// <param name="data">The data to pass to the window.</param>
@@ -139,7 +146,6 @@ namespace Engine
 		/// <param name="animation">The animation state name to play when showing.</param>
 		/// <param name="conflictMode">What to do if the window already exists?</param>
 		/// <returns>An instance of the window.</returns>
-		/// <remarks>Can be await-ed upon.</remarks>
 		public static UniTask<Window> Show(string path,
 										   object data = null,
 										   Transform parent = default,
@@ -150,7 +156,8 @@ namespace Engine
 		}
 
 		/// <summary>
-		/// Show a window using a prefab.
+		/// <para>Show a window using a prefab.</para>
+		/// <para>Can be <c>await</c>-ed upon.</para>
 		/// </summary>
 		/// <param name="prefab">The prefab to use for instantiating.</param>
 		/// <param name="data">The data to pass to the window.</param>
@@ -158,7 +165,6 @@ namespace Engine
 		/// <param name="animation">The animation state to play when showing.</param>
 		/// <param name="conflictMode">What to do if the window already exists?</param>
 		/// <returns>An instance of the window.</returns>
-		/// <remarks>Can be await-ed upon.</remarks>
 		public static UniTask<Window> Show(Window prefab,
 										   object data = null,
 										   Transform parent = default,
@@ -229,13 +235,13 @@ namespace Engine
 		}
 
 		/// <summary>
-		/// Hide a window.
+		/// <para>Hide a window.</para>
+		/// <para>Can be <c>await</c>-ed upon.</para>
 		/// </summary>
-		/// <param name="name">The window (prefab/GameObject) name to hide.</param>
+		/// <param name="name">The window (prefab/<see cref="GameObject"/>) name to hide.</param>
 		/// <param name="animation">The animation state to play when hiding.</param>
 		/// <param name="mode">Whether to de-activate or destroy the instance.</param>
 		/// <returns>Whether the said window existed was successfully hidden.</returns>
-		/// <remarks>Can be await-ed upon.</remarks>
 		public static UniTask<bool> Hide(string name,
 										 string animation = default,
 										 WindowHideMode mode = DefaultHideMode)
@@ -249,7 +255,7 @@ namespace Engine
 		/// <summary>
 		/// Find a shown window by providing a name.
 		/// </summary>
-		/// <param name="name">The window (prefab/GameObject) name.</param>
+		/// <param name="name">The window (prefab/<see cref="GameObject"/>) name.</param>
 		/// <returns>Reference to the window.</returns>
 		public static Window Find(string name)
 		{
@@ -268,7 +274,7 @@ namespace Engine
 		/// <summary>
 		/// Returns whether a window with a particular name is shown.
 		/// </summary>
-		/// <param name="name">The window (prefab/GameObject) name.</param>
+		/// <param name="name">The window (prefab/<see cref="GameObject"/>) name.</param>
 		public static bool IsShown(string name)
 		{
 			return Find(name) != null;
@@ -307,12 +313,12 @@ namespace Engine
 		}
 
 		/// <summary>
-		/// Returns the first window shown, or null if none are.
+		/// Returns the first window shown, or <see langword="null"/> if none are.
 		/// </summary>
 		public static Window First => Windows.FirstOrDefault();
 
 		/// <summary>
-		/// Returns the last window shown, or null if none are.
+		/// Returns the last window shown, or <see langword="null"/> if none are.
 		/// </summary>
 		public static Window Last => Windows.LastOrDefault();
 	}

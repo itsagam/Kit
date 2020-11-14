@@ -55,7 +55,7 @@ namespace Engine
 		public const float DefaultFadeTime = 1.0f;
 
 		/// <summary>
-		/// The sort order of the canvas that's used for fading.
+		/// The sort order of the <see cref="Canvas"/> that's used for fading.
 		/// </summary>
 		public const int FadeCanvasOrder = 9999;
 
@@ -102,17 +102,17 @@ namespace Engine
 
 		private static Image fadeImage;
 
-		/// <summary>
-		/// Fade the screen.
-		/// </summary>
-		/// <param name="to">To alpha.</param>
-		/// <param name="from">From alpha. Current if not specified.</param>
-		/// <param name="color">Fade color. Default if not specified.</param>
-		/// <param name="time">Time to take.</param>
-		/// <param name="onComplete">Method to call when done.</param>
-		/// <returns>A UniTask that emits when fading's done.</returns>
-		/// <remarks>Can be await-ed upon.</remarks>
-		public static UniTask Fade(float to,
+        /// <summary>
+        /// <para>Fade the screen.</para>
+        /// <para>Can be <c>await</c>-ed upon.</para>
+        /// </summary>
+        /// <param name="to">To alpha.</param>
+        /// <param name="from">From alpha. Current if not specified.</param>
+        /// <param name="color">Fade color. Default if not specified.</param>
+        /// <param name="time">Time to take.</param>
+        /// <param name="onComplete">Method to call when done.</param>
+        /// <returns>A UniTask that emits when fading's done.</returns>
+        public static UniTask Fade(float to,
 								   float? from = null,
 								   Color? color = null,
 								   float time = DefaultFadeTime,
@@ -147,13 +147,13 @@ namespace Engine
 		}
 
 		/// <summary>
-		/// Fade in the screen.
+		/// <para>Fade in the screen.</para>
+		/// <para>Can be <c>await</c>-ed upon.</para>
 		/// </summary>
 		/// <param name="color">Fade color. Default if not specified.</param>
 		/// <param name="time">Time to take.</param>
 		/// <param name="onComplete">Method to call when done.</param>
 		/// <returns>A UniTask that emits when fading's done.</returns>
-		/// <remarks>Can be await-ed upon.</remarks>
 		public static UniTask FadeIn(Color? color = null, float time = DefaultFadeTime, Action onComplete = null)
 		{
 			FadingIn?.Invoke();
@@ -169,13 +169,13 @@ namespace Engine
 		}
 
 		/// <summary>
-		/// Fade out the screen.
+		/// <para>Fade out the screen.</para>
+		/// <para>Can be <c>await</c>-ed upon.</para>
 		/// </summary>
 		/// <param name="color">Fade color. Default if not specified.</param>
 		/// <param name="time">Time to take.</param>
 		/// <param name="onComplete">Method to call when done.</param>
 		/// <returns>A UniTask that emits when fading's done.</returns>
-		/// <remarks>Can be await-ed upon.</remarks>
 		public static UniTask FadeOut(Color? color = null, float time = DefaultFadeTime, Action onComplete = null)
 		{
 			FadingOut?.Invoke();
@@ -191,7 +191,8 @@ namespace Engine
 		}
 
 		/// <summary>
-		/// Reload the active scene.
+		/// <para>Reload the active scene.</para>
+		/// <para>Can be <c>await</c>-ed upon.</para>
 		/// </summary>
 		/// <param name="fadeMode">How to fade?</param>
 		/// <param name="fadeColor">Fade color. Default if not specified.</param>
@@ -201,7 +202,6 @@ namespace Engine
 		/// <param name="onLoadComplete">Method to call when loading completes.</param>
 		/// <param name="onComplete">Method to call when loading and fading (if applicable) completes.</param>
 		/// <returns>A UniTask that emits when fading's done.</returns>
-		/// <remarks>Can be await-ed upon.</remarks>
 		public static UniTask ReloadScene(FadeMode fadeMode = DefaultFadeMode,
 										  Color? fadeColor = null,
 										  float fadeTime = DefaultFadeTime,
@@ -214,7 +214,8 @@ namespace Engine
 		}
 
 		/// <summary>
-		/// Load a scene.
+		/// <para>Load a scene.</para>
+		/// <para>Can be <c>await</c>-ed upon.</para>
 		/// </summary>
 		/// <param name="nameOrPath">Name or path of the scene to load.</param>
 		/// <param name="fadeMode">How to fade?</param>
@@ -225,7 +226,6 @@ namespace Engine
 		/// <param name="onLoadComplete">Method to call when loading completes.</param>
 		/// <param name="onComplete">Method to call when loading and fading (if applicable) completes.</param>
 		/// <returns>A UniTask that emits when fading's done.</returns>
-		/// <remarks>Can be await-ed upon.</remarks>
 		public static async UniTask LoadScene(string nameOrPath,
 											  FadeMode fadeMode = DefaultFadeMode,
 											  Color? fadeColor = null,

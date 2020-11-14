@@ -6,13 +6,13 @@ using UnityEngine;
 namespace Engine.Behaviours
 {
 	/// <summary>
-	/// Orbits & zooms in/out a transform around another one with gestures.
+	/// Orbits & zooms in/out a <see cref="Transform"/> around another one with gestures.
 	/// </summary>
 	[RequireComponent(typeof(ScreenTransformGesture))]
 	public class OrbitCam: MonoBehaviour
 	{
 		/// <summary>
-		/// The transform to orbit around.
+		/// The <see cref="Transform"/> to orbit around.
 		/// </summary>
 		[Tooltip("The transform to orbit around.")]
 		public Transform Target;

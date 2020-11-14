@@ -4,6 +4,9 @@ using System.Text;
 
 namespace Engine
 {
+	/// <summary>
+	/// LINQ extensions.
+	/// </summary>
 	public static class EnumerableExtensions
 	{
 		/// <summary>
@@ -72,7 +75,7 @@ namespace Engine
 		}
 
 		/// <summary>
-		/// Combine a enumerable of strings separated by a delimiter and append them to a StringBuilder.
+		/// Combine a enumerable of strings separated by a delimiter and append them to a <see cref="StringBuilder"/>.
 		/// </summary>
 		public static void Join(this IEnumerable<string> source, StringBuilder builder, string separator = ", ")
 		{

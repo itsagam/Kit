@@ -4,12 +4,12 @@ using UnityEngine;
 namespace Engine.Behaviours
 {
 	/// <summary>
-	/// Follows a transform while keeping a certain distance.
+	/// Follow a <see cref="Transform"/> while keeping a certain distance.
 	/// </summary>
 	public class FollowTransform : MonoBehaviour
 	{
 		/// <summary>
-		/// The target transform to follow.
+		/// The target <see cref="Transform"/> to follow.
 		/// </summary>
 		[Tooltip("The target transform to follow.")]
 		public Transform Target;
@@ -27,9 +27,9 @@ namespace Engine.Behaviours
 		public float MoveSpeed = 10.0f;
 
 		/// <summary>
-		/// Should the transform keep facing the target?
+		/// Should it keep facing the target?
 		/// </summary>
-		[Tooltip("Should the transform keep facing the target?")]
+		[Tooltip("Should it keep facing the target?")]
 		public bool Face = true;
 
 		/// <summary>
@@ -55,7 +55,7 @@ namespace Engine.Behaviours
 		}
 
 		/// <summary>
-		/// Follow a different transform using the current distance between them.
+		/// Follow a different <see cref="Transform"/> using the current distance between them.
 		/// </summary>
 		public void Follow(Transform target)
 		{
@@ -66,7 +66,7 @@ namespace Engine.Behaviours
 		}
 
 		/// <summary>
-		/// Follow a different transform at a specified distance.
+		/// Follow a different <see cref="Transform"/> at a specified distance.
 		/// </summary>
 		public void Follow(Transform target, float distance)
 		{

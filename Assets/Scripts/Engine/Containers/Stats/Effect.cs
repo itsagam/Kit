@@ -3,7 +3,7 @@
 namespace Engine.Containers
 {
 	/// <summary>
-	/// Represents how an Effect affects the value.
+	/// Represents how an <see cref="Effect"/> affects the value.
 	/// </summary>
 	public enum EffectType
 	{
@@ -45,13 +45,13 @@ namespace Engine.Containers
 		public float Value;
 
 		/// <summary>
-		/// Create a new Effect.
+		/// Create a new <see cref="Effect"/>.
 		/// </summary>
 		/// <param name="stat">The ID of the stat.</param>
 		/// <param name="value">The Type and Value represented as a string.</param>
-		/// <remarks>See the Parse function.</remarks>
-		/// <example>new Effect("Health", "+50%")</example>
-		/// <example>new Effect("Damage", "x2")</example>
+		/// <see cref="Parse"/>
+		/// <example><code>new Effect("Health", "+50%")</code></example>
+		/// <example><code>new Effect("Damage", "x2")</code></example>
 		public Effect(string stat, string value)
 		{
 			Stat = stat;
@@ -59,7 +59,7 @@ namespace Engine.Containers
 		}
 
 		/// <summary>
-		/// Create a new Effect.
+		/// Create a new <see cref="Effect"/>.
 		/// </summary>
 		/// <param name="stat">The ID of the stat.</param>
 		/// <param name="type">The effect type.</param>
@@ -78,19 +78,18 @@ namespace Engine.Containers
 		}
 
 		/// <summary>
-		///
 		/// <para>
-		/// Converts a string to EffectType and value.
+		/// Converts a string to <see cref="EffectType"/> and value.
 		/// </para>
 		///
 		/// <para>
-		/// "x" at the beginning of a string translates to EffectType.Multiplier, a string ending with "%" means Percentage, while
-		/// neither of those means Constant. Rest of the string should be a number denoting the value.
+		/// "x" at the beginning of a string translates to <see cref="EffectType.Multiplier"/>, a string ending with "%" means
+		/// <see cref="EffectType.Percentage"/>, while neither of those means <see cref="EffectType.Constant"/>. Rest of the string
+		/// should be a number denoting the value.
 		/// </para>
-		///
 		/// </summary>
 		///
-		/// <returns>The EffectType and value in the form of a tuple.</returns>
+		/// <returns>The <see cref="EffectType"/> and value in the form of a tuple.</returns>
 		public static (EffectType, float) Parse(string str)
 		{
 			(EffectType type, float value) output;
@@ -114,9 +113,10 @@ namespace Engine.Containers
 		}
 
 		/// <summary>
-		/// Converts the EffectType and value to a human-readable string.
+		/// Converts the <see cref="EffectType"/> and value to a human-readable string.
 		/// </summary>
-		/// <remarks>Conversion is same as the Parse function, except in reverse.</remarks>
+		/// <remarks>Conversion is same as the <see cref="Parse"/> function, except in reverse.</remarks>
+		/// <seealso cref="Parse"/>
 		public static string Convert(Effect effect)
 		{
 			string output = "";

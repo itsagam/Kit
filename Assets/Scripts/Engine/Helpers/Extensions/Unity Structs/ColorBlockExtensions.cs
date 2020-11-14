@@ -3,10 +3,13 @@ using UnityEngine.UI;
 
 namespace Engine
 {
+	/// <summary>
+	/// <see cref="ColorBlock"/> extensions.
+	/// </summary>
 	public static class ColorBlockExtensions
 	{
 		/// <summary>
-		/// Set the Normal color and return the ColorBlock.
+		/// Set the <see cref="ColorBlock.normalColor"/> and return the <see cref="ColorBlock"/>.
 		/// </summary>
 		public static ColorBlock SetNormalColor(this ColorBlock colorBlock, Color normalColor)
 		{
@@ -15,7 +18,7 @@ namespace Engine
 		}
 
 		/// <summary>
-		/// Set the Pressed color and return the ColorBlock.
+		/// Set the <see cref="ColorBlock.pressedColor"/>  and return the <see cref="ColorBlock"/>.
 		/// </summary>
 		public static ColorBlock SetPressedColor(this ColorBlock colorBlock, Color pressedColor)
 		{
@@ -24,7 +27,7 @@ namespace Engine
 		}
 
 		/// <summary>
-		/// Set the Highlighted color and return the ColorBlock.
+		/// Set the <see cref="ColorBlock.highlightedColor"/> and return the <see cref="ColorBlock"/>.
 		/// </summary>
 		public static ColorBlock SetHighlightedColor(this ColorBlock colorBlock, Color disabledColor)
 		{
@@ -33,7 +36,7 @@ namespace Engine
 		}
 
 		/// <summary>
-		/// Set the Disabled color and return the ColorBlock.
+		/// Set the <see cref="ColorBlock.disabledColor"/> and return the <see cref="ColorBlock"/>.
 		/// </summary>
 		public static ColorBlock SetDisabledColor(this ColorBlock colorBlock, Color disabledColor)
 		{
@@ -42,7 +45,7 @@ namespace Engine
 		}
 
 		/// <summary>
-		/// Set the fade duration and return the ColorBlock.
+		/// Set the fade duration and return the <see cref="ColorBlock"/>.
 		/// </summary>
 		public static ColorBlock SetFadeDuration(this ColorBlock colorBlock, float fadeDuration)
 		{
@@ -51,7 +54,7 @@ namespace Engine
 		}
 
 		/// <summary>
-		/// Set the color multiplier and return the ColorBlock.
+		/// Set the color multiplier and return the <see cref="ColorBlock"/>.
 		/// </summary>
 		public static ColorBlock SetColorMultiplier(this ColorBlock colorBlock, float colorMultiplier)
 		{

@@ -10,7 +10,7 @@ using Random = UnityEngine.Random;
 namespace Engine
 {
 	/// <summary>
-	/// Allows to play & pool sounds and group them into AudioSources. Handles background music.
+	/// Allows to play & pool sounds and group them into <see cref="AudioSource"/>s. Handles background music.
 	/// </summary>
 	public static class AudioManager
 	{
@@ -74,7 +74,7 @@ namespace Engine
 		#region Group management
 
 		/// <summary>
-		/// Create a new AudioSource for a sound group.
+		/// Create a new <see cref="AudioSource"/> for a sound group.
 		/// </summary>
 		/// <param name="name">Name of the group.</param>
 		/// <param name="loadVolume">Whether to load the group's volume from settings.</param>
@@ -91,7 +91,7 @@ namespace Engine
 		}
 
 		/// <summary>
-		/// Get the AudioSource for a group.
+		/// Get the <see cref="AudioSource"/> for a group.
 		/// </summary>
 		public static AudioSource GetGroup(string name)
 		{
@@ -99,7 +99,7 @@ namespace Engine
 		}
 
 		/// <summary>
-		/// Get the AudioSource for a group and create a new one for it if it doesn't exist.
+		/// Get the <see cref="AudioSource"/> for a group and create a new one for it if it doesn't exist.
 		/// </summary>
 		public static AudioSource GetOrCreateGroup(string name)
 		{
@@ -107,7 +107,7 @@ namespace Engine
 		}
 
 		/// <summary>
-		/// Destroy the AudioSource for a group.
+		/// Destroy the <see cref="AudioSource"/> for a group.
 		/// </summary>
 		public static bool RemoveGroup(string name)
 		{
@@ -121,7 +121,7 @@ namespace Engine
 		}
 
 		/// <summary>
-		/// Returns all AudioSources.
+		/// Returns all <see cref="AudioSource"/>s.
 		/// </summary>
 		public static IEnumerable<AudioSource> GetAllGroups()
 		{
@@ -162,7 +162,7 @@ namespace Engine
 		#region Group playback
 
 		/// <summary>
-		/// Play an audio with a group's AudioSource. Create the group if it doesn't exist.
+		/// Play an audio with a group's <see cref="AudioSource"/>. Create the group if it doesn't exist.
 		/// </summary>
 		public static void Play(string group, AudioClip clip)
 		{
@@ -213,7 +213,6 @@ namespace Engine
 		/// <summary>
 		/// Play a random audio from a list.
 		/// </summary>
-		/// <param name="clips"></param>
 		public static void PlaySound(IReadOnlyList<AudioClip> clips)
 		{
 			if (clips == null || clips.Count <= 0)
@@ -236,7 +235,7 @@ namespace Engine
 		#region AudioSource (Pooled) playback
 
 		/// <summary>
-		/// Spawn an AudioSource and pool it after the sound ends.
+		/// Spawn an <see cref="AudioSource"/> and pool it after the sound ends.
 		/// </summary>
 		/// <returns>The pool instance.</returns>
 		public static AudioSource Play(AudioSource prefab)
@@ -250,7 +249,7 @@ namespace Engine
 		}
 
 		/// <summary>
-		/// Spawn an AudioSource and pool it after the sound ends.
+		/// Spawn an <see cref="AudioSource"/> and pool it after the sound ends.
 		/// </summary>
 		/// <returns>The pool instance.</returns>
 		public static AudioSource Play(AudioSource prefab, Transform parent, bool worldSpace = false)
@@ -264,7 +263,7 @@ namespace Engine
 		}
 
 		/// <summary>
-		/// Spawn an AudioSource and pool it after the sound ends.
+		/// Spawn an <see cref="AudioSource"/> and pool it after the sound ends.
 		/// </summary>
 		/// <returns>The pool instance.</returns>
 		public static AudioSource Play(AudioSource prefab, Vector3 position)
@@ -278,7 +277,7 @@ namespace Engine
 		}
 
 		/// <summary>
-		/// Spawn an AudioSource and pool it after the sound ends.
+		/// Spawn an <see cref="AudioSource"/> and pool it after the sound ends.
 		/// </summary>
 		/// <returns>The pool instance.</returns>
 		public static AudioSource Play(AudioSource prefab, Transform parent, Vector3 position)
@@ -305,18 +304,18 @@ namespace Engine
 		#region AudioClip (Unpooled) playback
 
 		/// <summary>
-		/// Play an audio with a dedicated AudioSource and destroy it after it ends (if it's not looping).
+		/// Play an audio with a dedicated <see cref="AudioSource"/> and destroy it after it ends (if it's not looping).
 		/// </summary>
-		/// <returns>The AudioSource instantiated.</returns>
+		/// <returns>The <see cref="AudioSource"/> instantiated.</returns>
 		public static AudioSource Play(AudioClip clip, bool loop = false, bool is3D = false)
 		{
 			return clip == null ? null : PlayDedicated(clip, loop, is3D);
 		}
 
 		/// <summary>
-		/// Play an audio with a dedicated AudioSource and destroy it after it ends (if it's not looping).
+		/// Play an audio with a dedicated <see cref="AudioSource"/> and destroy it after it ends (if it's not looping).
 		/// </summary>
-		/// <returns>The AudioSource instantiated.</returns>
+		/// <returns>The <see cref="AudioSource"/> instantiated.</returns>
 		public static AudioSource Play(AudioClip clip, Vector3 position, bool loop = false, bool is3D = true)
 		{
 			if (clip == null)
@@ -328,9 +327,9 @@ namespace Engine
 		}
 
 		/// <summary>
-		/// Play an audio with a dedicated AudioSource and destroy it after it ends (if it's not looping).
+		/// Play an audio with a dedicated <see cref="AudioSource"/> and destroy it after it ends (if it's not looping).
 		/// </summary>
-		/// <returns>The AudioSource instantiated.</returns>
+		/// <returns>The <see cref="AudioSource"/> instantiated.</returns>
 		public static AudioSource Play(AudioClip clip, Transform parent, bool loop = false, bool is3D = true)
 		{
 			if (clip == null)
@@ -342,9 +341,9 @@ namespace Engine
 		}
 
 		/// <summary>
-		/// Play an audio with a dedicated AudioSource and destroy it after it ends (if it's not looping).
+		/// Play an audio with a dedicated <see cref="AudioSource"/> and destroy it after it ends (if it's not looping).
 		/// </summary>
-		/// <returns>The AudioSource instantiated.</returns>
+		/// <returns>The <see cref="AudioSource"/> instantiated.</returns>
 		public static AudioSource Play(AudioClip clip, Transform parent, Vector3 position, bool loop = false, bool is3D = true)
 		{
 			if (clip == null)
@@ -385,17 +384,17 @@ namespace Engine
 		#region Public properties
 
 		/// <summary>
-		/// The AudioSource for background music.
+		/// The <see cref="AudioSource"/> for background music.
 		/// </summary>
 		public static AudioSource MusicSource => GetGroup(MusicGroup);
 
 		/// <summary>
-		/// The AudioSource for general sounds group.
+		/// The <see cref="AudioSource"/> for general sounds group.
 		/// </summary>
 		public static AudioSource SoundSource => GetGroup(SoundGroup);
 
 		/// <summary>
-		/// The AudioSource for UI sounds group.
+		/// The <see cref="AudioSource"/> for UI sounds group.
 		/// </summary>
 		public static AudioSource UISource => GetGroup(UIGroup);
 

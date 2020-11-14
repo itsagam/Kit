@@ -6,15 +6,15 @@ using UniRx;
 namespace Engine.Containers
 {
 	/// <summary>
-	/// Represents the base and current values of stats of an entity as a dictionary. Can be used with both POCO objects or MonoBehaviours
-	/// with Odin's SerializedMonoBehaviour.
+	/// Represents the base and current values of stats of an entity as a dictionary. Can be used with both POCO objects or
+	/// <see cref="UnityEngine.MonoBehaviour"/>s with Odin's <see cref="Sirenix.OdinInspector.SerializedMonoBehaviour"/>.
 	/// </summary>
-	/// <remarks>The class is highly optimized as the current values are only updated when the IUpgradeable adds or removes an Upgrade
-	/// or the base value of a property changes.</remarks>
+	/// <remarks>The class is highly optimized as the current values are only updated when the <see cref="IUpgradeable"/> adds or removes
+	/// an <see cref="Upgrade"/> or the base value of a property changes.</remarks>
 	public class Stats: Dictionary<string, StatBaseProperty>, IDisposable
 	{
 		/// <summary>
-		/// The IUpgradeable to use for calculating current values.
+		/// The <see cref="IUpgradeable"/> to use for calculating current values.
 		/// </summary>
 		public IUpgradeable Upgradeable;
 
@@ -25,6 +25,7 @@ namespace Engine.Containers
 
 		public Stats()
 		{
+
 		}
 
 		public Stats(IUpgradeable upgradeable)

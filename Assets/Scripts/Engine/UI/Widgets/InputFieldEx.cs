@@ -8,7 +8,7 @@ using UnityEngine.UI;
 namespace Engine.UI.Widgets
 {
 	/// <summary>
-	/// An enhanced <see cref="UnityEngine.UI.InputField"/> that allows you to hook into key presses on or manually send key events to it.
+	/// An enhanced <see cref="InputField"/> that allows you to hook into key presses on or manually send key events to it.
 	/// </summary>
 	public class InputFieldEx: InputField
 	{
@@ -47,7 +47,6 @@ namespace Engine.UI.Widgets
 		/// <param name="action">Method to call when the combination is pressed.</param>
 		/// <param name="modifiers">Key modifiers that should be pressed with it.</param>
 		/// <param name="disregard">Key modifiers that should be dis-regarded.</param>
-		/// <returns></returns>
 		public KeyHandler AddKeyHandler(KeyCode key,
 										Action action,
 										EventModifiers modifiers = EventModifiers.None,

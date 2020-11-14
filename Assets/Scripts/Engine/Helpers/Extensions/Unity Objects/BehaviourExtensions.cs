@@ -2,6 +2,9 @@
 
 namespace Engine
 {
+	/// <summary>
+	/// <see cref="Behaviour"/> extensions.
+	/// </summary>
 	public static class BehaviourExtensions
 	{
 		/// <summary>

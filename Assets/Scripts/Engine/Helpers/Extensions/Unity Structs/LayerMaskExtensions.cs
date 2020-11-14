@@ -2,6 +2,9 @@ using UnityEngine;
 
 namespace Engine
 {
+	/// <summary>
+	/// <see cref="LayerMask"/> extensions.
+	/// </summary>
 	public static class LayerMaskExtensions
 	{
 		/// <summary>

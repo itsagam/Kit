@@ -6,8 +6,8 @@ using UniRx;
 namespace Engine.Containers
 {
 	/// <summary>
-	/// Any entity (POCO or SerializedMonoBehaviour) that wishes to have stats should implement this interface and provide a
-	/// List of Upgrades.
+	/// Any entity (POCO or <see cref="Sirenix.OdinInspector.SerializedMonoBehaviour"/>) that wishes to have stats should implement this
+	/// interface and provide a list of Upgrades.
 	/// </summary>
 	public interface IUpgradeable
 	{
@@ -15,7 +15,7 @@ namespace Engine.Containers
 	}
 
 	/// <summary>
-	/// A more inspector-friendly list for use in (Serialized)MonoBehaviours.
+	/// A more inspector-friendly list for use in <see cref="Sirenix.OdinInspector.SerializedMonoBehaviour"/>s.
 	/// </summary>
 	public class UpgradeList: ReactiveCollection<Upgrade>
 	{
@@ -52,7 +52,7 @@ namespace Engine.Containers
 		}
 
 		/// <summary>
-		/// Add specified Effects.
+		/// Add specified <see cref="Effect"/>s.
 		/// </summary>
 		public void AddEffects(IEnumerable<Effect> effects)
 		{
@@ -60,7 +60,7 @@ namespace Engine.Containers
 		}
 
 		/// <summary>
-		/// Add specified Effect.
+		/// Add the specified <see cref="Effect"/>.
 		/// </summary>
 		public void AddEffect(Effect effect)
 		{
@@ -68,7 +68,7 @@ namespace Engine.Containers
 		}
 
 		/// <summary>
-		/// Create a new Effect and add it.
+		/// Create a new <see cref="Effect"/> and add it.
 		/// </summary>
 		/// <param name="stat">The stat ID.</param>
 		/// <param name="value">The effect Type and Value represented as a string.</param>
@@ -78,7 +78,7 @@ namespace Engine.Containers
 		}
 
 		/// <summary>
-		/// Create a new Effect and add it.
+		/// Create a new <see cref="Effect"/> and add it.
 		/// </summary>
 		/// <param name="stat">The stat ID.</param>
 		/// <param name="type">The effect's Type.</param>
@@ -89,7 +89,7 @@ namespace Engine.Containers
 		}
 
 		/// <summary>
-		/// Remove the specified effect.
+		/// Remove the specified <see cref="Effect"/>.
 		/// </summary>
 		public void RemoveEffect(Effect effect)
 		{
@@ -97,7 +97,7 @@ namespace Engine.Containers
 		}
 
 		/// <summary>
-		/// Remove all effects associated with the given stat ID.
+		/// Remove all <see cref="Effect"/>s associated with the given stat ID.
 		/// </summary>
 		public void RemoveEffects(string stat)
 		{
@@ -105,7 +105,7 @@ namespace Engine.Containers
 		}
 
 		/// <summary>
-		/// Find an Upgrade with its ID.
+		/// Find an <see cref="Upgrade" /> with its ID.
 		/// </summary>
 		public static Upgrade Find(IUpgradeable upgradeable, string id)
 		{
@@ -113,7 +113,7 @@ namespace Engine.Containers
 		}
 
 		/// <summary>
-		/// Remove an Upgrade with its ID.
+		/// Remove an <see cref="Upgrade" /> with its ID.
 		/// </summary>
 		public static bool RemoveFrom(IUpgradeable upgradeable, string id)
 		{

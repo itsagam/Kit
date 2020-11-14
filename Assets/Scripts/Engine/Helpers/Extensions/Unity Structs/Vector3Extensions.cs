@@ -2,6 +2,9 @@ using UnityEngine;
 
 namespace Engine
 {
+	/// <summary>
+	/// <see cref="Vector3"/> extensions.
+	/// </summary>
 	public static class Vector3Extensions
 	{
 		/// <summary>

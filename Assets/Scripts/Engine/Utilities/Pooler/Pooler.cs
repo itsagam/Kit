@@ -129,7 +129,7 @@ namespace Engine.Pooling
 		}
 
 		/// <summary>
-		/// Unregister a group. Called automatically.
+		/// Unregister a pool. Called automatically.
 		/// </summary>
 		public static void UncachePool(Pool pool)
 		{
@@ -456,6 +456,10 @@ namespace Engine.Pooling
 			return GetOrCreatePool(prefab).Instantiate<T>(position, rotation);
 		}
 
+		/// <summary>
+		/// Initialize a pool instance.
+		/// </summary>
+		/// <returns>The instance given.</returns>
 		public static T Instantiate<T>(T prefab, Vector3 position, Transform parent) where T: Component
 		{
 			return GetOrCreatePool(prefab).Instantiate<T>(position, parent);

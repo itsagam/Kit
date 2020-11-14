@@ -4,7 +4,7 @@ using UnityEngine;
 namespace Engine.Behaviours
 {
 	/// <summary>
-	/// Marks the GameObject for destruction after a specified time.
+	/// Marks the <see cref="GameObject"/> for destruction after a specified time.
 	/// </summary>
 	public class SelfDestroy: MonoBehaviour
 	{

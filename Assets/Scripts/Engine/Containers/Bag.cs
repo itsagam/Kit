@@ -9,8 +9,15 @@ namespace Engine.Containers
 	/// <summary>
 	/// A generic class that holds how much of a particular item you carry. Can be used to create things like Inventories or Wallets.
 	/// </summary>
-	/// <remarks>To create nested inventories, create Bag&lt;object&gt; and add other bags.</remarks>
-	/// <typeparam name="T">Type of items.</typeparam>
+	/// <typeparam name="T">Base type of items.</typeparam>
+	/// <example>
+	/// <code>
+	/// Bag&lt;Currency&gt; wallet = new Bag&lt;Currency&gt;();
+	/// wallet.Add(Currency.Diamonds, 15);
+	/// wallet -= new Bunch&lt;Currency&gt;(Currency.Diamonds, 10);
+	/// </code>
+	/// </example>
+	/// <remarks>To create nested inventories, create <c>Bag&lt;object&gt;</c> and add other bags.</remarks>
 	[DictionaryDrawerSettings(KeyLabel = "Item", ValueLabel = "Amount")]
 	public class Bag<T>: Dictionary<T, int>
 	{
@@ -31,14 +38,13 @@ namespace Engine.Containers
 
 		/// <summary>
 		/// A dictionary that tells the maximum amount of items of different types can be there. The amount of those types will not go
-		/// beyond this number if it is specified. Ignored if null.
+		/// beyond this number if it is specified. Ignored if <see langword="null" />.
 		/// </summary>
 		public IDictionary<T, int> Max;
 
 		/// <summary>
 		/// Returns the current amount of an item.
 		/// </summary>
-		/// <param name="item"></param>
 		public new int this[T item]
 		{
 
@@ -265,9 +271,15 @@ namespace Engine.Containers
 	}
 
 	/// <summary>
-	/// <see cref="Bunch{T}"/> is just KeyValuePair&lt;<typeparamref name="T"/>, int&gt; with operators for use with Bags
-	/// (would've just derived from KeyValuePair but you can't inherit structs).
+	/// <see cref="Bunch{T}"/> is just <c>KeyValuePair&lt;<typeparamref name="T"/>, int&gt;</c> with operators for use with Bags
+	/// (would've just derived from <c>KeyValuePair</c> but you can't inherit structs).
 	/// </summary>
+	/// <example>
+	/// <code>
+	/// Bunch&lt;Currency&gt; base = new Bunch&lt;Currency&gt;(Currency.Diamonds, 10);
+	/// Bunch&lt;Currency&gt; bonus = base * 4;
+	/// </code>
+	/// </example>
 	[Serializable]
 	public struct Bunch<T>
 	{
@@ -356,7 +368,7 @@ namespace Engine.Containers
 		}
 
 		/// <summary>
-		/// Convert to KeyValuePair&lt;<typeparamref name="T" />, int&gt;.
+		/// Convert to <c>KeyValuePair&lt;<typeparamref name="T" />, int&gt;</c>.
 		/// </summary>
 		public KeyValuePair<T, int> ToKVP()
 		{

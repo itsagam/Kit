@@ -3,7 +3,7 @@
 namespace Engine.Behaviours
 {
 	/// <summary>
-	/// Orbits the camera (or transform) around a given Transform
+	/// Orbits the <see cref="Camera"/> (or <see cref="Transform"/>) around a given <see cref="Transform"/>.
 	/// </summary>
 	public class OrbitTransform: MonoBehaviour
 	{

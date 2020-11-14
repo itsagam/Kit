@@ -2,6 +2,10 @@
 
 namespace Engine.Algorithms
 {
+    /// <summary>
+    /// Finds the optimal assignment of tasks when worker costs for doing each are given.
+    /// </summary>
+    /// <remarks>See <see href="https://en.wikipedia.org/wiki/Hungarian_algorithm" />.</remarks>
     // Copyright (c) 2010 Alex Regueiro
     // Licensed under MIT license, available at <http://www.opensource.org/licenses/mit-license.php>.
     // Published originally at <http://blog.noldorin.com/2009/09/hungarian-algorithm-in-csharp/>.

@@ -3,6 +3,9 @@ using System.Text.RegularExpressions;
 
 namespace Engine
 {
+	/// <summary>
+	/// <see cref="String"/> extensions.
+	/// </summary>
 	public static class StringExtensions
 	{
 		/// <summary>
@@ -70,7 +73,7 @@ namespace Engine
 		}
 
 		/// <summary>
-		/// Is the string null or white-space?
+		/// Is the string <see langword="null"/> or white-space?
 		/// </summary>
 		public static bool IsNullOrWhiteSpace(this string str)
 		{
@@ -78,7 +81,7 @@ namespace Engine
 		}
 
 		/// <summary>
-		/// Is the string null or empty?
+		/// Is the string <see langword="null"/> or empty?
 		/// </summary>
 		public static bool IsNullOrEmpty(this string str)
 		{

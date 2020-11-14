@@ -2,6 +2,9 @@ using UnityEngine;
 
 namespace Engine
 {
+	/// <summary>
+	/// Helper functions for ray-casting.
+	/// </summary>
 	public static class RaycastHelper
 	{
 		/// <summary>

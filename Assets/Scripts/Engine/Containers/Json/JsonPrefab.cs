@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,40 +14,57 @@ namespace Engine.Containers
 	///     the instances with the states provided. You have to provide the path to a prefab and
 	///     anything enclosed with {} in the prefab path is replaced with the value of a property,
 	/// 	so you can instantiate different prefabs depending on the state.
-	///
-	///     There are three ways to use this class – Mono-only, State-Mono or JObject-Mono method:
-	///
-	///     1) In the Mono-only mode, you put a JsonConverter attribute on a MonoBehaviour with
-	///     type JsonPrefabConverter and the prefab path as its first argument. On the Json side,
-	///     you use the actual MonoBehaviour type in the GameState object. Whenever the Json is
-	///     loaded, the converter will instantiate objects and assign them in the GameState. This
-	///     way, the MonoBehaviours will be strongly bound to the GameState. The advantage of this
-	///     is that any changes in the MonoBehaviours will be automatically be reflected in the
-	/// 	state. The disadvantage being if MonoBehaviours are destroyed, they'll become null or
-	/// 	inaccessible in the GameState.
-	///
-	///     2) In the State-Mono mode, you put JsonPrefab attribute on a separate class denoting a
-	///     MonoBehaviour's state and use that in the GameState. The Json will be loaded normally,
-	///     and nothing will happen by itself. To instantiate objects, you have to call
-	///     JsonPrefab.Instantiate on state-objects whenever you want. The advantage of this is
-	///     that you have more control on the life-cycle of MonoBehaviours and states will not
-	///     become null if MonoBehaviours are destroyed. The disadvantage is that you have to save
-	///     back state manually if/when MonoBehaviours are changed. To aid this, there is a method
-	///     called JsonPrefab.Save which can be called manually and is automatically called when a
-	///     Json-created MonoBehaviour is destroyed. This is the slowest method since we have to
-	///     convert to and from JObject each time we have to populate data.
-	///
-	///     3) The JObject mode is very similar to State-Mono mode, except that you put JObject in
-	///     GameState wherever you want to work with MonoBehaviours and call JsonPrefab.Instantiate
-	///     by providing it the prefab path and JObjects to instantiate directly. This is the faster
-	///     method and doesn't have problems like having to use JsonSubtypes to create the correct
-	///     State-object type.
 	/// </summary>
+	/// <remarks>
+	/// <para>
+	///     There are three ways to use this class – Mono-only, State-Mono or JObject-Mono method:
+	/// </para>
+	///	<list type="number">
+	/// 	<item>
+	/// 		<description>
+	///     		In the Mono-only mode, you put a <see cref="JsonConverter"/> attribute on a <see cref="MonoBehaviour" /> with
+	///     		type <see cref="JsonPrefabConverter"/> and the prefab path as its first argument. On the Json side,
+	///     		you use the actual <see cref="MonoBehaviour" /> type in the GameState object. Whenever the Json is
+	///     		loaded, the converter will instantiate objects and assign them in the GameState. This
+	///     		way, the <see cref="MonoBehaviour" />s will be strongly bound to the GameState. The advantage of this
+	///				is that any changes in the <see cref="MonoBehaviour" />s will be automatically be reflected in the
+	/// 			state. The disadvantage being if <see cref="MonoBehaviour" />s are destroyed, they'll become <see langword="null" /> or
+	/// 			inaccessible in the GameState.
+	///			</description>
+	/// 	</item>
+	///
+	/// 	<item>
+	/// 		<description>
+	///     		In the State-Mono mode, you put <see cref="JsonPrefabAttribute" /> on a separate class denoting a
+	///     		<see cref="MonoBehaviour" />'s state and use that in the GameState. The Json will be loaded normally,
+	///     		and nothing will happen by itself. To instantiate objects, you have to call
+	///     		<see cref="JsonPrefab.Instantiate{T}(IEnumerable, bool)" /> on state-objects whenever you want. The advantage of this is
+	///     		that you have more control on the life-cycle of MonoBehaviours and states will not
+	///     		become <see langword="null" /> if <see cref="MonoBehaviour" />s are destroyed. The disadvantage is that you have to save
+	///     		back state manually if/when <see cref="MonoBehaviour" />s are changed. To aid this, there is a method
+	///     		called <see cref="JsonPrefab.Save(MonoBehaviour, object)"/> which can be called manually and is automatically called when a
+	///     		Json-created <see cref="MonoBehaviour" /> is destroyed. This is the slowest method since we have to
+	///     		convert to and from <see cref="JObject" /> each time we have to populate data.
+	///		 	</description>
+	///		</item>
+	///
+	/// 	<item>
+	/// 		<description>
+	///     		The JObject mode is very similar to State-Mono mode, except that you put <see cref="JObject" /> in
+	///     		GameState wherever you want to work with <see cref="MonoBehaviour" />s and call
+	/// 			<see cref="JsonPrefab.Instantiate{T}(string, IEnumerable{JObject}, bool)" /> by providing it the prefab path and
+	/// 			<see cref="JObject" />s to instantiate directly. This is the faster
+	///     		method and doesn't have problems like having to use <see cref="JsonSubtypes" /> to create the correct
+	///     		State-object type.
+	/// 		</description>
+	/// 	</item>
+	/// </list>
+	/// </remarks>
 	/// <example>
 	///     The following will all instantiate two prefabs, "Building/ProducerBuilding" and
 	///     "Building/BankBuilding", with Position (1, 1) and (2, 2) respectively.
-	///     Json:
-	///     <code>
+	///  	Json:
+	///  <code language="JavaScript">
 	///  {
 	/// 		"Buildings":
 	/// 		[
@@ -63,8 +80,8 @@ namespace Engine.Containers
 	///  }
 	///  </code>
 	///
-	///     C# (Mono-only mode):
-	///     <code>
+	///  	Mono-only mode:
+	///  <code>
 	///  [JsonConverter(typeof(JsonPrefabConverter), "Buildings/{Type}")]
 	///  [JsonObject(MemberSerialization.OptIn)]
 	///  public class Building: MonoBehaviour
@@ -81,8 +98,8 @@ namespace Engine.Containers
 	///  }
 	///  </code>
 	///
-	///     C# (State-Mono method):
-	///     <code>
+	///  	State-Mono method:
+	///  <code>
 	///  [JsonObject(MemberSerialization.OptIn)]
 	///  public class Building: MonoBehaviour
 	///  {
@@ -105,8 +122,8 @@ namespace Engine.Containers
 	///  JsonPrefab.Instantiate&lt;Building&gt;(GameState.Buildings);
 	///  </code>
 	///
-	///     C# (JObject-Mono method):
-	///     <code>
+	///  	JObject-Mono method:
+	///  <code>
 	///  [JsonObject(MemberSerialization.OptIn)]
 	///  public class Building: MonoBehaviour
 	///  {
@@ -128,12 +145,12 @@ namespace Engine.Containers
 		private static JsonSerializer serializer = JsonSerializer.CreateDefault();
 
 		/// <summary>
-		/// Instantiate MonoBehaviours based on a list of objects and populate them.
+		/// Instantiate <see cref="MonoBehaviour" />s based on a list of objects and populate them.
 		/// </summary>
-		/// <param name="stateObjects">List of objects to instantiate MonoBehaviours of.</param>
-		/// <param name="saveOnDestroy">Should it save back the state when a MonoBehaviour is destroyed?</param>
-		/// <typeparam name="T">Type of MonoBehaviours to instantiate.</typeparam>
-		/// <returns>List of MonoBehaviours instantiated.</returns>
+		/// <param name="stateObjects">List of objects to instantiate <see cref="MonoBehaviour" />s of.</param>
+		/// <param name="saveOnDestroy">Should it save back the state when a <see cref="MonoBehaviour" /> is destroyed?</param>
+		/// <typeparam name="T">Type of <see cref="MonoBehaviour" />s to instantiate.</typeparam>
+		/// <returns>List of <see cref="MonoBehaviour" />s instantiated.</returns>
 		public static IEnumerable<T> Instantiate<T>(IEnumerable stateObjects, bool saveOnDestroy = true) where T: MonoBehaviour
 		{
 			foreach (object stateObject in stateObjects)
@@ -145,13 +162,13 @@ namespace Engine.Containers
 		}
 
 		/// <summary>
-		/// Instantiate MonoBehaviours based on a list of JObjects and populate them.
+		/// Instantiate <see cref="MonoBehaviour" />s based on a list of <see cref="JObject"/>s and populate them.
 		/// </summary>
 		/// <param name="path">Path to the prefab(s). Anything enclosed in {} gets replaced with the value of a property.</param>
-		/// <param name="jObjects">List of JObjects to instantiate instances of.</param>
-		/// <param name="saveOnDestroy">Should it save back the state when a MonoBehaviour is destroyed?</param>
-		/// <typeparam name="T">Type of MonoBehaviours to instantiate.</typeparam>
-		/// <returns>List of MonoBehaviours instantiated.</returns>
+		/// <param name="jObjects">List of <see cref="JObject" />s to instantiate instances of.</param>
+		/// <param name="saveOnDestroy">Should it save back the state when a <see cref="MonoBehaviour" /> is destroyed?</param>
+		/// <typeparam name="T">Type of <see cref="MonoBehaviour" />s to instantiate.</typeparam>
+		/// <returns>List of <see cref="MonoBehaviour" />s instantiated.</returns>
 		public static IEnumerable<T> Instantiate<T>(string path, IEnumerable<JObject> jObjects, bool saveOnDestroy = true) where T: MonoBehaviour
 		{
 			foreach (JObject jObject in jObjects)
@@ -163,12 +180,12 @@ namespace Engine.Containers
 		}
 
 		/// <summary>
-		/// Instantiate a MonoBehaviour based on an object and populates it.
+		/// Instantiate a <see cref="MonoBehaviour" /> based on an object and populates it.
 		/// </summary>
-		/// <param name="stateObject">The object to instantiate a MonoBehaviour of.</param>
-		/// <param name="saveOnDestroy">Should it save back the state when the MonoBehaviour is destroyed?</param>
-		/// <typeparam name="T">Type of MonoBehaviour to instantiate.</typeparam>
-		/// <returns>MonoBehaviour instance instantiated, or null.</returns>
+		/// <param name="stateObject">The object to instantiate a <see cref="MonoBehaviour" /> of.</param>
+		/// <param name="saveOnDestroy">Should it save back the state when the <see cref="MonoBehaviour" /> is destroyed?</param>
+		/// <typeparam name="T">Type of <see cref="MonoBehaviour" /> to instantiate.</typeparam>
+		/// <returns><see cref="MonoBehaviour" /> instance instantiated, or <see langword="null"/>.</returns>
 		public static T Instantiate<T>(object stateObject, bool saveOnDestroy = true) where T: MonoBehaviour
 		{
 			Type type = stateObject.GetType();
@@ -192,13 +209,13 @@ namespace Engine.Containers
 		}
 
 		/// <summary>
-		/// Instantiate a MonoBehaviour based on an JObject and populates it.
+		/// Instantiate a <see cref="MonoBehaviour" /> based on an <see cref="JObject" /> and populates it.
 		/// </summary>
 		/// <param name="path">Path to the prefab. Anything enclosed in {} gets replaced with the value of a property.</param>
-		/// <param name="jObject">The JObject to instantiate a MonoBehaviour of.</param>
-		/// <param name="saveOnDestroy">Should it save back the state when the MonoBehaviour is destroyed?</param>
-		/// <typeparam name="T">Type of MonoBehaviour to instantiate.</typeparam>
-		/// <returns>MonoBehaviour instance instantiated, or null.</returns>
+		/// <param name="jObject">The <see cref="JObject" /> to instantiate a <see cref="MonoBehaviour" /> of.</param>
+		/// <param name="saveOnDestroy">Should it save back the state when the <see cref="MonoBehaviour" /> is destroyed?</param>
+		/// <typeparam name="T">Type of <see cref="MonoBehaviour" /> to instantiate.</typeparam>
+		/// <returns><see cref="MonoBehaviour" /> instance instantiated, or <see langword="null" />.</returns>
 		public static T Instantiate<T>(string path, JObject jObject, bool saveOnDestroy = true) where T: MonoBehaviour
 		{
 			T instance = InstantiateInternal<T>(path, jObject);
@@ -228,11 +245,11 @@ namespace Engine.Containers
 		}
 
 		/// <summary>
-		/// Save the current values of a list of MonoBehaviours back to their states.
+		/// Save the current values of a list of <see cref="MonoBehaviour" />s back to their states.
 		/// </summary>
-		/// <param name="monoObjects">The list of MonoBehaviours to save values of.</param>
+		/// <param name="monoObjects">The list of <see cref="MonoBehaviour" />s to save values of.</param>
 		/// <param name="stateObjects">The list of objects to save values to.</param>
-		/// <typeparam name="T">Type of MonoBehaviours to save.</typeparam>
+		/// <typeparam name="T">Type of <see cref="MonoBehaviour" />s to save.</typeparam>
 		public static void Save<T>(List<T> monoObjects, List<object> stateObjects) where T: MonoBehaviour
 		{
 			if (monoObjects.Count != stateObjects.Count)
@@ -243,11 +260,11 @@ namespace Engine.Containers
 		}
 
 		/// <summary>
-		/// Save the current values of a list of MonoBehaviours back to their JObjects.
+		/// Save the current values of a list of <see cref="MonoBehaviour" />s back to their <see cref="JObject" />s.
 		/// </summary>
-		/// <param name="monoObjects">The list of MonoBehaviours to save values of.</param>
-		/// <param name="jObjects">The list of JObjects to save values to.</param>
-		/// <typeparam name="T">Type of MonoBehaviours to save.</typeparam>
+		/// <param name="monoObjects">The list of <see cref="MonoBehaviour" />s to save values of.</param>
+		/// <param name="jObjects">The list of <see cref="JObject" />s to save values to.</param>
+		/// <typeparam name="T">Type of <see cref="MonoBehaviour" />s to save.</typeparam>
 		public static void Save<T>(List<T> monoObjects, List<JObject> jObjects) where T: MonoBehaviour
 		{
 			if (monoObjects.Count != jObjects.Count)
@@ -258,9 +275,9 @@ namespace Engine.Containers
 		}
 
 		/// <summary>
-		/// Save the current values of a MonoBehaviour back to its state.
+		/// Save the current values of a <see cref="MonoBehaviour" /> back to its state.
 		/// </summary>
-		/// <param name="monoObject">The MonoBehaviour to save values of.</param>
+		/// <param name="monoObject">The <see cref="MonoBehaviour" /> to save values of.</param>
 		/// <param name="stateObject">The object to save values to.</param>
 		public static void Save(MonoBehaviour monoObject, object stateObject)
 		{
@@ -270,10 +287,10 @@ namespace Engine.Containers
 		}
 
 		/// <summary>
-		/// Save the current values of a MonoBehaviour back to its JObject.
+		/// Save the current values of a <see cref="MonoBehaviour" /> back to its <see cref="JObject" />.
 		/// </summary>
-		/// <param name="monoObject">The MonoBehaviour to save values of.</param>
-		/// <param name="jObject">The JObject to save values to.</param>
+		/// <param name="monoObject">The <see cref="MonoBehaviour" /> to save values of.</param>
+		/// <param name="jObject">The <see cref="JObject" /> to save values to.</param>
 		public static void Save(MonoBehaviour monoObject, JObject jObject)
 		{
 			JObject newJObject = JObject.FromObject(monoObject);
@@ -309,12 +326,16 @@ namespace Engine.Containers
 	}
 
 	/// <summary>
-	/// JsonConverter to use for the Mono-only mode.
+	/// <see cref="JsonConverter"/> to use for the Mono-only mode.
 	/// </summary>
 	public class JsonPrefabConverter: JsonConverter
 	{
 		public readonly string Path;
 
+		/// <summary>
+		/// Create a new <see cref="JsonConverter"/> for prefab(s).
+		/// </summary>
+		/// <param name="path">Prefab path. Anything enclosed in {} is replaced with the value of a property.</param>
 		public JsonPrefabConverter(string path)
 		{
 			Path = path;
