@@ -1,0 +1,169 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <!-- The configuration and platform will be used to determine which assemblies to include from solution and
+				 project documentation sources -->
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>01bbd627-19ed-4eb0-918d-82ba625859ee</ProjectGuid>
+    <SHFBSchemaVersion>2017.9.26.0</SHFBSchemaVersion>
+    <!-- AssemblyName, Name, and RootNamespace are not used by SHFB but Visual Studio adds them anyway -->
+    <AssemblyName>KitDocumentation</AssemblyName>
+    <RootNamespace>KitDocumentation</RootNamespace>
+    <Name>KitDocumentation</Name>
+    <!-- SHFB properties -->
+    <FrameworkVersion>.NET Framework 4.7.2</FrameworkVersion>
+    <OutputPath>Help\</OutputPath>
+    <HtmlHelpName>KitDocumentation</HtmlHelpName>
+    <Language>en-US</Language>
+    <TransformComponentArguments>
+      <Argument Key="logoFile" Value="Help.png" />
+      <Argument Key="logoHeight" Value="" />
+      <Argument Key="logoWidth" Value="" />
+      <Argument Key="logoAltText" Value="" />
+      <Argument Key="logoPlacement" Value="left" />
+      <Argument Key="logoAlignment" Value="left" />
+      <Argument Key="maxVersionParts" Value="2" />
+      <Argument Key="defaultLanguage" Value="cs" />
+      <Argument Key="includeEnumValues" Value="false" />
+      <Argument Key="baseSourceCodeUrl" Value="https://github.com/itsagam/Kit/blob/master/" />
+      <Argument Key="requestExampleUrl" Value="mailto:agam@frag-games.com" />
+    </TransformComponentArguments>
+    <HelpFileFormat>Website</HelpFileFormat>
+    <SyntaxFilters>C#</SyntaxFilters>
+    <PresentationStyle>VS2013</PresentationStyle>
+    <CleanIntermediates>True</CleanIntermediates>
+    <KeepLogFile>False</KeepLogFile>
+    <DisableCodeBlockComponent>False</DisableCodeBlockComponent>
+    <IndentHtml>False</IndentHtml>
+    <BuildAssemblerVerbosity>OnlyErrors</BuildAssemblerVerbosity>
+    <SaveComponentCacheCapacity>100</SaveComponentCacheCapacity>
+    <SourceCodeBasePath>..\</SourceCodeBasePath>
+    <WarnOnMissingSourceContext>False</WarnOnMissingSourceContext>
+    <VisibleItems>ProtectedInternalAsProtected, NonBrowsable</VisibleItems>
+    <DocumentationSources>
+      <DocumentationSource sourceFile="..\Temp\bin\Debug\Assembly-CSharp.dll" />
+      <DocumentationSource sourceFile="..\Temp\bin\Debug\Assembly-CSharp.xml" />
+    </DocumentationSources>
+    <HelpTitle>Kit Documentation</HelpTitle>
+    <HelpFileVersion>v1.0</HelpFileVersion>
+    <NamingMethod>HashedMemberName</NamingMethod>
+    <ContentPlacement>AboveNamespaces</ContentPlacement>
+    <RootNamespaceContainer>True</RootNamespaceContainer>
+    <RootNamespaceTitle>API Reference</RootNamespaceTitle>
+    <NamespaceGrouping>True</NamespaceGrouping>
+    <MaximumGroupParts>3</MaximumGroupParts>
+    <Preliminary>False</Preliminary>
+    <SdkLinkTarget>Blank</SdkLinkTarget>
+    <MissingTags>AutoDocumentCtors, AutoDocumentDispose</MissingTags>
+    <ApiFilter>
+      <Filter entryType="Namespace" fullName="Demos" isExposed="False" xmlns="" />
+      <Filter entryType="Namespace" fullName="Game" isExposed="False" xmlns="" />
+      <Filter entryType="Namespace" fullName="Game.UI.Menu" isExposed="False" xmlns="" />
+      <Filter entryType="Namespace" fullName="Game.UI.Mods" isExposed="False" xmlns="" />
+      <Filter entryType="Namespace" fullName="Game.UI.Settings" isExposed="False" xmlns="" />
+      <Filter entryType="Namespace" fullName="Game.UI.Splash" isExposed="False" xmlns="" />
+      <Filter entryType="Namespace" fullName="SoftMasking" isExposed="False" xmlns="" />
+      <Filter entryType="Namespace" fullName="SoftMasking.Extensions" isExposed="False" xmlns="" />
+      <Filter entryType="Namespace" fullName="SoftMasking.TextMeshPro" isExposed="False" xmlns="" />
+      <Filter entryType="Namespace" fullName="XLua" isExposed="False" xmlns="" />
+      <Filter entryType="Namespace" fullName="XLua.Cast" isExposed="False" xmlns="" />
+      <Filter entryType="Namespace" fullName="XLua.LuaDLL" isExposed="False" xmlns="" />
+      <Filter entryType="Namespace" fullName="XLua.TemplateEngine" isExposed="False" xmlns="" />
+    </ApiFilter>
+    <PlugInConfigurations />
+    <ComponentConfigurations />
+    <NamespaceSummaries>
+      <NamespaceSummaryItem name="Kit" isDocumented="True">Base namespace with managers, helpers and extensions.</NamespaceSummaryItem>
+      <NamespaceSummaryItem name="Kit.Algorithms" isDocumented="True">Implementations of common algorithms.</NamespaceSummaryItem>
+      <NamespaceSummaryItem name="Kit.Behaviours" isDocumented="True">&lt;b&gt;MonoBehaviours&lt;/b&gt; for all occasions.</NamespaceSummaryItem>
+      <NamespaceSummaryItem name="Kit.Containers" isDocumented="True">Collections and data containers.</NamespaceSummaryItem>
+      <NamespaceSummaryItem name="Kit.Modding (Group)" isGroup="True" isDocumented="True">The modding system.</NamespaceSummaryItem>
+      <NamespaceSummaryItem name="Kit.Modding" isDocumented="True">The modding system.</NamespaceSummaryItem>
+      <NamespaceSummaryItem name="Kit.Modding.Loaders" isDocumented="True">Handlers for loading mods of different file types.</NamespaceSummaryItem>
+      <NamespaceSummaryItem name="Kit.Modding.Scripting" isDocumented="True">Support for executing Lua scripts from mods.</NamespaceSummaryItem>
+      <NamespaceSummaryItem name="Kit.Parsers" isDocumented="True">Handlers for parsing different types of files from &lt;b&gt;ResourceManager&lt;/b&gt; and mods.</NamespaceSummaryItem>
+      <NamespaceSummaryItem name="Kit.Pooling" isDocumented="True">&lt;b&gt;GameObject&lt;/b&gt; pooler.</NamespaceSummaryItem>
+      <NamespaceSummaryItem name="Kit.UI" isDocumented="True">Most common UI elements.</NamespaceSummaryItem>
+      <NamespaceSummaryItem name="Kit.UI.Behaviours" isDocumented="True">Common &lt;b&gt;MonoBehaviours&lt;/b&gt; for UI elements.</NamespaceSummaryItem>
+      <NamespaceSummaryItem name="Kit.UI.Buttons" isDocumented="True">Common functionalities for buttons.</NamespaceSummaryItem>
+      <NamespaceSummaryItem name="Kit.UI.Layout" isDocumented="True">Scripts for UI layouts.</NamespaceSummaryItem>
+      <NamespaceSummaryItem name="Kit.UI.Message" isDocumented="True">A pre-made &lt;b&gt;Window&lt;/b&gt; for showing general game messages.</NamespaceSummaryItem>
+      <NamespaceSummaryItem name="Kit.UI.Widgets" isDocumented="True">UI widgets.</NamespaceSummaryItem>
+      <NamespaceSummaryItem name="Kit.UI (Group)" isGroup="True" isDocumented="True">Most common UI elements.</NamespaceSummaryItem>
+    </NamespaceSummaries>
+    <FeedbackEMailAddress>agam%40frag-games.com</FeedbackEMailAddress>
+    <HeaderText>
+    </HeaderText>
+    <FooterText>
+    </FooterText>
+    <CopyrightHref>
+    </CopyrightHref>
+    <CopyrightText>
+    </CopyrightText>
+    <FeedbackEMailLinkText>
+    </FeedbackEMailLinkText>
+  </PropertyGroup>
+  <!-- There are no properties for these groups.  AnyCPU needs to appear in order for Visual Studio to perform
+			 the build.  The others are optional common platform types that may appear. -->
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x64' ">
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x64' ">
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|Win32' ">
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|Win32' ">
+  </PropertyGroup>
+  <ItemGroup>
+    <Folder Include="Content" />
+    <Folder Include="icons" />
+    <Folder Include="media" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Content\Welcome.aml" />
+  </ItemGroup>
+  <ItemGroup>
+    <ContentLayout Include="ContentLayout.content" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="icons\Help.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="UniTask, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+      <HintPath>..\Temp\bin\Debug\UniTask.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="UnityEngine, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+      <HintPath>..\Temp\bin\Debug\UnityEngine.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+      <HintPath>..\Temp\bin\Debug\UnityEngine.CoreModule.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="UnityEngine.UI, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null">
+      <HintPath>..\Temp\bin\Debug\UnityEngine.UI.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+  </ItemGroup>
+  <!-- Import the SHFB build targets -->
+  <Import Project="$(SHFBROOT)\SandcastleHelpFileBuilder.targets" />
+  <!-- The pre-build and post-build event properties must appear *after* the targets file import in order to be
+			 evaluated correctly. -->
+  <PropertyGroup>
+    <PreBuildEvent>
+    </PreBuildEvent>
+    <PostBuildEvent>
+    </PostBuildEvent>
+    <RunPostBuildEvent>OnBuildSuccess</RunPostBuildEvent>
+  </PropertyGroup>
+</Project>

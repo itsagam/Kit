@@ -1,19 +1,18 @@
 -- Logging
 function print(line)
-	CS.Console.Log(line)
+	Kit.Console.Log(line)
 end
-CS.UnityEngine.Debug.Log = print
 
 function list(object)
 	if type(object) == "table" and typeof(object) ~= nil then
-		CS.Console.List(typeof(object))
+		Kit.Console.List(typeof(object))
 	else
-		CS.Console.Log(object)
+		Kit.Console.Log(object)
 	end
 end
 
 function clear()
-	CS.Console.ClearLog()
+	Kit.Console.ClearLog()
 end
 cls = clear
 

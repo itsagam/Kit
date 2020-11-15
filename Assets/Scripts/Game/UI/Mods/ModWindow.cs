@@ -1,10 +1,9 @@
-﻿using Engine;
-using Engine.UI;
-using Engine.UI.Widgets;
+﻿using Kit;
+using Kit.UI;
 using UnityEngine.UI;
 
 #if MODDING
-using Engine.Modding;
+using Kit.Modding;
 #endif
 
 namespace Game.UI.Mods

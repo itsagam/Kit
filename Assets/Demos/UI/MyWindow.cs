@@ -1,6 +1,6 @@
 ﻿
-using Engine;
-using Engine.UI;
+using Kit;
+using Kit.UI;
 using UnityEngine.UI;
 
 namespace Demos

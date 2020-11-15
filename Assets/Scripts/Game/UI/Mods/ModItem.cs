@@ -1,11 +1,11 @@
 ﻿using DG.Tweening;
-using Engine;
-using Engine.UI;
+using Kit;
+using Kit.UI;
 using UnityEngine;
 using UnityEngine.UI;
 
 #if MODDING
-using Engine.Modding;
+using Kit.Modding;
 #endif
 namespace Game.UI.Mods
 {
