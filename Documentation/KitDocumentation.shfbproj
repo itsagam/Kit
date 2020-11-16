@@ -48,7 +48,7 @@
     </DocumentationSources>
     <HelpTitle>Kit Documentation</HelpTitle>
     <HelpFileVersion>v1.0</HelpFileVersion>
-    <NamingMethod>HashedMemberName</NamingMethod>
+    <NamingMethod>MemberName</NamingMethod>
     <ContentPlacement>AboveNamespaces</ContentPlacement>
     <RootNamespaceContainer>True</RootNamespaceContainer>
     <RootNamespaceTitle>API Reference</RootNamespaceTitle>
@@ -129,6 +129,9 @@
     <Folder Include="media" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Content\Modding.aml" />
+    <None Include="Content\Plugins.aml" />
+    <None Include="Content\Console.aml" />
     <None Include="Content\Welcome.aml" />
   </ItemGroup>
   <ItemGroup>

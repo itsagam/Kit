@@ -67,7 +67,7 @@ namespace Kit
 					break;
 
 				default:
-					PlayerPrefs.SetString(key, JSONParser.ToJson(value));
+					PlayerPrefs.SetString(key, JsonParser.ToJson(value));
 					break;
 			}
 		}
@@ -122,7 +122,7 @@ namespace Kit
 						return defaultValue;
 
 					string serialized = PlayerPrefs.GetString(key, null);
-					T deserialized = JSONParser.FromJson<T>(serialized);
+					T deserialized = JsonParser.FromJson<T>(serialized);
 					return deserialized;
 			}
 		}

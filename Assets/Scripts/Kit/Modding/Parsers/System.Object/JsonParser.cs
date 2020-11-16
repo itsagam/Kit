@@ -3,7 +3,7 @@ using Newtonsoft.Json;
 
 namespace Kit.Parsers
 {
-	public class JSONParser: ResourceParser
+	public class JsonParser: ResourceParser
 	{
 		public override Type[] SupportedTypes { get; } = { };
 		public override string[] SupportedExtensions { get; } = { ".json" };

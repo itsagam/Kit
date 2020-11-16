@@ -1,0 +1,268 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<topic id="Console" revisionNumber="1">
+	<developerConceptualDocument xmlns="http://ddue.schemas.microsoft.com/authoring/2003/5" xmlns:xlink="http://www.w3.org/1999/xlink">
+
+		<introduction>
+			<para>
+				There is a custom in-game <codeEntityReference>T:Kit.Console</codeEntityReference> integrated into the kit that can be brought up by
+				pressing tilde (~) on PC and a flicking down on mobile. The console displays all Log messages and supports Lua scripting. This should come
+				in handy in situations where you want to debug or tweak the game.
+			</para>
+			<para>
+				There is no need to bind commands to the console — it has full access to your game code. XLua does, however, require classes be referred
+				to by their fully-qualified name, starting with <codeInline>CS</codeInline>. So <codeInline>GameObject("MyObject")</codeInline> or
+				<codeInline>DataManager.GameData</codeInline> will not work but
+				<codeInline>CS.UnityEngine.GameObject("MyObject")</codeInline> and <codeInline>CS.Game.DataManager.GameData</codeInline> will. To ease the
+				pain of typing <codeInline>CS.</codeInline> over and over again labels <codeInline>UE</codeInline>, <codeInline>Kit</codeInline> and
+				<codeInline>Game</codeInline> have been bound to <codeInline>CS.UnityEngine</codeInline>, <codeInline>CS.Kit</codeInline> and
+				<codeInline>CS.Game</codeInline> respectively (see <localUri>Resources/Lua/General.lua.txt</localUri>) so
+				<codeInline>UE.GameObject("MyObject")</codeInline> and <codeInline>Game.DataManager.GameData</codeInline> will work just as well.
+			</para>
+			<alert class="note">
+				<para>
+					You can, if you so desire, add new functions and commands to the console for easier access by modifying
+					<localUri>Resources/Lua/Console.lua.txt</localUri>.
+				</para>
+			</alert>
+		</introduction>
+
+		<section>
+			<title>Built-in Commands</title>
+			<content>
+				<definitionTable>
+					<definedTerm>
+						<replaceable>expression</replaceable>
+					</definedTerm>
+					<definition>
+						<para>
+							Evaluate and output the value of the <replaceable>expression</replaceable>.
+						</para>
+					</definition>
+					<definedTerm>
+						<replaceable>statement</replaceable>
+					</definedTerm>
+					<definition>
+						<para>
+							Execute the <replaceable>statement</replaceable>.
+						</para>
+					</definition>
+					<definedTerm>
+						print(<replaceable>expression</replaceable>)
+					</definedTerm>
+					<definition>
+						<para>
+							Same as typing the <replaceable>expression</replaceable>.
+						</para>
+					</definition>
+					<definedTerm>
+						list(<replaceable>type</replaceable>)
+					</definedTerm>
+					<definition>
+						<para>
+							List all public methods, properties, and fields associated with a <replaceable>type</replaceable>.
+						</para>
+						<alert class="tip">
+							<para>Use this when you're not sure about the class structure or which member to access.</para>
+						</alert>
+					</definition>
+					<definedTerm>
+						clear()
+					</definedTerm>
+					<definition>
+						<para>
+							Clear the log.
+						</para>
+					</definition>
+					<definedTerm>
+						go(<replaceable>path</replaceable>)
+					</definedTerm>
+					<definition>
+						<para>
+							Get the <codeInline>GameObject</codeInline> at the specified scene <replaceable>path</replaceable>.
+							Uses <codeInline>GameObject.Find</codeInline>.
+						</para>
+					</definition>
+					<definedTerm>
+						go(<replaceable>path</replaceable>, <replaceable>type</replaceable>)
+					</definedTerm>
+					<definition>
+						<para>
+							Get the specified component of the <codeInline>GameObject</codeInline> at given scene <replaceable>path</replaceable>.
+							Uses <codeInline>GameObject.Find</codeInline>.
+						</para>
+					</definition>
+					<definedTerm>
+						go(<replaceable>type</replaceable>)
+					</definedTerm>
+					<definition>
+						<para>
+							Get the first component of given <replaceable>type</replaceable>.
+						</para>
+					</definition>
+					<definedTerm>
+						gos(<replaceable>tag</replaceable>)
+					</definedTerm>
+					<definition>
+						<para>
+							Get the <codeInline>GameObject</codeInline>s with the given <replaceable>tag</replaceable>.
+						</para>
+					</definition>
+					<definedTerm>
+						gos(<replaceable>type</replaceable>)
+					</definedTerm>
+					<definition>
+						<para>
+							Get the components with the given <replaceable>type</replaceable>.
+						</para>
+					</definition>
+					<definedTerm>
+						newGO(<replaceable>name</replaceable>, ...)
+					</definedTerm>
+					<definition>
+						<para>
+							Create a new <codeInline>GameObject</codeInline> with the given <replaceable>name</replaceable> and list of components.
+						</para>
+					</definition>
+					<definedTerm>
+						instantiate(<replaceable>path</replaceable>)
+					</definedTerm>
+					<definition>
+						<para>
+							Create an instance of the prefab at <replaceable>path</replaceable>.
+						</para>
+					</definition>
+					<definedTerm>
+						destroy(<replaceable>object</replaceable>)
+					</definedTerm>
+					<definition>
+						<para>
+							Destroy the given <replaceable>object</replaceable>.
+						</para>
+					</definition>
+					<definedTerm>
+						destroy(<replaceable>array</replaceable>)
+					</definedTerm>
+					<definition>
+						<para>
+							Destroy all the <replaceable>array</replaceable> objects.
+						</para>
+					</definition>					
+					<definedTerm>
+						destroy(<replaceable>path</replaceable>)
+					</definedTerm>
+					<definition>
+						<para>
+							Destroy the <codeInline>GameObject</codeInline> at <replaceable>path</replaceable>.
+						</para>
+					</definition>
+					<definedTerm>
+						destroy(<replaceable>path</replaceable>, <replaceable>type</replaceable>)
+					</definedTerm>
+					<definition>
+						<para>
+							Destroy the given component of the <codeInline>GameObject</codeInline> at <replaceable>path</replaceable>.
+						</para>
+					</definition>
+					<definedTerm>
+						destroy(<replaceable>type</replaceable>)
+					</definedTerm>
+					<definition>
+						<para>
+							Destroy the first component of given <replaceable>type</replaceable>.
+						</para>
+					</definition>
+				</definitionTable>
+			</content>
+		</section>
+
+		<section>
+			<title>Keyboard Shortcuts</title>
+			<content>
+				<table>
+					<tableHeader>
+						<row>
+							<entry>
+								<para>Keys</para>
+							</entry>
+							<entry>
+								<para>Action</para>
+							</entry>
+						</row>
+					</tableHeader>
+					<row>
+						<entry>
+							<para>
+								<command>Enter</command>
+							</para>
+						</entry>
+						<entry>
+							<para>Submit command.</para>
+						</entry>
+					</row>
+					<row>
+						<entry>
+							<para>
+								<command>Shift</command> + <command>Enter</command>
+							</para>
+						</entry>
+						<entry>
+							<para>New line.</para>
+						</entry>
+					</row>
+					<row>
+						<entry>
+							<para>
+								<command>Up</command>
+							</para>
+						</entry>
+						<entry>
+							<para>Previous command.</para>
+						</entry>
+					</row>
+					<row>
+						<entry>
+							<para>
+								<command>Down</command>
+							</para>
+						</entry>
+						<entry>
+							<para>Next command.</para>
+						</entry>
+					</row>
+					<row>
+						<entry>
+							<para>
+								<command>Shift</command> + <command>Up</command>
+							</para>
+						</entry>
+						<entry>
+							<para>Move up.</para>
+						</entry>
+					</row>
+					<row>
+						<entry>
+							<para>
+								<command>Shift</command> + <command>Down</command>
+							</para>
+						</entry>
+						<entry>
+							<para>Move down.</para>
+						</entry>
+					</row>
+				</table>
+			</content>
+		</section>
+
+		<relatedTopics>
+			<link xlink:href="Modding" />
+			<externalLink>
+				<linkText>Lua (programming language)</linkText>
+				<linkUri>https://en.wikipedia.org/wiki/Lua_(programming_language)</linkUri>
+			</externalLink>
+			<externalLink>
+				<linkText>Programming in Lua, 4th edition</linkText>
+				<linkUri>https://www.moys.gov.iq/upload/common/Programming_in_Lua%2C_4th_ed._%282017%29_.pdf</linkUri>
+			</externalLink>
+		</relatedTopics>
+	</developerConceptualDocument>
+</topic>

@@ -54,6 +54,16 @@ function instantiate(path)
 	end
 end
 
-function destroy(path, comp)
-	UE.GameObject.Destroy(go(path, comp))
+function destroy(arg1, arg2)
+	if type(arg1) == "userdata" then
+		if arg1.Length == nil then
+			UE.GameObject.Destroy(arg1)
+		else
+			for i=0, arg1.Length-1 do
+				UE.GameObject.Destroy(arg1[i])
+			end
+		end
+	else
+		UE.GameObject.Destroy(go(arg1, arg2))
+	end
 end

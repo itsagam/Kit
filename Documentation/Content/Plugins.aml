@@ -1,0 +1,208 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<topic id="Plugins" revisionNumber="1">
+	<developerConceptualDocument xmlns="http://ddue.schemas.microsoft.com/authoring/2003/5" xmlns:xlink="http://www.w3.org/1999/xlink">
+
+		<introduction>
+			<para>List of all third-party plug-ins being used in the kit:</para>
+		</introduction>
+
+		<section>
+			<title>Assets</title>
+			<content>
+				<table>
+					<tableHeader>
+						<row>
+							<entry>
+								<para>Plugin</para>
+							</entry>
+							<entry>
+								<para>Description</para>
+							</entry>
+							<entry>
+								<para>Location(s)</para>
+							</entry>
+						</row>
+					</tableHeader>
+					<row>
+						<entry>
+							<para>
+								<externalLink>
+									<linkText>DOTween</linkText>
+									<linkUri>http://dotween.demigiant.com/</linkUri>
+								</externalLink>
+							</para>
+						</entry>
+						<entry>
+							<para>Tweening engine.</para>
+						</entry>
+						<entry>
+							<para>
+								<localUri>Assets/ThirdParty/DOTween/</localUri>
+							</para>
+						</entry>
+					</row>
+					<row>
+						<entry>
+							<para>
+								<externalLink>
+									<linkText>Odin</linkText>
+									<linkUri>https://odininspector.com/</linkUri>
+								</externalLink>
+							</para>
+						</entry>
+						<entry>
+							<para>Serialization and editor customization.</para>
+						</entry>
+						<entry>
+							<para>
+								<localUri>Assets/ThirdParty/Sirenix/</localUri>
+							</para>
+						</entry>
+					</row>
+					<row>
+						<entry>
+							<para>
+								<externalLink>
+									<linkText>XLua</linkText>
+									<linkUri>https://github.com/Tencent/xLua</linkUri>
+								</externalLink>
+							</para>
+						</entry>
+						<entry>
+							<para>
+								<externalLink>
+									<linkText>Lua</linkText>
+									<linkUri>https://en.wikipedia.org/wiki/Lua_(programming_language)</linkUri>
+								</externalLink>
+								interpreter for <codeEntityReference linkText="modding">T:Kit.Modding.Mod</codeEntityReference> and 
+								<codeEntityReference>T:Kit.Console</codeEntityReference>.
+							</para>
+						</entry>
+						<entry>
+							<para>
+								<localUri>Assets/ThirdParty/XLua/</localUri>, <localUri>Assets/Plugins/XLua/</localUri>, <localUri>Assets/Tools</localUri>
+							</para>
+						</entry>
+					</row>
+					<row>
+						<entry>
+							<para>
+								<externalLink>
+									<linkText>TouchScript</linkText>
+									<linkUri>https://github.com/TouchScript/TouchScript</linkUri>
+								</externalLink>
+							</para>
+						</entry>
+						<entry>
+							<para>Gestures and touch library.</para>
+						</entry>
+						<entry>
+							<para>
+								<localUri>Assets/ThirdParty/TouchScript/</localUri>
+							</para>
+						</entry>						
+					</row>
+					<row>
+						<entry>
+							<para>
+								<externalLink>
+									<linkText>Clean UI</linkText>
+									<linkUri>https://assetstore.unity.com/packages/2d/gui/clean-minimalist-gui-pack-75123</linkUri>
+								</externalLink>
+							</para>
+						</entry>
+						<entry>
+							<para>UI sprites for prototyping.</para>
+						</entry>
+						<entry>
+							<para>
+								<localUri>Assets/ThirdParty/CleanUI/</localUri>
+							</para>
+						</entry>
+					</row>
+					<row>
+						<entry>
+							<para>
+								<externalLink>
+									<linkText>Soft-Mask</linkText>
+									<linkUri>https://assetstore.unity.com/packages/tools/gui/soft-mask-80667</linkUri>
+								</externalLink>
+							</para>
+						</entry>
+						<entry>
+							<para>UI shader for masking.</para>
+						</entry>
+						<entry>
+							<para>
+								<localUri>Assets/ThirdParty/SoftMask/</localUri>
+							</para>
+						</entry>						
+					</row>
+				</table>
+			</content>
+		</section>
+
+
+		<section>
+			<title>Packages</title>
+			<content>
+				<table>
+					<tableHeader>
+						<row>
+							<entry>
+								<para>Plugin</para>
+							</entry>
+							<entry>
+								<para>Description</para>
+							</entry>
+						</row>
+					</tableHeader>
+					<row>
+						<entry>
+							<para>
+								<externalLink>
+									<linkText>Json.NET</linkText>
+									<linkUri>https://github.com/jilleJr/Newtonsoft.Json-for-Unity</linkUri>
+								</externalLink>
+							</para>
+						</entry>
+						<entry>
+							<para>
+								Json <codeEntityReference linkText="serialization and deserialization">T:Kit.Parsers.JsonParser</codeEntityReference>.</para>
+						</entry>
+					</row>
+					<row>
+						<entry>
+							<para>
+								<externalLink>
+									<linkText>UniRx</linkText>
+									<linkUri>https://github.com/neuecc/UniRx</linkUri>
+								</externalLink>
+							</para>
+						</entry>
+						<entry>
+							<para>Reactive programming implementation.</para>
+						</entry>
+					</row>
+					<row>
+						<entry>
+							<para>
+								<externalLink>
+									<linkText>UniTask</linkText>
+									<linkUri>https://github.com/Cysharp/UniTask</linkUri>
+								</externalLink>
+							</para>
+						</entry>
+						<entry>
+							<para>
+								<codeInline>async</codeInline>-<codeInline>await</codeInline> support.
+							</para>
+						</entry>
+					</row>					
+				</table>
+			</content>
+		</section>
+		<relatedTopics>
+		</relatedTopics>
+	</developerConceptualDocument>
+</topic>

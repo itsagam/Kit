@@ -94,7 +94,7 @@ namespace Kit
 		/// </summary>
 		public static readonly List<ResourceParser> Parsers = new List<ResourceParser>
 															  {
-																  new JSONParser(),
+																  new JsonParser(),
 																  new Texture2DParser(),
 																  new AudioClipParser(),
 																  new TextAssetParser()

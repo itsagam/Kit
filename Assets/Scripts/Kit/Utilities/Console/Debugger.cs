@@ -164,7 +164,7 @@ namespace Kit
 			if (obj == null)
 				return nullString;
 
-			return serialize ? JSONParser.ToJson(obj) : obj.ToString();
+			return serialize ? JsonParser.ToJson(obj) : obj.ToString();
 		}
 
 		/// <summary>
