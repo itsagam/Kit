@@ -23,7 +23,7 @@ namespace Kit
 		public const bool Enabled = true;
 
 		/// <summary>Prefab location to the Console UI.</summary>
-		private const string Prefab = "Console/Console";
+		public const string Prefab = "Console/Console";
 
 		/// <summary>Maximum length of the log in characters.</summary>
 		public static int Length = 10000;
@@ -35,13 +35,13 @@ namespace Kit
 		public static string LogColor = "#7EF9FF";
 
 		/// <summary>Garbage collector interval for the Lua environment of the Console.</summary>
-		private const float GCInterval = 1.0f;
+		public const float GCInterval = 1.0f;
 
 		/// <summary>Text to display for distinguishing typed content.</summary>
-		private const string CommandPrefix = "> ";
+		public const string CommandPrefix = "> ";
 
 		/// <summary>Text to display for <see langword="null" /> objects.</summary>
-		private const string NullString = "nil";
+		public const string NullString = "nil";
 
 		private static ConsoleUI instance;
 		private static CompositeDisposable disposables = new CompositeDisposable();

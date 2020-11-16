@@ -5,9 +5,10 @@ namespace Kit.Pooling
 {
 	/// <summary>A robust and easy-to-use GameObject pooler. Supports grouping, limiting and pre-loading.</summary>
 	/// <example>
-	///     Replace <see cref="GameObject" />.<see cref="Object.Instantiate(Object)" /> calls with <see cref="Pooler" />.
-	///     <see cref="Pooler.Instantiate(Component)" /> &amp; <see cref="GameObject" />.<see cref="Object.Destroy(Object)" /> with
-	///     <see cref="Pooler" />.<see cref="Pooler.Destroy(Component)" />, and you're good to go.
+	///     Replace <see cref="Object.Instantiate(Object)" qualifyHint="true" /> calls with
+	///     <see cref="Pooler.Instantiate(Component)" qualifyHint="true" /> &amp;
+	/// 	<see cref="Object.Destroy(Object)" qualifyHint="true" /> with
+	///     <see cref="Pooler.Destroy(Component)" qualifyHint="true" />, and you're good to go.
 	/// </example>
 	public static class Pooler
 	{

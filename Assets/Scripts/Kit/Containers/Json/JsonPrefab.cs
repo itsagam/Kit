@@ -65,7 +65,7 @@ namespace Kit.Containers
 	/// <example>
 	///     The following will all instantiate two prefabs, "Building/ProducerBuilding" and "Building/BankBuilding", with Position (1, 1)
 	///     and (2, 2) respectively.
-	///     <code language="JavaScript" title="Json">
+	///     <code language="javascript" title="Json">
 	///   {
 	///  		"Buildings":
 	///  		[

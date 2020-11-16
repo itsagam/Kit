@@ -2,17 +2,297 @@
 <topic id="Modding" revisionNumber="1">
 	<developerConceptualDocument xmlns="http://ddue.schemas.microsoft.com/authoring/2003/5" xmlns:xlink="http://www.w3.org/1999/xlink">
 		<introduction>
-			<para>Introduction</para>
+			<para>
+				Unity does not have any modding system of its own. The traditional way of allowing modding with Unity is to load asset bundles from external
+				sources and override game assets and scripts from there. This has the benefit of handling everything through Unity, but makes the actual
+				process of modding quite a bit harder as any potential modder has to have an installation of Unity compatible with your game and be familiar
+				with it to be able to create a mod. Which is one of the reasons most Unity games with good modding support don’t go this route and implement
+				custom modding tools &amp; systems.
+			</para>
 		</introduction>
 
 		<section>
-			<title>Section title</title>
+			<title>System</title>
 			<content>
-          Section content.
+				<para>Any modding system has to contend with two types of resources:</para>
+				<list class="ordered">
+					<listItem>
+						<para>Assets such as textures, sounds and configuration files to allow modding of in-game look-and-feel.</para>
+					</listItem>
+					<listItem>
+						<para>Scripts to add new features or modify existing functionality.</para>
+					</listItem>
+				</list>
+				<para>The modding system integrated into the kit supports both.</para>
+
+			</content>
+			<sections>
+				<section>
+					<title>Assets</title>
+					<content>
+						<para>
+							Our modding system achieves the former by hooking into <codeEntityReference>T:Kit.ResourceManager</codeEntityReference>.
+							ResourceManager is the global center where all in-game assets can be loaded and should be the class you use to load everything.
+							Before looking for assets in the game <codeEntityReference>T:Kit.ResourceManager</codeEntityReference> asks
+							<codeEntityReference>T:Kit.Modding.ModManager</codeEntityReference> if any of mods has the asset being requested. If that is
+							indeed the case, the mod version is loaded instead.
+						</para>
+						<alert class="note">
+							<para>
+								If you want, you can force the game version by passing <codeInline>false</codeInline>
+								for the <codeInline>modded</codeInline> parameter in a <codeInline>ResourceManager.Load</codeInline> call, or you can change
+								<codeEntityReference>F:Kit.ResourceManager.DefaultModding</codeEntityReference> to <codeInline>false</codeInline> altogether if
+								you only want modding for very few files.
+							</para>
+						</alert>
+					</content>
+				</section>
+				<section>
+					<title>Scripts</title>
+					<content>
+						<para>
+							For scripting, the kit provides full
+							<externalLink>
+								<linkText>Lua</linkText>
+								<linkUri>https://en.wikipedia.org/wiki/Lua_(programming_language</linkUri>
+							</externalLink>
+							support through
+							<externalLink>
+								<linkText>XLua</linkText>
+								<linkUri>https://github.com/Tencent/xLua</linkUri>
+							</externalLink>.
+							A mod just has to provide a list of <localUri>.lua</localUri> scripts it wants to executes. The scripts have full access to your game (with the
+							<codeInline>CS</codeInline> namespace) and Unity (with the <codeInline>UnityEngine</codeInline> or <codeInline>UE</codeInline>
+							namespace) and can do pretty much everything. They also support code injection whereby they can modify the functionality of
+							existing methods.
+						</para>
+						<alert class="tip">
+							<para>
+								You can restrict access by configuring <localUri>Kit/Modding/Scripting/Editor/ScriptingConfig.cs</localUri>.
+							</para>
+						</alert>
+						<para>
+							The system supports all platforms including mobile. You have to generate code by pressing <ui>Menu</ui> → <ui>XLua</ui> → 
+							<ui>Generate Code</ui> for mobile platforms to resolve AOT issues.
+						</para>
+						<para>
+							All of the modding functionality is only compiled if <codeInline>MODDING</codeInline> is defined in
+							<ui>Project Settings</ui> → <ui>Player</ui> → <ui>Scripting Define Symbols</ui>.
+							This not only ensures that modding for a game can be enabled or disabled at the flip of as switch but also that if modding
+							support is not needed, the code is not packaged into the game to prevent abuse. Remove the <codeInline>MODDING</codeInline>
+							symbol definition if you don't want modding.
+						</para>
+					</content>
+				</section>
+			</sections>
+		</section>
+
+		<section>
+			<title>Mods</title>
+			<content>
+				<para>
+					Mod-loading is done just by calling <codeEntityReference qualifyHint="true">M:Kit.Modding.ModManager.LoadMods(Boolean)</codeEntityReference>/
+					<codeEntityReference qualifyHint="true">M:Kit.Modding.ModManager.LoadModsAsync(Boolean)</codeEntityReference> methods, whereby the game will look for mods
+					in pre-defined locations (generally inside a <link xlink:href="Structure">Mods folder within the base game folder</link>) and load them.
+				</para>
+				<para>The system supports loading mods from 3 different formats:</para>
+				<list class="ordered">
+					<listItem>
+						<para>
+							<legacyBold>Folders</legacyBold> – You create a folder and place your mod contents inside it.
+						</para>
+					</listItem>
+					<listItem>
+						<para>
+							<legacyBold>Archives</legacyBold> – You compress your mod contents inside a <localUri>.zip</localUri> file.
+						</para>
+					</listItem>
+					<listItem>
+						<para>
+							<legacyBold>Asset bundle</legacyBold> – You create an asset bundle of your assets.
+						</para>
+					</listItem>
+				</list>
+				<para>
+					However a modder chooses to package a mod, it just needs to be placed inside the <localUri>Mods</localUri> folder. Individual mods can also be enabled
+					or disabled within the game once the system is able to detect them. Their execution order can also be configured in the game.
+				</para>
+				<para>A mod will typically have the following structure: </para>
+				<table>
+					<tableHeader>
+						<row>
+							<entry>
+								<para>Path</para>
+							</entry>
+							<entry>
+								<para>Requirement</para>
+							</entry>
+							<entry>
+								<para>Description</para>
+							</entry>
+						</row>
+					</tableHeader>
+					<row>
+						<entry>
+							<para>Metadata.json</para>
+						</entry>
+						<entry>
+							<para>Mandatory</para>
+						</entry>
+						<entry>
+							<para>Mod metadata and configuration in the form of a Json file.</para>
+						</entry>
+					</row>
+					<row>
+						<entry>
+							<para>Resources/</para>
+						</entry>
+						<entry>
+							<para>Optional</para>
+						</entry>
+						<entry>
+							<para>Game assets to replace in a Resources folder.</para>
+						</entry>
+					</row>
+					<row>
+						<entry>
+							<para>StreamingAssets/</para>
+						</entry>
+						<entry>
+							<para>Optional</para>
+						</entry>
+						<entry>
+							<para>Game assets to replace in the streaming assets folder.</para>
+						</entry>
+					</row>
+					<row>
+						<entry>
+							<para>PersistentData/</para>
+						</entry>
+						<entry>
+							<para>Optional</para>
+						</entry>
+						<entry>
+							<para>Game assets to replace in the persistent data folder.</para>
+						</entry>
+					</row>
+					<row>
+						<entry>
+							<para>Data/</para>
+						</entry>
+						<entry>
+							<para>Optional</para>
+						</entry>
+						<entry>
+							<para>Game assets to replace in the base game folder folder.</para>
+						</entry>
+					</row>
+					<row>
+						<entry>
+							<para>*.lua</para>
+						</entry>
+						<entry>
+							<para>Optional</para>
+						</entry>
+						<entry>
+							<para>Lua scripts.</para>
+						</entry>
+					</row>
+				</table>
+				<para>
+					Any paths/files placed inside <localUri>Resources</localUri>, <localUri>StreamingAssets</localUri>, <localUri>PersistentData</localUri>
+					and <localUri>Data</localUri> folders inside a mod directly override the version base game provides. So, for example, if you have a
+					<localUri>Mod1/Resources/Backgrounds/Background1.jpg</localUri>, and the game calls
+					<codeInline>ResourceManager.Load&lt;Texture&gt;(ResourceFolder.Resources, "Backgrounds/Background1")</codeInline> the mod version will be 
+					loaded.
+				</para>
+				<para>
+					The mod <localUri>Metadata.json</localUri> provides the following information in the Json format.
+				</para>
+				<definitionTable>
+					<definedTerm>Name:</definedTerm>
+					<definition>
+						<para>Name of the mod.</para>
+					</definition>
+
+					<definedTerm>Version:</definedTerm>
+					<definition>
+						<para>Mod author.</para>
+					</definition>
+
+					<definedTerm>Description:</definedTerm>
+					<definition>
+						<para>A short description of the mod.</para>
+					</definition>
+
+					<definedTerm>Persistence:</definedTerm>
+					<definition>
+						<para>Defines a mode for executing Lua scripts.</para>
+
+						<list class="nobullet">
+							<listItem>
+								<para>
+									<legacyBold>None</legacyBold> – Just execute them and then destroy the scripting environment.
+								</para>
+							</listItem>
+							<listItem>
+								<para>
+									<legacyBold>Simple</legacyBold> – Execute them, create a <codeInline>GameObject</codeInline> for the mod to run co-routines 
+									with, and keep the scripting environment until the mod is unloaded.
+								</para>
+							</listItem>
+							<listItem>
+								<para>
+									<legacyBold>Full</legacyBold> – Execute them, create a <codeInline>GameObject</codeInline> for the mod, hook 
+									<codeInline>awake</codeInline>/<codeInline>start</codeInline>/<codeInline>update</codeInline>/... methods from
+									scripts with the <codeInline>GameObject</codeInline>, and keep the scripting environment until the mod is unloaded.
+								</para>
+							</listItem>
+						</list>
+					</definition>
+
+					<definedTerm>Scripts:</definedTerm>
+					<definition>
+						<para>Relative paths to <localUri>.lua</localUri> files to execute, in the order they should be executed.</para>
+					</definition>
+				</definitionTable>
+				<para>
+					Here is a sample <localUri>Metadata.json</localUri>:
+				</para>
+				<code language="javascript">
+{
+	"Name": "Mod 1",
+	"Version": "v1.0",
+	"Author": "Mod 1 Author",
+	"Description": "Mod 1 description",
+	"Persistence": "None",
+	"Scripts":
+	[
+		"Script1.lua"
+	]
+}
+				</code>
 			</content>
 		</section>
 
+
 		<relatedTopics>
+			<link xlink:href="Console" />
+			<codeEntityReference>T:Kit.Modding.ModManager</codeEntityReference>
+			<codeEntityReference>T:Kit.Modding.ModMetadata</codeEntityReference>
+			<codeEntityReference>T:Kit.ResourceManager</codeEntityReference>
+			<externalLink>
+				<linkText>Lua (programming language)</linkText>
+				<linkUri>https://en.wikipedia.org/wiki/Lua_(programming_language)</linkUri>
+			</externalLink>
+			<externalLink>
+				<linkText>Programming in Lua, 4th edition</linkText>
+				<linkUri>https://www.moys.gov.iq/upload/common/Programming_in_Lua%2C_4th_ed._%282017%29_.pdf</linkUri>
+			</externalLink>
+			<externalLink>
+				<linkText>XLua</linkText>
+				<linkUri>https://github.com/Tencent/xLua</linkUri>
+			</externalLink>
 		</relatedTopics>
 	</developerConceptualDocument>
 </topic>

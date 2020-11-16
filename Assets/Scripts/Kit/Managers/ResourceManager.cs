@@ -142,7 +142,7 @@ namespace Kit
 		///     </para>
 		/// </summary>
 		/// <param name="folder">The folder to load the resource from.</param>
-		/// <param name="file">The path and file-name relative to the <paramref name="folder" </param>
+		/// <param name="file">The path and file-name relative to the <paramref name="folder" />.</param>
 		/// <param name="modded">
 		///     Whether to allow mods to load their version of the asset instead. Useful if you want to allow some assets to
 		///     be modded, but not others. Has no effect if MODDING is not defined.
