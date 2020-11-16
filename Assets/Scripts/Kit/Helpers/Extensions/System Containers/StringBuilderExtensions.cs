@@ -2,14 +2,10 @@
 
 namespace Kit
 {
-	/// <summary>
-	/// <see cref="StringBuilder"/> extensions.
-	/// </summary>
+	/// <summary><see cref="StringBuilder" /> extensions.</summary>
 	public static class StringBuilderExtensions
 	{
-		/// <summary>
-		/// Returns the index of a specified character.
-		/// </summary>
+		/// <summary>Returns the index of a specified character.</summary>
 		public static int IndexOf(this StringBuilder sb, char value, int startIndex = 0)
 		{
 			for (int i = startIndex; i < sb.Length; i++)
@@ -18,9 +14,7 @@ namespace Kit
 			return -1;
 		}
 
-		/// <summary>
-		/// Returns the index of a specified substring.
-		/// </summary>
+		/// <summary>Returns the index of a specified substring.</summary>
 		public static int IndexOf(this StringBuilder sb, string value, int startIndex = 0)
 		{
 			int length = value.Length;

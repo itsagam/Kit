@@ -3,9 +3,7 @@ using UnityEngine.UI;
 
 namespace Kit.UI.Behaviours
 {
-	/// <summary>
-	/// Parent class for behaviours that want to react to a <see cref="UnityEngine.UI.Toggle" />'s value.
-	/// </summary>
+	/// <summary>Parent class for behaviours that want to react to a <see cref="UnityEngine.UI.Toggle" />'s value.</summary>
 	[RequireComponent(typeof(Toggle))]
 	public abstract class ToggleBehaviour: MonoBehaviour
 	{

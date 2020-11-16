@@ -2,7 +2,7 @@ using Kit;
 
 namespace Game
 {
-	public interface IXPLeveled : ILeveled
+	public interface IXPLeveled: ILeveled
 	{
 		int XP { get; }
 		int[] XPCurve { get; }

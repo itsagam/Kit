@@ -4,39 +4,29 @@ using System.Text;
 
 namespace Kit
 {
-	/// <summary>
-	/// LINQ extensions.
-	/// </summary>
+	/// <summary>LINQ extensions.</summary>
 	public static class EnumerableExtensions
 	{
-		/// <summary>
-		/// Return just the one item specified.
-		/// </summary>
+		/// <summary>Return just the one item specified.</summary>
 		public static IEnumerable<T> One<T>(T item)
 		{
 			yield return item;
 		}
 
-		/// <summary>
-		/// Perform an action on a enumerable of items.
-		/// </summary>
+		/// <summary>Perform an action on a enumerable of items.</summary>
 		public static void ForEach<T>(this IEnumerable<T> enumerable, Action<T> action)
 		{
 			foreach (T obj in enumerable)
 				action(obj);
 		}
 
-		/// <summary>
-		/// Log all the items in enumerable to the Console.
-		/// </summary>
+		/// <summary>Log all the items in enumerable to the Console.</summary>
 		public static void Log<T>(this IEnumerable<T> enumerable, bool serialize = false)
 		{
 			enumerable.ForEach(o => Debugger.Log(o, serialize));
 		}
 
-		/// <summary>
-		/// Return the index of an item, or -1 if not found.
-		/// </summary>
+		/// <summary>Return the index of an item, or -1 if not found.</summary>
 		public static int IndexOf<T>(this IEnumerable<T> source, T value)
 		{
 			int index = 0;
@@ -50,9 +40,7 @@ namespace Kit
 			return -1;
 		}
 
-		/// <summary>
-		/// Return the index of an item, or -1 if not found.
-		/// </summary>
+		/// <summary>Return the index of an item, or -1 if not found.</summary>
 		public static int IndexOf<T>(this IEnumerable<T> source, T value, IEqualityComparer<T> comparer)
 		{
 			int index = 0;
@@ -66,17 +54,13 @@ namespace Kit
 			return -1;
 		}
 
-		/// <summary>
-		/// Combine a enumerable of strings separated by a delimiter.
-		/// </summary>
+		/// <summary>Combine a enumerable of strings separated by a delimiter.</summary>
 		public static string Join(this IEnumerable<string> source, string separator = ", ")
 		{
 			return string.Join(separator, source);
 		}
 
-		/// <summary>
-		/// Combine a enumerable of strings separated by a delimiter and append them to a <see cref="StringBuilder"/>.
-		/// </summary>
+		/// <summary>Combine a enumerable of strings separated by a delimiter and append them to a <see cref="StringBuilder" />.</summary>
 		public static void Join(this IEnumerable<string> source, StringBuilder builder, string separator = ", ")
 		{
 			bool first = true;

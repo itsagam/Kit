@@ -5,51 +5,37 @@ using UnityEngine;
 
 namespace Kit.Behaviours
 {
-	/// <summary>
-	/// Orbits and zooms in/out a <see cref="Transform" /> around another one with gestures.
-	/// </summary>
+	/// <summary>Orbits and zooms in/out a <see cref="Transform" /> around another one with gestures.</summary>
 	[RequireComponent(typeof(ScreenTransformGesture))]
 	public class OrbitCam: MonoBehaviour
 	{
-		/// <summary>
-		/// The <see cref="Transform"/> to orbit around.
-		/// </summary>
+		/// <summary>The <see cref="Transform" /> to orbit around.</summary>
 		[Tooltip("The transform to orbit around.")]
 		public Transform Target;
 
-		/// <summary>
-		/// Should orbit using screen X-axis?
-		/// </summary>
+		/// <summary>Should orbit using screen X-axis?</summary>
 		[Title("Orbit")]
 		[LabelText("X")]
 		[Tooltip("Should orbit using screen X-axis?")]
 		public bool OrbitX = true;
 
-		/// <summary>
-		/// Should orbit using screen Y-axis?
-		/// </summary>
+		/// <summary>Should orbit using screen Y-axis?</summary>
 		[LabelText("Y")]
 		[Tooltip("Should orbit using screen Y-axis?")]
 		public bool OrbitY = true;
 
-		/// <summary>
-		/// The speed at which to orbit.
-		/// </summary>
+		/// <summary>The speed at which to orbit.</summary>
 		[LabelText("Speed")]
 		[Tooltip("The speed at which to orbit.")]
 		public float OrbitSpeed = 0.25f;
 
-		/// <summary>
-		/// The speed at which to zoom.
-		/// </summary>
+		/// <summary>The speed at which to zoom.</summary>
 		[Title("Zoom")]
 		[LabelText("Speed")]
 		[Tooltip("The speed at which to zoom.")]
 		public float ZoomSpeed = 2.5f;
 
-		/// <summary>
-		/// Minimum and maximum distances to keep while zooming.
-		/// </summary>
+		/// <summary>Minimum and maximum distances to keep while zooming.</summary>
 		[LabelText("Bounds")]
 		[Tooltip("Minimum and maximum distances to keep while zooming.")]
 		public Vector2 ZoomBounds = new Vector2(2, 10);

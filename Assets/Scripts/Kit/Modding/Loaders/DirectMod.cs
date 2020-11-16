@@ -101,8 +101,8 @@ namespace Kit.Modding.Loaders
 				string fullPath = GetFullPath(path);
 				using (FileStream stream = new FileStream(fullPath, FileMode.Open))
 				{
-					byte[] data = new byte[stream.Length];
-					await stream.ReadAsync(data, 0, (int)stream.Length);
+					var data = new byte[stream.Length];
+					await stream.ReadAsync(data, 0, (int) stream.Length);
 					return data;
 				}
 			}

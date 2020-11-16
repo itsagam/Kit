@@ -2,9 +2,7 @@
 
 namespace Kit.UI.Layout
 {
-	/// <summary>
-	/// Give a UI element the size of this <see cref="rectTransform"/> whenever it's resized.
-	/// </summary>
+	/// <summary>Give a UI element the size of this <see cref="rectTransform" /> whenever it's resized.</summary>
 	public class MatchSizeLayout: MonoBehaviour
 	{
 		public RectTransform Element;

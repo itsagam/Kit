@@ -5,14 +5,12 @@ using UnityEngine;
 namespace Kit
 {
 	/// <summary>
-	/// Allows to save/load device-specific app-wide settings (with <see cref="PlayerPrefs"/> as back-end). Supports organization,
-	/// more types, and is easier-to-use.
+	///     Allows to save/load device-specific app-wide settings (with <see cref="PlayerPrefs" /> as back-end). Supports
+	///     organization, more types, and is easier-to-use.
 	/// </summary>
 	public static class SettingsManager
 	{
-		/// <summary>
-		/// Set the value of a setting.
-		/// </summary>
+		/// <summary>Set the value of a setting.</summary>
 		/// <param name="category">Category/system the setting is for.</param>
 		/// <param name="entity">Object/entity the setting is for.</param>
 		/// <param name="property">Name of the setting.</param>
@@ -72,9 +70,7 @@ namespace Kit
 			}
 		}
 
-		/// <summary>
-		/// Return the value of a setting, or default value if doesn't exist.
-		/// </summary>
+		/// <summary>Return the value of a setting, or default value if doesn't exist.</summary>
 		/// <param name="category">Category/system the setting is for.</param>
 		/// <param name="entity">Object/entity the setting is for.</param>
 		/// <param name="property">Name of the setting.</param>
@@ -127,9 +123,7 @@ namespace Kit
 			}
 		}
 
-		/// <summary>
-		/// Delete a setting.
-		/// </summary>
+		/// <summary>Delete a setting.</summary>
 		/// <param name="category">Category/system the setting is for.</param>
 		/// <param name="entity">Object/entity the setting is for.</param>
 		/// <param name="property">Name of the setting.</param>
@@ -138,9 +132,7 @@ namespace Kit
 			PlayerPrefs.DeleteKey(GetKey(category, entity, property));
 		}
 
-		/// <summary>
-		/// Returns whether a setting exists.
-		/// </summary>
+		/// <summary>Returns whether a setting exists.</summary>
 		/// <param name="category">Category/system the setting is for.</param>
 		/// <param name="entity">Object/entity the setting is for.</param>
 		/// <param name="property">Name of the setting.</param>
@@ -154,17 +146,13 @@ namespace Kit
 			return $"{category}/{entity}.{property}";
 		}
 
-		/// <summary>
-		/// Delete all settings.
-		/// </summary>
+		/// <summary>Delete all settings.</summary>
 		public static void Clear()
 		{
 			PlayerPrefs.DeleteAll();
 		}
 
-		/// <summary>
-		/// Save settings.
-		/// </summary>
+		/// <summary>Save settings.</summary>
 		public static void Save()
 		{
 			PlayerPrefs.Save();

@@ -6,16 +6,16 @@ using UniRx;
 namespace Kit.Containers
 {
 	/// <summary>
-	/// Represents the base and current values of stats of an entity as a dictionary. Can be used with both POCO objects or
-	/// <see cref="UnityEngine.MonoBehaviour"/>s with Odin's <see cref="Sirenix.OdinInspector.SerializedMonoBehaviour"/>.
+	///     Represents the base and current values of stats of an entity as a dictionary. Can be used with both POCO objects or
+	///     <see cref="UnityEngine.MonoBehaviour" />s with Odin's <see cref="Sirenix.OdinInspector.SerializedMonoBehaviour" />.
 	/// </summary>
-	/// <remarks>The class is highly optimized as the current values are only updated when the <see cref="IUpgradeable"/> adds or removes
-	/// an <see cref="Upgrade"/> or the base value of a property changes.</remarks>
+	/// <remarks>
+	///     The class is highly optimized as the current values are only updated when the <see cref="IUpgradeable" /> adds or
+	///     removes an <see cref="Upgrade" /> or the base value of a property changes.
+	/// </remarks>
 	public class Stats: Dictionary<string, StatBaseProperty>, IDisposable
 	{
-		/// <summary>
-		/// The <see cref="IUpgradeable"/> to use for calculating current values.
-		/// </summary>
+		/// <summary>The <see cref="IUpgradeable" /> to use for calculating current values.</summary>
 		public IUpgradeable Upgradeable;
 
 		protected readonly Dictionary<string, ReadOnlyReactiveProperty<float>> currentProperties =
@@ -25,7 +25,6 @@ namespace Kit.Containers
 
 		public Stats()
 		{
-
 		}
 
 		public Stats(IUpgradeable upgradeable)
@@ -33,50 +32,38 @@ namespace Kit.Containers
 			Upgradeable = upgradeable;
 		}
 
-		/// <summary>
-		/// Returns the current value of a stat or allow to set the base value.
-		/// </summary>
+		/// <summary>Returns the current value of a stat or allow to set the base value.</summary>
 		public new float this[string stat]
 		{
 			get => GetCurrentValue(stat);
 			set => SetBaseValue(stat, value);
 		}
 
-		/// <summary>
-		/// Set the base value of a stat.
-		/// </summary>
+		/// <summary>Set the base value of a stat.</summary>
 		public void Add(string stat, float value)
 		{
 			SetBaseValue(stat, value);
 		}
 
-		/// <summary>
-		/// Get the base value property of a stat.
-		/// </summary>
+		/// <summary>Get the base value property of a stat.</summary>
 		public StatBaseProperty GetBaseProperty(string stat)
 		{
 			return this.GetOrDefault(stat);
 		}
 
-		/// <summary>
-		/// Set the base value property of a stat.
-		/// </summary>
+		/// <summary>Set the base value property of a stat.</summary>
 		public void SetBaseProperty(string stat, StatBaseProperty value)
 		{
 			base[stat] = value;
 		}
 
-		/// <summary>
-		/// Get the base value of a stat.
-		/// </summary>
+		/// <summary>Get the base value of a stat.</summary>
 		public float GetBaseValue(string stat)
 		{
 			return GetBaseProperty(stat).Value;
 		}
 
-		/// <summary>
-		/// Set the base value of a stat.
-		/// </summary>
+		/// <summary>Set the base value of a stat.</summary>
 		public void SetBaseValue(string stat, float value)
 		{
 			if (TryGetValue(stat, out StatBaseProperty property))
@@ -88,9 +75,7 @@ namespace Kit.Containers
 			}
 		}
 
-		/// <summary>
-		/// Get the current value property of a stat.
-		/// </summary>
+		/// <summary>Get the current value property of a stat.</summary>
 		public ReadOnlyReactiveProperty<float> GetCurrentProperty(string stat)
 		{
 			if (currentProperties.TryGetValue(stat, out var property))
@@ -105,9 +90,7 @@ namespace Kit.Containers
 		}
 
 
-		/// <summary>
-		/// Get the current value of a stat.
-		/// </summary>
+		/// <summary>Get the current value of a stat.</summary>
 		public float GetCurrentValue(string stat)
 		{
 			return GetCurrentProperty(stat).Value;
@@ -188,9 +171,7 @@ namespace Kit.Containers
 		}
 	}
 
-	/// <summary>
-	/// A more inspector-friendly <see cref="ReactiveProperty{T}"/> for use in <see cref="Stats"/>.
-	/// </summary>
+	/// <summary>A more inspector-friendly <see cref="ReactiveProperty{T}" /> for use in <see cref="Stats" />.</summary>
 	[Serializable]
 	public class StatBaseProperty: ReactiveProperty<float>
 	{

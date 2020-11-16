@@ -7,92 +7,76 @@ using UnityEngine;
 namespace Kit.Behaviours
 {
 	/// <summary>
-	/// Provides a robust gesture-oriented Pan/Zoom/Rotate functionality for a camera. Supports both orthographic and perspective modes.
+	///     Provides a robust gesture-oriented Pan/Zoom/Rotate functionality for a camera. Supports both orthographic and
+	///     perspective modes.
 	/// </summary>
 	[RequireComponent(typeof(Camera))]
 	[RequireComponent(typeof(MetaGesture))]
-	public class PanZoomRotateCam : MonoBehaviour
+	public class PanZoomRotateCam: MonoBehaviour
 	{
 		#region Fields
+
 		/// <summary>
-		/// <para>Area/bounds to focus on, be it a <see cref="Transform"/>, <see cref="Renderer"/> or <see cref="Collider"/>.</para>
-		/// <para>Will be origin if not provided.</para>
+		///     <para>Area/bounds to focus on, be it a <see cref="Transform" />, <see cref="Renderer" /> or <see cref="Collider" />.</para>
+		///     <para>Will be origin if not provided.</para>
 		/// </summary>
 		[Tooltip("Area/bounds to focus on, be it a transform, renderer or collider; will be origin if not provided.")]
 		[SceneObjectsOnly]
 		public Component View;
 
 		/// <summary>
-		/// <para>Smoothing to apply while Lerp-ing.</para>
-		/// <para>Applies to position, rotation and <see cref="Camera.orthographicSize"/>.</para>
+		///     <para>Smoothing to apply while Lerp-ing.</para>
+		///     <para>Applies to position, rotation and <see cref="Camera.orthographicSize" />.</para>
 		/// </summary>
 		[Tooltip("Smoothing to apply while Lerp-ing. Applies to position, rotation and orthographicSize.")]
 		[MinValue(0.0f)]
 		public float Smoothing = 10f;
 
-		/// <summary>
-		/// Whether to allow panning.
-		/// </summary>
+		/// <summary>Whether to allow panning.</summary>
 		[ToggleGroup("Pan")]
 		public bool Pan = true;
 
-		/// <summary>
-		/// Panning speed.
-		/// </summary>
+		/// <summary>Panning speed.</summary>
 		/// <remarks>Depends on world scale.</remarks>
 		[ToggleGroup("Pan")]
 		[Tooltip("Panning speed. Depends on world scale.")]
 		[MinValue(0.0f)]
 		public float PanSpeed = 5.0f;
 
-		/// <summary>
-		/// Order of magnitude zoom level affects panning speed.
-		/// </summary>
+		/// <summary>Order of magnitude zoom level affects panning speed.</summary>
 		[ToggleGroup("Pan")]
 		[Tooltip("Order of magnitude zoom level affects panning speed.")]
 		[MinValue(1.0f)]
 		public float PanZoomFactor = 1.5f;
 
 
-		/// <summary>
-		/// Whether to allow zooming.
-		/// </summary>
+		/// <summary>Whether to allow zooming.</summary>
 		[ToggleGroup("Zoom")]
 		public bool Zoom = true;
 
-		/// <summary>
-		/// Zooming speed.
-		/// </summary>
+		/// <summary>Zooming speed.</summary>
 		/// <remarks>Depends on world scale in perspective mode.</remarks>
 		[ToggleGroup("Zoom")]
 		[Tooltip("Zooming speed. Depends on world scale in perspective mode.")]
 		[MinValue(0.0f)]
 		public float ZoomSpeed = 0.025f;
 
-		/// <summary>
-		/// Minimum <see cref="Camera.orthographicSize"/> if camera is orthographic, camera position in forward axis otherwise.
-		/// </summary>
+		/// <summary>Minimum <see cref="Camera.orthographicSize" /> if camera is orthographic, camera position in forward axis otherwise.</summary>
 		[ToggleGroup("Zoom")]
 		[Tooltip("Minimum orthographicSize if camera is orthographic, camera position in forward axis otherwise.")]
 		public float ZoomMin = 1;
 
-		/// <summary>
-		/// Maximum <see cref="Camera.orthographicSize"/> if camera is orthographic, camera position in forward axis otherwise.
-		/// </summary>
+		/// <summary>Maximum <see cref="Camera.orthographicSize" /> if camera is orthographic, camera position in forward axis otherwise.</summary>
 		[ToggleGroup("Zoom")]
 		[Tooltip("Maximum orthographicSize if camera is orthographic, camera position in forward axis otherwise.")]
 		public float ZoomMax = 10;
 
 
-		/// <summary>
-		/// Whether to allow rotation.
-		/// </summary>
+		/// <summary>Whether to allow rotation.</summary>
 		[ToggleGroup("Rotate")]
 		public bool Rotate = false;
 
-		/// <summary>
-		/// The rotation speed.
-		/// </summary>
+		/// <summary>The rotation speed.</summary>
 		[ToggleGroup("Rotate")]
 		[Tooltip("Rotation speed.")]
 		[MinValue(0.0f)]
@@ -112,9 +96,11 @@ namespace Kit.Behaviours
 		protected Vector3 targetPosition;
 		protected Quaternion targetRotation;
 		protected float targetZoom;
+
 		#endregion
 
 		#region Initialization
+
 		protected void Awake()
 		{
 			transform = base.transform;
@@ -139,9 +125,7 @@ namespace Kit.Behaviours
 			gesture.PointerUpdated -= OnMoved;
 		}
 
-		/// <summary>
-		/// Reset values.
-		/// </summary>
+		/// <summary>Reset values.</summary>
 		public void Refresh()
 		{
 			targetPosition = transform.position;
@@ -149,9 +133,11 @@ namespace Kit.Behaviours
 			targetZoom = camera.orthographic ? camera.orthographicSize : GetForwardComponent(targetPosition);
 			Clamp();
 		}
+
 		#endregion
 
 		#region Pinch/Zoom/Rotate
+
 		protected void OnMoved(object sender, EventArgs e)
 		{
 			switch (gesture.ActivePointers.Count)
@@ -217,21 +203,27 @@ namespace Kit.Behaviours
 			targetZoom = newTargetZoom;
 
 			float frustumHeight = GetFrustumHeight();
-			targetPosition = targetPosition
-						   + transform.TransformDirection((previousPosition1 + previousPosition2 - viewSize) * frustumHeight / viewSize.y) * direction * magnitude
-						   - transform.TransformDirection((position1 + position2 - viewSize) * (frustumHeight + delta) / viewSize.y) * direction * magnitude;
+			targetPosition = targetPosition +
+							 transform.TransformDirection((previousPosition1 + previousPosition2 - viewSize) * frustumHeight / viewSize.y) *
+							 direction                                                                                                     *
+							 magnitude -
+							 transform.TransformDirection((position1 + position2 - viewSize) * (frustumHeight + delta) / viewSize.y) *
+							 direction                                                                                               *
+							 magnitude;
 		}
 
 		protected void TwistRotate(Vector2 position1, Vector2 position2, Vector2 previousPosition1, Vector2 previousPosition2)
 		{
-			float angle = MathHelper.AngleBetween(position1, position2);
+			float angle = MathHelper.AngleBetween(position1,                 position2);
 			float previousAngle = MathHelper.AngleBetween(previousPosition1, previousPosition2);
 			float deltaAngle = Mathf.DeltaAngle(angle, previousAngle);
 			targetRotation = Quaternion.AngleAxis(deltaAngle * RotateSpeed, forward) * targetRotation;
 		}
+
 		#endregion
 
 		#region Calculations
+
 		protected float GetFrustumHeight()
 		{
 			if (camera.orthographic)
@@ -280,9 +272,11 @@ namespace Kit.Behaviours
 		{
 			return SetForwardComponent(vector, newForward * forwardAbs);
 		}
+
 		#endregion
 
 		#region Update
+
 		protected void Clamp()
 		{
 			targetZoom = Mathf.Clamp(targetZoom, ZoomMin, ZoomMax);
@@ -323,7 +317,7 @@ namespace Kit.Behaviours
 			transform.position = Vector3.Lerp(transform.position, targetPosition, fraction);
 			transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, fraction);
 		}
-		#endregion
 
+		#endregion
 	}
 }

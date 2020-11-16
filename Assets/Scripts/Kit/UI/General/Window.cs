@@ -6,63 +6,45 @@ using UnityEngine.Events;
 
 namespace Kit.UI
 {
-	/// <summary>
-	/// Base class for all screens. Handles animation, sound and events.
-	/// </summary>
+	/// <summary>Base class for all screens. Handles animation, sound and events.</summary>
 	public class Window: MonoBehaviour
 	{
-		/// <summary>
-		/// The animation state to play when showing the screen.
-		/// </summary>
+		/// <summary>The animation state to play when showing the screen.</summary>
 		[FoldoutGroup("Animations")]
 		[Tooltip("The animation state to play when showing the screen.")]
 		public string ShowAnimation = "Show";
 
-		/// <summary>
-		/// The animation state to play when hiding the screen.
-		/// </summary>
+		/// <summary>The animation state to play when hiding the screen.</summary>
 		[FoldoutGroup("Animations")]
 		[Tooltip("The animation state to play when hiding the screen.")]
 		public string HideAnimation = "Hide";
 
-		/// <summary>
-		/// The audio to play when showing.
-		/// </summary>
+		/// <summary>The audio to play when showing.</summary>
 		[FoldoutGroup("Sounds")]
 		[Tooltip("The audio to play when showing.")]
 		public AudioClip ShowSound;
 
-		/// <summary>
-		/// The audio to play when hiding.
-		/// </summary>
+		/// <summary>The audio to play when hiding.</summary>
 		[FoldoutGroup("Sounds")]
 		[Tooltip("The audio to play when hiding.")]
 		public AudioClip HideSound;
 
-		/// <summary>
-		/// Stuff to do when showing the screen.
-		/// </summary>
+		/// <summary>Stuff to do when showing the screen.</summary>
 		[Tooltip("Stuff to do when showing the screen.")]
 		[FoldoutGroup("Events")]
 		public UnityEvent Showing;
 
-		/// <summary>
-		/// Stuff to do when the screen has shown.
-		/// </summary>
+		/// <summary>Stuff to do when the screen has shown.</summary>
 		[Tooltip("Stuff to do when the screen has shown.")]
 		[FoldoutGroup("Events")]
 		public UnityEvent Shown;
 
-		/// <summary>
-		/// Stuff to do when hiding the screen.
-		/// </summary>
+		/// <summary>Stuff to do when hiding the screen.</summary>
 		[Tooltip("Stuff to do when hiding the screen.")]
 		[FoldoutGroup("Events")]
 		public UnityEvent Hiding;
 
-		/// <summary>
-		/// Stuff to do when the screen has hidden.
-		/// </summary>
+		/// <summary>Stuff to do when the screen has hidden.</summary>
 		[Tooltip("Stuff to do when the screen has hidden.")]
 		[FoldoutGroup("Events")]
 		public UnityEvent Hidden;
@@ -82,9 +64,7 @@ namespace Kit.UI
 			UIManager.Register(this);
 		}
 
-		/// <summary>
-		/// Show the window.
-		/// </summary>
+		/// <summary>Show the window.</summary>
 		/// <param name="data">Data to pass to the window.</param>
 		/// <returns>Whether the window was successfully shown.</returns>
 		/// <remarks>Can be <c>await</c>-ed upon.</remarks>
@@ -93,10 +73,8 @@ namespace Kit.UI
 			return Show(ShowAnimation, data);
 		}
 
-		/// <summary>
-		/// Show the window.
-		/// </summary>
-		/// <param name="animation">Play this animation state instead of the one set in <see cref="ShowAnimation"/>.</param>
+		/// <summary>Show the window.</summary>
+		/// <param name="animation">Play this animation state instead of the one set in <see cref="ShowAnimation" />.</param>
 		/// <param name="data">Data to pass to the window.</param>
 		/// <returns>Whether the window was successfully shown.</returns>
 		/// <remarks>Can be <c>await</c>-ed upon.</remarks>
@@ -133,9 +111,7 @@ namespace Kit.UI
 			return true;
 		}
 
-		/// <summary>
-		/// Hide the window.
-		/// </summary>
+		/// <summary>Hide the window.</summary>
 		/// <param name="mode">How to hide the window?</param>
 		/// <returns>Whether the window was successfully hidden.</returns>
 		/// <remarks>Can be <c>await</c>-ed upon.</remarks>
@@ -144,10 +120,8 @@ namespace Kit.UI
 			return Hide(HideAnimation, mode);
 		}
 
-		/// <summary>
-		/// Hide the window.
-		/// </summary>
-		/// <param name="animation">Play this animation state instead of the one set in <see cref="HideAnimation"/>.</param>
+		/// <summary>Hide the window.</summary>
+		/// <param name="animation">Play this animation state instead of the one set in <see cref="HideAnimation" />.</param>
 		/// <param name="mode">How to hide the window?</param>
 		/// <returns>Whether the window was successfully hidden.</returns>
 		/// <remarks>Can be <c>await</c>-ed upon.</remarks>
@@ -203,12 +177,8 @@ namespace Kit.UI
 			Hidden.Invoke();
 		}
 
-		/// <summary>
-		/// Mark the window as one not already in the scene. Called automatically.
-		/// </summary>
-		/// <remarks>
-		/// Used to decide the behaviour when <see cref="WindowHideMode"/> is <see cref="WindowHideMode.Auto"/>.
-		/// </remarks>
+		/// <summary>Mark the window as one not already in the scene. Called automatically.</summary>
+		/// <remarks>Used to decide the behaviour when <see cref="WindowHideMode" /> is <see cref="WindowHideMode.Auto" />.</remarks>
 		public void MarkAsInstance()
 		{
 			isInstance = true;
@@ -223,30 +193,22 @@ namespace Kit.UI
 
 		#region Extendable functions
 
-		/// <summary>
-		/// Child classes that want to do stuff while the window is showing should extend this method.
-		/// </summary>
+		/// <summary>Child classes that want to do stuff while the window is showing should extend this method.</summary>
 		protected virtual void OnShowing()
 		{
 		}
 
-		/// <summary>
-		/// Child classes that want to do stuff when the window has shown should extend this method.
-		/// </summary>
+		/// <summary>Child classes that want to do stuff when the window has shown should extend this method.</summary>
 		protected virtual void OnShown()
 		{
 		}
 
-		/// <summary>
-		/// Child classes that want to do stuff while the window is hiding should extend this method.
-		/// </summary>
+		/// <summary>Child classes that want to do stuff while the window is hiding should extend this method.</summary>
 		protected virtual void OnHiding()
 		{
 		}
 
-		/// <summary>
-		/// Child classes that want to do stuff when the window has hidden should extend this method.
-		/// </summary>
+		/// <summary>Child classes that want to do stuff when the window has hidden should extend this method.</summary>
 		protected virtual void OnHidden()
 		{
 		}

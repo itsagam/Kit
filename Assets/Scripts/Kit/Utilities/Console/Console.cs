@@ -16,49 +16,31 @@ using Object = UnityEngine.Object;
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
 namespace Kit
 {
-	/// <summary>
-	/// In-game Lua console. Press tilde (~) on PC or flick-down on mobile to show.
-	/// </summary>
+	/// <summary>In-game Lua console. Press tilde (~) on PC or flick-down on mobile to show.</summary>
 	public static class Console
 	{
-		/// <summary>
-		/// Set to <see langword="true"/> to enable the Console.
-		/// </summary>
+		/// <summary>Set to <see langword="true" /> to enable the Console.</summary>
 		public const bool Enabled = true;
 
-		/// <summary>
-		/// Prefab location to the Console UI.
-		/// </summary>
+		/// <summary>Prefab location to the Console UI.</summary>
 		private const string Prefab = "Console/Console";
 
-		/// <summary>
-		/// Maximum length of the log in characters.
-		/// </summary>
+		/// <summary>Maximum length of the log in characters.</summary>
 		public static int Length = 10000;
 
-		/// <summary>
-		/// How deep to go when logging object contents.
-		/// </summary>
+		/// <summary>How deep to go when logging object contents.</summary>
 		public static int Depth = 2;
 
-		/// <summary>
-		/// Color to use for showing <see cref="Debug.Log(object)"/> messages.
-		/// </summary>
+		/// <summary>Color to use for showing <see cref="Debug.Log(object)" /> messages.</summary>
 		public static string LogColor = "#7EF9FF";
 
-		/// <summary>
-		/// Garbage collector interval for the Lua environment of the Console.
-		/// </summary>
+		/// <summary>Garbage collector interval for the Lua environment of the Console.</summary>
 		private const float GCInterval = 1.0f;
 
-		/// <summary>
-		/// Text to display for distinguishing typed content.
-		/// </summary>
+		/// <summary>Text to display for distinguishing typed content.</summary>
 		private const string CommandPrefix = "> ";
 
-		/// <summary>
-		/// Text to display for <see langword="null" /> objects.
-		/// </summary>
+		/// <summary>Text to display for <see langword="null" /> objects.</summary>
 		private const string NullString = "nil";
 
 		private static ConsoleUI instance;
@@ -66,9 +48,7 @@ namespace Kit
 
 		#region Initialization
 
-		/// <summary>
-		/// Initialize the Console.
-		/// </summary>
+		/// <summary>Initialize the Console.</summary>
 		[RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
 		public static void Initialize()
 		{
@@ -108,7 +88,8 @@ namespace Kit
 
 				FlickGesture flick = gameObject.AddComponent<FlickGesture>();
 				flick.Direction = FlickGesture.GestureDirection.Vertical;
-				flick.Flicked += (o, e) => {
+				flick.Flicked += (o, e) =>
+								 {
 									 if (flick.ScreenFlickVector.y < 0 && !IsVisible)
 										 Show();
 									 else if (flick.ScreenFlickVector.y > 0 && IsVisible)
@@ -116,13 +97,11 @@ namespace Kit
 								 };
 			}
 			else
-			{
 				Observable
 				   .EveryUpdate()
 				   .Where(l => Input.GetKeyDown(KeyCode.BackQuote))
 				   .Subscribe(l => Toggle())
 				   .AddTo(disposables);
-			}
 
 			const EventModifiers disregard = EventModifiers.FunctionKey | EventModifiers.Numeric | EventModifiers.CapsLock;
 			InputFieldEx input = instance.CommandInput;
@@ -147,9 +126,7 @@ namespace Kit
 			instance.CommandInput.text = "";
 		}
 
-		/// <summary>
-		/// Show the Console.
-		/// </summary>
+		/// <summary>Show the Console.</summary>
 		public static void Show()
 		{
 			instance.Animator.Play("Show");
@@ -159,9 +136,7 @@ namespace Kit
 			Observable.NextFrame().Subscribe(t => ScrollToBottom());
 		}
 
-		/// <summary>
-		/// Hide the Console.
-		/// </summary>
+		/// <summary>Hide the Console.</summary>
 		public static void Hide()
 		{
 			instance.Animator.Play("Hide");
@@ -169,17 +144,13 @@ namespace Kit
 			instance.CommandInput.gameObject.SetActive(false);
 		}
 
-		/// <summary>
-		/// Show if not visible, and vice versa.
-		/// </summary>
+		/// <summary>Show if not visible, and vice versa.</summary>
 		public static void Toggle()
 		{
 			IsVisible = !IsVisible;
 		}
 
-		/// <summary>
-		/// Get whether the Console is visible or show/hide it.
-		/// </summary>
+		/// <summary>Get whether the Console is visible or show/hide it.</summary>
 		public static bool IsVisible
 		{
 			get
@@ -204,10 +175,9 @@ namespace Kit
 
 		#region Log
 
-		/// <summary>
-		/// <see cref="StringBuilder"/> for the entire log.
-		/// </summary>
+		/// <summary><see cref="StringBuilder" /> for the entire log.</summary>
 		public static readonly StringBuilder LogBuilder = new StringBuilder(Length);
+
 		private static string logEnd = Environment.NewLine;
 
 		private static void RegisterLogging()
@@ -225,17 +195,13 @@ namespace Kit
 			Log($"<color={LogColor}>{message}</color>");
 		}
 
-		/// <summary>
-		/// Log an object on the Console.
-		/// </summary>
+		/// <summary>Log an object on the Console.</summary>
 		public static void Log(object obj)
 		{
 			Log(ObjectOrTableToString(obj));
 		}
 
-		/// <summary>
-		/// Log a line on the Console.
-		/// </summary>
+		/// <summary>Log a line on the Console.</summary>
 		public static void Log(string line)
 		{
 			if (instance == null)
@@ -305,9 +271,7 @@ namespace Kit
 				Debugger.ObjectToString(output, obj, false, NullString);
 		}
 
-		/// <summary>
-		/// List all members of a class on the Console.
-		/// </summary>
+		/// <summary>List all members of a class on the Console.</summary>
 		public static void List(Type type)
 		{
 			var members = type.GetMembers(BindingFlags.Public | BindingFlags.DeclaredOnly | BindingFlags.Static | BindingFlags.Instance);
@@ -382,25 +346,19 @@ namespace Kit
 			return output.ToString();
 		}
 
-		/// <summary>
-		/// Scroll the Console log to the bottom.
-		/// </summary>
+		/// <summary>Scroll the Console log to the bottom.</summary>
 		public static void ScrollToBottom()
 		{
 			instance.LogScroll.verticalNormalizedPosition = 0;
 		}
 
-		/// <summary>
-		/// Scroll the Console log to the top.
-		/// </summary>
+		/// <summary>Scroll the Console log to the top.</summary>
 		public static void ScrollToTop()
 		{
 			instance.LogScroll.verticalNormalizedPosition = 1;
 		}
 
-		/// <summary>
-		/// Clear the Console log.
-		/// </summary>
+		/// <summary>Clear the Console log.</summary>
 		public static void ClearLog()
 		{
 			LogBuilder.Clear();
@@ -432,9 +390,7 @@ namespace Kit
 			return "<b>" + output + "</b>";
 		}
 
-		/// <summary>
-		/// Clear the command input field.
-		/// </summary>
+		/// <summary>Clear the command input field.</summary>
 		public static void ClearCommand()
 		{
 			instance.CommandInput.ActivateInputField();
@@ -456,9 +412,7 @@ namespace Kit
 			Observable.Timer(TimeSpan.FromSeconds(GCInterval)).Subscribe(l => scriptEnv.Tick()).AddTo(disposables);
 		}
 
-		/// <summary>
-		/// Execute a Lua command or expression on the Console.
-		/// </summary>
+		/// <summary>Execute a Lua command or expression on the Console.</summary>
 		/// <param name="command">Command or expression to execute.</param>
 		public static void Execute(string command)
 		{
@@ -529,9 +483,7 @@ namespace Kit
 			input.MoveTextEnd(false);
 		}
 
-		/// <summary>
-		/// Clear Console history.
-		/// </summary>
+		/// <summary>Clear Console history.</summary>
 		public static void ClearHistory()
 		{
 			history.Clear();
@@ -541,9 +493,7 @@ namespace Kit
 
 		#region Destruction
 
-		/// <summary>
-		/// Destroy the Console.
-		/// </summary>
+		/// <summary>Destroy the Console.</summary>
 		public static void Destroy()
 		{
 			disposables.Dispose();

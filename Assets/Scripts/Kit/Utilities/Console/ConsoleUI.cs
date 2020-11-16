@@ -4,9 +4,7 @@ using UnityEngine.UI;
 
 namespace Kit
 {
-	/// <summary>
-	/// UI hookup for the <see cref="Console"/>.
-	/// </summary>
+	/// <summary>UI hookup for the <see cref="Console" />.</summary>
 	public class ConsoleUI: MonoBehaviour
 	{
 		public Animator Animator;

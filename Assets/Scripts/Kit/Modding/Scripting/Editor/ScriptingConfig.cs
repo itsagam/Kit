@@ -25,10 +25,10 @@ namespace Kit.Modding.Scripting
 		[CSharpCallLua]
 		public static IEnumerable<Type> CSharpCallLua
 		{
-				get
-				{
-					yield return typeof(IEnumerator);
-				}
+			get
+			{
+				yield return typeof(IEnumerator);
+			}
 		}
 
 		/*

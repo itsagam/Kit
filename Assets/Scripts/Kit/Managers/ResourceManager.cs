@@ -15,82 +15,87 @@ using Object = UnityEngine.Object;
 
 namespace Kit
 {
-	/// <summary>
-	/// Locations where game assets can be stored.
-	/// </summary>
+	/// <summary>Locations where game assets can be stored.</summary>
 	public enum ResourceFolder
 	{
-		/// <summary>
-		/// Main game folder.
-		/// </summary>
+		/// <summary>Main game folder.</summary>
 		Data,
 
 		/// <summary>
-		/// <para>
-		/// The streaming assets folder where assets that should not be packaged can be stored.
-		/// </para>
-		///
-		/// <para>
-		/// Windows/Linux: (Game)\StreamingAssets <br />
-		/// macOS: (Game)/Resources/Data/StreamingAssets <br />
-		/// iOS: (Game)/Raw <br />
-		/// Android: jar:file://(Game)!/assets
-		/// </para>
+		///     <para>The streaming assets folder where assets that should not be packaged can be stored.</para>
+		///     <list type="bullet">
+		///         <item>
+		///             <term>Windows</term> <description>.\StreamingAssets</description>
+		///         </item>
+		///         <item>
+		///             <term>macOS</term> <description>./Resources/Data/StreamingAssets</description>
+		///         </item>
+		///         <item>
+		///             <term>iOS</term> <description>./Raw</description>
+		///         </item>
+		///         <item>
+		///             <term>Android</term> <description>jar:file://(Game)!/assets</description>
+		///         </item>
+		///     </list>
 		/// </summary>
 		StreamingAssets,
 
 		/// <summary>
-		/// <para>
-		/// The persistent data folder where local data can be stored.
-		/// </para>
-		///
-		/// <para>
-		///	Windows: (User)\AppData\LocalLow\(Company)\(Product) <br />
-		/// macOS: (User)/Library/Application Support/(Company)/(Product) <br />
-		/// iOS: /var/mobile/Containers/Data/Application/(GUID)/Documents <br />
-		/// Android: /storage/emulated/0/Android/data/(Package)/files
-		/// </para>
+		///     <para>The persistent data folder where local data can be stored.</para>
+		///     <list type="bullet">
+		///         <item>
+		///             <term>Windows</term> <description>(User)\AppData\LocalLow\(Company)\(Product)</description>
+		///         </item>
+		///         <item>
+		///             <term>macOS</term> <description>(User)/Library/Application Support/(Company)/(Product)</description>
+		///         </item>
+		///         <item>
+		///             <term>iOS</term> <description>/var/mobile/Containers/Data/Application/(GUID)/Documents</description>
+		///         </item>
+		///         <item>
+		///             <term>Android</term> <description>/storage/emulated/0/Android/data/(Package)/files</description>
+		///         </item>
+		///     </list>
 		/// </summary>
 		PersistentData,
 
-		/// <summary>
-		/// Folder(s) for in-game assets that want to be loaded dynamically. Get packaged with the game.
-		/// </summary>
+		/// <summary>Folder(s) for in-game assets that want to be loaded dynamically. Get packaged with the game.</summary>
 		Resources
 	}
 
 	/// <summary>
-	/// A versatile resource management system for loading, unloading, caching, reading, saving and parsing assets with support for modding
-	/// and async methods.
+	///     A versatile resource management system for loading, unloading, caching, reading, saving and parsing assets with support
+	///     for modding and async methods.
 	/// </summary>
 	/// <remarks>
-	/// Can handle file-names without extensions from <see cref="ResourceFolder.Resources" />. Otherwise you have to provide it, as you
-	/// can't enumerate and match files in <see cref="ResourceFolder.StreamingAssets"/> on platforms like Android.
+	///     Can handle file-names without extensions from <see cref="ResourceFolder.Resources" /> . Otherwise you have to provide
+	///     it, as you can't enumerate and match files in <see cref="ResourceFolder.StreamingAssets" /> on platforms like Android.
 	/// </remarks>
 	/// <example>
-	/// <code>
+	///     <code>
 	/// ResourceManager.Load&lt;Texture&gt;(ResourceFolder.Resources, "Textures/Background");
 	/// </code>
-	/// <code>
+	///     <code>
 	/// ResourceManager.LoadAsync&lt;GameState&gt;(ResourceFolder.PersistentData, "GameState.json");
 	/// </code>
 	/// </example>
 	public static class ResourceManager
 	{
 		#region Fields
-		/// <summary>
-		/// Absolute paths to <see cref="ResourceFolder"/>s.
-		/// </summary>
+
+		/// <summary>Absolute paths to <see cref="ResourceFolder" /> s.</summary>
+		// @formatter:off
 		public static readonly Dictionary<ResourceFolder, string> Paths = new Dictionary<ResourceFolder, string> {
 			{ ResourceFolder.Data, Application.dataPath                       + "/"},
 			{ ResourceFolder.StreamingAssets, Application.streamingAssetsPath + "/"},
 			{ ResourceFolder.PersistentData, Application.persistentDataPath   + "/"},
 			{ ResourceFolder.Resources, Application.dataPath                  + "/Resources/"}
 		};
+		// @formatter:on
 
 		/// <summary>
-		/// Instances of classes to use for parsing data when calling Load methods on a <see cref="ResourceFolder"/> other than
-		/// <see cref="ResourceFolder.Resources"/>.
+		///     Instances of classes to use for parsing data when calling Load methods on a <see cref="ResourceFolder" /> other than
+		///     <see cref="ResourceFolder.Resources" /> .
 		/// </summary>
 		public static readonly List<ResourceParser> Parsers = new List<ResourceParser>
 															  {
@@ -101,34 +106,26 @@ namespace Kit
 															  };
 
 		/// <summary>
-		/// <para>
-		/// Event fired when when any resource is loaded.
-		/// </para>
-		/// <para>
-		/// Returns the folder, path, reference to the resource and whether the resource was actually loaded (true) or re-used from
-		/// cache (false).
-		/// </para>
+		///     <para>Event fired when when any resource is loaded.</para>
+		///     <para>
+		///         Returns the folder, path, reference to the resource and whether the resource was actually loaded (true) or re-used from
+		///         cache (false).
+		///     </para>
 		/// </summary>
 		public static event Action<ResourceFolder, string, object, bool> ResourceLoaded;
 
 		/// <summary>
-		/// <para>
-		/// Event fired when when any resource is unloaded.
-		/// </para>
-		/// <para>
-		/// Returns the folder and path to the resource unloaded.
-		/// </para>
+		///     <para>Event fired when when any resource is unloaded.</para>
+		///     <para>Returns the folder and path to the resource unloaded.</para>
 		/// </summary>
 		public static event Action<ResourceFolder, string> ResourceUnloaded;
 
-		/// <summary>
-		/// Default mode for modding in individual calls. Has no effect if MODDING is not defined.
-		/// </summary>
+		/// <summary>Default mode for modding in individual calls. Has no effect if MODDING is not defined.</summary>
 		private const bool DefaultModding = true;
 
 		/// <summary>
-		/// Dictionary that holds references to all loaded resources so we don't have to keep loading them. References are held as a
-		/// <see cref="WeakReference"/> so they can be let go when not in use.
+		///     Dictionary that holds references to all loaded resources so we don't have to keep loading them. References are held as a
+		///     <see cref="WeakReference" /> so they can be let go when not in use.
 		/// </summary>
 		private static Dictionary<(Type type, ResourceFolder folder, string file), WeakReference> cachedResources =
 			new Dictionary<(Type, ResourceFolder, string), WeakReference>();
@@ -138,22 +135,25 @@ namespace Kit
 		#region Loading
 
 		/// <summary>
-		///	<para>
-		/// Load and cache a resource.
-		/// </para>
-		/// <para>
-		/// If <paramref name="folder"/> is <see cref="ResourceFolder.Resources" /> the asset is loaded with
-		/// Resources.<see cref="Resources.Load(string)" />. If it's not, it's parsed manually with the list of parsers registered.
-		/// </para>
+		///     <para>Load and cache a resource.</para>
+		///     <para>
+		///         If <paramref name="folder" /> is <see cref="ResourceFolder.Resources" /> the asset is loaded with Resources.Load. If
+		///         it's not, it's parsed manually with the list of parsers registered.
+		///     </para>
 		/// </summary>
 		/// <param name="folder">The folder to load the resource from.</param>
-		/// <param name="file">The path and file-name relative to the <paramref name="folder"/>.</param>
-		/// <param name="modded">Whether to allow mods to load their version of the asset instead. Useful if you want to allow some assets
-		/// to be modded, but not others. Has no effect if MODDING is not defined.</param>
-		/// <param name="merge">Whether to merge the game version and all mod versions of the asset. Useful to allow modding of
-		/// configuration files. Has no effect if MODDING is not defined or <paramref name ="modded" /> is false.</param>
+		/// <param name="file">The path and file-name relative to the <paramref name="folder" /> .</param>
+		/// <param name="modded">
+		///     Whether to allow mods to load their version of the asset instead. Useful if you want to allow some assets to
+		///     be modded, but not others. Has no effect if MODDING is not defined.
+		/// </param>
+		/// <param name="merge">
+		///     Whether to merge the game version and all mod versions of the asset. Useful to allow modding of configuration
+		///     files. Has no effect if MODDING is not defined or <paramref name="modded" /> is false.
+		/// </param>
 		/// <typeparam name="T">Type of the resource expected.</typeparam>
 		/// <returns>Reference to the resource.</returns>
+
 		#region Load(folder, file)
 
 		public static T Load<T>(ResourceFolder folder, string file, bool modded = DefaultModding, bool merge = false)
@@ -174,21 +174,23 @@ namespace Kit
 		}
 
 		/// <summary>
-		/// <para>
-		/// Load and cache a resource.
-		/// </para>
-		/// <para>
-		/// If <paramref name="folder"/> is <see cref="ResourceFolder.Resources" /> the asset is loaded with
-		/// Resources.<see cref="Resources.Load(string)" />. If it's not, it's parsed manually with the list of parsers registered.
-		/// </para>
+		///     <para>Load and cache a resource.</para>
+		///     <para>
+		///         If <paramref name="folder" /> is <see cref="ResourceFolder.Resources" /> the asset is loaded with Resources.Load. If
+		///         it's not, it's parsed manually with the list of parsers registered.
+		///     </para>
 		/// </summary>
 		/// <param name="type">Type of the resource expected.</param>
 		/// <param name="folder">The folder to load the resource from.</param>
-		/// <param name="file">The path and file-name relative to the <paramref name="folder"/>.</param>
-		/// <param name="modded">Whether to allow mods to load their version of the asset instead. Useful if you want to allow some assets
-		/// to be modded, but not others. Has no effect if MODDING is not defined.</param>
-		/// <param name="merge">Whether to merge the game version and all mod versions of the asset. Useful to allow modding of
-		/// configuration files. Has no effect if MODDING is not defined or <paramref name ="modded" /> is false.</param>
+		/// <param name="file">The path and file-name relative to the <paramref name="folder" /> .</param>
+		/// <param name="modded">
+		///     Whether to allow mods to load their version of the asset instead. Useful if you want to allow some assets to
+		///     be modded, but not others. Has no effect if MODDING is not defined.
+		/// </param>
+		/// <param name="merge">
+		///     Whether to merge the game version and all mod versions of the asset. Useful to allow modding of configuration
+		///     files. Has no effect if MODDING is not defined or <paramref name="modded" /> is false.
+		/// </param>
 		/// <returns>Reference to the resource.</returns>
 		public static object Load(Type type, ResourceFolder folder, string file, bool modded = DefaultModding, bool merge = false)
 		{
@@ -207,20 +209,22 @@ namespace Kit
 		}
 
 		/// <summary>
-		/// <para>
-		/// Load and cache a resource. Can be <c>await</c>-ed.
-		/// </para>
-		/// <para>
-		/// If <paramref name="folder"/> is <see cref="ResourceFolder.Resources" /> the asset is loaded with
-		/// Resources.<see cref="Resources.Load(string)" />. If it's not, it's parsed manually with the list of parsers registered.
-		/// </para>
+		///     <para>Load and cache a resource. Can be <c>await</c>-ed.</para>
+		///     <para>
+		///         If <paramref name="folder" /> is <see cref="ResourceFolder.Resources" /> the asset is loaded with Resources.Load. If
+		///         it's not, it's parsed manually with the list of parsers registered.
+		///     </para>
 		/// </summary>
 		/// <param name="folder">The folder to load the resource from.</param>
-		/// <param name="file">The path and file-name relative to the <paramref name="folder"/>.</param>
-		/// <param name="modded">Whether to allow mods to load their version of the asset instead. Useful if you want to allow some assets
-		/// to be modded, but not others. Has no effect if MODDING is not defined.</param>
-		/// <param name="merge">Whether to merge the game version and all mod versions of the asset. Useful to allow modding of
-		/// configuration files. Has no effect if MODDING is not defined or <paramref name ="modded" /> is false.</param>
+		/// <param name="file">The path and file-name relative to the <paramref name="folder" /> .</param>
+		/// <param name="modded">
+		///     Whether to allow mods to load their version of the asset instead. Useful if you want to allow some assets to
+		///     be modded, but not others. Has no effect if MODDING is not defined.
+		/// </param>
+		/// <param name="merge">
+		///     Whether to merge the game version and all mod versions of the asset. Useful to allow modding of configuration
+		///     files. Has no effect if MODDING is not defined or <paramref name="modded" /> is false.
+		/// </param>
 		/// <typeparam name="T">Type of the resource expected.</typeparam>
 		/// <returns>Reference to the resource.</returns>
 		public static async UniTask<T> LoadAsync<T>(ResourceFolder folder, string file, bool modded = DefaultModding, bool merge = false)
@@ -241,21 +245,23 @@ namespace Kit
 		}
 
 		/// <summary>
-		/// <para>
-		/// Load and cache a resource. Can be <c>await</c>-ed.
-		/// </para>
-		/// <para>
-		/// If <paramref name="folder"/> is <see cref="ResourceFolder.Resources" /> the asset is loaded with
-		/// Resources.<see cref="Resources.Load(string)" />. If it's not, it's parsed manually with the list of parsers registered.
-		/// </para>
+		///     <para>Load and cache a resource. Can be <c>await</c>-ed.</para>
+		///     <para>
+		///         If <paramref name="folder" /> is <see cref="ResourceFolder.Resources" /> the asset is loaded with Resources.Load. If
+		///         it's not, it's parsed manually with the list of parsers registered.
+		///     </para>
 		/// </summary>
 		/// <param name="type">Type of the resource expected.</param>
 		/// <param name="folder">The folder to load the resource from.</param>
-		/// <param name="file">The path and file-name relative to the <paramref name="folder"/>.</param>
-		/// <param name="modded">Whether to allow mods to load their version of the asset instead. Useful if you want to allow some assets
-		/// to be modded, but not others. Has no effect if MODDING is not defined.</param>
-		/// <param name="merge">Whether to merge the game version and all mod versions of the asset. Useful to allow modding of
-		/// configuration files. Has no effect if MODDING is not defined or <paramref name ="modded" /> is false.</param>
+		/// <param name="file">The path and file-name relative to the <paramref name="folder" /> .</param>
+		/// <param name="modded">
+		///     Whether to allow mods to load their version of the asset instead. Useful if you want to allow some assets to
+		///     be modded, but not others. Has no effect if MODDING is not defined.
+		/// </param>
+		/// <param name="merge">
+		///     Whether to merge the game version and all mod versions of the asset. Useful to allow modding of configuration
+		///     files. Has no effect if MODDING is not defined or <paramref name="modded" /> is false.
+		/// </param>
 		/// <returns>Reference to the resource.</returns>
 		public static async UniTask<object> LoadAsync(Type type,
 													  ResourceFolder folder,
@@ -291,16 +297,14 @@ namespace Kit
 		}
 
 		/// <summary>
-		/// <para>
-		/// Load and cache a resource without regarding mods.
-		/// </para>
-		/// <para>
-		/// If <paramref name="folder"/> is <see cref="ResourceFolder.Resources" /> the asset is loaded with
-		/// Resources.<see cref="Resources.Load(string)" />. If it's not, it's parsed manually with the list of parsers registered.
-		/// </para>
+		///     <para>Load and cache a resource without regarding mods.</para>
+		///     <para>
+		///         If <paramref name="folder" /> is <see cref="ResourceFolder.Resources" /> the asset is loaded with Resources.Load. If
+		///         it's not, it's parsed manually with the list of parsers registered.
+		///     </para>
 		/// </summary>
 		/// <param name="folder">The folder to load the resource from.</param>
-		/// <param name="file">The path and file-name relative to the <paramref name="folder"/>.</param>
+		/// <param name="file">The path and file-name relative to the <paramref name="folder" /> .</param>
 		/// <typeparam name="T">Type of the resource expected.</typeparam>
 		/// <returns>Reference to the resource.</returns>
 		public static T LoadUnmodded<T>(ResourceFolder folder, string file)
@@ -309,17 +313,15 @@ namespace Kit
 		}
 
 		/// <summary>
-		/// <para>
-		/// Load and cache a resource without regarding mods.
-		/// </para>
-		/// <para>
-		/// If <paramref name="folder"/> is <see cref="ResourceFolder.Resources" /> the asset is loaded with
-		/// Resources.<see cref="Resources.Load(string)" />. If it's not, it's parsed manually with the list of parsers registered.
-		/// </para>
+		///     <para>Load and cache a resource without regarding mods.</para>
+		///     <para>
+		///         If <paramref name="folder" /> is <see cref="ResourceFolder.Resources" /> the asset is loaded with  If it's not, it's
+		///         parsed manually with the list of parsers registered.
+		///     </para>
 		/// </summary>
 		/// <param name="type">Type of the resource expected.</param>
 		/// <param name="folder">The folder to load the resource from.</param>
-		/// <param name="file">The path and file-name relative to the <paramref name="folder"/>.</param>
+		/// <param name="file">The path and file-name relative to the <paramref name="folder" /> .</param>
 		/// <returns>Reference to the resource.</returns>
 		public static object LoadUnmodded(Type type, ResourceFolder folder, string file)
 		{
@@ -349,16 +351,14 @@ namespace Kit
 
 
 		/// <summary>
-		/// <para>
-		/// Load and cache a resource without regarding mods. Can be <c>await</c>-ed.
-		/// </para>
-		/// <para>
-		/// If <paramref name="folder"/> is <see cref="ResourceFolder.Resources" /> the asset is loaded with
-		/// Resources.<see cref="Resources.Load(string)" />. If it's not, it's parsed manually with the list of parsers registered.
-		/// </para>
+		///     <para>Load and cache a resource without regarding mods. Can be <c>await</c>-ed.</para>
+		///     <para>
+		///         If <paramref name="folder" /> is <see cref="ResourceFolder.Resources" /> the asset is loaded with  If it's not, it's
+		///         parsed manually with the list of parsers registered.
+		///     </para>
 		/// </summary>
 		/// <param name="folder">The folder to load the resource from.</param>
-		/// <param name="file">The path and file-name relative to the <paramref name="folder"/>.</param>
+		/// <param name="file">The path and file-name relative to the <paramref name="folder" /> .</param>
 		/// <typeparam name="T">Type of the resource expected.</typeparam>
 		/// <returns>Reference to the resource.</returns>
 		public static async UniTask<T> LoadUnmoddedAsync<T>(ResourceFolder folder, string file)
@@ -368,17 +368,15 @@ namespace Kit
 
 
 		/// <summary>
-		/// <para>
-		/// Load and cache a resource without regarding mods. Can be <c>await</c>-ed.
-		/// </para>
-		/// <para>
-		/// If <paramref name="folder"/> is <see cref="ResourceFolder.Resources" /> the asset is loaded with
-		/// Resources.<see cref="Resources.Load(string)" />. If it's not, it's parsed manually with the list of parsers registered.
-		/// </para>
+		///     <para>Load and cache a resource without regarding mods. Can be <c>await</c>-ed.</para>
+		///     <para>
+		///         If <paramref name="folder" /> is <see cref="ResourceFolder.Resources" /> the asset is loaded with  If it's not, it's
+		///         parsed manually with the list of parsers registered.
+		///     </para>
 		/// </summary>
 		/// <param name="type">Type of the resource expected.</param>
 		/// <param name="folder">The folder to load the resource from.</param>
-		/// <param name="file">The path and file-name relative to the <paramref name="folder"/>.</param>
+		/// <param name="file">The path and file-name relative to the <paramref name="folder" /> .</param>
 		/// <returns>Reference to the resource.</returns>
 		public static async UniTask<object> LoadUnmoddedAsync(Type type, ResourceFolder folder, string file)
 		{
@@ -411,17 +409,17 @@ namespace Kit
 
 #if MODDING
 		/// <summary>
-		/// <para>
-		/// Load a resource merging the game version with all the mod versions and cache it. Useful to allow modding of configuration files
-		/// like Json.
-		/// </para>
-		/// <para>
-		/// If <paramref name="folder"/> is <see cref="ResourceFolder.Resources" /> the base asset is loaded with
-		/// Resources.<see cref="Resources.Load(string)" />. If it's not, it's parsed manually with the list of parsers registered.
-		/// </para>
+		///     <para>
+		///         Load a resource merging the game version with all the mod versions and cache it. Useful to allow modding of
+		///         configuration files like Json.
+		///     </para>
+		///     <para>
+		///         If <paramref name="folder" /> is <see cref="ResourceFolder.Resources" /> the base asset is loaded with  If it's not,
+		///         it's parsed manually with the list of parsers registered.
+		///     </para>
 		/// </summary>
 		/// <param name="folder">The folder to load the resource from.</param>
-		/// <param name="file">The path and file-name relative to the <paramref name="folder"/>.</param>
+		/// <param name="file">The path and file-name relative to the <paramref name="folder" /> .</param>
 		/// <typeparam name="T">Type of the resource expected.</typeparam>
 		/// <returns>Reference to the resource.</returns>
 		public static T LoadMerged<T>(ResourceFolder folder, string file)
@@ -430,18 +428,18 @@ namespace Kit
 		}
 
 		/// <summary>
-		/// <para>
-		/// Load a resource merging the game version with all the mod versions and cache it. Useful to allow modding of configuration files
-		/// like Json.
-		/// </para>
-		/// <para>
-		/// If <paramref name="folder"/> is <see cref="ResourceFolder.Resources" /> the base asset is loaded with
-		/// Resources.<see cref="Resources.Load(string)" />. If it's not, it's parsed manually with the list of parsers registered.
-		/// </para>
+		///     <para>
+		///         Load a resource merging the game version with all the mod versions and cache it. Useful to allow modding of
+		///         configuration files like Json.
+		///     </para>
+		///     <para>
+		///         If <paramref name="folder" /> is <see cref="ResourceFolder.Resources" /> the base asset is loaded with Resources.Load.
+		///         If it's not, it's parsed manually with the list of parsers registered.
+		///     </para>
 		/// </summary>
 		/// <param name="type">Type of the resource expected.</param>
 		/// <param name="folder">The folder to load the resource from.</param>
-		/// <param name="file">The path and file-name relative to the <paramref name="folder"/>.</param>
+		/// <param name="file">The path and file-name relative to the <paramref name="folder" /> .</param>
 		/// <returns>Reference to the resource.</returns>
 		public static object LoadMerged(Type type, ResourceFolder folder, string file)
 		{
@@ -468,19 +466,18 @@ namespace Kit
 
 			object merged = reference;
 			if (parser != null)
-			{
 				try
 				{
 					if (parser.ParseMode == ParseMode.Text)
 					{
-						IEnumerable<string> textList = ModManager.ReadTextAll(folder, file);
+						var textList = ModManager.ReadTextAll(folder, file);
 						foreach (string text in textList)
 							parser.Merge(merged, text);
 					}
 					else
 					{
-						IEnumerable<byte[]> bytesList = ModManager.ReadBytesAll(folder, file);
-						foreach (byte[] bytes in bytesList)
+						var bytesList = ModManager.ReadBytesAll(folder, file);
+						foreach (var bytes in bytesList)
 							parser.Merge(merged, bytes);
 					}
 				}
@@ -488,24 +485,24 @@ namespace Kit
 				{
 					Debugger.Log("ResourceManager", e.Message);
 				}
-			}
+
 			cachedResources[(type, folder, file)] = new WeakReference(merged);
 			ResourceLoaded?.Invoke(folder, file, merged, true);
 			return merged;
 		}
 
 		/// <summary>
-		/// <para>
-		/// Load a resource merging the game version with all the mod versions and cache it. Useful to allow modding of configuration files
-		/// like Json. Can be <c>await</c>-ed upon.
-		/// </para>
-		/// <para>
-		/// If <paramref name="folder"/> is <see cref="ResourceFolder.Resources" /> the base asset is loaded with
-		/// Resources.<see cref="Resources.Load(string)" />. If it's not, it's parsed manually with the list of parsers registered.
-		/// </para>
+		///     <para>
+		///         Load a resource merging the game version with all the mod versions and cache it. Useful to allow modding of
+		///         configuration files like Json. Can be <c>await</c>-ed upon.
+		///     </para>
+		///     <para>
+		///         If <paramref name="folder" /> is <see cref="ResourceFolder.Resources" /> the base asset is loaded with Resources.Load.
+		///         If it's not, it's parsed manually with the list of parsers registered.
+		///     </para>
 		/// </summary>
 		/// <param name="folder">The folder to load the resource from.</param>
-		/// <param name="file">The path and file-name relative to the <paramref name="folder"/>.</param>
+		/// <param name="file">The path and file-name relative to the <paramref name="folder" /> .</param>
 		/// <typeparam name="T">Type of the resource expected.</typeparam>
 		/// <returns>Reference to the resource.</returns>
 		public static async UniTask<T> LoadMergedAsync<T>(ResourceFolder folder, string file)
@@ -514,18 +511,18 @@ namespace Kit
 		}
 
 		/// <summary>
-		/// <para>
-		/// Load a resource merging the game version with all the mod versions and cache it. Useful to allow modding of configuration files
-		/// like Json. Can be <c>await</c>-ed upon.
-		/// </para>
-		/// <para>
-		/// If <paramref name="folder"/> is <see cref="ResourceFolder.Resources" /> the base asset is loaded with
-		/// Resources.<see cref="Resources.Load(string)" />. If it's not, it's parsed manually with the list of parsers registered.
-		/// </para>
+		///     <para>
+		///         Load a resource merging the game version with all the mod versions and cache it. Useful to allow modding of
+		///         configuration files like Json. Can be <c>await</c>-ed upon.
+		///     </para>
+		///     <para>
+		///         If <paramref name="folder" /> is <see cref="ResourceFolder.Resources" /> the base asset is loaded with Resources.Load.
+		///         If it's not, it's parsed manually with the list of parsers registered.
+		///     </para>
 		/// </summary>
 		/// <param name="type">Type of the resource expected.</param>
 		/// <param name="folder">The folder to load the resource from.</param>
-		/// <param name="file">The path and file-name relative to the <paramref name="folder"/>.</param>
+		/// <param name="file">The path and file-name relative to the <paramref name="folder" /> .</param>
 		/// <returns>Reference to the resource.</returns>
 		public static async UniTask<object> LoadMergedAsync(Type type, ResourceFolder folder, string file)
 		{
@@ -552,19 +549,18 @@ namespace Kit
 
 			object merged = reference;
 			if (parser != null)
-			{
 				try
 				{
 					if (parser.ParseMode == ParseMode.Text)
 					{
-						IEnumerable<string> textList = await ModManager.ReadTextAllAsync(folder, file);
+						var textList = await ModManager.ReadTextAllAsync(folder, file);
 						foreach (string text in textList)
 							parser.Merge(merged, text);
 					}
 					else
 					{
-						IEnumerable<byte[]> bytesList = await ModManager.ReadBytesAllAsync(folder, file);
-						foreach (byte[] bytes in bytesList)
+						var bytesList = await ModManager.ReadBytesAllAsync(folder, file);
+						foreach (var bytes in bytesList)
 							parser.Merge(merged, bytes);
 					}
 				}
@@ -572,7 +568,7 @@ namespace Kit
 				{
 					Debugger.Log("ResourceManager", e.Message);
 				}
-			}
+
 			cachedResources[(type, folder, file)] = new WeakReference(merged);
 			ResourceLoaded?.Invoke(folder, file, merged, true);
 			return merged;
@@ -583,9 +579,7 @@ namespace Kit
 
 		#region Load(fullPath)
 
-		/// <summary>
-		/// Load a resource from an absolute path with the list of parsers registered. Does not cache.
-		/// </summary>
+		/// <summary>Load a resource from an absolute path with the list of parsers registered. Does not cache.</summary>
 		/// <param name="fullPath">Absolute path to the resource.</param>
 		/// <typeparam name="T">Type of the resource expected.</typeparam>
 		/// <returns>Reference to the resource.</returns>
@@ -594,9 +588,7 @@ namespace Kit
 			return (T) LoadEx(typeof(T), fullPath).reference;
 		}
 
-		/// <summary>
-		/// Load a resource from an absolute path with the list of parsers registered. Does not cache.
-		/// </summary>
+		/// <summary>Load a resource from an absolute path with the list of parsers registered. Does not cache.</summary>
 		/// <param name="type">Type of the resource expected.</param>
 		/// <param name="fullPath">Absolute path to the resource.</param>
 		/// <returns>Reference to the resource.</returns>
@@ -605,9 +597,7 @@ namespace Kit
 			return LoadEx(type, fullPath).reference;
 		}
 
-		/// <summary>
-		/// Load a resource from an absolute path with the list of parsers registered. Does not cache.
-		/// </summary>
+		/// <summary>Load a resource from an absolute path with the list of parsers registered. Does not cache.</summary>
 		/// <param name="type">Type of the resource expected.</param>
 		/// <param name="fullPath">Absolute path to the resource.</param>
 		/// <returns>Reference to the resource and the parser used to decode it.</returns>
@@ -646,9 +636,7 @@ namespace Kit
 			return default;
 		}
 
-		/// <summary>
-		/// Load a resource from an absolute path with the list of parsers registered. Does not cache. Can be <c>await</c>-ed.
-		/// </summary>
+		/// <summary>Load a resource from an absolute path with the list of parsers registered. Does not cache. Can be <c>await</c>-ed.</summary>
 		/// <param name="fullPath">Absolute path to the resource.</param>
 		/// <typeparam name="T">Type of the resource expected.</typeparam>
 		/// <returns>Reference to the resource.</returns>
@@ -657,9 +645,7 @@ namespace Kit
 			return (T) (await LoadExAsync(typeof(T), fullPath)).reference;
 		}
 
-		/// <summary>
-		/// Load a resource from an absolute path with the list of parsers registered. Does not cache. Can be <c>await</c>-ed.
-		/// </summary>
+		/// <summary>Load a resource from an absolute path with the list of parsers registered. Does not cache. Can be <c>await</c>-ed.</summary>
 		/// <param name="type">Type of the resource expected.</param>
 		/// <param name="fullPath">Absolute path to the resource.</param>
 		/// <returns>Reference to the resource.</returns>
@@ -668,9 +654,7 @@ namespace Kit
 			return (await LoadExAsync(type, fullPath)).reference;
 		}
 
-		/// <summary>
-		/// Load a resource from an absolute path with the list of parsers registered. Does not cache. Can be <c>await</c>-ed.
-		/// </summary>
+		/// <summary>Load a resource from an absolute path with the list of parsers registered. Does not cache. Can be <c>await</c>-ed.</summary>
 		/// <param name="type">Type of the resource expected.</param>
 		/// <param name="fullPath">Absolute path to the resource.</param>
 		/// <returns>Reference to the resource and the parser used to decode it.</returns>
@@ -713,9 +697,7 @@ namespace Kit
 
 		#region Unload
 
-		/// <summary>
-		/// Unload a resource from cache and memory.
-		/// </summary>
+		/// <summary>Unload a resource from cache and memory.</summary>
 		/// <param name="reference">Reference to the resource.</param>
 		/// <returns>Whether the resource was successfully unloaded.</returns>
 		public static bool Unload(object reference)
@@ -749,11 +731,9 @@ namespace Kit
 			return false;
 		}
 
-		/// <summary>
-		/// Unload a resource from cache and memory.
-		/// </summary>
+		/// <summary>Unload a resource from cache and memory.</summary>
 		/// <param name="folder">The folder from where the resource was loaded.</param>
-		/// <param name="file">The path and file-name relative to the <paramref name="folder"/>.</param>
+		/// <param name="file">The path and file-name relative to the <paramref name="folder" /> .</param>
 		/// <typeparam name="T">Type of the resource.</typeparam>
 		/// <returns>Whether the resource was successfully unloaded.</returns>
 		public static bool Unload<T>(ResourceFolder folder, string file)
@@ -761,12 +741,10 @@ namespace Kit
 			return Unload(typeof(T), folder, file);
 		}
 
-		/// <summary>
-		/// Unload a resource from cache and memory.
-		/// </summary>
+		/// <summary>Unload a resource from cache and memory.</summary>
 		/// <param name="type">Type of the resource.</param>
 		/// <param name="folder">The folder from where the resource was loaded.</param>
-		/// <param name="file">The path and file-name relative to the <paramref name="folder"/>.</param>
+		/// <param name="file">The path and file-name relative to the <paramref name="folder" /> .</param>
 		/// <returns>Whether the resource was successfully unloaded.</returns>
 		public static bool Unload(Type type, ResourceFolder folder, string file)
 		{
@@ -792,9 +770,7 @@ namespace Kit
 			return true;
 		}
 
-		/// <summary>
-		/// Clear the cache and (optionally) unload assets not in use.
-		/// </summary>
+		/// <summary>Clear the cache and (optionally) unload assets not in use.</summary>
 		/// <param name="unload">Whether to unload assets.</param>
 		public static void ClearCache(bool unload = false)
 		{
@@ -803,9 +779,7 @@ namespace Kit
 				Resources.UnloadUnusedAssets();
 		}
 
-		/// <summary>
-		/// Clear the cache and (optionally) unload assets not in use. Can be <c>await</c>-ed.
-		/// </summary>
+		/// <summary>Clear the cache and (optionally) unload assets not in use. Can be <c>await</c>-ed.</summary>
 		/// <param name="unload">Whether to unload assets.</param>
 		public static async UniTask ClearCacheAsync(bool unload = false)
 		{
@@ -820,13 +794,10 @@ namespace Kit
 
 		#region Reading
 
-		/// <summary>
-		/// Read the contents of a file in text mode.
-		/// </summary>
+		/// <summary>Read the contents of a file in text mode.</summary>
 		/// <param name="folder">The folder to read the file from.</param>
-		/// <param name="file">The path and file-name relative to the <paramref name="folder"/>.</param>
-		/// <param name="modded">Whether to allow mods to provide their version of the file instead. Has no effect if MODDING is not
-		/// defined.</param>
+		/// <param name="file">The path and file-name relative to the <paramref name="folder" /> .</param>
+		/// <param name="modded">Whether to allow mods to provide their version of the file instead. Has no effect if MODDING is not defined.</param>
 		/// <returns>Contents of the file as a string.</returns>
 		public static string ReadText(ResourceFolder folder, string file, bool modded = DefaultModding)
 		{
@@ -841,13 +812,10 @@ namespace Kit
 			return ReadText(GetPath(folder, file));
 		}
 
-		/// <summary>
-		/// Read the contents of a file in text mode. Can be <c>await</c>-ed.
-		/// </summary>
+		/// <summary>Read the contents of a file in text mode. Can be <c>await</c>-ed.</summary>
 		/// <param name="folder">The folder to read the file from.</param>
-		/// <param name="file">The path and file-name relative to the <paramref name="folder"/>.</param>
-		/// <param name="modded">Whether to allow mods to provide their version of the file instead. Has no effect if MODDING is not
-		/// defined.</param>
+		/// <param name="file">The path and file-name relative to the <paramref name="folder" /> .</param>
+		/// <param name="modded">Whether to allow mods to provide their version of the file instead. Has no effect if MODDING is not defined.</param>
 		/// <returns>Contents of the file as a string.</returns>
 		public static async UniTask<string> ReadTextAsync(ResourceFolder folder, string file, bool modded = DefaultModding)
 		{
@@ -862,20 +830,17 @@ namespace Kit
 			return await ReadTextAsync(GetPath(folder, file));
 		}
 
-		/// <summary>
-		/// Read the contents of a file in binary mode.
-		/// </summary>
+		/// <summary>Read the contents of a file in binary mode.</summary>
 		/// <param name="folder">The folder to read the file from.</param>
-		/// <param name="file">The path and file-name relative to the <paramref name="folder"/>.</param>
-		/// <param name="modded">Whether to allow mods to provide their version of the file instead. Has no effect if MODDING is not
-		/// defined.</param>
+		/// <param name="file">The path and file-name relative to the <paramref name="folder" /> .</param>
+		/// <param name="modded">Whether to allow mods to provide their version of the file instead. Has no effect if MODDING is not defined.</param>
 		/// <returns>Contents of the file as a byte array.</returns>
 		public static byte[] ReadBytes(ResourceFolder folder, string file, bool modded = DefaultModding)
 		{
 #if MODDING
 			if (modded)
 			{
-				byte[] moddedFile = ModManager.ReadBytes(folder, file);
+				var moddedFile = ModManager.ReadBytes(folder, file);
 				if (moddedFile != null)
 					return moddedFile;
 			}
@@ -883,20 +848,17 @@ namespace Kit
 			return ReadBytes(GetPath(folder, file));
 		}
 
-		/// <summary>
-		/// Read the contents of a file in binary mode. Can be <c>await</c>-ed.
-		/// </summary>
+		/// <summary>Read the contents of a file in binary mode. Can be <c>await</c>-ed.</summary>
 		/// <param name="folder">The folder to read the file from.</param>
-		/// <param name="file">The path and file-name relative to the <paramref name="folder"/>.</param>
-		/// <param name="modded">Whether to allow mods to provide their version of the file instead. Has no effect if MODDING is not
-		/// defined.</param>
+		/// <param name="file">The path and file-name relative to the <paramref name="folder" /> .</param>
+		/// <param name="modded">Whether to allow mods to provide their version of the file instead. Has no effect if MODDING is not defined.</param>
 		/// <returns>Contents of the file as a byte array.</returns>
 		public static async UniTask<byte[]> ReadBytesAsync(ResourceFolder folder, string file, bool modded = DefaultModding)
 		{
 #if MODDING
 			if (modded)
 			{
-				byte[] moddedFile = await ModManager.ReadBytesAsync(folder, file);
+				var moddedFile = await ModManager.ReadBytesAsync(folder, file);
 				if (moddedFile != null)
 					return moddedFile;
 			}
@@ -904,9 +866,7 @@ namespace Kit
 			return await ReadBytesAsync(GetPath(folder, file));
 		}
 
-		/// <summary>
-		/// Read the contents of a file in text mode.
-		/// </summary>
+		/// <summary>Read the contents of a file in text mode.</summary>
 		/// <param name="fullPath">Absolute path to the file.</param>
 		/// <returns>Contents of the file as a string.</returns>
 		public static string ReadText(string fullPath)
@@ -922,9 +882,7 @@ namespace Kit
 			}
 		}
 
-		/// <summary>
-		/// Read the contents of a file in text mode. Can be <c>await</c>-ed.
-		/// </summary>
+		/// <summary>Read the contents of a file in text mode. Can be <c>await</c>-ed.</summary>
 		/// <param name="fullPath">Absolute path to the file.</param>
 		/// <returns>Contents of the file as a string.</returns>
 		public static async UniTask<string> ReadTextAsync(string fullPath)
@@ -935,9 +893,7 @@ namespace Kit
 			return request.downloadHandler.text;
 		}
 
-		/// <summary>
-		/// Read the contents of a file in binary mode.
-		/// </summary>
+		/// <summary>Read the contents of a file in binary mode.</summary>
 		/// <param name="fullPath">Absolute path to the file.</param>
 		/// <returns>Contents of the file as a byte array.</returns>
 		public static byte[] ReadBytes(string fullPath)
@@ -953,9 +909,7 @@ namespace Kit
 			}
 		}
 
-		/// <summary>
-		/// Read the contents of a file in binary mode. Can be <c>await</c>-ed.
-		/// </summary>
+		/// <summary>Read the contents of a file in binary mode. Can be <c>await</c>-ed.</summary>
 		/// <param name="fullPath">Absolute path to the file.</param>
 		/// <returns>Contents of the file as a byte array.</returns>
 		public static async UniTask<byte[]> ReadBytesAsync(string fullPath)
@@ -976,14 +930,10 @@ namespace Kit
 
 		#region Saving/Deleting
 
-		/// <summary>
-		/// Save the contents of an object to a file.
-		/// </summary>
-		/// <remarks>
-		/// A parser is chosen based on the type of the object to serialize it.
-		/// </remarks>
+		/// <summary>Save the contents of an object to a file.</summary>
+		/// <remarks>A parser is chosen based on the type of the object to serialize it.</remarks>
 		/// <param name="folder">The folder where the file should exist.</param>
-		/// <param name="file">The path and file-name relative to the <paramref name="folder"/>.</param>
+		/// <param name="file">The path and file-name relative to the <paramref name="folder" /> .</param>
 		/// <param name="contents">The object to save.</param>
 		/// <returns>Whether the file was successfully saved.</returns>
 		public static bool Save(ResourceFolder folder, string file, object contents)
@@ -991,14 +941,10 @@ namespace Kit
 			return Save(GetPath(folder, file), contents);
 		}
 
-		/// <summary>
-		/// Save the contents of an object to a file. Can be <c>await</c>-ed.
-		/// </summary>
-		/// <remarks>
-		/// A parser is chosen based on the type of the object to serialize it.
-		/// </remarks>
+		/// <summary>Save the contents of an object to a file. Can be <c>await</c>-ed.</summary>
+		/// <remarks>A parser is chosen based on the type of the object to serialize it.</remarks>
 		/// <param name="folder">The folder where the file should exist.</param>
-		/// <param name="file">The path and file-name relative to the <paramref name="folder"/>.</param>
+		/// <param name="file">The path and file-name relative to the <paramref name="folder" /> .</param>
 		/// <param name="contents">The object to save.</param>
 		/// <returns>Whether the file was successfully saved.</returns>
 		public static UniTask<bool> SaveAsync(ResourceFolder folder, string file, object contents)
@@ -1007,12 +953,8 @@ namespace Kit
 		}
 
 
-		/// <summary>
-		/// Save the contents of an object to a file.
-		/// </summary>
-		/// <remarks>
-		/// A parser is chosen based on the type of the object to serialize it.
-		/// </remarks>
+		/// <summary>Save the contents of an object to a file.</summary>
+		/// <remarks>A parser is chosen based on the type of the object to serialize it.</remarks>
 		/// <param name="fullPath">Absolute path to the file.</param>
 		/// <param name="contents">The object to save.</param>
 		/// <returns>Whether the file was successfully saved.</returns>
@@ -1034,12 +976,8 @@ namespace Kit
 			return false;
 		}
 
-		/// <summary>
-		/// Save the contents of an object to a file. Can be <c>await</c>-ed.
-		/// </summary>
-		/// <remarks>
-		/// A parser is chosen based on the type of the object to serialize it.
-		/// </remarks>
+		/// <summary>Save the contents of an object to a file. Can be <c>await</c>-ed.</summary>
+		/// <remarks>A parser is chosen based on the type of the object to serialize it.</remarks>
 		/// <param name="fullPath">Absolute path to the file.</param>
 		/// <param name="contents">The object to save.</param>
 		/// <returns>Whether the file was successfully saved.</returns>
@@ -1061,11 +999,9 @@ namespace Kit
 			return UniTask.FromResult(false);
 		}
 
-		/// <summary>
-		/// Save text content to a file.
-		/// </summary>
+		/// <summary>Save text content to a file.</summary>
 		/// <param name="folder">The folder where the file should exist.</param>
-		/// <param name="file">The path and file-name relative to the <paramref name="folder"/>.</param>
+		/// <param name="file">The path and file-name relative to the <paramref name="folder" /> .</param>
 		/// <param name="contents">The string to save.</param>
 		/// <returns>Whether the file was successfully saved.</returns>
 		public static bool SaveText(ResourceFolder folder, string file, string contents)
@@ -1073,11 +1009,9 @@ namespace Kit
 			return SaveText(GetPath(folder, file), contents);
 		}
 
-		/// <summary>
-		/// Save text content to a file. Can be <c>await</c>-ed.
-		/// </summary>
+		/// <summary>Save text content to a file. Can be <c>await</c>-ed.</summary>
 		/// <param name="folder">The folder where the file should exist.</param>
-		/// <param name="file">The path and file-name relative to the <paramref name="folder"/>.</param>
+		/// <param name="file">The path and file-name relative to the <paramref name="folder" /> .</param>
 		/// <param name="contents">The string to save.</param>
 		/// <returns>Whether the file was successfully saved.</returns>
 		public static UniTask<bool> SaveTextAsync(ResourceFolder folder, string file, string contents)
@@ -1085,11 +1019,9 @@ namespace Kit
 			return SaveTextAsync(GetPath(folder, file), contents);
 		}
 
-		/// <summary>
-		/// Save binary content to a file.
-		/// </summary>
+		/// <summary>Save binary content to a file.</summary>
 		/// <param name="folder">The folder where the file should exist.</param>
-		/// <param name="file">The path and file-name relative to the <paramref name="folder"/>.</param>
+		/// <param name="file">The path and file-name relative to the <paramref name="folder" /> .</param>
 		/// <param name="bytes">The byte array to save.</param>
 		/// <returns>Whether the file was successfully saved.</returns>
 		public static bool SaveBytes(ResourceFolder folder, string file, byte[] bytes)
@@ -1097,11 +1029,9 @@ namespace Kit
 			return SaveBytes(GetPath(folder, file), bytes);
 		}
 
-		/// <summary>
-		/// Save binary content to a file. Can be <c>await</c>-ed.
-		/// </summary>
+		/// <summary>Save binary content to a file. Can be <c>await</c>-ed.</summary>
 		/// <param name="folder">The folder where the file should exist.</param>
-		/// <param name="file">The path and file-name relative to the <paramref name="folder"/>.</param>
+		/// <param name="file">The path and file-name relative to the <paramref name="folder" /> .</param>
 		/// <param name="bytes">The byte array to save.</param>
 		/// <returns>Whether the file was successfully saved.</returns>
 		public static UniTask<bool> SaveBytesAsync(ResourceFolder folder, string file, byte[] bytes)
@@ -1109,9 +1039,7 @@ namespace Kit
 			return SaveBytesAsync(GetPath(folder, file), bytes);
 		}
 
-		/// <summary>
-		/// Save text content to a file.
-		/// </summary>
+		/// <summary>Save text content to a file.</summary>
 		/// <param name="fullPath">Absolute path to the file.</param>
 		/// <param name="contents">The string to save.</param>
 		/// <returns>Whether the file was successfully saved.</returns>
@@ -1130,9 +1058,7 @@ namespace Kit
 			}
 		}
 
-		/// <summary>
-		/// Save text content to a file. Can be <c>await</c>-ed.
-		/// </summary>
+		/// <summary>Save text content to a file. Can be <c>await</c>-ed.</summary>
 		/// <param name="fullPath">Absolute path to the file.</param>
 		/// <param name="contents">The string to save.</param>
 		/// <returns>Whether the file was successfully saved.</returns>
@@ -1152,9 +1078,7 @@ namespace Kit
 			}
 		}
 
-		/// <summary>
-		/// Save binary content to a file.
-		/// </summary>
+		/// <summary>Save binary content to a file.</summary>
 		/// <param name="fullPath">Absolute path to the file.</param>
 		/// <param name="bytes">The byte array to save.</param>
 		/// <returns>Whether the file was successfully saved.</returns>
@@ -1173,9 +1097,7 @@ namespace Kit
 			}
 		}
 
-		/// <summary>
-		/// Save binary content to a file. Can be <c>await</c>-ed.
-		/// </summary>
+		/// <summary>Save binary content to a file. Can be <c>await</c>-ed.</summary>
 		/// <param name="fullPath">Absolute path to the file.</param>
 		/// <param name="bytes">The byte array to save.</param>
 		/// <returns>Whether the file was successfully saved.</returns>
@@ -1195,20 +1117,16 @@ namespace Kit
 			}
 		}
 
-		/// <summary>
-		/// Delete a file.
-		/// </summary>
+		/// <summary>Delete a file.</summary>
 		/// <param name="folder">The folder where the file should exist.</param>
-		/// <param name="file">The path and file-name relative to the <paramref name="folder"/>.</param>
+		/// <param name="file">The path and file-name relative to the <paramref name="folder" /> .</param>
 		/// <returns>Whether the file was successfully deleted.</returns>
 		public static bool Delete(ResourceFolder folder, string file)
 		{
 			return Delete(GetPath(folder, file));
 		}
 
-		/// <summary>
-		/// Delete a file.
-		/// </summary>
+		/// <summary>Delete a file.</summary>
 		/// <param name="fullPath">Absolute path to the file.</param>
 		/// <returns>Whether the file was successfully deleted.</returns>
 		public static bool Delete(string fullPath)
@@ -1225,19 +1143,15 @@ namespace Kit
 			}
 		}
 
-		/// <summary>
-		/// Returns whether a file exists.
-		/// </summary>
+		/// <summary>Returns whether a file exists.</summary>
 		/// <param name="folder">The folder where to check.</param>
-		/// <param name="file">The path and file-name relative to the <paramref name="folder"/>.</param>
+		/// <param name="file">The path and file-name relative to the <paramref name="folder" /> .</param>
 		public static bool Exists(ResourceFolder folder, string file)
 		{
 			return Exists(GetPath(folder, file));
 		}
 
-		/// <summary>
-		/// Returns whether a file exists.
-		/// </summary>
+		/// <summary>Returns whether a file exists.</summary>
 		/// <param name="fullPath">Absolute path to the file.</param>
 		public static bool Exists(string fullPath)
 		{
@@ -1255,35 +1169,27 @@ namespace Kit
 						  .OrderByDescending(tuple => tuple.certainty);
 		}
 
-		/// <summary>
-		/// Returns whether a path matches one of the extensions specified.
-		/// </summary>
+		/// <summary>Returns whether a path matches one of the extensions specified.</summary>
 		public static bool MatchExtension(string path, IEnumerable<string> extensions)
 		{
 			string extracted = Path.GetExtension(path);
 			return extensions.Any(e => e.Equals(extracted, StringComparison.OrdinalIgnoreCase));
 		}
 
-		/// <summary>
-		/// Returns whether a path matches the extension specified.
-		/// </summary>
+		/// <summary>Returns whether a path matches the extension specified.</summary>
 		public static bool MatchExtension(string path, string extension)
 		{
 			string extracted = Path.GetExtension(path);
 			return extension.Equals(extracted, StringComparison.OrdinalIgnoreCase);
 		}
 
-		/// <summary>
-		/// Returns whether two paths are equal.
-		/// </summary>
+		/// <summary>Returns whether two paths are equal.</summary>
 		public static bool ComparePath(string path1, string path2)
 		{
 			return path1.Equals(path2, StringComparison.OrdinalIgnoreCase);
 		}
 
-		/// <summary>
-		/// Create directories for a file.
-		/// </summary>
+		/// <summary>Create directories for a file.</summary>
 		public static void CreateDirectoryForFile(string fullPath)
 		{
 			string directory = Path.GetDirectoryName(fullPath);
@@ -1291,17 +1197,13 @@ namespace Kit
 				Directory.CreateDirectory(directory);
 		}
 
-		/// <summary>
-		/// Get the absolute path to a folder.
-		/// </summary>
+		/// <summary>Get the absolute path to a folder.</summary>
 		public static string GetPath(ResourceFolder folder)
 		{
 			return Paths[folder];
 		}
 
-		/// <summary>
-		/// Get the absolute path to a file.
-		/// </summary>
+		/// <summary>Get the absolute path to a file.</summary>
 		public static string GetPath(ResourceFolder folder, string file)
 		{
 			return GetPath(folder) + file;

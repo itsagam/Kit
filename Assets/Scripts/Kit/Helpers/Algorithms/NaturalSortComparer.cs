@@ -4,9 +4,7 @@ using System.Text.RegularExpressions;
 
 namespace Kit.Algorithms
 {
-	/// <summary>
-	/// A natural sort (human-friendly) comparer for sorting names.
-	/// </summary>
+	/// <summary>A natural sort (human-friendly) comparer for sorting names.</summary>
 	public class NaturalSortComparer: IComparer<string>, IDisposable
 	{
 		public readonly bool IsAscending;

@@ -5,22 +5,21 @@ using Object = UnityEngine.Object;
 #if UNITY_EDITOR
 using UnityEditor;
 using Sirenix.OdinInspector.Editor;
+
 #endif
 
 namespace Kit.UI
 {
 	/// <summary>
-	/// A <see cref="SoftReference{T}"/> (path-only) to a <see cref="Window"/>. Here because Unity can be picky about serializing generic
-	/// variables.
+	///     A <see cref="SoftReference{T}" /> (path-only) to a <see cref="Window" />. Here because Unity can be picky about
+	///     serializing generic variables.
 	/// </summary>
 	[Serializable]
 	public class WindowReference: SoftReference<Window>
 	{
 	}
 
-	/// <summary>
-	/// A <see cref="SoftReference{T}"/> (path) to a scene.
-	/// </summary>
+	/// <summary>A <see cref="SoftReference{T}" /> (path) to a scene.</summary>
 	[Serializable]
 #if UNITY_EDITOR
 	public class SceneReference: SoftReference<SceneAsset>
@@ -39,10 +38,11 @@ namespace Kit.UI
 	}
 
 	/// <summary>
-	/// A class that allows one to select assets in the inspector without hard-referencing them. Saves their path instead which can
-	/// later be used to load with <see cref="Load"/> or manually with <see cref="ResourceManager" /> or <see cref="Resources"/>.
+	///     A class that allows one to select assets in the inspector without hard-referencing them. Saves their path instead which
+	///     can later be used to load with <see cref="Load" /> or manually with <see cref="ResourceManager" /> or
+	///     <see cref="Resources" />.
 	/// </summary>
-	/// <remarks>Can be used directly as a string without needing to call <see cref="ToString"/>.</remarks>
+	/// <remarks>Can be used directly as a string without needing to call <see cref="ToString" />.</remarks>
 	/// <typeparam name="T">Type of the unity object. Used to filter assets.</typeparam>
 	[Serializable]
 	[InlineProperty]
@@ -82,7 +82,7 @@ namespace Kit.UI
 #if UNITY_EDITOR
 		[ShowInInspector]
 		[HideLabel]
-		[AssetsOnly, AssetList]
+		[AssetsOnly] [AssetList]
 		[OnInspectorGUI("OnDraw")]
 		[OnValueChanged("OnChanged")]
 		[ValidateInput("OnValidate", "The asset must be under a \"Resources\" folder for it be to be loaded at runtime.")]

@@ -3,7 +3,7 @@ using System.Linq;
 
 namespace Game
 {
-	public class TeamPlayer : Player
+	public class TeamPlayer: Player
 	{
 		public Team Team;
 
@@ -13,6 +13,6 @@ namespace Game
 		}
 
 		public IEnumerable<TeamPlayer> Partners => Team.Players.Where(p => p != this);
-		public TeamPlayer Partner => Team.Players.Find(p => p != this);
+		public TeamPlayer Partner => Team.Players.Find(p => p                != this);
 	}
 }

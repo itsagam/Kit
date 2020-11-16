@@ -2,9 +2,7 @@ using UnityEngine;
 
 namespace Kit.Behaviours
 {
-	/// <summary>
-	/// Quits the application when the Back button is pressed on Android.
-	/// </summary>
+	/// <summary>Quits the application when the Back button is pressed on Android.</summary>
 	public class QuitOnBack: MonoBehaviour
 	{
 #if UNITY_ANDROID

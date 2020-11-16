@@ -5,21 +5,18 @@ using System.Linq;
 
 namespace Kit.Algorithms
 {
-	/// <summary>
-	/// A generic implementation of the A-Star algorithm.
-	/// </summary>
+	/// <summary>A generic implementation of the A-Star algorithm.</summary>
 	public class AStar
 	{
-		/// <summary>
-		/// Find the shortest path from start to destination.
-		/// </summary>
+		/// <summary>Find the shortest path from start to destination.</summary>
 		/// <param name="start">The initial node.</param>
 		/// <param name="destination">The final node.</param>
 		/// <param name="distance">A function that should return the distance between two nodes.</param>
 		/// <param name="estimate">A function that should return an estimate between a node and the destination.</param>
 		/// <param name="links">A function that should return all the nodes linked with a given one.</param>
 		/// <typeparam name="T">The type of a node.</typeparam>
-		public static Path<T> FindPath<T>(T start, T destination,
+		public static Path<T> FindPath<T>(T start,
+										  T destination,
 										  Func<T, T, int> distance,
 										  Func<T, int> estimate,
 										  Func<T, IEnumerable<T>> links)
@@ -50,25 +47,19 @@ namespace Kit.Algorithms
 	}
 
 	/// <summary>
-	/// <para>Represents a linked-list of nodes and a running total of cost.</para>
-	/// <para>Result spited out by the <see cref="AStar"/> algorithm.</para>
+	///     <para>Represents a linked-list of nodes and a running total of cost.</para>
+	///     <para>Result spited out by the <see cref="AStar" /> algorithm.</para>
 	/// </summary>
 	/// <typeparam name="T">The type of a node.</typeparam>
 	public class Path<T>: IEnumerable<T>
 	{
-		/// <summary>
-		/// Reference to the last node.
-		/// </summary>
+		/// <summary>Reference to the last node.</summary>
 		public T LastStep { get; }
 
-		/// <summary>
-		/// A <see cref="Path{T}"/> to all the previous nodes.
-		/// </summary>
+		/// <summary>A <see cref="Path{T}" /> to all the previous nodes.</summary>
 		public Path<T> PreviousSteps { get; }
 
-		/// <summary>
-		/// Total cost of this <see cref="Path{T}"/>.
-		/// </summary>
+		/// <summary>Total cost of this <see cref="Path{T}" />.</summary>
 		public int TotalCost { get; }
 
 		private Path(T lastStep, Path<T> previousSteps, int totalCost)

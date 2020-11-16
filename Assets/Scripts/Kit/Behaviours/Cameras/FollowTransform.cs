@@ -3,38 +3,26 @@ using UnityEngine;
 
 namespace Kit.Behaviours
 {
-	/// <summary>
-	/// Follow a <see cref="Transform"/> while keeping a certain distance.
-	/// </summary>
-	public class FollowTransform : MonoBehaviour
+	/// <summary>Follow a <see cref="Transform" /> while keeping a certain distance.</summary>
+	public class FollowTransform: MonoBehaviour
 	{
-		/// <summary>
-		/// The target <see cref="Transform"/> to follow.
-		/// </summary>
+		/// <summary>The target <see cref="Transform" /> to follow.</summary>
 		[Tooltip("The target transform to follow.")]
 		public Transform Target;
 
-		/// <summary>
-		/// The distance to keep while following.
-		/// </summary>
+		/// <summary>The distance to keep while following.</summary>
 		[Tooltip("The distance to keep while following.")]
 		public float Distance = 10.0f;
 
-		/// <summary>
-		/// The speed at which to follow.
-		/// </summary>
+		/// <summary>The speed at which to follow.</summary>
 		[Tooltip("The speed at which to follow.")]
 		public float MoveSpeed = 10.0f;
 
-		/// <summary>
-		/// Should it keep facing the target?
-		/// </summary>
+		/// <summary>Should it keep facing the target?</summary>
 		[Tooltip("Should it keep facing the target?")]
 		public bool Face = true;
 
-		/// <summary>
-		/// The speed at which to face.
-		/// </summary>
+		/// <summary>The speed at which to face.</summary>
 		[ShowIf("Face")]
 		[Tooltip("The speed at which to face.")]
 		public float RotateSpeed = 5.0f;
@@ -46,17 +34,13 @@ namespace Kit.Behaviours
 			transform = base.transform;
 		}
 
-		/// <summary>
-		/// Start following again if stopped.
-		/// </summary>
+		/// <summary>Start following again if stopped.</summary>
 		public void Follow()
 		{
 			enabled = true;
 		}
 
-		/// <summary>
-		/// Follow a different <see cref="Transform"/> using the current distance between them.
-		/// </summary>
+		/// <summary>Follow a different <see cref="Transform" /> using the current distance between them.</summary>
 		public void Follow(Transform target)
 		{
 			if (target == null)
@@ -65,9 +49,7 @@ namespace Kit.Behaviours
 			Follow(target, (target.position - ((Component) this).transform.position).magnitude);
 		}
 
-		/// <summary>
-		/// Follow a different <see cref="Transform"/> at a specified distance.
-		/// </summary>
+		/// <summary>Follow a different <see cref="Transform" /> at a specified distance.</summary>
 		public void Follow(Transform target, float distance)
 		{
 			Target = target;
@@ -75,9 +57,7 @@ namespace Kit.Behaviours
 			enabled = true;
 		}
 
-		/// <summary>
-		/// Stop following.
-		/// </summary>
+		/// <summary>Stop following.</summary>
 		public void Stop()
 		{
 			enabled = false;
@@ -92,7 +72,7 @@ namespace Kit.Behaviours
 			}
 
 			Vector3 targetPosition = Target.position;
-			Vector3 newPosition = targetPosition - transform.forward * Distance;
+			Vector3 newPosition = targetPosition - transform.forward                     * Distance;
 			transform.position = Vector3.Lerp(transform.position, newPosition, MoveSpeed * Time.deltaTime);
 			if (Face)
 			{

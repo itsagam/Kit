@@ -39,6 +39,7 @@ namespace Kit.Modding.Loaders
 					Debugger.Log("ModManager", $"Could not load metadata for mod \"{path}\"");
 					return null;
 				}
+
 				mod.Metadata = metadata;
 				return mod;
 			}
@@ -75,6 +76,7 @@ namespace Kit.Modding.Loaders
 					Debugger.Log("ModManager", $"Could not load metadata for mod \"{path}\"");
 					return null;
 				}
+
 				mod.Metadata = metadata;
 				return mod;
 			}
@@ -113,6 +115,7 @@ namespace Kit.Modding.Loaders
 			catch
 			{
 			}
+
 			return default;
 		}
 
@@ -135,6 +138,7 @@ namespace Kit.Modding.Loaders
 			catch
 			{
 			}
+
 			return default;
 		}
 
@@ -172,7 +176,7 @@ namespace Kit.Modding.Loaders
 				return Enumerable.Empty<string>();
 
 			return Bundle.GetAllAssetNames()
-			             .Where(assetPath => ResourceManager.ComparePath(path, Path.ChangeExtension(assetPath, null)));
+						 .Where(assetPath => ResourceManager.ComparePath(path, Path.ChangeExtension(assetPath, null)));
 		}
 
 		public override bool Exists(string path)

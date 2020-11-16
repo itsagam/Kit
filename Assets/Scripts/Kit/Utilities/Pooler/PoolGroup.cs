@@ -7,39 +7,31 @@ using UnityEngine;
 namespace Kit.Pooling
 {
 	/// <summary>
-	/// A PoolGroup represents a collection of <see cref="Pool"/> grouped by name. Can be used to group together pools of different types
-	/// and components, or configure them together.
+	///     A PoolGroup represents a collection of <see cref="Pool" /> grouped by name. Can be used to group together pools of
+	///     different types and components, or configure them together.
 	/// </summary>
 	[AddComponentMenu("Pooling/PoolGroup")]
 	public class PoolGroup: MonoBehaviour, IEnumerable<Component>
 	{
 		#region Fields
 
-		/// <summary>
-		/// <see cref="Pool.MessageMode"/> of pools added to this group.
-		/// </summary>
+		/// <summary><see cref="Pool.MessageMode" /> of pools added to this group.</summary>
 		[LabelText("Message")]
 		[Tooltip("MessageMode of pools added to this group.")]
 		[OnValueChanged("ResetMessageMode")]
 		public PoolMessageMode MessageMode = PoolMessageMode.None;
 
-		/// <summary>
-		/// Whether to organize groups, pools, and instances for a cleaner scene hierarchy?
-		/// </summary>
+		/// <summary>Whether to organize groups, pools, and instances for a cleaner scene hierarchy?</summary>
 		[Tooltip("Whether to organize groups, pools, and instances for a cleaner scene hierarchy?")]
 		[OnValueChanged("ResetOrganize")]
 		public bool Organize = true;
 
-		/// <summary>
-		/// Keep pools under this group persistent across scenes.
-		/// </summary>
+		/// <summary>Keep pools under this group persistent across scenes.</summary>
 		[Tooltip("Keep pools under this group persistent across scenes.")]
 		[ShowIf("ShowPersistent")]
 		public bool Persistent = false;
 
-		/// <summary>
-		/// List of pools associated with this group.
-		/// </summary>
+		/// <summary>List of pools associated with this group.</summary>
 		[PropertySpace]
 		[SceneObjectsOnly]
 		[InlineEditor]
@@ -74,9 +66,7 @@ namespace Kit.Pooling
 
 		#region Pool management
 
-		/// <summary>
-		/// Add a pool to this group.
-		/// </summary>
+		/// <summary>Add a pool to this group.</summary>
 		public void AddPool(Pool pool)
 		{
 			Pools.Add(pool);
@@ -88,17 +78,13 @@ namespace Kit.Pooling
 			pool.Persistent = false;
 		}
 
-		/// <summary>
-		/// Return whether a pool is a part of this group.
-		/// </summary>
+		/// <summary>Return whether a pool is a part of this group.</summary>
 		public bool ContainsPool(Pool pool)
 		{
 			return Pools.Contains(pool);
 		}
 
-		/// <summary>
-		/// Remove a pool from this group.
-		/// </summary>
+		/// <summary>Remove a pool from this group.</summary>
 		/// <returns>Whether the pool was successfully removed.</returns>
 		public bool RemovePool(Pool pool)
 		{
@@ -108,6 +94,7 @@ namespace Kit.Pooling
 				pool.Group = null;
 				pool.transform.parent = null;
 			}
+
 			return result;
 		}
 
@@ -162,24 +149,16 @@ namespace Kit.Pooling
 
 		#region Public properties
 
-		/// <summary>
-		/// All the instances available for re-use in this group.
-		/// </summary>
+		/// <summary>All the instances available for re-use in this group.</summary>
 		public IEnumerable<Component> Available => Pools.SelectMany(p => p.Available);
 
-		/// <summary>
-		/// Total number of instances available for re-use in this group.
-		/// </summary>
+		/// <summary>Total number of instances available for re-use in this group.</summary>
 		public int AvailableCount => Pools.Sum(p => p.Available.Count);
 
-		/// <summary>
-		/// All the instances being used by pools in this group.
-		/// </summary>
+		/// <summary>All the instances being used by pools in this group.</summary>
 		public IEnumerable<Component> Used => Pools.SelectMany(p => p.Used);
 
-		/// <summary>
-		/// Total number of instances being used by pools in this group.
-		/// </summary>
+		/// <summary>Total number of instances being used by pools in this group.</summary>
 		public int UsedCount => Pools.Sum(p => p.Used.Count);
 
 		#endregion

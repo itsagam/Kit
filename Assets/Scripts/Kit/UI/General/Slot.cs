@@ -3,20 +3,14 @@ using UnityEngine.EventSystems;
 
 namespace Kit.UI
 {
-	/// <summary>
-	/// A UI element that can hold an <see cref="Item"/> inside it.
-	/// </summary>
+	/// <summary>A UI element that can hold an <see cref="Item" /> inside it.</summary>
 	public class Slot: MonoBehaviour, IDropHandler
 	{
-		/// <summary>
-		/// The prefab to use for showing data in this slot.
-		/// </summary>
+		/// <summary>The prefab to use for showing data in this slot.</summary>
 		[Tooltip("The prefab to use for showing data in this slot.")]
 		public Item Prefab;
 
-		/// <summary>
-		/// The <see cref="Item"/> fitted in this slot.
-		/// </summary>
+		/// <summary>The <see cref="Item" /> fitted in this slot.</summary>
 		public Item Item { get; protected set; }
 
 		public virtual void OnDrop(PointerEventData eventData)
@@ -34,17 +28,13 @@ namespace Kit.UI
 			Receive(cursor.Item);
 		}
 
-		/// <summary>
-		/// Decides whether this slot can receive a particular item. To be overriden in child classes.
-		/// </summary>
+		/// <summary>Decides whether this slot can receive a particular item. To be overriden in child classes.</summary>
 		public virtual bool CanReceive(Item item)
 		{
 			return true;
 		}
 
-		/// <summary>
-		/// Fit an item into this slot.
-		/// </summary>
+		/// <summary>Fit an item into this slot.</summary>
 		public virtual void Receive(Item newItem)
 		{
 			if (newItem == null)
@@ -59,9 +49,7 @@ namespace Kit.UI
 			Item.Data = newItem.Data;
 		}
 
-		/// <summary>
-		/// Clear this slot.
-		/// </summary>
+		/// <summary>Clear this slot.</summary>
 		public virtual void Clear()
 		{
 			if (!HasItem)
@@ -71,9 +59,7 @@ namespace Kit.UI
 			Item = null;
 		}
 
-		/// <summary>
-		/// Returns whether this slot is filled.
-		/// </summary>
+		/// <summary>Returns whether this slot is filled.</summary>
 		public virtual bool HasItem => Item != null;
 	}
 }

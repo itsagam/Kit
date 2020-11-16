@@ -2,57 +2,38 @@
 
 namespace Kit.Containers
 {
-	/// <summary>
-	/// Represents how an <see cref="Effect"/> affects the value.
-	/// </summary>
+	/// <summary>Represents how an <see cref="Effect" /> affects the value.</summary>
 	public enum EffectType
 	{
-		/// <summary>
-		/// It adds or subtracts a constant.
-		/// </summary>
+		/// <summary>It adds or subtracts a constant.</summary>
 		Constant,
 
-		/// <summary>
-		/// It adds or subtracts a certain percentage.
-		/// </summary>
+		/// <summary>It adds or subtracts a certain percentage.</summary>
 		Percentage,
 
-		/// <summary>
-		/// It multiplies by a certain number.
-		/// </summary>
+		/// <summary>It multiplies by a certain number.</summary>
 		Multiplier
 	}
 
-	/// <summary>
-	/// Denotes a change in the value of a stat.
-	/// </summary>
+	/// <summary>Denotes a change in the value of a stat.</summary>
 	[Serializable]
 	public struct Effect
 	{
-		/// <summary>
-		/// The stat to which the change should apply.
-		/// </summary>
+		/// <summary>The stat to which the change should apply.</summary>
 		public string Stat;
 
-		/// <summary>
-		/// How does it change the value?
-		/// </summary>
+		/// <summary>How does it change the value?</summary>
 		public EffectType Type;
 
-		/// <summary>
-		/// The amount of change.
-		/// </summary>
+		/// <summary>The amount of change.</summary>
 		public float Value;
 
-		/// <summary>
-		/// Create a new <see cref="Effect"/>.
-		/// </summary>
+		/// <summary>Create a new <see cref="Effect" />.</summary>
 		/// <param name="stat">The ID of the stat.</param>
 		/// <param name="value">The Type and Value represented as a string.</param>
-		/// <see cref="Parse"/>
+		/// <see cref="Parse" />
 		/// <example>
-		/// <code>new Effect("Health", "+50%")</code>
-		/// <code>new Effect("Damage", "x2")</code>
+		///     <code>new Effect("Health", "+50%")</code> <code>new Effect("Damage", "x2")</code>
 		/// </example>
 		public Effect(string stat, string value)
 		{
@@ -60,9 +41,7 @@ namespace Kit.Containers
 			(Type, Value) = Parse(value);
 		}
 
-		/// <summary>
-		/// Create a new <see cref="Effect"/>.
-		/// </summary>
+		/// <summary>Create a new <see cref="Effect" />.</summary>
 		/// <param name="stat">The ID of the stat.</param>
 		/// <param name="type">The effect type.</param>
 		/// <param name="value">The amount of the effect.</param>
@@ -80,18 +59,14 @@ namespace Kit.Containers
 		}
 
 		/// <summary>
-		/// <para>
-		/// Converts a string to <see cref="EffectType"/> and value.
-		/// </para>
-		///
-		/// <para>
-		/// "x" at the beginning of a string translates to <see cref="EffectType.Multiplier"/>, a string ending with "%" means
-		/// <see cref="EffectType.Percentage"/>, while neither of those means <see cref="EffectType.Constant"/>. Rest of the string
-		/// should be a number denoting the value.
-		/// </para>
+		///     <para>Converts a string to <see cref="EffectType" /> and value.</para>
+		///     <para>
+		///         "x" at the beginning of a string translates to <see cref="EffectType.Multiplier" />, a string ending with "%" means
+		///         <see cref="EffectType.Percentage" />, while neither of those means <see cref="EffectType.Constant" />. Rest of the string
+		///         should be a number denoting the value.
+		///     </para>
 		/// </summary>
-		///
-		/// <returns>The <see cref="EffectType"/> and value in the form of a tuple.</returns>
+		/// <returns>The <see cref="EffectType" /> and value in the form of a tuple.</returns>
 		public static (EffectType, float) Parse(string str)
 		{
 			(EffectType type, float value) output;
@@ -114,11 +89,9 @@ namespace Kit.Containers
 			return output;
 		}
 
-		/// <summary>
-		/// Converts the <see cref="EffectType"/> and value to a human-readable string.
-		/// </summary>
-		/// <remarks>Conversion is same as the <see cref="Parse"/> function, except in reverse.</remarks>
-		/// <seealso cref="Parse"/>
+		/// <summary>Converts the <see cref="EffectType" /> and value to a human-readable string.</summary>
+		/// <remarks>Conversion is same as the <see cref="Parse" /> function, except in reverse.</remarks>
+		/// <seealso cref="Parse" />
 		public static string Convert(Effect effect)
 		{
 			string output = "";

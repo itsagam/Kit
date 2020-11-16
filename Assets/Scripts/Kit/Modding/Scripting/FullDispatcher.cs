@@ -4,7 +4,7 @@ using XLua;
 
 namespace Kit.Modding.Scripting
 {
-	public class FullDispatcher : SimpleDispatcher
+	public class FullDispatcher: SimpleDispatcher
 	{
 		protected LuaEnv scriptEnv;
 		protected event Action updateEvent;

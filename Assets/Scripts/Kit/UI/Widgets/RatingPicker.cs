@@ -7,9 +7,7 @@ using UnityEngine.UI;
 
 namespace Kit.UI.Widgets
 {
-	/// <summary>
-	/// A rating picker/display widget.
-	/// </summary>
+	/// <summary>A rating picker/display widget.</summary>
 	[RequireComponent(typeof(HorizontalLayoutGroup))]
 	public class RatingPicker: MonoBehaviour
 	{
@@ -147,9 +145,7 @@ namespace Kit.UI.Widgets
 			SetRating(rating);
 		}
 
-		/// <summary>
-		/// Get or set the maximum rating you can pick or show.
-		/// </summary>
+		/// <summary>Get or set the maximum rating you can pick or show.</summary>
 		[ShowInInspector]
 		[PropertyTooltip("The maximum rating you can pick or show.")]
 		[PropertyRange(1, 10)]
@@ -169,9 +165,7 @@ namespace Kit.UI.Widgets
 			}
 		}
 
-		/// <summary>
-		/// Get or set the current rating.
-		/// </summary>
+		/// <summary>Get or set the current rating.</summary>
 		[ShowInInspector]
 		[PropertyTooltip("The current rating.")]
 		[PropertyRange(0, "MaxRating")]
@@ -181,9 +175,7 @@ namespace Kit.UI.Widgets
 			set => SetRating(value);
 		}
 
-		/// <summary>
-		/// Whether to allow half-point ratings.
-		/// </summary>
+		/// <summary>Whether to allow half-point ratings.</summary>
 		[ShowInInspector]
 		[PropertyTooltip("Whether to allow half-point ratings.")]
 		public bool AllowHalf
@@ -196,9 +188,7 @@ namespace Kit.UI.Widgets
 			}
 		}
 
-		/// <summary>
-		/// Whether to allow to pick a rating or just display it.
-		/// </summary>
+		/// <summary>Whether to allow to pick a rating or just display it.</summary>
 		[ShowInInspector]
 		[PropertyTooltip("Whether to allow to pick a rating or just display it.")]
 		public bool IsReadonly
@@ -214,9 +204,7 @@ namespace Kit.UI.Widgets
 			}
 		}
 
-		/// <summary>
-		/// The <see cref="Sprite"/> to use for a zero point of rating.
-		/// </summary>
+		/// <summary>The <see cref="Sprite" /> to use for a zero point of rating.</summary>
 		[ShowInInspector]
 		[FoldoutGroup("Sprites")]
 		[PropertyTooltip("The sprite to use for a zero point of rating.")]
@@ -230,9 +218,7 @@ namespace Kit.UI.Widgets
 			}
 		}
 
-		/// <summary>
-		/// The <see cref="Sprite"/> to use for half a point of rating.
-		/// </summary>
+		/// <summary>The <see cref="Sprite" /> to use for half a point of rating.</summary>
 		[ShowInInspector]
 		[ShowIf("allowHalf")]
 		[FoldoutGroup("Sprites")]
@@ -247,9 +233,7 @@ namespace Kit.UI.Widgets
 			}
 		}
 
-		/// <summary>
-		/// The <see cref="Sprite"/> to use for a full point of rating.
-		/// </summary>
+		/// <summary>The <see cref="Sprite" /> to use for a full point of rating.</summary>
 		[ShowInInspector]
 		[FoldoutGroup("Sprites")]
 		[PropertyTooltip("The sprite to use for a full point of rating.")]
@@ -263,9 +247,7 @@ namespace Kit.UI.Widgets
 			}
 		}
 
-		/// <summary>
-		/// The color of buttons when they're highlighted.
-		/// </summary>
+		/// <summary>The color of buttons when they're highlighted.</summary>
 		[ShowInInspector]
 		[FoldoutGroup("Appearance")]
 		[PropertyTooltip("The color of buttons when they're highlighted.")]
@@ -282,9 +264,7 @@ namespace Kit.UI.Widgets
 			}
 		}
 
-		/// <summary>
-		/// The color of buttons when they're pressed.
-		/// </summary>
+		/// <summary>The color of buttons when they're pressed.</summary>
 		[ShowInInspector]
 		[FoldoutGroup("Appearance")]
 		[PropertyTooltip("The color of buttons when they're pressed.")]

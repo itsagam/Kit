@@ -5,9 +5,9 @@ using Kit;
 using Kit.UI;
 using UnityEngine;
 using UnityEngine.UI;
-
 #if MODDING
 using Kit.Modding;
+
 #endif
 
 namespace Game.UI.Splash

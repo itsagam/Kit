@@ -5,20 +5,14 @@ using UnityEngine.UI;
 
 namespace Kit.UI
 {
-	/// <summary>
-	/// A UI element that provides the cursor functionality for drag-and-drop operations.
-	/// </summary>
+	/// <summary>A UI element that provides the cursor functionality for drag-and-drop operations.</summary>
 	public class DragCursor: MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler
 	{
-		/// <summary>
-		/// The <see cref="Item"/> for which this cursor is created.
-		/// </summary>
+		/// <summary>The <see cref="Item" /> for which this cursor is created.</summary>
 		[Tooltip("The Item for which this cursor is created.")]
 		public Item Item;
 
-		/// <summary>
-		/// How fast does the cursor move back to its initial position?
-		/// </summary>
+		/// <summary>How fast does the cursor move back to its initial position?</summary>
 		[Tooltip("How fast does the cursor move back to its initial position?")]
 		public float MoveSpeed = 750.0f;
 

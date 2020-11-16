@@ -8,7 +8,7 @@ using Cysharp.Threading.Tasks;
 
 namespace Kit.Modding.Loaders
 {
-	public class ZipModLoader : ModLoader
+	public class ZipModLoader: ModLoader
 	{
 		public readonly List<string> SupportedExtensions = new List<string> { ".zip" };
 
@@ -32,6 +32,7 @@ namespace Kit.Modding.Loaders
 					Debugger.Log("ModManager", $"Could not load metadata for mod \"{path}\"");
 					return null;
 				}
+
 				mod.Metadata = metadata;
 				return mod;
 			}
@@ -63,6 +64,7 @@ namespace Kit.Modding.Loaders
 					Debugger.Log("ModManager", $"Could not load metadata for mod \"{path}\"");
 					return null;
 				}
+
 				mod.Metadata = metadata;
 				return mod;
 			}
@@ -75,7 +77,7 @@ namespace Kit.Modding.Loaders
 		}
 	}
 
-	public class ZipMod : Mod
+	public class ZipMod: Mod
 	{
 		public ZipArchive Archive { get; }
 
@@ -126,7 +128,7 @@ namespace Kit.Modding.Loaders
 				ZipArchiveEntry entry = Archive.GetEntry(path);
 				using (Stream stream = entry.Open())
 				{
-					byte[] data = new byte[entry.Length];
+					var data = new byte[entry.Length];
 					stream.Read(data, 0, (int) entry.Length);
 					return data;
 				}
@@ -144,7 +146,7 @@ namespace Kit.Modding.Loaders
 				ZipArchiveEntry entry = Archive.GetEntry(path);
 				using (Stream stream = entry.Open())
 				{
-					byte[] data = new byte[entry.Length];
+					var data = new byte[entry.Length];
 					await stream.ReadAsync(data, 0, (int) entry.Length);
 					return data;
 				}
@@ -166,9 +168,9 @@ namespace Kit.Modding.Loaders
 
 			// Name is empty string for directory ZipArchiveEntries
 			return Archive.Entries
-			              .Where(entry => entry.Name != "" &&
+						  .Where(entry => entry.Name != "" &&
 										  ResourceManager.ComparePath(path, Path.ChangeExtension(entry.FullName, null)))
-			              .Select(entry => entry.FullName);
+						  .Select(entry => entry.FullName);
 		}
 
 		public override void Unload()

@@ -3,14 +3,10 @@ using UnityEngine;
 
 namespace Kit
 {
-	/// <summary>
-	/// <see cref="Bounds"/> extensions.
-	/// </summary>
+	/// <summary><see cref="Bounds" /> extensions.</summary>
 	public static class BoundsExtensions
 	{
-		/// <summary>
-		/// Rotate the <see cref="Bounds"/>.
-		/// </summary>
+		/// <summary>Rotate the <see cref="Bounds" />.</summary>
 		public static Bounds Rotate(this Bounds bounds, Quaternion rotation)
 		{
 			var points = bounds.GetPoints();
@@ -24,9 +20,7 @@ namespace Kit
 			return rotated;
 		}
 
-		/// <summary>
-		/// Get all the vertices on the <see cref="Bounds"/>.
-		/// </summary>
+		/// <summary>Get all the vertices on the <see cref="Bounds" />.</summary>
 		public static Vector3[] GetPoints(this Bounds bounds)
 		{
 			var points = new Vector3[8];
@@ -41,9 +35,7 @@ namespace Kit
 			return points;
 		}
 
-		/// <summary>
-		/// Get a random point within the <see cref="Bounds"/>.
-		/// </summary>
+		/// <summary>Get a random point within the <see cref="Bounds" />.</summary>
 		public static Vector3 GetRandomPoint(this Bounds bounds)
 		{
 			Vector3 min = bounds.min;
@@ -53,9 +45,7 @@ namespace Kit
 							   Random.Range(min.z, max.z));
 		}
 
-		/// <summary>
-		/// Returns whether it overlaps with another <see cref="Bounds"/>.
-		/// </summary>
+		/// <summary>Returns whether it overlaps with another <see cref="Bounds" />.</summary>
 		public static bool Overlaps(this Bounds boundsA, Bounds boundsB)
 		{
 			Vector3 topLeftA = boundsA.min, bottomRightA = boundsA.max;
@@ -68,9 +58,7 @@ namespace Kit
 				   bottomRightA.z > topLeftB.z;
 		}
 
-		/// <summary>
-		/// Returns the distance to a point.
-		/// </summary>
+		/// <summary>Returns the distance to a point.</summary>
 		public static float GetDistance(this Bounds bounds, Vector3 point)
 		{
 			return Mathf.Sqrt(bounds.SqrDistance(point));

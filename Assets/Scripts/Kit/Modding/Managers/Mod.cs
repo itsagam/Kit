@@ -11,15 +11,15 @@ using XLua;
 
 namespace Kit.Modding
 {
-    public class ModMetadata
-    {
-        public string Name;
-        public string Author;
+	public class ModMetadata
+	{
+		public string Name;
+		public string Author;
 		public string Description;
-        public string Version;
+		public string Version;
 		public ModPersistence Persistence;
 		public List<string> Scripts;
-    }
+	}
 
 	public enum ModPersistence
 	{
@@ -31,6 +31,7 @@ namespace Kit.Modding
 	public abstract class Mod
 	{
 		#region Fields
+
 		public const float GCInterval = 1.0f;
 		private static YieldInstruction gcYield = new WaitForSeconds(GCInterval);
 
@@ -46,9 +47,11 @@ namespace Kit.Modding
 
 		public LuaEnv ScriptEnv { get; protected set; }
 		public SimpleDispatcher ScriptDispatcher { get; protected set; }
+
 		#endregion
 
 		#region Resources
+
 		public object Load(ResourceFolder folder, string file)
 		{
 			return LoadEx(typeof(object), ModManager.GetModdingPath(folder, file)).reference;
@@ -85,7 +88,7 @@ namespace Kit.Modding
 			var certainties = RankParsers(type, matchingFiles);
 			string text = null;
 			byte[] bytes = null;
-			foreach (var (filePath, parser, _) in certainties)
+			foreach ((string filePath, ResourceParser parser, var _) in certainties)
 				try
 				{
 					if (parser.ParseMode == ParseMode.Binary)
@@ -96,18 +99,18 @@ namespace Kit.Modding
 							if (bytes == null)
 								return default;
 						}
+
 						return (parser.Read(type, bytes, filePath), filePath, parser);
 					}
-					else
+
+					if (text == null)
 					{
+						text = ReadText(filePath);
 						if (text == null)
-						{
-							text = ReadText(filePath);
-							if (text == null)
-								return default;
-						}
-						return (parser.Read(type, text, filePath), filePath, parser);
+							return default;
 					}
+
+					return (parser.Read(type, text, filePath), filePath, parser);
 				}
 				catch
 				{
@@ -152,7 +155,7 @@ namespace Kit.Modding
 			var certainties = RankParsers(type, matchingFiles);
 			string text = null;
 			byte[] bytes = null;
-			foreach (var (filePath, parser, _) in certainties)
+			foreach ((string filePath, ResourceParser parser, var _) in certainties)
 				try
 				{
 					if (parser.ParseMode == ParseMode.Binary)
@@ -163,18 +166,18 @@ namespace Kit.Modding
 							if (bytes == null)
 								return default;
 						}
+
 						return (parser.Read(type, bytes, filePath), filePath, parser);
 					}
-					else
+
+					if (text == null)
 					{
+						text = await ReadTextAsync(filePath);
 						if (text == null)
-						{
-							text = await ReadTextAsync(filePath);
-							if (text == null)
-								return default;
-						}
-						return (parser.Read(type, text, filePath), filePath, parser);
+							return default;
 					}
+
+					return (parser.Read(type, text, filePath), filePath, parser);
 				}
 				catch
 				{
@@ -183,16 +186,21 @@ namespace Kit.Modding
 			return default;
 		}
 
-		protected static IEnumerable<(string filePath, ResourceParser parser, float certainty)> RankParsers(Type type, IEnumerable<string> files)
+		protected static IEnumerable<(string filePath, ResourceParser parser, float certainty)> RankParsers(
+			Type type,
+			IEnumerable<string> files)
 		{
 			return files
-			      .SelectMany(filePath => ResourceManager.Parsers.Select(parser => (filePath, parser, certainty: parser.CanParse(type, filePath))))
-			      .Where(tuple => tuple.certainty > 0)
-			      .OrderByDescending(tuple => tuple.certainty);
+				  .SelectMany(filePath => ResourceManager.Parsers.Select(parser => (filePath, parser,
+																					certainty: parser.CanParse(type, filePath))))
+				  .Where(tuple => tuple.certainty > 0)
+				  .OrderByDescending(tuple => tuple.certainty);
 		}
+
 		#endregion
 
 		#region Scripting
+
 		protected IEnumerable<string> SetupScripting()
 		{
 			if (Metadata.Scripts == null || Metadata.Scripts.Count == 0)
@@ -309,13 +317,16 @@ namespace Kit.Modding
 			ScriptEnv.Dispose();
 			ScriptEnv = null;
 		}
+
 		#endregion
 
 		#region Destruction
+
 		public virtual void Unload()
 		{
 			DisposeScripting();
 		}
+
 		#endregion
 	}
 }

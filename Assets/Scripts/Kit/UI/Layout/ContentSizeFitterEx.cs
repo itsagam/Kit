@@ -15,9 +15,7 @@ namespace Kit.UI.Layout
 	}
 #endif
 
-	/// <summary>
-	/// A <see cref="ContentSizeFitter"/> that allows you to add padding.
-	/// </summary>
+	/// <summary>A <see cref="ContentSizeFitter" /> that allows you to add padding.</summary>
 	public class ContentSizeFitterEx: ContentSizeFitter
 	{
 		public Vector2 Padding;

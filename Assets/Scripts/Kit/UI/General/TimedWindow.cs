@@ -5,14 +5,10 @@ using UnityEngine;
 
 namespace Kit.UI
 {
-	/// <summary>
-	/// A <see cref="Window"/> that hides itself automatically after a specified time.
-	/// </summary>
+	/// <summary>A <see cref="Window" /> that hides itself automatically after a specified time.</summary>
 	public class TimedWindow: Window
 	{
-		/// <summary>
-		/// Duration to display the window for in seconds.
-		/// </summary>
+		/// <summary>Duration to display the window for in seconds.</summary>
 		[PropertyOrder(-99)]
 		[SuffixLabel("seconds", true)]
 		[MinValue(0)]

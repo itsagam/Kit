@@ -3,7 +3,7 @@ using Cysharp.Threading.Tasks;
 
 namespace Kit.Modding
 {
-    public abstract class ModLoader
+	public abstract class ModLoader
 	{
 		public const string MetadataFile = "Metadata.json";
 

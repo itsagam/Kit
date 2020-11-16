@@ -3,9 +3,10 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using UniRx;
 using Cysharp.Threading.Tasks;
 using Kit.Modding.Loaders;
+using Kit.Parsers;
+using UniRx;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
@@ -14,25 +15,32 @@ namespace Kit.Modding
 	public static class ModManager
 	{
 		#region Fields
+
 		public static event Action<Mod> ModLoaded;
 		public static event Action<Mod> ModUnloaded;
 		public static event Action<ResourceFolder, string, ResourceInfo, bool> ResourceLoaded;
 		public static event Action<ResourceFolder, string, Mod> ResourceUnloaded;
 
 		public static readonly Dictionary<ModType, ModGroup> Groups = new Dictionary<ModType, ModGroup>();
-		public static readonly List<ModLoader> Loaders = new List<ModLoader>{
-				new DirectModLoader(),
-				new ZipModLoader(),
-				new AssetBundleModLoader()
-		};
+
+		public static readonly List<ModLoader> Loaders = new List<ModLoader>
+														 {
+															 new DirectModLoader(),
+															 new ZipModLoader(),
+															 new AssetBundleModLoader()
+														 };
+
 		public static IReadOnlyList<Mod> ActiveMods { get; private set; } = new List<Mod>();
 
 		private static Dictionary<(Type type, ResourceFolder folder, string file), ResourceInfo> cachedResources =
-				new Dictionary<(Type, ResourceFolder, string), ResourceInfo>();
+			new Dictionary<(Type, ResourceFolder, string), ResourceInfo>();
+
 		private static Dictionary<ResourceFolder, string> folderToString = new Dictionary<ResourceFolder, string>();
+
 		#endregion
 
 		#region Initialization
+
 		static ModManager()
 		{
 			AddDefaultGroups();
@@ -41,11 +49,11 @@ namespace Kit.Modding
 		}
 
 		private static void AddDefaultGroups()
-        {
+		{
 			// The order in which groups are added is taken into account in mod order and cannot be changed by any means
 			string writableFolder = GetWritableFolder();
 			AddGroup(new ModGroup(ModType.Patch, writableFolder + "Patches/", false, false));
-			AddGroup(new ModGroup(ModType.Mod, writableFolder + "Mods/", true, true));
+			AddGroup(new ModGroup(ModType.Mod,   writableFolder + "Mods/",    true,  true));
 		}
 
 		public static string GetWritableFolder()
@@ -67,6 +75,7 @@ namespace Kit.Modding
 					folder = Application.persistentDataPath;
 					break;
 			}
+
 			if (folder != null)
 				folder += "/";
 			return folder;
@@ -78,13 +87,15 @@ namespace Kit.Modding
 			foreach (ResourceFolder value in Enum.GetValues(typeof(ResourceFolder)))
 				folderToString[value] = Enum.GetName(typeof(ResourceFolder), value) + "/";
 		}
+
 		#endregion
 
 		#region Mod-loading
+
 		public static Dictionary<ModGroup, string[]> GetModPathsByGroup()
 		{
 			return Groups.Values
-			             .Where(g => Directory.Exists(g.Path))
+						 .Where(g => Directory.Exists(g.Path))
 						 .ToDictionary(g => g, g => Directory.GetFileSystemEntries(g.Path));
 		}
 
@@ -149,7 +160,7 @@ namespace Kit.Modding
 			SaveModOrder();
 			RefreshActiveMods();
 
-			Debugger.Log("ModManager",$"{Mods.Count()} mods loaded, {ActiveMods.Count} active.");
+			Debugger.Log("ModManager", $"{Mods.Count()} mods loaded, {ActiveMods.Count} active.");
 
 			if (executeScripts)
 				await ExecuteScriptsAsync();
@@ -171,9 +182,11 @@ namespace Kit.Modding
 		{
 			ActiveMods = Groups.SelectMany(kvp => kvp.Value.Mods).Where(IsModEnabled).ToList();
 		}
+
 		#endregion
 
 		#region Settings
+
 		public static void EnableMod(Mod mod)
 		{
 			ToggleMod(mod, true);
@@ -223,7 +236,7 @@ namespace Kit.Modding
 
 		public static void MoveModBottom(Mod mod)
 		{
-			MoveModOrder(mod, mod.Group.Mods.Count-1);
+			MoveModOrder(mod, mod.Group.Mods.Count - 1);
 		}
 
 		public static void MoveModUp(Mod mod)
@@ -259,8 +272,9 @@ namespace Kit.Modding
 					group.Mods = group.Mods.AsEnumerable()
 									  .Reverse()
 									  .OrderBy(mod => SettingsManager.Get(group.Name.ToString(),
-																			 mod.Metadata.Name,
-																			 "Order", -1))
+																		  mod.Metadata.Name,
+																		  "Order",
+																		  -1))
 									  .ToList();
 		}
 
@@ -278,6 +292,7 @@ namespace Kit.Modding
 		#endregion
 
 		#region Resource-loading
+
 		private static object LoadCached(Type type, ResourceFolder folder, string file)
 		{
 			if (!cachedResources.TryGetValue((type, folder, file), out ResourceInfo resource))
@@ -308,7 +323,7 @@ namespace Kit.Modding
 			string path = GetModdingPath(folder, file);
 			foreach (Mod mod in ActiveMods)
 			{
-				var (reference, filePath, parser) = mod.LoadEx(type, path);
+				(object reference, string filePath, ResourceParser parser) = mod.LoadEx(type, path);
 				if (reference != null)
 				{
 					ResourceInfo resource = new ResourceInfo(mod, filePath, parser, reference);
@@ -338,7 +353,7 @@ namespace Kit.Modding
 			string path = GetModdingPath(folder, file);
 			foreach (Mod mod in ActiveMods)
 			{
-				var (reference, filePath, parser) = await mod.LoadExAsync(type, path);
+				(object reference, string filePath, ResourceParser parser) = await mod.LoadExAsync(type, path);
 				if (reference != null)
 				{
 					ResourceInfo resource = new ResourceInfo(mod, filePath, parser, reference);
@@ -384,7 +399,7 @@ namespace Kit.Modding
 		public static async UniTask<IEnumerable<T>> LoadAllAsync<T>(string path)
 		{
 			return (await UniTask.WhenAll(ActiveMods.Select(mod => mod.LoadExAsync(typeof(T), path))))
-			      .Where(b => b.reference != null)
+				  .Where(b => b.reference != null)
 				  .Select(b => (T) b.reference);
 		}
 
@@ -404,9 +419,11 @@ namespace Kit.Modding
 		{
 			return cachedResources.FirstOrDefault(r => r.Value.Reference.Target == resource).Value;
 		}
+
 		#endregion
 
 		#region Reading
+
 		public static string ReadText(ResourceFolder folder, string file)
 		{
 			return ReadText(GetModdingPath(folder, file));
@@ -430,6 +447,7 @@ namespace Kit.Modding
 				if (text != null)
 					return text;
 			}
+
 			return null;
 		}
 
@@ -472,10 +490,11 @@ namespace Kit.Modding
 		{
 			foreach (Mod mod in ActiveMods)
 			{
-				byte[] bytes = await mod.ReadBytesAsync(path);
+				var bytes = await mod.ReadBytesAsync(path);
 				if (bytes != null)
 					return bytes;
 			}
+
 			return null;
 		}
 
@@ -502,6 +521,7 @@ namespace Kit.Modding
 		#endregion
 
 		#region Unloading
+
 		public static void UnloadMods(bool withResources = false)
 		{
 			int activeCount = ActiveMods.Count;
@@ -512,6 +532,7 @@ namespace Kit.Modding
 					UnloadModInternal(group.Mods[i], withResources);
 					totalCount++;
 				}
+
 			ActiveMods = new List<Mod>();
 
 			if (totalCount > 0)
@@ -537,7 +558,7 @@ namespace Kit.Modding
 		public static bool UnloadAll(Mod mod)
 		{
 			bool found = false;
-			foreach ((var key, ResourceInfo resource) in cachedResources.Reverse())
+			foreach (((Type type, ResourceFolder folder, string file) key, ResourceInfo resource) in cachedResources.Reverse())
 				if (resource.Mod == mod)
 				{
 					UnloadInternal(resource.Reference.Target);
@@ -551,7 +572,8 @@ namespace Kit.Modding
 
 		public static bool Unload(object reference)
 		{
-			(var key, ResourceInfo resource) = cachedResources.FirstOrDefault(kvp => kvp.Value.Reference.Target == reference);
+			((Type type, ResourceFolder folder, string file) key, ResourceInfo resource) =
+				cachedResources.FirstOrDefault(kvp => kvp.Value.Reference.Target == reference);
 
 			// Because of FirstOrDefault, kvp.file will be null if key is not found
 			if (key.file == null)
@@ -566,7 +588,7 @@ namespace Kit.Modding
 
 		public static bool Unload(Type type, ResourceFolder folder, string file)
 		{
-			var key = (type, folder, file);
+			(Type type, ResourceFolder folder, string file) key = (type, folder, file);
 
 			if (!cachedResources.TryGetValue(key, out ResourceInfo resource))
 				return false;
@@ -583,9 +605,11 @@ namespace Kit.Modding
 			if (resource is Object unityObject)
 				unityObject.Destroy();
 		}
+
 		#endregion
 
 		#region Public methods
+
 		public static void AddGroup(ModGroup group)
 		{
 			Groups.Add(group.Name, group);
@@ -623,6 +647,7 @@ namespace Kit.Modding
 				return Groups.SelectMany(g => g.Value.Mods);
 			}
 		}
+
 		#endregion
 	}
 }

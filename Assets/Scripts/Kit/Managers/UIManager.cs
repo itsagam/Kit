@@ -9,136 +9,92 @@ using Object = UnityEngine.Object;
 
 namespace Kit
 {
-	/// <summary>
-	/// State of a window.
-	/// </summary>
+	/// <summary>State of a window.</summary>
 	public enum WindowState
 	{
-		/// <summary>
-		/// The window is animating to be shown.
-		/// </summary>
+		/// <summary>The window is animating to be shown.</summary>
 		Showing,
 
-		/// <summary>
-		/// The window has been shown.
-		/// </summary>
+		/// <summary>The window has been shown.</summary>
 		Shown,
 
-		/// <summary>
-		/// The window is animating to be hidden.
-		/// </summary>
+		/// <summary>The window is animating to be hidden.</summary>
 		Hiding,
 
-		/// <summary>
-		/// The window is hidden.
-		/// </summary>
+		/// <summary>The window is hidden.</summary>
 		Hidden
 	}
 
-	/// <summary>
-	/// The action to take when a window with the same name already exists.
-	/// </summary>
+	/// <summary>The action to take when a window with the same name already exists.</summary>
 	public enum WindowConflictMode
 	{
-		/// <summary>
-		/// Keep the previous window and show the new one as well.
-		/// </summary>
+		/// <summary>Keep the previous window and show the new one as well.</summary>
 		ShowNew,
 
-		/// <summary>
-		/// Just keep the previous window.
-		/// </summary>
+		/// <summary>Just keep the previous window.</summary>
 		DontShow,
 
-		/// <summary>
-		/// Overwrite and show the data on the previous window instead.
-		/// </summary>
+		/// <summary>Overwrite and show the data on the previous window instead.</summary>
 		OverwriteData,
 
-		/// <summary>
-		/// Hide the previous window (animations and all) and show the new one.
-		/// </summary>
+		/// <summary>Hide the previous window (animations and all) and show the new one.</summary>
 		HidePrevious
 	}
 
-	/// <summary>
-	/// How to hide the window?
-	/// </summary>
+	/// <summary>How to hide the window?</summary>
 	public enum WindowHideMode
 	{
-		/// <summary>
-		/// Decide automatically. Destroys if created using a prefab and de-activates if part of the scene.
-		/// </summary>
+		/// <summary>Decide automatically. Destroys if created using a prefab and de-activates if part of the scene.</summary>
 		Auto,
 
-		/// <summary>
-		/// Deactivate the window <see cref="GameObject"/>.
-		/// </summary>
+		/// <summary>Deactivate the window <see cref="GameObject" />.</summary>
 		Deactivate,
 
-		/// <summary>
-		/// Destroy the window <see cref="GameObject"/>.
-		/// </summary>
+		/// <summary>Destroy the window <see cref="GameObject" />.</summary>
 		Destroy
 	}
 
 	/// <summary>
-	/// <para>
-	/// Global access to UI and window management. Your screens need to derive from <see cref="Window"/> which you can then show by calling
-	/// <see cref="UIManager.Show(Window, object, Transform, string, WindowConflictMode)" /> on prefabs.
-	/// </para>
-	/// <para>
-	/// You can you also call <see cref="Window.Show(object)"/>Show/<see cref="Window.Hide(WindowHideMode)"/> on them directly if they are
-	/// in the scene, for example.
-	/// </para>
+	///     <para>
+	///         Global access to UI and window management. Your screens need to derive from <see cref="Window" /> which you can then
+	///         show by calling <see cref="UIManager.Show(Window, object, Transform, string, WindowConflictMode)" /> on prefabs.
+	///     </para>
+	///     <para>
+	///         You can you also call <see cref="Window.Show(object)" />/<see cref="Window.Hide(WindowHideMode)" /> on them directly if
+	///         they are in the scene, for example.
+	///     </para>
 	/// </summary>
 	public static class UIManager
 	{
-		/// <summary>
-		/// Default conflict mode to use in calls.
-		/// </summary>
+		/// <summary>Default conflict mode to use in calls.</summary>
 		public const WindowConflictMode DefaultConflictMode = WindowConflictMode.ShowNew;
 
-		/// <summary>
-		/// Default hide mode to use in calls.
-		/// </summary>
+		/// <summary>Default hide mode to use in calls.</summary>
 		public const WindowHideMode DefaultHideMode = WindowHideMode.Auto;
 
-		/// <summary>
-		/// The sort order of the <see cref="Canvas" /> that's used for newly-created windows.
-		/// </summary>
+		/// <summary>The sort order of the <see cref="Canvas" /> that's used for newly-created windows.</summary>
 		public const int WindowCanvasOrder = 1000;
 
-		/// <summary>
-		/// List of all shown/showing windows.
-		/// </summary>
+		/// <summary>List of all shown/showing windows.</summary>
 		public static readonly List<Window> Windows = new List<Window>();
 
-		/// <summary>
-		/// Event that's called when any window is showing.
-		/// </summary>
+		/// <summary>Event that's called when any window is showing.</summary>
 		public static event Action<Window> Showing;
 
-		/// <summary>
-		/// Event that's called when any window is shown.
-		/// </summary>
+		/// <summary>Event that's called when any window is shown.</summary>
 		public static event Action<Window> Shown;
 
-		/// <summary>
-		/// Event that's called when any window is hiding.
-		/// </summary>
+		/// <summary>Event that's called when any window is hiding.</summary>
 		public static event Action<Window> Hiding;
 
-		/// <summary>
-		/// Event that's called when any window is hidden.
-		/// </summary>
+		/// <summary>Event that's called when any window is hidden.</summary>
 		public static event Action<Window> Hidden;
 
 		private static Canvas lastCanvas = null;
 
 		/// <summary>
-		/// <para>Show a window from a path.</para>
-		/// <para>Can be <c>await</c>-ed upon.</para>
+		///     <para>Show a window from a path.</para>
+		///     <para>Can be <c>await</c>-ed upon.</para>
 		/// </summary>
 		/// <param name="path">The path to window (should be in a Resources folder).</param>
 		/// <param name="data">The data to pass to the window.</param>
@@ -156,8 +112,8 @@ namespace Kit
 		}
 
 		/// <summary>
-		/// <para>Show a window using a prefab.</para>
-		/// <para>Can be <c>await</c>-ed upon.</para>
+		///     <para>Show a window using a prefab.</para>
+		///     <para>Can be <c>await</c>-ed upon.</para>
 		/// </summary>
 		/// <param name="prefab">The prefab to use for instantiating.</param>
 		/// <param name="data">The data to pass to the window.</param>
@@ -235,10 +191,10 @@ namespace Kit
 		}
 
 		/// <summary>
-		/// <para>Hide a window.</para>
-		/// <para>Can be <c>await</c>-ed upon.</para>
+		///     <para>Hide a window.</para>
+		///     <para>Can be <c>await</c>-ed upon.</para>
 		/// </summary>
-		/// <param name="name">The window (prefab/<see cref="GameObject"/>) name to hide.</param>
+		/// <param name="name">The window (prefab/<see cref="GameObject" />) name to hide.</param>
 		/// <param name="animation">The animation state to play when hiding.</param>
 		/// <param name="mode">Whether to de-activate or destroy the instance.</param>
 		/// <returns>Whether the said window existed was successfully hidden.</returns>
@@ -252,45 +208,35 @@ namespace Kit
 			return UniTask.FromResult(false);
 		}
 
-		/// <summary>
-		/// Find a shown window by providing a name.
-		/// </summary>
-		/// <param name="name">The window (prefab/<see cref="GameObject"/>) name.</param>
+		/// <summary>Find a shown window by providing a name.</summary>
+		/// <param name="name">The window (prefab/<see cref="GameObject" />) name.</param>
 		/// <returns>Reference to the window.</returns>
 		public static Window Find(string name)
 		{
 			return Windows.Find(w => w.name == name);
 		}
 
-		/// <summary>
-		/// Find the first shown window of a given class.
-		/// </summary>
+		/// <summary>Find the first shown window of a given class.</summary>
 		/// <returns>Reference to the window.</returns>
 		public static T Find<T>() where T: Window
 		{
 			return Windows.OfType<T>().FirstOrDefault();
 		}
 
-		/// <summary>
-		/// Returns whether a window with a particular name is shown.
-		/// </summary>
-		/// <param name="name">The window (prefab/<see cref="GameObject"/>) name.</param>
+		/// <summary>Returns whether a window with a particular name is shown.</summary>
+		/// <param name="name">The window (prefab/<see cref="GameObject" />) name.</param>
 		public static bool IsShown(string name)
 		{
 			return Find(name) != null;
 		}
 
-		/// <summary>
-		/// Returns whether a window of a particular type is shown.
-		/// </summary>
+		/// <summary>Returns whether a window of a particular type is shown.</summary>
 		public static bool IsShown<T>() where T: Window
 		{
 			return Find<T>() != null;
 		}
 
-		/// <summary>
-		/// Register a window in the system. Called automatically.
-		/// </summary>
+		/// <summary>Register a window in the system. Called automatically.</summary>
 		public static void Register(Window instance)
 		{
 			instance.Hidden.AddListener(() => Showing?.Invoke(instance));
@@ -312,14 +258,10 @@ namespace Kit
 			return canvas;
 		}
 
-		/// <summary>
-		/// Returns the first window shown, or <see langword="null"/> if none are.
-		/// </summary>
+		/// <summary>Returns the first window shown, or <see langword="null" /> if none are.</summary>
 		public static Window First => Windows.FirstOrDefault();
 
-		/// <summary>
-		/// Returns the last window shown, or <see langword="null"/> if none are.
-		/// </summary>
+		/// <summary>Returns the last window shown, or <see langword="null" /> if none are.</summary>
 		public static Window Last => Windows.LastOrDefault();
 	}
 }

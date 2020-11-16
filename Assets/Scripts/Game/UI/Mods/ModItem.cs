@@ -3,9 +3,9 @@ using Kit;
 using Kit.UI;
 using UnityEngine;
 using UnityEngine.UI;
-
 #if MODDING
 using Kit.Modding;
+
 #endif
 namespace Game.UI.Mods
 {
@@ -95,7 +95,7 @@ namespace Game.UI.Mods
 
 		public void SetInteractable(int index)
 		{
-			MoveUpButton.interactable = index != 0;
+			MoveUpButton.interactable = index   != 0;
 			MoveDownButton.interactable = index < transform.parent.childCount - 1;
 		}
 

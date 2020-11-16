@@ -10,9 +10,7 @@ using Debug = UnityEngine.Debug;
 
 namespace Kit
 {
-	/// <summary>
-	/// Debugging methods for logging and profiling.
-	/// </summary>
+	/// <summary>Debugging methods for logging and profiling.</summary>
 	public static class Debugger
 	{
 		#region Profiling
@@ -21,9 +19,7 @@ namespace Kit
 		private static Dictionary<string, CustomSampler> samples = new Dictionary<string, CustomSampler>();
 		private static Stack<CustomSampler> runningSamples = new Stack<CustomSampler>();
 
-		/// <summary>
-		/// Start profiling a section of code.
-		/// </summary>
+		/// <summary>Start profiling a section of code.</summary>
 		/// <param name="name">Name of the profile to be used for sampling.</param>
 		public static void StartProfile(string name)
 		{
@@ -39,17 +35,13 @@ namespace Kit
 			sample.Begin();
 		}
 
-		/// <summary>
-		/// Get the sampler of a profile.
-		/// </summary>
+		/// <summary>Get the sampler of a profile.</summary>
 		public static CustomSampler GetProfile(string name)
 		{
 			return samples.GetOrDefault(name);
 		}
 
-		/// <summary>
-		/// Stop profiling the last section of code.
-		/// </summary>
+		/// <summary>Stop profiling the last section of code.</summary>
 		public static void EndProfile()
 		{
 			runningSamples.Pop()?.End();
@@ -78,17 +70,14 @@ namespace Kit
 		#endregion
 
 		#region Logging
-		/// <summary>
-		/// The string to display for <see langword="null" /> objects.
-		/// </summary>
+
+		/// <summary>The string to display for <see langword="null" /> objects.</summary>
 		public const string NullString = "Null";
 
 
 		// Conditionals make calls to these methods not be compiled in Release builds.
 
-		/// <summary>
-		/// Log a line.
-		/// </summary>
+		/// <summary>Log a line.</summary>
 		/// <param name="line">The line to log.</param>
 		/// <param name="type">Type of log.</param>
 		[Conditional("UNITY_EDITOR")] [Conditional("DEVELOPMENT_BUILD")]
@@ -118,9 +107,7 @@ namespace Kit
 			}
 		}
 
-		/// <summary>
-		/// Log a line.
-		/// </summary>
+		/// <summary>Log a line.</summary>
 		/// <param name="category">Category of the log.</param>
 		/// <param name="line">The line to log.</param>
 		/// <param name="type">Type of log.</param>
@@ -130,9 +117,7 @@ namespace Kit
 			Log("<b>[" + category + "]</b> " + line, type);
 		}
 
-		/// <summary>
-		/// Log an object.
-		/// </summary>
+		/// <summary>Log an object.</summary>
 		/// <param name="obj">The object to log. Can be a collection or a class.</param>
 		/// <param name="serialize">Whether to serialize the object for display if it's a class.</param>
 		[Conditional("UNITY_EDITOR")] [Conditional("DEVELOPMENT_BUILD")]
@@ -141,9 +126,7 @@ namespace Kit
 			Log(ObjectToString(obj, serialize));
 		}
 
-		/// <summary>
-		/// Log an object.
-		/// </summary>
+		/// <summary>Log an object.</summary>
 		/// <param name="category">Category of the log.</param>
 		/// <param name="obj">The object to log. Can be a collection or a class.</param>
 		/// <param name="serialize">Whether to serialize the object for display if it's a class.</param>
@@ -153,9 +136,7 @@ namespace Kit
 			Log(category, ObjectToString(obj, serialize));
 		}
 
-		/// <summary>
-		/// Convert an object to a string for display.
-		/// </summary>
+		/// <summary>Convert an object to a string for display.</summary>
 		/// <param name="obj">The object to convert.</param>
 		/// <param name="serialize">Whether to serialize the object if it's a class.</param>
 		/// <param name="nullString">The string to use for <see langword="null" /> objects.</param>
@@ -167,10 +148,8 @@ namespace Kit
 			return serialize ? JsonParser.ToJson(obj) : obj.ToString();
 		}
 
-		/// <summary>
-		/// Convert an object to a string and append it to a <see cref="StringBuilder"/>.
-		/// </summary>
-		/// <param name="output">The <see cref="StringBuilder"/> to append the result to.</param>
+		/// <summary>Convert an object to a string and append it to a <see cref="StringBuilder" />.</summary>
+		/// <param name="output">The <see cref="StringBuilder" /> to append the result to.</param>
 		/// <param name="obj">The object to convert.</param>
 		/// <param name="serialize">Whether to serialize the object if it's a class.</param>
 		/// <param name="nullString">The string to use for <see langword="null" /> objects.</param>
@@ -178,6 +157,7 @@ namespace Kit
 		{
 			output.Append(ObjectToString(obj, serialize, nullString));
 		}
+
 		#endregion
 	}
 }
