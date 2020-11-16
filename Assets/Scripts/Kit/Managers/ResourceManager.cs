@@ -3,14 +3,13 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Cysharp.Threading.Tasks;
-using Kit.Modding;
 using Kit.Parsers;
 using UnityEngine;
 using UnityEngine.Networking;
 using Object = UnityEngine.Object;
 
 #if MODDING
-
+using Kit.Modding;
 #endif
 
 namespace Kit
