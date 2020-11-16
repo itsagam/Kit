@@ -1,0 +1,586 @@
+<?xml version="1.0" encoding="utf-8"?>
+<topic id="Structure" revisionNumber="1">
+	<developerConceptualDocument xmlns="http://ddue.schemas.microsoft.com/authoring/2003/5" xmlns:xlink="http://www.w3.org/1999/xlink">
+		<introduction>
+			<para>The kit files are structured as below:</para>
+		</introduction>
+
+		<section>
+			<title>Base folder</title>
+			<content>
+				<table>
+					<tableHeader>
+						<row>
+							<entry>
+								<para>Path</para>
+							</entry>
+							<entry>
+								<para>Description</para>
+							</entry>
+						</row>
+					</tableHeader>
+					<row>
+						<entry>
+							<para>
+								Assets folder
+							</para>
+						</entry>
+						<entry>
+							<para><link xlink:href="#Assets"> See below.</link></para>
+						</entry>
+					</row>
+					<row>
+						<entry>
+							<para>
+								Documentation
+							</para>
+						</entry>
+						<entry>
+							<para>Sources for this help file.</para>
+						</entry>
+					</row>
+					<row>
+						<entry>
+							<para>
+								Mods
+							</para>
+						</entry>
+						<entry>
+							<para>Sample mods.</para>
+						</entry>
+					</row>
+					<row>
+						<entry>
+							<para>Tools</para>
+						</entry>
+						<entry>
+							<para>Compile-time XLua tools.</para>
+						</entry>
+					</row>
+				</table>
+			</content>
+		</section>
+
+		<section address="Assets">
+			<title>Assets folder</title>
+			<content>
+				<table>
+					<tableHeader>
+						<row>
+							<entry>
+								<para>Path</para>
+							</entry>
+							<entry>
+								<para>Description</para>
+							</entry>
+						</row>
+					</tableHeader>
+					<row>
+						<entry>
+							<para>
+								<legacyBold>Demos</legacyBold>
+							</para>
+						</entry>
+						<entry>
+							<para>Demos for the kit.</para>
+						</entry>
+					</row>
+					<row>
+						<entry>
+							<para>
+								<legacyBold>Extra</legacyBold>
+							</para>
+						</entry>
+						<entry>
+							<para>
+								Specialized systems.
+							</para>
+						</entry>
+					</row>
+					<row>
+						<entry>
+							<para>
+								<legacyBold>Prefabs</legacyBold>
+							</para>
+						</entry>
+						<entry>
+							<para></para>
+						</entry>
+					</row>
+					<row>
+						<entry>
+							<para>
+								<token>Tab</token>UI/General
+							</para>
+						</entry>
+						<entry>
+							<para>Common UI elements that you can just drag-&amp;-drop into your game.</para>
+						</entry>
+					</row>
+					<row>
+						<entry>
+							<para>
+								<legacyBold>Scripts/Kit</legacyBold>
+							</para>
+						</entry>
+						<entry>
+							<para>Kit-specific code.</para>
+						</entry>
+					</row>
+					<row>
+						<entry>
+							<para>
+								<token>Tab</token>
+								<legacyBold>Behaviours</legacyBold>
+							</para>
+						</entry>
+						<entry>
+							<para>MonoBehaviours for all occasions.</para>
+						</entry>
+					</row>
+					<row>
+						<entry>
+							<para>
+								<token>Tab</token>
+								<legacyBold>Containers</legacyBold>
+							</para>
+						</entry>
+						<entry>
+							<para>Collections and data containers.</para>
+						</entry>
+					</row>
+					<row>
+						<entry>
+							<para>
+								<token>Tab</token><token>Tab</token>Stats
+							</para>
+						</entry>
+						<entry>
+							<para>Stat system.</para>
+						</entry>
+					</row>
+					<row>
+						<entry>
+							<para>
+								<token>Tab</token><token>Tab</token>Json
+							</para>
+						</entry>
+						<entry>
+							<para>Json utitilies.</para>
+						</entry>
+					</row>
+					<row>
+						<entry>
+							<para>
+								<token>Tab</token>
+								<legacyBold>Helpers</legacyBold>
+							</para>
+						</entry>
+						<entry>
+							<para>Helper functions, algorithms and extension methods.</para>
+						</entry>
+					</row>
+					<row>
+						<entry>
+							<para>
+								<token>Tab</token><token>Tab</token>Algorithms
+							</para>
+						</entry>
+						<entry>
+							<para>Implementations of common algorithms.</para>
+						</entry>
+					</row>
+					<row>
+						<entry>
+							<para>
+								<token>Tab</token><token>Tab</token>Extensions
+							</para>
+						</entry>
+						<entry>
+							<para>Extension methods to ease development.</para>
+						</entry>
+					</row>
+					<row>
+						<entry>
+							<para>
+								<token>Tab</token><token>Tab</token>Methods
+							</para>
+						</entry>
+						<entry>
+							<para>Helper function library.</para>
+						</entry>
+					</row>
+					<row>
+						<entry>
+							<para>
+								<token>Tab</token><token>Tab</token>Patterns
+							</para>
+						</entry>
+						<entry>
+							<para>Design patterns.</para>
+						</entry>
+					</row>
+					<row>
+						<entry>
+							<para>
+								<token>Tab</token>
+								<legacyBold>Managers</legacyBold>
+							</para>
+						</entry>
+						<entry>
+							<para>Global managers.</para>
+						</entry>
+					</row>
+					<row>
+						<entry>
+							<para>
+								<token>Tab</token>
+								<token>Tab</token>
+								<codeEntityReference>T:Kit.ResourceManager</codeEntityReference>
+							</para>
+						</entry>
+						<entry>
+							<para>Resource loading, unloading, caching, reading, saving and parsing.</para>
+						</entry>
+					</row>
+					<row>
+						<entry>
+							<para>
+								<token>Tab</token>
+								<token>Tab</token>
+								<codeEntityReference>T:Kit.UIManager</codeEntityReference>
+							</para>
+						</entry>
+						<entry>
+							<para>UI and window management system.</para>
+						</entry>
+					</row>
+					<row>
+						<entry>
+							<para>
+								<token>Tab</token>
+								<token>Tab</token>
+								<codeEntityReference>T:Kit.SceneDirector</codeEntityReference>
+							</para>
+						</entry>
+						<entry>
+							<para>Fade in/out screens or load scenes with it.</para>
+						</entry>
+					</row>
+					<row>
+						<entry>
+							<para>
+								<token>Tab</token>
+								<token>Tab</token>
+								<codeEntityReference>T:Kit.AudioManager</codeEntityReference>
+							</para>
+						</entry>
+						<entry>
+							<para>Play &amp; pool sounds and group them into AudioSources. Handle music.</para>
+						</entry>
+					</row>
+					<row>
+						<entry>
+							<para>
+								<token>Tab</token>
+								<token>Tab</token>
+								<codeEntityReference>T:Kit.EffectsManager</codeEntityReference>
+							</para>
+						</entry>
+						<entry>
+							<para>Spawn/de-spawn and pool particle effects.</para>
+						</entry>
+					</row>
+					<row>
+						<entry>
+							<para>
+								<token>Tab</token>
+								<token>Tab</token>
+								<codeEntityReference>T:Kit.SettingsManager</codeEntityReference>
+							</para>
+						</entry>
+						<entry>
+							<para>Save/load device-specific app-wide settings.</para>
+						</entry>
+					</row>
+					<row>
+						<entry>
+							<para>
+								<token>Tab</token>
+								<legacyBold>Modding</legacyBold>
+							</para>
+						</entry>
+						<entry>
+							<para>The modding system.</para>
+						</entry>
+					</row>
+					<row>
+						<entry>
+							<para>
+								<token>Tab</token><token>Tab</token>Loaders
+							</para>
+						</entry>
+						<entry>
+							<para>Handlers for loading mods of different file-types.</para>
+						</entry>
+					</row>
+					<row>
+						<entry>
+							<para>
+								<token>Tab</token><token>Tab</token>Managers
+							</para>
+						</entry>
+						<entry>
+							<para>Core modding system classes.</para>
+						</entry>
+					</row>
+					<row>
+						<entry>
+							<para>
+								<token>Tab</token><token>Tab</token>Parsers
+							</para>
+						</entry>
+						<entry>
+							<para>
+								Handlers for parsing different types of files from mods and <codeEntityReference>T:Kit.ResourceManager</codeEntityReference>.
+							</para>
+						</entry>
+					</row>
+					<row>
+						<entry>
+							<para>
+								<token>Tab</token><token>Tab</token>Scripting
+							</para>
+						</entry>
+						<entry>
+							<para>Support for executing Lua scripts from mods.</para>
+						</entry>
+					</row>
+					<row>
+						<entry>
+							<para>
+								<token>Tab</token>
+								<legacyBold>UI</legacyBold>
+							</para>
+						</entry>
+						<entry>
+							<para></para>
+						</entry>
+					</row>
+					<row>
+						<entry>
+							<para>
+								<token>Tab</token><token>Tab</token>Behaviours
+							</para>
+						</entry>
+						<entry>
+							<para>Common MonoBehaviours for UI elements.</para>
+						</entry>
+					</row>
+					<row>
+						<entry>
+							<para>
+								<token>Tab</token><token>Tab</token>Buttons
+							</para>
+						</entry>
+						<entry>
+							<para>Common functionalities for buttons.</para>
+						</entry>
+					</row>
+					<row>
+						<entry>
+							<para>
+								<token>Tab</token><token>Tab</token>General
+							</para>
+						</entry>
+						<entry>
+							<para>Most common UI elements.</para>
+						</entry>
+					</row>
+					<row>
+						<entry>
+							<para>
+								<token>Tab</token><token>Tab</token>Layout
+							</para>
+						</entry>
+						<entry>
+							<para>Scripts for UI layouts.</para>
+						</entry>
+					</row>
+					<row>
+						<entry>
+							<para>
+								<token>Tab</token><token>Tab</token>Message
+							</para>
+						</entry>
+						<entry>
+							<para>
+								A premade <codeEntityReference>T:Kit.UI.Window</codeEntityReference> for showing general game messages.
+							</para>
+						</entry>
+					</row>
+					<row>
+						<entry>
+							<para>
+								<token>Tab</token><token>Tab</token>Widgets
+							</para>
+						</entry>
+						<entry>
+							<para>More UI elements.</para>
+						</entry>
+					</row>
+					<row>
+						<entry>
+							<para>
+								<token>Tab</token>
+								<legacyBold>Utilities</legacyBold>
+							</para>
+						</entry>
+						<entry>
+							<para></para>
+						</entry>
+					</row>
+					<row>
+						<entry>
+							<para>
+								<token>Tab</token>
+								<token>Tab</token>
+								<codeEntityReference>T:Kit.Console</codeEntityReference>
+							</para>
+						</entry>
+						<entry>
+							<para>In-game Lua Console brought up with tilde (~).</para>
+						</entry>
+					</row>
+					<row>
+						<entry>
+							<para>
+								<token>Tab</token>
+								<token>Tab</token>
+								<codeEntityReference>T:Kit.Pooling.Pooler</codeEntityReference>
+							</para>
+						</entry>
+						<entry>
+							<para>GameObject pooling and grouping.</para>
+						</entry>
+					</row>
+					<row>
+						<entry>
+							<para>
+								<legacyBold>Scripts/Game</legacyBold>
+							</para>
+						</entry>
+						<entry>
+							<para>Your game code.</para>
+						</entry>
+					</row>
+					<row>
+						<entry>
+							<para>
+								<token>Tab</token>
+								<legacyBold>Data</legacyBold>
+							</para>
+						</entry>
+						<entry>
+							<para>Classes for game data.</para>
+						</entry>
+					</row>
+					<row>
+						<entry>
+							<para>
+								<token>Tab</token><token>Tab</token>DataManager
+							</para>
+						</entry>
+						<entry>
+							<para>Manager for handling game state and data.</para>
+						</entry>
+					</row>
+					<row>
+						<entry>
+							<para>
+								<token>Tab</token><token>Tab</token>GameData
+							</para>
+						</entry>
+						<entry>
+							<para>POCO object to load game data into.</para>
+						</entry>
+					</row>
+					<row>
+						<entry>
+							<para>
+								<token>Tab</token><token>Tab</token>GameState
+							</para>
+						</entry>
+						<entry>
+							<para>POCO object to load game state into.</para>
+						</entry>
+					</row>
+					<row>
+						<entry>
+							<para>
+								<token>Tab</token>
+								<legacyBold>UI</legacyBold>
+							</para>
+						</entry>
+						<entry>
+							<para>Game UI.</para>
+						</entry>
+					</row>
+					<row>
+						<entry>
+							<para>
+								<token>Tab</token><token>Tab</token>Menu
+							</para>
+						</entry>
+						<entry>
+							<para>Main menu code.</para>
+						</entry>
+					</row>
+					<row>
+						<entry>
+							<para>
+								<token>Tab</token><token>Tab</token>Mods
+							</para>
+						</entry>
+						<entry>
+							<para>Mod window code.</para>
+						</entry>
+					</row>
+					<row>
+						<entry>
+							<para>
+								<token>Tab</token><token>Tab</token>Settings
+							</para>
+						</entry>
+						<entry>
+							<para>Settings window code.</para>
+						</entry>
+					</row>
+					<row>
+						<entry>
+							<para>
+								<token>Tab</token><token>Tab</token>Splash
+							</para>
+						</entry>
+						<entry>
+							<para>Splash screen code.</para>
+						</entry>
+					</row>
+					<row>
+						<entry>
+							<para>
+								<legacyBold>ThirdParty</legacyBold>
+							</para>
+						</entry>
+						<entry>
+							<para>Third-party plugins.</para>
+						</entry>
+					</row>
+				</table>
+			</content>
+		</section>
+
+		<relatedTopics>
+		</relatedTopics>
+	</developerConceptualDocument>
+</topic>

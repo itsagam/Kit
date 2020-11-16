@@ -24,7 +24,7 @@ namespace Kit
 		FadeOutIn
 	}
 
-	/// <summary>Allows to fade in/out scenes or load them with it. Provides hooks.</summary>
+	/// <summary>Fade in/out screens or load scenes with it. Provides hooks.</summary>
 	public static class SceneDirector
 	{
 		/// <summary>Default fade mode to use in calls.</summary>

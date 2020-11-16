@@ -2,13 +2,13 @@
 <topic id="Welcome" revisionNumber="1">
 	<developerConceptualDocument xmlns="http://ddue.schemas.microsoft.com/authoring/2003/5" xmlns:xlink="http://www.w3.org/1999/xlink">
 		<introduction>
-			<para>Introduction</para>
+			<para>Stub description.</para>
 		</introduction>
 
 		<section>
-			<title>Section title</title>
+			<title>Stub title.</title>
 			<content>
-          Section content.
+				<para>Stub content.</para>
 			</content>
 		</section>
 

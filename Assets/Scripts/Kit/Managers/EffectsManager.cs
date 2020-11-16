@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace Kit
 {
-	/// <summary>Handles Spawning/De-spawning and Pooling of particle effects.</summary>
+	/// <summary>Handles spawning/de-spawning and pooling of particle effects.</summary>
 	public static class EffectsManager
 	{
 		/// <summary>The pooling group name to use for effects.</summary>
