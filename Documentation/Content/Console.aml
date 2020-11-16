@@ -5,7 +5,7 @@
 		<introduction>
 			<para>
 				There is a custom in-game <codeEntityReference>T:Kit.Console</codeEntityReference> integrated into the kit that can be brought up by
-				pressing tilde (~) on PC and a flicking down on mobile. The console displays all Log messages and supports Lua scripting. This should come
+				pressing tilde (~) on PC or flicking down on mobile. The console displays all Log messages and supports Lua scripting. This should come
 				in handy in situations where you want to debug or tweak the game.
 			</para>
 			<para>
