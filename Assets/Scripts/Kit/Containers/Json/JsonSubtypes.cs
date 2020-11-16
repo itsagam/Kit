@@ -15,9 +15,9 @@ using TypeInfo = System.Type;
 namespace Kit.Containers
 {
 	/// <summary>
-	///     <para>Allows to create instances of subclasses depending on JSON.</para>
-	///     <para>See <see href="https://github.com/manuc66/JsonSubTypes" />.</para>
+	///     Allows to create instances of subclasses depending on Json.
 	/// </summary>
+	/// <seealso href="https://github.com/manuc66/JsonSubTypes"/>
 
 	//  MIT License
 	//

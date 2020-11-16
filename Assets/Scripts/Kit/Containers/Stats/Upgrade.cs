@@ -7,10 +7,14 @@ namespace Kit.Containers
 {
 	/// <summary>
 	/// Any entity (POCO or <see cref="Sirenix.OdinInspector.SerializedMonoBehaviour"/>) that wishes to have stats should implement this
-	/// interface and provide a list of Upgrades.
+	/// interface and provide a list of <see cref="Upgrade"/>s.
 	/// </summary>
 	public interface IUpgradeable
 	{
+		/// <summary>
+		/// Return a <see cref="ReactiveCollection{T}"/> of all the upgrades applied.
+		/// </summary>
+		/// <returns></returns>
 		ReactiveCollection<Upgrade> GetUpgrades();
 	}
 
@@ -33,7 +37,7 @@ namespace Kit.Containers
 		public string ID;
 
 		/// <summary>
-		/// List of effects this upgrades causes.
+		/// List of effects this upgrade causes.
 		/// </summary>
 		public List<Effect> Effects = new List<Effect>();
 

@@ -3,27 +3,38 @@
 	<developerConceptualDocument xmlns="http://ddue.schemas.microsoft.com/authoring/2003/5" xmlns:xlink="http://www.w3.org/1999/xlink">
 
 		<introduction>
-			<para>
-				There is a custom in-game <codeEntityReference>T:Kit.Console</codeEntityReference> integrated into the kit that can be brought up by
-				pressing tilde (~) on PC or flicking down on mobile. The console displays all Log messages and supports Lua scripting. This should come
-				in handy in situations where you want to debug or tweak the game.
-			</para>
-			<para>
-				There is no need to bind commands to the console — it has full access to your game code. XLua does, however, require classes be referred
-				to by their fully-qualified name, starting with <codeInline>CS</codeInline>. So <codeInline>GameObject("MyObject")</codeInline> or
-				<codeInline>DataManager.GameData</codeInline> will not work but
-				<codeInline>CS.UnityEngine.GameObject("MyObject")</codeInline> and <codeInline>CS.Game.DataManager.GameData</codeInline> will. To ease the
-				pain of typing <codeInline>CS.</codeInline> over and over again labels <codeInline>UE</codeInline>, <codeInline>Kit</codeInline> and
-				<codeInline>Game</codeInline> have been bound to <codeInline>CS.UnityEngine</codeInline>, <codeInline>CS.Kit</codeInline> and
-				<codeInline>CS.Game</codeInline> respectively (see <localUri>Resources/Lua/General.lua.txt</localUri>) so
-				<codeInline>UE.GameObject("MyObject")</codeInline> and <codeInline>Game.DataManager.GameData</codeInline> will work just as well.
-			</para>
-			<alert class="note">
-				<para>
-					You can, if you so desire, add new functions and commands to the console for easier access by modifying
-					<localUri>Resources/Lua/Console.lua.txt</localUri>.
-				</para>
-			</alert>
+			<table>
+				<row>
+					<entry>
+						<para>
+							There is a custom in-game <codeEntityReference>T:Kit.Console</codeEntityReference> integrated into the kit that can be brought up by
+							pressing tilde (~) on PC or flicking down on mobile. The console displays all Log messages and supports Lua scripting. This should come
+							in handy in situations where you want to debug or tweak the game.
+						</para>
+						<para>
+							There is no need to bind commands to the console — it has full access to your game code. XLua does, however, require classes be referred
+							to by their fully-qualified name, starting with <codeInline>CS</codeInline>. So <codeInline>GameObject("MyObject")</codeInline> or
+							<codeInline>DataManager.GameData</codeInline> will not work but
+							<codeInline>CS.UnityEngine.GameObject("MyObject")</codeInline> and <codeInline>CS.Game.DataManager.GameData</codeInline> will. To ease the
+							pain of typing <codeInline>CS.</codeInline> over and over again labels <codeInline>UE</codeInline>, <codeInline>Kit</codeInline> and
+							<codeInline>Game</codeInline> have been bound to <codeInline>CS.UnityEngine</codeInline>, <codeInline>CS.Kit</codeInline> and
+							<codeInline>CS.Game</codeInline> respectively (see <localUri>Resources/Lua/General.lua.txt</localUri>) so
+							<codeInline>UE.GameObject("MyObject")</codeInline> and <codeInline>Game.DataManager.GameData</codeInline> will work just as well.
+						</para>
+						<alert class="note">
+							<para>
+								You can, if you so desire, add new functions and commands to the console for easier access by modifying
+								<localUri>Resources/Lua/Console.lua.txt</localUri>.
+							</para>
+						</alert>
+					</entry>
+					<entry>
+						<mediaLink>
+							<image xlink:href="Console" placement="far"/>
+						</mediaLink>
+					</entry>
+				</row>
+			</table>
 		</introduction>
 
 		<section>
