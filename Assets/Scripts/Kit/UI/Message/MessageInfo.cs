@@ -36,17 +36,35 @@ namespace Kit.UI.Message
 	/// <summary>Button configurations for a <see cref="MessageWindow" />.</summary>
 	public enum MessageButtons
 	{
+		/// <summary>Just the OK button.</summary>
 		OK,
+
+		/// <summary>OK and Cancel buttons.</summary>
 		OKCancel,
+
+		/// <summary>Yes and No buttons.</summary>
 		YesNo,
+
+		/// <summary>Yes, No and Cancel buttons.</summary>
 		YesNoCancel
 	}
 
 	/// <summary>The type of message in a <see cref="MessageWindow" />.</summary>
 	public enum MessageType
 	{
+		/// <summary>
+		/// The message is to alert the user.
+		/// </summary>
 		Alert,
+
+		/// <summary>
+		/// The message is to inform the user.
+		/// </summary>
 		Info,
+
+		/// <summary>
+		/// The message is to ask the user.
+		/// </summary>
 		Question
 	}
 }

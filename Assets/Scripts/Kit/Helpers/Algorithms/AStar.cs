@@ -47,7 +47,7 @@ namespace Kit.Algorithms
 	}
 
 	/// <summary>
-	///     <para>Represents a linked-list of nodes and a running total of cost.</para>
+	///     <para>Represents a linked-list of nodes and the running total of cost.</para>
 	///     <para>Result spited out by the <see cref="AStar" /> algorithm.</para>
 	/// </summary>
 	/// <typeparam name="T">The type of a node.</typeparam>
@@ -73,6 +73,7 @@ namespace Kit.Algorithms
 		{
 		}
 
+		/// <summary>Add a new step to this <see cref="Path{T}" /> with the given <paramref name="stepCost" />.</summary>
 		public Path<T> AddStep(T step, int stepCost)
 		{
 			return new Path<T>(step, this, TotalCost + stepCost);
@@ -90,10 +91,13 @@ namespace Kit.Algorithms
 		}
 	}
 
+	/// <summary>An implementation of the <see href="https://en.wikipedia.org/wiki/Priority_queue" /> data structure.</summary>
+	/// <typeparam name="T">Type of the elements to queue.</typeparam>
 	public class PriorityQueue<T>
 	{
 		private SortedDictionary<int, Queue<T>> list = new SortedDictionary<int, Queue<T>>();
 
+		/// <summary>Add an element with the given priority.</summary>
 		public void Enqueue(int priority, T value)
 		{
 			if (!list.TryGetValue(priority, out var q))
@@ -105,6 +109,7 @@ namespace Kit.Algorithms
 			q.Enqueue(value);
 		}
 
+		/// <summary>Remove the last element.</summary>
 		public T Dequeue()
 		{
 			(int key, var value) = list.First();

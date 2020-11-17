@@ -40,6 +40,7 @@ namespace Kit.Containers
 	//  SOFTWARE.
 	public class JsonSubtypes: JsonConverter
 	{
+		/// <summary>The attribute to place on child classes for <see cref="JsonSubtypes" />.</summary>
 		[AttributeUsage(AttributeTargets.Class | AttributeTargets.Interface, AllowMultiple = true)]
 		public class KnownSubTypeAttribute: Attribute
 		{
@@ -53,6 +54,7 @@ namespace Kit.Containers
 			}
 		}
 
+		/// <summary>The attribute to place on child classes for <see cref="JsonSubtypes" /> (with property distinguishment).</summary>
 		[AttributeUsage(AttributeTargets.Class | AttributeTargets.Interface, AllowMultiple = true)]
 		public class KnownSubTypeWithPropertyAttribute: Attribute
 		{

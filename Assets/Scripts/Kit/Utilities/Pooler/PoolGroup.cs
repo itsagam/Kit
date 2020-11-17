@@ -7,7 +7,7 @@ using UnityEngine;
 namespace Kit.Pooling
 {
 	/// <summary>
-	///     A PoolGroup represents a collection of <see cref="Pool" /> grouped by name. Can be used to group together pools of
+	///     A PoolGroup represents a collection of <see cref="Pool" />s grouped by name. Can be used to group together pools of
 	///     different types and components, or configure them together.
 	/// </summary>
 	[AddComponentMenu("Pooling/PoolGroup")]

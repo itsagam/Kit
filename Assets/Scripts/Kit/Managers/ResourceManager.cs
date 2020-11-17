@@ -7,9 +7,9 @@ using Kit.Parsers;
 using UnityEngine;
 using UnityEngine.Networking;
 using Object = UnityEngine.Object;
-
 #if MODDING
 using Kit.Modding;
+
 #endif
 
 namespace Kit
@@ -67,8 +67,8 @@ namespace Kit
 	///     for modding and async methods.
 	/// </summary>
 	/// <remarks>
-	///     Can handle file-names without extensions from <see cref="ResourceFolder.Resources" />. Otherwise you have to provide
-	///     it, as you can't enumerate and match files in <see cref="ResourceFolder.StreamingAssets" /> on platforms like Android.
+	///     Can handle file-names without extensions from <see cref="ResourceFolder.Resources" />. Otherwise you have to provide it,
+	///     as you can't enumerate and match files in <see cref="ResourceFolder.StreamingAssets" /> on platforms like Android.
 	/// </remarks>
 	/// <example>
 	///     <code>
@@ -208,7 +208,7 @@ namespace Kit
 		}
 
 		/// <summary>
-		///     <para>Load and cache a resource. Can be <c>await</c>-ed.</para>
+		///     <para>Load and cache a resource asynchronously.</para>
 		///     <para>
 		///         If <paramref name="folder" /> is <see cref="ResourceFolder.Resources" /> the asset is loaded with Resources.Load. If
 		///         it's not, it's parsed manually with the list of parsers registered.
@@ -244,7 +244,7 @@ namespace Kit
 		}
 
 		/// <summary>
-		///     <para>Load and cache a resource. Can be <c>await</c>-ed.</para>
+		///     <para>Load and cache a resource asynchronously.</para>
 		///     <para>
 		///         If <paramref name="folder" /> is <see cref="ResourceFolder.Resources" /> the asset is loaded with Resources.Load. If
 		///         it's not, it's parsed manually with the list of parsers registered.
@@ -350,7 +350,7 @@ namespace Kit
 
 
 		/// <summary>
-		///     <para>Load and cache a resource without regarding mods. Can be <c>await</c>-ed.</para>
+		///     <para>Load and cache a resource asynchronously without regarding mods.</para>
 		///     <para>
 		///         If <paramref name="folder" /> is <see cref="ResourceFolder.Resources" /> the asset is loaded with  If it's not, it's
 		///         parsed manually with the list of parsers registered.
@@ -367,7 +367,7 @@ namespace Kit
 
 
 		/// <summary>
-		///     <para>Load and cache a resource without regarding mods. Can be <c>await</c>-ed.</para>
+		///     <para>Load and cache a resource asynchronously without regarding mods.</para>
 		///     <para>
 		///         If <paramref name="folder" /> is <see cref="ResourceFolder.Resources" /> the asset is loaded with  If it's not, it's
 		///         parsed manually with the list of parsers registered.
@@ -492,8 +492,8 @@ namespace Kit
 
 		/// <summary>
 		///     <para>
-		///         Load a resource merging the game version with all the mod versions and cache it. Useful to allow modding of
-		///         configuration files like Json. Can be <c>await</c>-ed upon.
+		///         Load a resource asynchronously merging the game version with all the mod versions and cache it. Useful to allow modding
+		///         of configuration files like Json.
 		///     </para>
 		///     <para>
 		///         If <paramref name="folder" /> is <see cref="ResourceFolder.Resources" /> the base asset is loaded with Resources.Load.
@@ -511,8 +511,8 @@ namespace Kit
 
 		/// <summary>
 		///     <para>
-		///         Load a resource merging the game version with all the mod versions and cache it. Useful to allow modding of
-		///         configuration files like Json. Can be <c>await</c>-ed upon.
+		///         Load a resource asynchronously merging the game version with all the mod versions and cache it. Useful to allow modding
+		///         of configuration files like Json.
 		///     </para>
 		///     <para>
 		///         If <paramref name="folder" /> is <see cref="ResourceFolder.Resources" /> the base asset is loaded with Resources.Load.
@@ -635,7 +635,7 @@ namespace Kit
 			return default;
 		}
 
-		/// <summary>Load a resource from an absolute path with the list of parsers registered. Does not cache. Can be <c>await</c>-ed.</summary>
+		/// <summary>Load a resource asynchronously from an absolute path with the list of parsers registered. Does not cache.</summary>
 		/// <param name="fullPath">Absolute path to the resource.</param>
 		/// <typeparam name="T">Type of the resource expected.</typeparam>
 		/// <returns>Reference to the resource.</returns>
@@ -644,7 +644,7 @@ namespace Kit
 			return (T) (await LoadExAsync(typeof(T), fullPath)).reference;
 		}
 
-		/// <summary>Load a resource from an absolute path with the list of parsers registered. Does not cache. Can be <c>await</c>-ed.</summary>
+		/// <summary>Load a resource asynchronously from an absolute path with the list of parsers registered. Does not cache.</summary>
 		/// <param name="type">Type of the resource expected.</param>
 		/// <param name="fullPath">Absolute path to the resource.</param>
 		/// <returns>Reference to the resource.</returns>
@@ -653,7 +653,7 @@ namespace Kit
 			return (await LoadExAsync(type, fullPath)).reference;
 		}
 
-		/// <summary>Load a resource from an absolute path with the list of parsers registered. Does not cache. Can be <c>await</c>-ed.</summary>
+		/// <summary>Load a resource asynchronously from an absolute path with the list of parsers registered. Does not cache.</summary>
 		/// <param name="type">Type of the resource expected.</param>
 		/// <param name="fullPath">Absolute path to the resource.</param>
 		/// <returns>Reference to the resource and the parser used to decode it.</returns>
@@ -778,13 +778,11 @@ namespace Kit
 				Resources.UnloadUnusedAssets();
 		}
 
-		/// <summary>Clear the cache and (optionally) unload assets not in use. Can be <c>await</c>-ed.</summary>
-		/// <param name="unload">Whether to unload assets.</param>
-		public static async UniTask ClearCacheAsync(bool unload = false)
+		/// <summary>Clear the cache and unload assets not in use asynchronously.</summary>
+		public static async UniTask ClearCacheAsync()
 		{
 			cachedResources.Clear();
-			if (unload)
-				await Resources.UnloadUnusedAssets();
+			await Resources.UnloadUnusedAssets();
 		}
 
 		#endregion
@@ -811,7 +809,7 @@ namespace Kit
 			return ReadText(GetPath(folder, file));
 		}
 
-		/// <summary>Read the contents of a file in text mode. Can be <c>await</c>-ed.</summary>
+		/// <summary>Read the contents of a file asynchronously in text mode.</summary>
 		/// <param name="folder">The folder to read the file from.</param>
 		/// <param name="file">The path and file-name relative to the <paramref name="folder" />.</param>
 		/// <param name="modded">Whether to allow mods to provide their version of the file instead. Has no effect if MODDING is not defined.</param>
@@ -847,7 +845,7 @@ namespace Kit
 			return ReadBytes(GetPath(folder, file));
 		}
 
-		/// <summary>Read the contents of a file in binary mode. Can be <c>await</c>-ed.</summary>
+		/// <summary>Read the contents of a file asynchronously in binary mode.</summary>
 		/// <param name="folder">The folder to read the file from.</param>
 		/// <param name="file">The path and file-name relative to the <paramref name="folder" />.</param>
 		/// <param name="modded">Whether to allow mods to provide their version of the file instead. Has no effect if MODDING is not defined.</param>
@@ -881,7 +879,7 @@ namespace Kit
 			}
 		}
 
-		/// <summary>Read the contents of a file in text mode. Can be <c>await</c>-ed.</summary>
+		/// <summary>Read the contents of a file asynchronously in text mode.</summary>
 		/// <param name="fullPath">Absolute path to the file.</param>
 		/// <returns>Contents of the file as a string.</returns>
 		public static async UniTask<string> ReadTextAsync(string fullPath)
@@ -908,7 +906,7 @@ namespace Kit
 			}
 		}
 
-		/// <summary>Read the contents of a file in binary mode. Can be <c>await</c>-ed.</summary>
+		/// <summary>Read the contents of a file asynchronously in binary mode.</summary>
 		/// <param name="fullPath">Absolute path to the file.</param>
 		/// <returns>Contents of the file as a byte array.</returns>
 		public static async UniTask<byte[]> ReadBytesAsync(string fullPath)
@@ -940,7 +938,7 @@ namespace Kit
 			return Save(GetPath(folder, file), contents);
 		}
 
-		/// <summary>Save the contents of an object to a file. Can be <c>await</c>-ed.</summary>
+		/// <summary>Save the contents of an object asynchronously to a file.</summary>
 		/// <remarks>A parser is chosen based on the type of the object to serialize it.</remarks>
 		/// <param name="folder">The folder where the file should exist.</param>
 		/// <param name="file">The path and file-name relative to the <paramref name="folder" />.</param>
@@ -975,7 +973,7 @@ namespace Kit
 			return false;
 		}
 
-		/// <summary>Save the contents of an object to a file. Can be <c>await</c>-ed.</summary>
+		/// <summary>Save the contents of an object asynchronously to a file.</summary>
 		/// <remarks>A parser is chosen based on the type of the object to serialize it.</remarks>
 		/// <param name="fullPath">Absolute path to the file.</param>
 		/// <param name="contents">The object to save.</param>
@@ -1008,7 +1006,7 @@ namespace Kit
 			return SaveText(GetPath(folder, file), contents);
 		}
 
-		/// <summary>Save text content to a file. Can be <c>await</c>-ed.</summary>
+		/// <summary>Save text content asynchronously to a file.</summary>
 		/// <param name="folder">The folder where the file should exist.</param>
 		/// <param name="file">The path and file-name relative to the <paramref name="folder" />.</param>
 		/// <param name="contents">The string to save.</param>
@@ -1028,7 +1026,7 @@ namespace Kit
 			return SaveBytes(GetPath(folder, file), bytes);
 		}
 
-		/// <summary>Save binary content to a file. Can be <c>await</c>-ed.</summary>
+		/// <summary>Save binary content asynchronously to a file.</summary>
 		/// <param name="folder">The folder where the file should exist.</param>
 		/// <param name="file">The path and file-name relative to the <paramref name="folder" />.</param>
 		/// <param name="bytes">The byte array to save.</param>
@@ -1057,7 +1055,7 @@ namespace Kit
 			}
 		}
 
-		/// <summary>Save text content to a file. Can be <c>await</c>-ed.</summary>
+		/// <summary>Save text content asynchronously to a file.</summary>
 		/// <param name="fullPath">Absolute path to the file.</param>
 		/// <param name="contents">The string to save.</param>
 		/// <returns>Whether the file was successfully saved.</returns>
@@ -1096,7 +1094,7 @@ namespace Kit
 			}
 		}
 
-		/// <summary>Save binary content to a file. Can be <c>await</c>-ed.</summary>
+		/// <summary>Save binary content asynchronously to a file.</summary>
 		/// <param name="fullPath">Absolute path to the file.</param>
 		/// <param name="bytes">The byte array to save.</param>
 		/// <returns>Whether the file was successfully saved.</returns>

@@ -1,4 +1,5 @@
 using System;
+using Cysharp.Threading.Tasks;
 using Sirenix.OdinInspector;
 using UnityEngine;
 using Object = UnityEngine.Object;
@@ -40,7 +41,7 @@ namespace Kit.UI
 	/// <summary>
 	///     A class that allows one to select assets in the inspector without hard-referencing them. Saves their path instead which
 	///     can later be used to load with <see cref="Load" /> or manually with <see cref="ResourceManager" /> or
-	///     <see cref="Resources" />.
+	///     <see cref="Resources.Load(string)" qualifyHint="true" />.
 	/// </summary>
 	/// <remarks>Can be used directly as a string without needing to call <see cref="ToString" />.</remarks>
 	/// <typeparam name="T">Type of the unity object. Used to filter assets.</typeparam>
@@ -48,6 +49,7 @@ namespace Kit.UI
 	[InlineProperty]
 	public class SoftReference<T> where T: Object
 	{
+		/// <summary>Text to trim paths till.</summary>
 		public const string ResourcesFolder = "/Resources/";
 
 		[HideLabel]
@@ -55,19 +57,32 @@ namespace Kit.UI
 		[SerializeField]
 		protected string fullPath;
 
+		/// <summary>Path to the asset with the location to <see cref="ResourcesFolder" /> removed.</summary>
 		public string Path => TrimPath(fullPath);
+
+		/// <summary>Full path to the asset.</summary>
 		public string FullPath => fullPath;
 
+		/// <summary>Load the asset with <see cref="ResourceManager" />.</summary>
+		/// <returns>Reference to the asset.</returns>
 		public T Load()
 		{
 			return ResourceManager.Load<T>(ResourceFolder.Resources, fullPath);
 		}
 
+		/// <summary>Load the asset asynchronously with <see cref="ResourceManager" />.</summary>
+		public UniTask<T> LoadAsync()
+		{
+			return ResourceManager.LoadAsync<T>(ResourceFolder.Resources, fullPath);
+		}
+
+		/// <summary>Returns the trimmed path to the asset.</summary>
 		public override string ToString()
 		{
 			return Path;
 		}
 
+		/// <summary>Returns the trimmed path to the asset.</summary>
 		public static implicit operator string(SoftReference<T> reference)
 		{
 			return reference.Path;

@@ -27,7 +27,7 @@ namespace Kit.Behaviours
 		[Tooltip("How fast to fade the audio.")]
 		public float Speed = 0.5f;
 
-		/// <summary>Should the audio automatically fade in/out when the scene changes with <see cref="SceneDirector" /></summary>
+		/// <summary>Should the audio automatically fade in/out when the scene changes with <see cref="SceneDirector" />?</summary>
 		/// <returns><see langword="true" /> by default.</returns>
 		[Tooltip("Should the audio automatically fade in/out when the scene changes with SceneDirector?")]
 		public bool FadeOnSceneChange = true;

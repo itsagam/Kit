@@ -10,7 +10,13 @@ using Debug = UnityEngine.Debug;
 
 namespace Kit
 {
-	/// <summary>Debugging methods for logging and profiling.</summary>
+	/// <summary>
+	///     <para>Debugging methods for logging and profiling.</para>
+	///     <para>
+	///         The <see cref="Debugger.Log(object, bool)" /> method is particularly useful for displaying the contents of any object,
+	///         or collection.
+	///     </para>
+	/// </summary>
 	public static class Debugger
 	{
 		#region Profiling

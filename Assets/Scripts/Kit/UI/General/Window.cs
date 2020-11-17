@@ -49,6 +49,7 @@ namespace Kit.UI
 		[FoldoutGroup("Events")]
 		public UnityEvent Hidden;
 
+		/// <summary>Current window state.</summary>
 		public WindowState State { get; protected set; } = WindowState.Hidden;
 
 		protected Animator animator;
@@ -213,6 +214,10 @@ namespace Kit.UI
 		{
 		}
 
+		/// <summary>
+		///     Method that gets called when <see cref="Data" /> is updated. Child classes should override this method and update the UI
+		///     here.
+		/// </summary>
 		public virtual void Refresh()
 		{
 		}
@@ -221,12 +226,16 @@ namespace Kit.UI
 
 		#region Public functions
 
+		/// <summary>Returns whether the window is showing or hiding.</summary>
 		public virtual bool IsBusy => State == WindowState.Showing || State == WindowState.Hiding;
 
+		/// <summary>Returns whether the window is shown.</summary>
 		public virtual bool IsShown => State == WindowState.Shown;
 
+		/// <summary>Returns whether the window is hidden.</summary>
 		public virtual bool IsHidden => State == WindowState.Hidden;
 
+		/// <summary>Gets or sets window data. Calls <see cref="Refresh" /> when setting so the UI updates.</summary>
 		public virtual object Data
 		{
 			get => data;

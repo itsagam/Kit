@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace Kit.Pooling
 {
-	/// <summary>A robust and easy-to-use GameObject pooler. Supports grouping, limiting and pre-loading.</summary>
+	/// <summary>A robust and easy-to-use <see cref="GameObject" /> pooler. Supports grouping, limiting and pre-loading.</summary>
 	/// <example>
 	///     Replace <see cref="Object.Instantiate(Object)" qualifyHint="true" /> calls with
 	///     <see cref="Pooler.Instantiate(Component)" qualifyHint="true" /> &amp;

@@ -101,6 +101,11 @@ namespace Kit.Containers
 			disposables.Dispose();
 		}
 
+		/// <summary>Create a property that changes values when the base property changes or an upgrade is added or removed.</summary>
+		/// <param name="baseProperty">The base property.</param>
+		/// <param name="upgradeable">The <see cref="IUpgradeable" /> to get the upgrade list from.</param>
+		/// <param name="stat">The stat name.</param>
+		/// <returns>A read-only <see cref="ReactiveProperty{T}" />.</returns>
 		public static ReadOnlyReactiveProperty<float> CreateCurrentProperty(ReactiveProperty<float> baseProperty,
 																			IUpgradeable upgradeable,
 																			string stat)
@@ -121,13 +126,19 @@ namespace Kit.Containers
 			return GetAggregates(GetEffects(upgradeable, stat));
 		}
 
+		/// <summary>Calculate the current value of an stat based on base value.</summary>
+		/// <param name="upgradeable">The <see cref="IUpgradeable" /> to get the list of upgrades from.</param>
+		/// <param name="stat">The stat name to calculate value of.</param>
+		/// <param name="baseValue">The base value to use.</param>
+		/// <returns>Current value of a stat.</returns>
 		public static float CalculateValue(IUpgradeable upgradeable, string stat, float baseValue)
 		{
 			return CalculateValue(GetAggregates(upgradeable, stat), baseValue);
 		}
 
+		/// <summary>Get all upgrades and effects on an <see cref="IUpgradeable" /> for a given stat.</summary>
 		public static IEnumerable<(Upgrade upgrade, IEnumerable<Effect> effects)> GetEffectsAndUpgrades(IUpgradeable upgradeable,
-			string stat)
+																										string stat)
 		{
 			return upgradeable.GetUpgrades()
 							  .Where(u => u != null)
@@ -135,6 +146,7 @@ namespace Kit.Containers
 							  .Where(g => g.effects.Any());
 		}
 
+		/// <summary>Get all effects on an <see cref="IUpgradeable" /> for a given stat.</summary>
 		public static IEnumerable<Effect> GetEffects(IUpgradeable upgradeable, string stat)
 		{
 			return upgradeable.GetUpgrades()
@@ -143,14 +155,20 @@ namespace Kit.Containers
 							  .Where(e => e.Stat == stat);
 		}
 
+		/// <summary>Calculate aggregates from a list of effects.</summary>
+		/// <param name="effects">The list of effect to calculate aggregates of.</param>
+		/// <returns>
+		///     A tuple with <see cref="EffectType.Constant" />, <see cref="EffectType.Percentage" /> and
+		///     <see cref="EffectType.Multiplier" /> sums respectively.
+		/// </returns>
 		public static (float, float, float) GetAggregates(IEnumerable<Effect> effects)
 		{
-			float valueSum = 0, percentSum = 100, multiplierSum = 1;
+			float constantSum = 0, percentSum = 100, multiplierSum = 1;
 			foreach (Effect effect in effects)
 				switch (effect.Type)
 				{
 					case EffectType.Constant:
-						valueSum += effect.Value;
+						constantSum += effect.Value;
 						break;
 
 					case EffectType.Percentage:
@@ -162,9 +180,13 @@ namespace Kit.Containers
 						break;
 				}
 
-			return (valueSum, percentSum, multiplierSum);
+			return (constantSum, percentSum, multiplierSum);
 		}
 
+		/// <summary>Calculate current value from a base value and aggregates.</summary>
+		/// <param name="aggregates">The aggregate tuple to use.</param>
+		/// <param name="baseValue">The base value to use.</param>
+		/// <returns>Current value.</returns>
 		public static float CalculateValue((float value, float percent, float multiplier) aggregates, float baseValue)
 		{
 			return (baseValue + aggregates.value) * aggregates.percent / 100 * aggregates.multiplier;
