@@ -39,14 +39,14 @@ namespace Kit.Modding
 		/// <summary>Just execute.</summary>
 		None,
 
-		/// <summary>Execute and create a <see cref="SimpleDispatcher"/>.</summary>
+		/// <summary>Execute and create a <see cref="SimpleDispatcher" />.</summary>
 		Simple,
 
-		/// <summary>Execute and create a <see cref="FullDispatcher"/>.</summary>
+		/// <summary>Execute and create a <see cref="FullDispatcher" />.</summary>
 		Full
 	}
 
-	/// <summary>Base class for mods loaded by a <see cref="ModLoader"/>.</summary>
+	/// <summary>Base class for mods loaded by a <see cref="ModLoader" />.</summary>
 	public abstract class Mod
 	{
 		#region Fields
@@ -56,7 +56,7 @@ namespace Kit.Modding
 
 		private static YieldInstruction gcYield = new WaitForSeconds(GCInterval);
 
-		/// <summary>The <see cref="ModGroup"/> this mod belong to.</summary>
+		/// <summary>The <see cref="ModGroup" /> this mod belong to.</summary>
 		public ModGroup Group { get; set; }
 
 		/// <summary>The mod's metadata.</summary>
@@ -71,22 +71,22 @@ namespace Kit.Modding
 		/// <param name="path">Path to the file.</param>
 		public abstract bool Exists(string path);
 
-		/// <inheritdoc cref="ModManager.ReadText(string)"/>
+		/// <inheritdoc cref="ModManager.ReadText(string)" />
 		public abstract string ReadText(string path);
 
-		/// <inheritdoc cref="ModManager.ReadTextAsync(string)"/>
+		/// <inheritdoc cref="ModManager.ReadTextAsync(string)" />
 		public abstract UniTask<string> ReadTextAsync(string path);
 
-		/// <inheritdoc cref="ModManager.ReadBytes(string)"/>
+		/// <inheritdoc cref="ModManager.ReadBytes(string)" />
 		public abstract byte[] ReadBytes(string path);
 
-		/// <inheritdoc cref="ModManager.ReadBytesAsync(string)"/>
+		/// <inheritdoc cref="ModManager.ReadBytesAsync(string)" />
 		public abstract UniTask<byte[]> ReadBytesAsync(string path);
 
 		/// <summary>The scripting environment associated with this mod.</summary>
 		public LuaEnv ScriptEnv { get; protected set; }
 
-		/// <summary>The <see cref="ScriptDispatcher"/> associated with this mod.</summary>
+		/// <summary>The <see cref="ScriptDispatcher" /> associated with this mod.</summary>
 		public SimpleDispatcher ScriptDispatcher { get; protected set; }
 
 		#endregion
@@ -102,42 +102,42 @@ namespace Kit.Modding
 			return LoadEx(typeof(object), ModManager.GetModdingPath(folder, file)).reference;
 		}
 
-		/// <inheritdoc cref="Load(ResourceFolder, string)"/>
+		/// <inheritdoc cref="Load(ResourceFolder, string)" />
 		/// <typeparam name="T">Type of the resource expected.</typeparam>
 		public T Load<T>(ResourceFolder folder, string file)
 		{
 			return (T) LoadEx(typeof(T), ModManager.GetModdingPath(folder, file)).reference;
 		}
 
-		/// <inheritdoc cref="Load(ResourceFolder, string)"/>
+		/// <inheritdoc cref="Load(ResourceFolder, string)" />
 		/// <param name="type">Type of the resource expected.</param>
 		public object Load(Type type, ResourceFolder folder, string file)
 		{
 			return LoadEx(type, ModManager.GetModdingPath(folder, file)).reference;
 		}
 
-		/// <inheritdoc cref="Load(ResourceFolder, string)"/>
+		/// <inheritdoc cref="Load(ResourceFolder, string)" />
 		/// <param name="path">Path to the resource.</param>
 		public object Load(string path)
 		{
 			return LoadEx(typeof(object), path).reference;
 		}
 
-		/// <inheritdoc cref="Load(string)"/>
+		/// <inheritdoc cref="Load(string)" />
 		/// <typeparam name="T">Type of the resource expected.</typeparam>
 		public T Load<T>(string path)
 		{
 			return (T) LoadEx(typeof(T), path).reference;
 		}
 
-		/// <inheritdoc cref="Load(string)"/>
+		/// <inheritdoc cref="Load(string)" />
 		/// <param name="type">Type of the resource expected.</param>
 		public object Load(Type type, string path)
 		{
 			return LoadEx(type, path).reference;
 		}
 
-		/// <inheritdoc cref="Load(string)"/>
+		/// <inheritdoc cref="Load(string)" />
 		/// <returns>Reference to the resource, matched file's path, and the parser used to decode it.</returns>
 		public virtual (object reference, string filePath, ResourceParser parser) LoadEx(Type type, string path)
 		{
@@ -176,49 +176,49 @@ namespace Kit.Modding
 			return default;
 		}
 
-		/// <inheritdoc cref="Load(ResourceFolder, string)"/>
+		/// <inheritdoc cref="Load(ResourceFolder, string)" />
 		/// <summary>Load a resource asynchronously.</summary>
 		public async UniTask<object> LoadAsync(ResourceFolder folder, string file)
 		{
 			return (await LoadExAsync(typeof(object), ModManager.GetModdingPath(folder, file))).reference;
 		}
 
-		/// <inheritdoc cref="Load{T}(ResourceFolder, string)"/>
+		/// <inheritdoc cref="Load{T}(ResourceFolder, string)" />
 		/// <summary>Load a resource asynchronously.</summary>
 		public async UniTask<T> LoadAsync<T>(ResourceFolder folder, string file)
 		{
 			return (T) (await LoadExAsync(typeof(T), ModManager.GetModdingPath(folder, file))).reference;
 		}
 
-		/// <inheritdoc cref="Load(Type, ResourceFolder, string)"/>
+		/// <inheritdoc cref="Load(Type, ResourceFolder, string)" />
 		/// <summary>Load a resource asynchronously.</summary>
 		public async UniTask<object> LoadAsync(Type type, ResourceFolder folder, string file)
 		{
 			return (await LoadExAsync(type, ModManager.GetModdingPath(folder, file))).reference;
 		}
 
-		/// <inheritdoc cref="Load(string)"/>
+		/// <inheritdoc cref="Load(string)" />
 		/// <summary>Load a resource asynchronously.</summary>
 		public async UniTask<object> LoadAsync(string path)
 		{
 			return (await LoadExAsync(typeof(object), path)).reference;
 		}
 
-		/// <inheritdoc cref="Load{T}(string)"/>
+		/// <inheritdoc cref="Load{T}(string)" />
 		/// <summary>Load a resource asynchronously.</summary>
 		public async UniTask<T> LoadAsync<T>(string path)
 		{
 			return (T) (await LoadExAsync(typeof(T), path)).reference;
 		}
 
-		/// <inheritdoc cref="Load(Type, string)"/>
+		/// <inheritdoc cref="Load(Type, string)" />
 		/// <summary>Load a resource asynchronously.</summary>
 		public async UniTask<object> LoadAsync(Type type, string path)
 		{
 			return (await LoadExAsync(type, path)).reference;
 		}
 
-		/// <inheritdoc cref="LoadEx(Type, string)"/>
+		/// <inheritdoc cref="LoadEx(Type, string)" />
 		/// <summary>Load a resource asynchronously.</summary>
 		public virtual async UniTask<(object reference, string filePath, ResourceParser parser)> LoadExAsync(Type type, string path)
 		{

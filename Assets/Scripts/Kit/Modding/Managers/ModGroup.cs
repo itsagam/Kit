@@ -31,7 +31,7 @@ namespace Kit.Modding
 		/// <summary>List of mods belonging to this group.</summary>
 		public List<Mod> Mods = new List<Mod>();
 
-		/// <summary>Create a new <see cref="ModGroup"/>.</summary>
+		/// <summary>Create a new <see cref="ModGroup" />.</summary>
 		/// <param name="name">Group identifier.</param>
 		/// <param name="path">>Base path where the mods of this group will be searched for.</param>
 		/// <param name="deactivatable">Whether mods of this group can be de-activated.</param>

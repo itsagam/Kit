@@ -11,7 +11,7 @@ using Object = UnityEngine.Object;
 namespace Kit.Modding.Loaders
 {
 	/// <summary>A <see cref="ModLoader" /> that loads resources from asset bundles.</summary>
-	/// <seealso cref="Kit.Modding.ModLoader" />
+	/// <seealso cref="ModLoader" />
 	public class AssetBundleModLoader: ModLoader
 	{
 		/// <summary>List of extensions that can be loaded as an asset bundle.</summary>
@@ -94,7 +94,7 @@ namespace Kit.Modding.Loaders
 	}
 
 	/// <summary>An asset bundle loaded as a <see cref="Mod" />. Loaded with <see cref="AssetBundleModLoader" />.</summary>
-	/// <seealso cref="Kit.Modding.Mod" />
+	/// <seealso cref="Mod" />
 	public class AssetBundleMod: Mod
 	{
 		/// <summary>Reference to the asset bundle.</summary>

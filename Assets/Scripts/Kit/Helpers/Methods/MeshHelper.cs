@@ -5,7 +5,7 @@ namespace Kit
 	/// <summary>Helper functions for mesh operations.</summary>
 	public static class MeshHelper
 	{
-		/// <summary>Generates a new <see cref="Mesh"/> with four vertices.</summary>
+		/// <summary>Generates a new <see cref="Mesh" /> with four vertices.</summary>
 		/// <param name="size">Size of the mesh.</param>
 		/// <param name="pivot">Center of the mesh.</param>
 		public static Mesh GenerateQuad(float size, Vector2 pivot)

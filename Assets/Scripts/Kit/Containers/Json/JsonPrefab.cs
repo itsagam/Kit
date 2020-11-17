@@ -87,7 +87,7 @@ namespace Kit.Containers
 	///   {
 	///  		[JsonProperty]
 	///  		public string Type;
-	///
+	/// 
 	///   		[JsonProperty]
 	///  		public Vector2 Position;
 	///   }
@@ -102,7 +102,7 @@ namespace Kit.Containers
 	///   {
 	///  		[JsonProperty]
 	///  		public string Type;
-	///
+	/// 
 	///   		[JsonProperty]
 	///  		public Vector2 Position;
 	///   }
@@ -124,7 +124,7 @@ namespace Kit.Containers
 	///   {
 	///  		[JsonProperty]
 	///  		public string Type;
-	///
+	/// 
 	///   		[JsonProperty]
 	///  		public Vector2 Position;
 	///   }
@@ -138,9 +138,7 @@ namespace Kit.Containers
 	public static class JsonPrefab
 	{
 		/// <summary>
-		/// <para>
-		/// fafas
-		/// </para>
+		///     <para>fafas</para>
 		/// </summary>
 		private static JsonSerializer serializer = JsonSerializer.CreateDefault();
 
@@ -282,11 +280,9 @@ namespace Kit.Containers
 			jObject.ReplaceAll(newJObject.Children());
 		}
 
-		/// <summary>
-		/// Replace the names enclosed in {} with respective values from a <see cref="JObject"/>.
-		/// </summary>
+		/// <summary>Replace the names enclosed in {} with respective values from a <see cref="JObject" />.</summary>
 		/// <param name="path">The string to replace values in.</param>
-		/// <param name="jObject">The <see cref="JObject"/> to get values from.</param>
+		/// <param name="jObject">The <see cref="JObject" /> to get values from.</param>
 		/// <returns>A string with replaced names.</returns>
 		public static string ReplaceValues(string path, JToken jObject)
 		{

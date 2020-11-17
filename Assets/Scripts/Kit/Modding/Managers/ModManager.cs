@@ -38,7 +38,7 @@ namespace Kit.Modding
 		/// </summary>
 		public static event Action<ResourceFolder, string, Mod> ResourceUnloaded;
 
-		/// <summary><see cref="ModGroup"/>s by <see cref="ModType"/>.</summary>
+		/// <summary><see cref="ModGroup" />s by <see cref="ModType" />.</summary>
 		public static readonly Dictionary<ModType, ModGroup> Groups = new Dictionary<ModType, ModGroup>();
 
 		/// <summary>All mod loaders registered with the system.</summary>
@@ -131,7 +131,7 @@ namespace Kit.Modding
 			LoadMods(GetModPathsByGroup(), executeScripts);
 		}
 
-		/// <inheritdoc cref="LoadMods(bool)"/>
+		/// <inheritdoc cref="LoadMods(bool)" />
 		/// <param name="modPaths">A dictionary of group and potential mod locations.</param>
 		public static void LoadMods(Dictionary<ModGroup, string[]> modPaths, bool executeScripts = false)
 		{
@@ -161,14 +161,14 @@ namespace Kit.Modding
 				ExecuteScripts();
 		}
 
-		/// <inheritdoc cref="LoadMods(bool)"/>
+		/// <inheritdoc cref="LoadMods(bool)" />
 		/// <summary>Load the mods asynchronously.</summary>
 		public static UniTask LoadModsAsync(bool executeScripts = false)
 		{
 			return LoadModsAsync(GetModPathsByGroup(), executeScripts);
 		}
 
-		/// <inheritdoc cref="LoadMods(Dictionary{ModGroup, string[]}, bool)"/>
+		/// <inheritdoc cref="LoadMods(Dictionary{ModGroup, string[]}, bool)" />
 		/// <summary>Load the mods asynchronously.</summary>
 		public static async UniTask LoadModsAsync(Dictionary<ModGroup, string[]> modPaths, bool executeScripts = false)
 		{
@@ -526,25 +526,25 @@ namespace Kit.Modding
 
 		#region Reading
 
-		/// <inheritdoc cref="ResourceManager.ReadText(ResourceFolder, string, bool)"/>
+		/// <inheritdoc cref="ResourceManager.ReadText(ResourceFolder, string, bool)" />
 		public static string ReadText(ResourceFolder folder, string file)
 		{
 			return ReadText(GetModdingPath(folder, file));
 		}
 
-		/// <inheritdoc cref="ResourceManager.ReadText(string)"/>
+		/// <inheritdoc cref="ResourceManager.ReadText(string)" />
 		public static string ReadText(string path)
 		{
 			return ActiveMods.Select(mod => mod.ReadText(path)).FirstOrDefault(text => text != null);
 		}
 
-		/// <inheritdoc cref="ResourceManager.ReadTextAsync(ResourceFolder, string, bool)"/>
+		/// <inheritdoc cref="ResourceManager.ReadTextAsync(ResourceFolder, string, bool)" />
 		public static UniTask<string> ReadTextAsync(ResourceFolder folder, string file)
 		{
 			return ReadTextAsync(GetModdingPath(folder, file));
 		}
 
-		/// <inheritdoc cref="ResourceManager.ReadTextAsync(string)"/>
+		/// <inheritdoc cref="ResourceManager.ReadTextAsync(string)" />
 		public static async UniTask<string> ReadTextAsync(string path)
 		{
 			foreach (Mod mod in ActiveMods)
@@ -768,7 +768,7 @@ namespace Kit.Modding
 			return Groups.TryGetValue(name, out ModGroup group) ? group.Mods : null;
 		}
 
-		/// <summary>Returns the relative path to a <see cref="ResourceFolder"/>.</summary>
+		/// <summary>Returns the relative path to a <see cref="ResourceFolder" />.</summary>
 		public static string GetModdingPath(ResourceFolder folder)
 		{
 			return folderToString[folder];

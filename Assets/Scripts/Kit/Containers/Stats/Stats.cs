@@ -138,7 +138,7 @@ namespace Kit.Containers
 
 		/// <summary>Get all upgrades and effects on an <see cref="IUpgradeable" /> for a given stat.</summary>
 		public static IEnumerable<(Upgrade upgrade, IEnumerable<Effect> effects)> GetEffectsAndUpgrades(IUpgradeable upgradeable,
-																										string stat)
+			string stat)
 		{
 			return upgradeable.GetUpgrades()
 							  .Where(u => u != null)

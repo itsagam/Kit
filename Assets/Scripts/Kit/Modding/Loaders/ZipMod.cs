@@ -8,16 +8,14 @@ using Cysharp.Threading.Tasks;
 
 namespace Kit.Modding.Loaders
 {
-	/// <summary>Class ZipModLoader. Implements the <see cref="Kit.Modding.ModLoader" /></summary>
-	/// <seealso cref="Kit.Modding.ModLoader" />
+	/// <summary>A <see cref="ModLoader" /> that loads compressed archives as mods.</summary>
+	/// <seealso cref="ModLoader" />
 	public class ZipModLoader: ModLoader
 	{
-		/// <summary>The supported extensions</summary>
+		/// <summary>List of archive extensions that can be loaded.</summary>
 		public readonly List<string> SupportedExtensions = new List<string> { ".zip" };
 
-		/// <summary>Loads the mod.</summary>
-		/// <param name="path">The path.</param>
-		/// <returns>Mod.</returns>
+		/// <inheritdoc />
 		public override Mod LoadMod(string path)
 		{
 			FileAttributes attributes = File.GetAttributes(path);
@@ -50,9 +48,7 @@ namespace Kit.Modding.Loaders
 			}
 		}
 
-		/// <summary>load mod as an asynchronous operation.</summary>
-		/// <param name="path">The path.</param>
-		/// <returns>UniTask&lt;Mod&gt;.</returns>
+		/// <inheritdoc />
 		public override async UniTask<Mod> LoadModAsync(string path)
 		{
 			FileAttributes attributes = File.GetAttributes(path);
@@ -86,8 +82,8 @@ namespace Kit.Modding.Loaders
 		}
 	}
 
-	/// <summary>A compressed archive loaded as a mod. Loaded with <see cref="ZipModLoader"/>.</summary>
-	/// <seealso cref="Kit.Modding.Mod" />
+	/// <summary>A compressed archive loaded as a mod. Loaded with <see cref="ZipModLoader" />.</summary>
+	/// <seealso cref="Mod" />
 	public class ZipMod: Mod
 	{
 		/// <summary>The mod archive.</summary>

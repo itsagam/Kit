@@ -172,7 +172,7 @@ namespace Kit
 			return (T) LoadUnmodded(type, folder, file);
 		}
 
-		/// <inheritdoc cref="Load{T}(ResourceFolder, string, bool, bool)"/>
+		/// <inheritdoc cref="Load{T}(ResourceFolder, string, bool, bool)" />
 		/// <param name="type">Type of the resource expected.</param>
 		public static object Load(Type type, ResourceFolder folder, string file, bool modded = DefaultModding, bool merge = false)
 		{
@@ -190,7 +190,7 @@ namespace Kit
 			return LoadUnmodded(type, folder, file);
 		}
 
-		/// <inheritdoc cref="Load{T}(ResourceFolder, string, bool, bool)"/>
+		/// <inheritdoc cref="Load{T}(ResourceFolder, string, bool, bool)" />
 		/// <summary>
 		///     <para>Load and cache a resource asynchronously.</para>
 		///     <para>
@@ -215,7 +215,7 @@ namespace Kit
 			return (T) await LoadUnmoddedAsync(type, folder, file);
 		}
 
-		/// <inheritdoc cref="Load(Type, ResourceFolder, string, bool, bool)"/>
+		/// <inheritdoc cref="Load(Type, ResourceFolder, string, bool, bool)" />
 		/// <summary>
 		///     <para>Load and cache a resource asynchronously.</para>
 		///     <para>
@@ -277,7 +277,7 @@ namespace Kit
 			return (T) LoadUnmodded(typeof(T), folder, file);
 		}
 
-		/// <inheritdoc cref="LoadUnmodded{T}(ResourceFolder, string)"/>
+		/// <inheritdoc cref="LoadUnmodded{T}(ResourceFolder, string)" />
 		/// <param name="type">Type of the resource expected.</param>
 		public static object LoadUnmodded(Type type, ResourceFolder folder, string file)
 		{
@@ -305,7 +305,7 @@ namespace Kit
 			return reference;
 		}
 
-		/// <inheritdoc cref="LoadUnmodded{T}(ResourceFolder, string)"/>
+		/// <inheritdoc cref="LoadUnmodded{T}(ResourceFolder, string)" />
 		/// <summary>
 		///     <para>Load and cache a resource asynchronously without regarding mods.</para>
 		///     <para>
@@ -318,7 +318,7 @@ namespace Kit
 			return (T) await LoadUnmoddedAsync(typeof(T), folder, file);
 		}
 
-		/// <inheritdoc cref="LoadUnmodded(Type, ResourceFolder, string)"/>
+		/// <inheritdoc cref="LoadUnmodded(Type, ResourceFolder, string)" />
 		/// <summary>
 		///     <para>Load and cache a resource asynchronously without regarding mods.</para>
 		///     <para>
@@ -375,7 +375,7 @@ namespace Kit
 			return (T) LoadMerged(typeof(T), folder, file);
 		}
 
-		/// <inheritdoc cref="LoadMerged{T}(ResourceFolder, string)"/>
+		/// <inheritdoc cref="LoadMerged{T}(ResourceFolder, string)" />
 		/// <param name="type">Type of the resource expected.</param>
 		public static object LoadMerged(Type type, ResourceFolder folder, string file)
 		{
@@ -427,7 +427,7 @@ namespace Kit
 			return merged;
 		}
 
-		/// <inheritdoc cref="LoadMerged{T}(ResourceFolder, string)"/>
+		/// <inheritdoc cref="LoadMerged{T}(ResourceFolder, string)" />
 		/// <summary>
 		///     <para>
 		///         Load a resource asynchronously merging the game version with all the mod versions and cache it. Useful to allow modding
@@ -443,7 +443,7 @@ namespace Kit
 			return (T) await LoadMergedAsync(typeof(T), folder, file);
 		}
 
-		/// <inheritdoc cref="LoadMerged(Type, ResourceFolder, string)"/>
+		/// <inheritdoc cref="LoadMerged(Type, ResourceFolder, string)" />
 		/// <summary>
 		///     <para>
 		///         Load a resource asynchronously merging the game version with all the mod versions and cache it. Useful to allow modding
@@ -518,14 +518,14 @@ namespace Kit
 			return (T) LoadEx(typeof(T), fullPath).reference;
 		}
 
-		/// <inheritdoc cref="Load{T}(string)"/>
+		/// <inheritdoc cref="Load{T}(string)" />
 		/// <param name="type">Type of the resource expected.</param>
 		public static object Load(Type type, string fullPath)
 		{
 			return LoadEx(type, fullPath).reference;
 		}
 
-		/// <inheritdoc cref="Load{T}(string)"/>
+		/// <inheritdoc cref="Load{T}(string)" />
 		/// <returns>Reference to the resource and the parser used to decode it.</returns>
 		public static (object reference, ResourceParser parser) LoadEx(Type type, string fullPath)
 		{
@@ -562,21 +562,21 @@ namespace Kit
 			return default;
 		}
 
-		/// <inheritdoc cref="Load{T}(string)"/>
+		/// <inheritdoc cref="Load{T}(string)" />
 		/// <summary>Load a resource asynchronously from an absolute path with the list of parsers registered. Does not cache.</summary>
 		public static async UniTask<T> LoadAsync<T>(string fullPath)
 		{
 			return (T) (await LoadExAsync(typeof(T), fullPath)).reference;
 		}
 
-		/// <inheritdoc cref="Load(Type, string)"/>
+		/// <inheritdoc cref="Load(Type, string)" />
 		/// <summary>Load a resource asynchronously from an absolute path with the list of parsers registered. Does not cache.</summary>
 		public static async UniTask<object> LoadAsync(Type type, string fullPath)
 		{
 			return (await LoadExAsync(type, fullPath)).reference;
 		}
 
-		/// <inheritdoc cref="LoadEx(Type, string)"/>
+		/// <inheritdoc cref="LoadEx(Type, string)" />
 		/// <summary>Load a resource asynchronously from an absolute path with the list of parsers registered. Does not cache.</summary>
 		public static async UniTask<(object reference, ResourceParser parser)> LoadExAsync(Type type, string fullPath)
 		{
@@ -661,7 +661,7 @@ namespace Kit
 			return Unload(typeof(T), folder, file);
 		}
 
-		/// <inheritdoc cref="Unload{T}(ResourceFolder, string)"/>
+		/// <inheritdoc cref="Unload{T}(ResourceFolder, string)" />
 		/// <param name="type">Type of the resource.</param>
 		public static bool Unload(Type type, ResourceFolder folder, string file)
 		{
@@ -709,11 +709,11 @@ namespace Kit
 
 		#region Reading
 
-		/// <summary>Read the contents of a file in text mode.</summary>
+		/// <summary>Read the contents of a file in text-mode.</summary>
 		/// <param name="folder">The folder to read the file from.</param>
 		/// <param name="file">The path and file-name relative to the <paramref name="folder" />.</param>
 		/// <param name="modded">Whether to allow mods to provide their version of the file instead. Has no effect if MODDING is not defined.</param>
-		/// <returns>Contents of the file as a <see cref="string"/>.</returns>
+		/// <returns>Contents of the file as a <see cref="string" />.</returns>
 		public static string ReadText(ResourceFolder folder, string file, bool modded = DefaultModding)
 		{
 #if MODDING
@@ -727,8 +727,8 @@ namespace Kit
 			return ReadText(GetPath(folder, file));
 		}
 
-		/// <inheritdoc cref="ReadText(ResourceFolder, string, bool)"/>
-		/// <summary>Read the contents of a file asynchronously in text mode.</summary>
+		/// <inheritdoc cref="ReadText(ResourceFolder, string, bool)" />
+		/// <summary>Read the contents of a file asynchronously in text-mode.</summary>
 		public static async UniTask<string> ReadTextAsync(ResourceFolder folder, string file, bool modded = DefaultModding)
 		{
 #if MODDING
@@ -742,7 +742,7 @@ namespace Kit
 			return await ReadTextAsync(GetPath(folder, file));
 		}
 
-		/// <summary>Read the contents of a file in binary mode.</summary>
+		/// <summary>Read the contents of a file in binary-mode.</summary>
 		/// <param name="folder">The folder to read the file from.</param>
 		/// <param name="file">The path and file-name relative to the <paramref name="folder" />.</param>
 		/// <param name="modded">Whether to allow mods to provide their version of the file instead. Has no effect if MODDING is not defined.</param>
@@ -760,8 +760,8 @@ namespace Kit
 			return ReadBytes(GetPath(folder, file));
 		}
 
-		/// <inheritdoc cref="ReadBytes(ResourceFolder, string, bool)"/>
-		/// <summary>Read the contents of a file asynchronously in text mode.</summary>
+		/// <inheritdoc cref="ReadBytes(ResourceFolder, string, bool)" />
+		/// <summary>Read the contents of a file asynchronously in text-mode.</summary>
 		public static async UniTask<byte[]> ReadBytesAsync(ResourceFolder folder, string file, bool modded = DefaultModding)
 		{
 #if MODDING
@@ -775,7 +775,7 @@ namespace Kit
 			return await ReadBytesAsync(GetPath(folder, file));
 		}
 
-		/// <inheritdoc cref="ReadText(ResourceFolder, string, bool)"/>
+		/// <inheritdoc cref="ReadText(ResourceFolder, string, bool)" />
 		/// <param name="fullPath">Absolute path to the file.</param>
 		public static string ReadText(string fullPath)
 		{
@@ -790,8 +790,8 @@ namespace Kit
 			}
 		}
 
-		/// <inheritdoc cref="ReadText(string)"/>
-		/// <summary>Read the contents of a file asynchronously in text mode.</summary>
+		/// <inheritdoc cref="ReadText(string)" />
+		/// <summary>Read the contents of a file asynchronously in text-mode.</summary>
 		public static async UniTask<string> ReadTextAsync(string fullPath)
 		{
 			UnityWebRequest request = await WebAsync(fullPath);
@@ -800,7 +800,7 @@ namespace Kit
 			return request.downloadHandler.text;
 		}
 
-		/// <inheritdoc cref="ReadBytes(ResourceFolder, string, bool)"/>
+		/// <inheritdoc cref="ReadBytes(ResourceFolder, string, bool)" />
 		/// <param name="fullPath">Absolute path to the file.</param>
 		public static byte[] ReadBytes(string fullPath)
 		{
@@ -815,8 +815,8 @@ namespace Kit
 			}
 		}
 
-		/// <inheritdoc cref="ReadBytes(string)"/>
-		/// <summary>Read the contents of a file asynchronously in binary mode.</summary>
+		/// <inheritdoc cref="ReadBytes(string)" />
+		/// <summary>Read the contents of a file asynchronously in binary-mode.</summary>
 		public static async UniTask<byte[]> ReadBytesAsync(string fullPath)
 		{
 			UnityWebRequest request = await WebAsync(fullPath);
@@ -846,14 +846,14 @@ namespace Kit
 			return Save(GetPath(folder, file), contents);
 		}
 
-		/// <inheritdoc cref="Save(ResourceFolder, string, object)"/>
+		/// <inheritdoc cref="Save(ResourceFolder, string, object)" />
 		/// <summary>Save the contents of an object asynchronously to a file.</summary>
 		public static UniTask<bool> SaveAsync(ResourceFolder folder, string file, object contents)
 		{
 			return SaveAsync(GetPath(folder, file), contents);
 		}
 
-		/// <inheritdoc cref="Save(ResourceFolder, string, object)"/>
+		/// <inheritdoc cref="Save(ResourceFolder, string, object)" />
 		/// <param name="fullPath">Absolute path to the file.</param>
 		public static bool Save(string fullPath, object contents)
 		{
@@ -873,7 +873,7 @@ namespace Kit
 			return false;
 		}
 
-		/// <inheritdoc cref="SaveAsync(ResourceFolder, string, object)"/>
+		/// <inheritdoc cref="SaveAsync(ResourceFolder, string, object)" />
 		/// <param name="fullPath">Absolute path to the file.</param>
 		public static UniTask<bool> SaveAsync(string fullPath, object contents)
 		{
@@ -903,7 +903,7 @@ namespace Kit
 			return SaveText(GetPath(folder, file), contents);
 		}
 
-		/// <inheritdoc cref="SaveText(ResourceFolder, string, string)"/>
+		/// <inheritdoc cref="SaveText(ResourceFolder, string, string)" />
 		/// <summary>Save text content asynchronously to a file.</summary>
 		public static UniTask<bool> SaveTextAsync(ResourceFolder folder, string file, string contents)
 		{
@@ -920,14 +920,14 @@ namespace Kit
 			return SaveBytes(GetPath(folder, file), bytes);
 		}
 
-		/// <inheritdoc cref="SaveBytes(ResourceFolder, string, byte[])"/>
+		/// <inheritdoc cref="SaveBytes(ResourceFolder, string, byte[])" />
 		/// <summary>Save binary content asynchronously to a file.</summary>
 		public static UniTask<bool> SaveBytesAsync(ResourceFolder folder, string file, byte[] bytes)
 		{
 			return SaveBytesAsync(GetPath(folder, file), bytes);
 		}
 
-		/// <inheritdoc cref="SaveText(ResourceFolder, string, string)"/>
+		/// <inheritdoc cref="SaveText(ResourceFolder, string, string)" />
 		/// <param name="fullPath">Absolute path to the file.</param>
 		public static bool SaveText(string fullPath, string contents)
 		{
@@ -944,7 +944,7 @@ namespace Kit
 			}
 		}
 
-		/// <inheritdoc cref="SaveText(string, string)"/>
+		/// <inheritdoc cref="SaveText(string, string)" />
 		/// <summary>Save text content asynchronously to a file.</summary>
 		public static async UniTask<bool> SaveTextAsync(string fullPath, string contents)
 		{
@@ -962,7 +962,7 @@ namespace Kit
 			}
 		}
 
-		/// <inheritdoc cref="SaveBytes(ResourceFolder, string, byte[])"/>
+		/// <inheritdoc cref="SaveBytes(ResourceFolder, string, byte[])" />
 		/// <param name="fullPath">Absolute path to the file.</param>
 		public static bool SaveBytes(string fullPath, byte[] bytes)
 		{
@@ -979,7 +979,7 @@ namespace Kit
 			}
 		}
 
-		/// <inheritdoc cref="SaveBytes(string, byte[])"/>
+		/// <inheritdoc cref="SaveBytes(string, byte[])" />
 		/// <summary>Save binary content asynchronously to a file.</summary>
 		public static async UniTask<bool> SaveBytesAsync(string fullPath, byte[] bytes)
 		{
@@ -1006,7 +1006,7 @@ namespace Kit
 			return Delete(GetPath(folder, file));
 		}
 
-		/// <inheritdoc cref="Delete(ResourceFolder, string)"/>
+		/// <inheritdoc cref="Delete(ResourceFolder, string)" />
 		/// <param name="fullPath">Absolute path to the file.</param>
 		public static bool Delete(string fullPath)
 		{
@@ -1030,7 +1030,7 @@ namespace Kit
 			return Exists(GetPath(folder, file));
 		}
 
-		/// <inheritdoc cref="Exists(ResourceFolder, string)"/>
+		/// <inheritdoc cref="Exists(ResourceFolder, string)" />
 		/// <param name="fullPath">Absolute path to the file.</param>
 		public static bool Exists(string fullPath)
 		{

@@ -2,20 +2,20 @@
 
 namespace Kit.Algorithms
 {
-    /// <summary>Finds the optimal assignment of tasks when worker costs for doing each are given.</summary>
-    /// <remarks>See <see href="https://en.wikipedia.org/wiki/Hungarian_algorithm" />.</remarks>
-    // Copyright (c) 2010 Alex Regueiro
+	/// <summary>Finds the optimal assignment of tasks when worker costs for doing each are given.</summary>
+	/// <remarks>See <see href="https://en.wikipedia.org/wiki/Hungarian_algorithm" />.</remarks>
+	// Copyright (c) 2010 Alex Regueiro
 	// Licensed under MIT license, available at <http://www.opensource.org/licenses/mit-license.php>.
 	// Published originally at <http://blog.noldorin.com/2009/09/hungarian-algorithm-in-csharp/>.
 	// Based on implementation described at <http://www.public.iastate.edu/~ddoty/HungarianAlgorithm.html>.
 	// Version 1.3, released 22nd May 2010.
 	public static class HungarianAlgorithm
 	{
-        /// <summary>Given a matrix of worker costs and tasks, find the optimal allocation of workers such that the total cost is minimized.</summary>
-        /// <param name="costs">A 2D-matrix where the element at [i, j] represents the cost of worker i doing task j.</param>
-        /// <returns>An array where the value at index i is the index of the task assigned to worker i.</returns>
-        /// <exception cref="ArgumentNullException"><paramref name="costs" /> is <see langword="null" />.</exception>
-        public static int[] FindAssignments(this int[,] costs)
+		/// <summary>Given a matrix of worker costs and tasks, find the optimal allocation of workers such that the total cost is minimized.</summary>
+		/// <param name="costs">A 2D-matrix where the element at [i, j] represents the cost of worker i doing task j.</param>
+		/// <returns>An array where the value at index i is the index of the task assigned to worker i.</returns>
+		/// <exception cref="ArgumentNullException"><paramref name="costs" /> is <see langword="null" />.</exception>
+		public static int[] FindAssignments(this int[,] costs)
 		{
 			if (costs == null)
 				throw new ArgumentNullException(nameof(costs));

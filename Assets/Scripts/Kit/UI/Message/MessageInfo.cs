@@ -52,19 +52,13 @@ namespace Kit.UI.Message
 	/// <summary>The type of message in a <see cref="MessageWindow" />.</summary>
 	public enum MessageType
 	{
-		/// <summary>
-		/// The message is to alert the user.
-		/// </summary>
+		/// <summary>The message is to alert the user.</summary>
 		Alert,
 
-		/// <summary>
-		/// The message is to inform the user.
-		/// </summary>
+		/// <summary>The message is to inform the user.</summary>
 		Info,
 
-		/// <summary>
-		/// The message is to ask the user.
-		/// </summary>
+		/// <summary>The message is to ask the user.</summary>
 		Question
 	}
 }

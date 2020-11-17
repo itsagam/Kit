@@ -7,8 +7,8 @@ namespace Kit.Pooling
 	/// <example>
 	///     Replace <see cref="Object.Instantiate(Object)" qualifyHint="true" /> calls with
 	///     <see cref="Pooler.Instantiate(Component)" qualifyHint="true" /> &amp;
-	/// 	<see cref="Object.Destroy(Object)" qualifyHint="true" /> with
-	///     <see cref="Pooler.Destroy(Component)" qualifyHint="true" />, and you're good to go.
+	///     <see cref="Object.Destroy(Object)" qualifyHint="true" /> with <see cref="Pooler.Destroy(Component)" qualifyHint="true" />,
+	///     and you're good to go.
 	/// </example>
 	public static class Pooler
 	{

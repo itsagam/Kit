@@ -28,10 +28,10 @@ namespace Kit.Pooling
 		/// <summary>Call <see cref="IPooled" /> methods directly if the instance component implements it.</summary>
 		Interface,
 
-		/// <summary>Call <see cref="Component.SendMessage(string)" /> on instance <see cref="GameObject"/>s.</summary>
+		/// <summary>Call <see cref="Component.SendMessage(string)" /> on instance <see cref="GameObject" />s.</summary>
 		SendMessage,
 
-		/// <summary>Call <see cref="Component.BroadcastMessage(string)" /> on instance  <see cref="GameObject"/>s.</summary>
+		/// <summary>Call <see cref="Component.BroadcastMessage(string)" /> on instance  <see cref="GameObject" />s.</summary>
 		BroadcastMessage
 	}
 

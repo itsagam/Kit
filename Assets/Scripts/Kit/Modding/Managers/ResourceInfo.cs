@@ -19,7 +19,7 @@ namespace Kit.Modding
 		/// <summary>Reference to the resource.</summary>
 		public WeakReference Reference;
 
-		/// <inheritdoc cref="ResourceInfo(Mod, string, ResourceParser, WeakReference)"/>
+		/// <inheritdoc cref="ResourceInfo(Mod, string, ResourceParser, WeakReference)" />
 		public ResourceInfo(Mod mod, string file, ResourceParser parser, object reference)
 			: this(mod, file, parser, new WeakReference(reference))
 		{

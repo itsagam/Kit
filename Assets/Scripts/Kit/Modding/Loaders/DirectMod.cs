@@ -6,7 +6,8 @@ using Cysharp.Threading.Tasks;
 
 namespace Kit.Modding.Loaders
 {
-	/// <summary>A <see cref="ModLoader" /> that loads resources directly from folders.</summary>
+	/// <summary>A <see cref="ModLoader" /> that loads resources directly from a folder.</summary>
+	/// <seealso cref="ModLoader" />
 	public class DirectModLoader: ModLoader
 	{
 		/// <inheritdoc />
@@ -48,8 +49,8 @@ namespace Kit.Modding.Loaders
 		}
 	}
 
-	/// <summary>A mod that load files directly.</summary>
-	/// <seealso cref="Kit.Modding.Mod" />
+	/// <summary>A mod that loads resources directly from a folder.</summary>
+	/// <seealso cref="Mod" />
 	public class DirectMod: Mod
 	{
 		/// <summary>Path to the mod.</summary>
