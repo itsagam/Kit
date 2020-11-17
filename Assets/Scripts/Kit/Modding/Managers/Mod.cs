@@ -71,22 +71,16 @@ namespace Kit.Modding
 		/// <param name="path">Path to the file.</param>
 		public abstract bool Exists(string path);
 
-		/// <summary>Read a file from the mod in text-mode.</summary>
-		/// <param name="path">Path to the file.</param>
-		/// <returns>Contents of the file as a <see cref="string"/>.</returns>
+		/// <inheritdoc cref="ModManager.ReadText(string)"/>
 		public abstract string ReadText(string path);
 
-		/// <inheritdoc cref="ReadText(string)"/>
-		/// <summary>Read a file from the mod asynchronously in text-mode.</summary>
+		/// <inheritdoc cref="ModManager.ReadTextAsync(string)"/>
 		public abstract UniTask<string> ReadTextAsync(string path);
 
-		/// <summary>Read a file in binary-mode from the mod.</summary>
-		/// <param name="path">Path to the file.</param>
-		/// <returns>Contents of the file as a byte array.</returns>
+		/// <inheritdoc cref="ModManager.ReadBytes(string)"/>
 		public abstract byte[] ReadBytes(string path);
 
-		/// <inheritdoc cref="ReadBytes(string)"/>
-		/// <summary>Read a file from the mod asynchronously in binary-mode.</summary>
+		/// <inheritdoc cref="ModManager.ReadBytesAsync(string)"/>
 		public abstract UniTask<byte[]> ReadBytesAsync(string path);
 
 		/// <summary>The scripting environment associated with this mod.</summary>
@@ -405,7 +399,7 @@ namespace Kit.Modding
 
 		#region Destruction
 
-		/// <summary>Unloads the mod.</summary>
+		/// <summary>Unload the mod.</summary>
 		public virtual void Unload()
 		{
 			DisposeScripting();

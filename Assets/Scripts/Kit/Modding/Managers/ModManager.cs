@@ -206,7 +206,7 @@ namespace Kit.Modding
 				mod.ExecuteScripts();
 		}
 
-		/// <summary>Execute all mod asynchronously.</summary>
+		/// <summary>Execute all mod scripts asynchronously.</summary>
 		public static async UniTask ExecuteScriptsAsync()
 		{
 			foreach (Mod mod in ActiveMods)
@@ -237,7 +237,7 @@ namespace Kit.Modding
 			ToggleMod(mod, false);
 		}
 
-		/// <summary>Toggles a mod.</summary>
+		/// <summary>Toggle a mod.</summary>
 		/// <param name="mod">The mod to toggle.</param>
 		public static void ToggleMod(Mod mod)
 		{

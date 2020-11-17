@@ -172,25 +172,8 @@ namespace Kit
 			return (T) LoadUnmodded(type, folder, file);
 		}
 
-		/// <summary>
-		///     <para>Load and cache a resource.</para>
-		///     <para>
-		///         If <paramref name="folder" /> is <see cref="ResourceFolder.Resources" /> the asset is loaded with Resources.Load. If
-		///         it's not, it's parsed manually with the list of parsers registered.
-		///     </para>
-		/// </summary>
+		/// <inheritdoc cref="Load{T}(ResourceFolder, string, bool, bool)"/>
 		/// <param name="type">Type of the resource expected.</param>
-		/// <param name="folder">The folder to load the resource from.</param>
-		/// <param name="file">The path and file-name relative to the <paramref name="folder" />.</param>
-		/// <param name="modded">
-		///     Whether to allow mods to load their version of the asset instead. Useful if you want to allow some assets to
-		///     be modded, but not others. Has no effect if MODDING is not defined.
-		/// </param>
-		/// <param name="merge">
-		///     Whether to merge the game version and all mod versions of the asset. Useful to allow modding of configuration
-		///     files. Has no effect if MODDING is not defined or <paramref name="modded" /> is false.
-		/// </param>
-		/// <returns>Reference to the resource.</returns>
 		public static object Load(Type type, ResourceFolder folder, string file, bool modded = DefaultModding, bool merge = false)
 		{
 #if MODDING
@@ -207,6 +190,7 @@ namespace Kit
 			return LoadUnmodded(type, folder, file);
 		}
 
+		/// <inheritdoc cref="Load{T}(ResourceFolder, string, bool, bool)"/>
 		/// <summary>
 		///     <para>Load and cache a resource asynchronously.</para>
 		///     <para>
@@ -214,18 +198,6 @@ namespace Kit
 		///         it's not, it's parsed manually with the list of parsers registered.
 		///     </para>
 		/// </summary>
-		/// <param name="folder">The folder to load the resource from.</param>
-		/// <param name="file">The path and file-name relative to the <paramref name="folder" />.</param>
-		/// <param name="modded">
-		///     Whether to allow mods to load their version of the asset instead. Useful if you want to allow some assets to
-		///     be modded, but not others. Has no effect if MODDING is not defined.
-		/// </param>
-		/// <param name="merge">
-		///     Whether to merge the game version and all mod versions of the asset. Useful to allow modding of configuration
-		///     files. Has no effect if MODDING is not defined or <paramref name="modded" /> is false.
-		/// </param>
-		/// <typeparam name="T">Type of the resource expected.</typeparam>
-		/// <returns>Reference to the resource.</returns>
 		public static async UniTask<T> LoadAsync<T>(ResourceFolder folder, string file, bool modded = DefaultModding, bool merge = false)
 		{
 			Type type = typeof(T);
@@ -243,6 +215,7 @@ namespace Kit
 			return (T) await LoadUnmoddedAsync(type, folder, file);
 		}
 
+		/// <inheritdoc cref="Load(Type, ResourceFolder, string, bool, bool)"/>
 		/// <summary>
 		///     <para>Load and cache a resource asynchronously.</para>
 		///     <para>
@@ -250,18 +223,6 @@ namespace Kit
 		///         it's not, it's parsed manually with the list of parsers registered.
 		///     </para>
 		/// </summary>
-		/// <param name="type">Type of the resource expected.</param>
-		/// <param name="folder">The folder to load the resource from.</param>
-		/// <param name="file">The path and file-name relative to the <paramref name="folder" />.</param>
-		/// <param name="modded">
-		///     Whether to allow mods to load their version of the asset instead. Useful if you want to allow some assets to
-		///     be modded, but not others. Has no effect if MODDING is not defined.
-		/// </param>
-		/// <param name="merge">
-		///     Whether to merge the game version and all mod versions of the asset. Useful to allow modding of configuration
-		///     files. Has no effect if MODDING is not defined or <paramref name="modded" /> is false.
-		/// </param>
-		/// <returns>Reference to the resource.</returns>
 		public static async UniTask<object> LoadAsync(Type type,
 													  ResourceFolder folder,
 													  string file,
@@ -316,17 +277,8 @@ namespace Kit
 			return (T) LoadUnmodded(typeof(T), folder, file);
 		}
 
-		/// <summary>
-		///     <para>Load and cache a resource without regarding mods.</para>
-		///     <para>
-		///         If <paramref name="folder" /> is <see cref="ResourceFolder.Resources" /> the asset is loaded with  If it's not, it's
-		///         parsed manually with the list of parsers registered.
-		///     </para>
-		/// </summary>
+		/// <inheritdoc cref="LoadUnmodded{T}(ResourceFolder, string)"/>
 		/// <param name="type">Type of the resource expected.</param>
-		/// <param name="folder">The folder to load the resource from.</param>
-		/// <param name="file">The path and file-name relative to the <paramref name="folder" />.</param>
-		/// <returns>Reference to the resource.</returns>
 		public static object LoadUnmodded(Type type, ResourceFolder folder, string file)
 		{
 			object reference = LoadCached(type, folder, file);
@@ -353,7 +305,7 @@ namespace Kit
 			return reference;
 		}
 
-
+		/// <inheritdoc cref="LoadUnmodded{T}(ResourceFolder, string)"/>
 		/// <summary>
 		///     <para>Load and cache a resource asynchronously without regarding mods.</para>
 		///     <para>
@@ -361,16 +313,12 @@ namespace Kit
 		///         parsed manually with the list of parsers registered.
 		///     </para>
 		/// </summary>
-		/// <param name="folder">The folder to load the resource from.</param>
-		/// <param name="file">The path and file-name relative to the <paramref name="folder" />.</param>
-		/// <typeparam name="T">Type of the resource expected.</typeparam>
-		/// <returns>Reference to the resource.</returns>
 		public static async UniTask<T> LoadUnmoddedAsync<T>(ResourceFolder folder, string file)
 		{
 			return (T) await LoadUnmoddedAsync(typeof(T), folder, file);
 		}
 
-
+		/// <inheritdoc cref="LoadUnmodded(Type, ResourceFolder, string)"/>
 		/// <summary>
 		///     <para>Load and cache a resource asynchronously without regarding mods.</para>
 		///     <para>
@@ -378,10 +326,6 @@ namespace Kit
 		///         parsed manually with the list of parsers registered.
 		///     </para>
 		/// </summary>
-		/// <param name="type">Type of the resource expected.</param>
-		/// <param name="folder">The folder to load the resource from.</param>
-		/// <param name="file">The path and file-name relative to the <paramref name="folder" />.</param>
-		/// <returns>Reference to the resource.</returns>
 		public static async UniTask<object> LoadUnmoddedAsync(Type type, ResourceFolder folder, string file)
 		{
 			object reference = LoadCached(type, folder, file);
@@ -769,7 +713,7 @@ namespace Kit
 		/// <param name="folder">The folder to read the file from.</param>
 		/// <param name="file">The path and file-name relative to the <paramref name="folder" />.</param>
 		/// <param name="modded">Whether to allow mods to provide their version of the file instead. Has no effect if MODDING is not defined.</param>
-		/// <returns>Contents of the file as a string.</returns>
+		/// <returns>Contents of the file as a <see cref="string"/>.</returns>
 		public static string ReadText(ResourceFolder folder, string file, bool modded = DefaultModding)
 		{
 #if MODDING
