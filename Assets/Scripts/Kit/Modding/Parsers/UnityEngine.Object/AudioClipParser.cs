@@ -14,12 +14,20 @@ using UnityEngine;
 
 namespace Kit.Parsers
 {
+	/// <summary>An <see cref="AudioClip" /> parser.</summary>
+	/// <seealso cref="Kit.Parsers.ResourceParser" />
 	public class AudioClipParser: ResourceParser
 	{
+		/// <inheritdoc />
 		public override Type[] SupportedTypes { get; } = { typeof(AudioClip) };
+
+		/// <inheritdoc />
 		public override string[] SupportedExtensions { get; } = { ".wav" };
+
+		/// <inheritdoc />
 		public override ParseMode ParseMode => ParseMode.Binary;
 
+		/// <inheritdoc />
 		public override object Read(Type type, object data, string path = null)
 		{
 			return WavUtility.ToAudioClip((byte[]) data, 0, path);

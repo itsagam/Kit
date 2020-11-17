@@ -10,10 +10,14 @@ using Object = UnityEngine.Object;
 
 namespace Kit.Modding.Loaders
 {
+	/// <summary>A <see cref="ModLoader" /> that loads resources from asset bundles.</summary>
+	/// <seealso cref="Kit.Modding.ModLoader" />
 	public class AssetBundleModLoader: ModLoader
 	{
+		/// <summary>List of extensions that can be loaded as an asset bundle.</summary>
 		public readonly List<string> SupportedExtensions = new List<string> { ".assetbundle", ".unity3d" };
 
+		/// <inheritdoc />
 		public override Mod LoadMod(string path)
 		{
 			FileAttributes attributes = File.GetAttributes(path);
@@ -50,6 +54,7 @@ namespace Kit.Modding.Loaders
 			}
 		}
 
+		/// <inheritdoc />
 		public override async UniTask<Mod> LoadModAsync(string path)
 		{
 			FileAttributes attributes = File.GetAttributes(path);
@@ -88,15 +93,21 @@ namespace Kit.Modding.Loaders
 		}
 	}
 
+	/// <summary>An asset bundle loaded as a <see cref="Mod" />. Loaded with <see cref="AssetBundleModLoader" />.</summary>
+	/// <seealso cref="Kit.Modding.Mod" />
 	public class AssetBundleMod: Mod
 	{
+		/// <summary>Reference to the asset bundle.</summary>
 		public AssetBundle Bundle { get; }
 
+		/// <summary>Create a instance with the given asset bundle.</summary>
+		/// <param name="bundle">The asset bundle.</param>
 		public AssetBundleMod(AssetBundle bundle)
 		{
 			Bundle = bundle;
 		}
 
+		/// <inheritdoc />
 		public override (object reference, string filePath, ResourceParser parser) LoadEx(Type type, string path)
 		{
 			// If input type is UnityEngine.Object, load the asset from bundle locally otherwise try to parse
@@ -119,7 +130,7 @@ namespace Kit.Modding.Loaders
 			return default;
 		}
 
-
+		/// <inheritdoc />
 		public override UniTask<(object reference, string filePath, ResourceParser parser)> LoadExAsync(Type type, string path)
 		{
 			return typeof(Object).IsAssignableFrom(type) ? LoadUnityObjectAsync(type, path) : base.LoadExAsync(type, path);
@@ -142,30 +153,35 @@ namespace Kit.Modding.Loaders
 			return default;
 		}
 
+		/// <inheritdoc />
 		public override string ReadText(string path)
 		{
 			TextAsset textAsset = (TextAsset) LoadUnityObject(typeof(TextAsset), path).reference;
 			return textAsset != null ? textAsset.text : null;
 		}
 
+		/// <inheritdoc />
 		public override async UniTask<string> ReadTextAsync(string path)
 		{
 			TextAsset textAsset = (TextAsset) (await LoadUnityObjectAsync(typeof(TextAsset), path)).reference;
 			return textAsset != null ? textAsset.text : null;
 		}
 
+		/// <inheritdoc />
 		public override byte[] ReadBytes(string path)
 		{
 			TextAsset textAsset = (TextAsset) LoadUnityObject(typeof(TextAsset), path).reference;
 			return textAsset != null ? textAsset.bytes : null;
 		}
 
+		/// <inheritdoc />
 		public override async UniTask<byte[]> ReadBytesAsync(string path)
 		{
 			TextAsset textAsset = (TextAsset) (await LoadUnityObjectAsync(typeof(TextAsset), path)).reference;
 			return textAsset != null ? textAsset.bytes : null;
 		}
 
+		/// <inheritdoc />
 		public override IEnumerable<string> FindFiles(string path)
 		{
 			path = GetAssetPath(path);
@@ -179,6 +195,7 @@ namespace Kit.Modding.Loaders
 						 .Where(assetPath => ResourceManager.ComparePath(path, Path.ChangeExtension(assetPath, null)));
 		}
 
+		/// <inheritdoc />
 		public override bool Exists(string path)
 		{
 			return Bundle.Contains(GetAssetPath(path));
@@ -192,6 +209,7 @@ namespace Kit.Modding.Loaders
 			return path.StartsWith("Assets/", StringComparison.OrdinalIgnoreCase) ? path : "Assets/" + path;
 		}
 
+		/// <inheritdoc />
 		public override void Unload()
 		{
 			base.Unload();

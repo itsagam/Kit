@@ -5,7 +5,7 @@ using UnityEngine.UI;
 
 namespace Kit.UI
 {
-	/// <summary>A UI element that provides the cursor functionality for drag-and-drop operations.</summary>
+	/// <summary>A UI element that provides the cursor functionality for drag-&amp;-drop operations.</summary>
 	public class DragCursor: MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler
 	{
 		/// <summary>The <see cref="Item" /> for which this cursor is created.</summary>

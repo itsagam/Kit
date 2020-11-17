@@ -6,22 +6,21 @@ using XLua;
 
 namespace Kit.Modding.Scripting
 {
+	/// <summary>Configuration file for XLua.</summary>
 	public static class ScriptingConfig
 	{
-		// Recommended that all types to be accessed in Lua have LuaCallCSharp or ReflectionUse
+		// Recommended that all types to be accessed in Lua have LuaCallCSharp or ReflectionUse.
 
-		/*
-		// Generate adapter code for these types, otherwise use reflection with lower performance
-		[LuaCallCSharp]
-		public static IEnumerable<Type> LuaCallCSharp
-		{
-				get
-				{
-				}
-		}
-		*/
+		// /// <summary>Generate adapter code for these types, otherwise use reflection with lower performance.</summary>
+		// [LuaCallCSharp]
+		// public static IEnumerable<Type> LuaCallCSharp
+		// {
+		// 	get
+		// 	{
+		// 	}
+		// }
 
-		// Allows you to adapt a Lua function to a C# delegate or to adapt a Lua table to a C# interface
+		/// <summary>Allows you to adapt a Lua function to a C# delegate or to adapt a Lua table to a C# interface.</summary>
 		[CSharpCallLua]
 		public static IEnumerable<Type> CSharpCallLua
 		{
@@ -31,50 +30,44 @@ namespace Kit.Modding.Scripting
 			}
 		}
 
-		/*
-		[Hotfix]
-		// Types and individual members marked with [Hotfix] can be injected. Caution.
-		public static IEnumerable<Type> Hotfix
-		{
-			get
-			{
-			}
-		}
-		*/
+		// /// <summary>Types and individual members marked with [Hotfix] can be injected. Caution.</summary>
+		// [Hotfix]
+		// public static IEnumerable<Type> Hotfix
+		// {
+		// 	get
+		// 	{
+		// 	}
+		// }
 
-		/*
-		[ReflectionUse]
-		// Force reflection access on these types (and generate "link.xml" to block code stripping on IL2CPP)
-		public static IEnumerable<Type> ReflectionUse
-		{
-			get
-			{
-			}
-		}
-		*/
+		// /// <summary>Force reflection access on these types (and generate "link.xml" to block code stripping on IL2CPP).</summary>
+		// [ReflectionUse]
+		// public static IEnumerable<Type> ReflectionUse
+		// {
+		// 	get
+		// 	{
+		// 	}
+		// }
 
-		/*
-		// Generate optimized code with no gc allocs for pure value-types
-		[GCOptimize]
-		public static IEnumerable<Type> CSharpCallLua
-		{
-			get
-			{
-			}
-		}
-		*/
+		// /// <summary>Generate optimized code with no GC allocs for pure value-types.</summary>
+		// [GCOptimize]
+		// public static IEnumerable<Type> CSharpCallLua
+		// {
+		// 	get
+		// 	{
+		// 	}
+		// }
 
-		/*
-		// If you do not want to generate adaption code for a member of a type, implement it with this attribute
-		[BlackList]
-		public static List<List<string>> BlackList = new List<List<string>>()
-		{
+		// /// <summary>If you do not want to generate adaption code for a member of a type, implement it with this attribute.</summary>
+		// [BlackList]
+		// public static List<List<string>> BlackList = new List<List<string>>()
+		// 											 {
+		// 											 };
 
-		};
-		*/
-
-		// Individual functions, fields, and properties marked with [DoNotGen] do not generate code and are accessed through reflection
-		//[DoNotGen]
+		// /// <summary>
+		// ///     Individual functions, fields, and properties marked with [DoNotGen] do not generate code and are accessed through
+		// ///     reflection.
+		// /// </summary>
+		// [DoNotGen]
 	}
 }
 #endif

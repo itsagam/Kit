@@ -73,7 +73,8 @@
       <Filter entryType="Namespace" fullName="XLua.TemplateEngine" isExposed="False" xmlns="" />
     </ApiFilter>
     <PlugInConfigurations />
-    <ComponentConfigurations />
+    <ComponentConfigurations>
+    </ComponentConfigurations>
     <NamespaceSummaries>
       <NamespaceSummaryItem name="Kit" isDocumented="True">Base namespace with managers, helpers and extensions.</NamespaceSummaryItem>
       <NamespaceSummaryItem name="Kit.Algorithms" isDocumented="True">Implementations of common algorithms.</NamespaceSummaryItem>

@@ -5,10 +5,13 @@ using UnityEngine;
 
 namespace Kit.Modding.Scripting
 {
+	/// <summary>A buddy <see cref="Component" />/<see cref="GameObject" /> for a mod.</summary>
 	public class SimpleDispatcher: MonoBehaviour
 	{
+		/// <summary>Parent <see cref="Transform" /> for all mods.</summary>
 		protected static Transform parent = null;
 
+		/// <summary>Create the parent <see cref="GameObject" />/<see cref="Transform" /> for mods.</summary>
 		protected static void CreateParent()
 		{
 			GameObject parentGO = new GameObject("Mods");
@@ -23,6 +26,7 @@ namespace Kit.Modding.Scripting
 			transform.parent = parent;
 		}
 
+		/// <summary>Executes a piece of code such that exceptions are handled.</summary>
 		protected void ExecuteSafe(Action action)
 		{
 			try
@@ -35,6 +39,7 @@ namespace Kit.Modding.Scripting
 			}
 		}
 
+		/// <summary>Executes a co-routine such that exceptions are handled.</summary>
 		protected IEnumerator ExecuteSafe(IEnumerator enumerator)
 		{
 			while (true)
@@ -54,6 +59,7 @@ namespace Kit.Modding.Scripting
 			}
 		}
 
+		/// <summary>Starts a co-routine with exceptions handled.</summary>
 		public void StartCoroutineSafe(IEnumerator enumerator)
 		{
 			StartCoroutine(ExecuteSafe(enumerator));
@@ -64,6 +70,7 @@ namespace Kit.Modding.Scripting
 			Stop();
 		}
 
+		/// <summary>Stop all co-routines running with the component.</summary>
 		public virtual void Stop()
 		{
 			StopAllCoroutines();

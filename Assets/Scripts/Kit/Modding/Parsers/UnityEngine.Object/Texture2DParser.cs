@@ -4,12 +4,20 @@ using UnityEngine;
 
 namespace Kit.Parsers
 {
+	/// <summary>A texture parser.</summary>
+	/// <seealso cref="Kit.Parsers.ResourceParser" />
 	public class Texture2DParser: ResourceParser
 	{
+		/// <inheritdoc />
 		public override Type[] SupportedTypes { get; } = { typeof(Texture2D) };
+
+		/// <inheritdoc />
 		public override string[] SupportedExtensions { get; } = { ".jpg", ".jpeg", ".png" };
+
+		/// <inheritdoc />
 		public override ParseMode ParseMode => ParseMode.Binary;
 
+		/// <inheritdoc />
 		public override object Read(Type type, object data, string path = null)
 		{
 			Texture2D texture = new Texture2D(0, 0);
@@ -19,6 +27,7 @@ namespace Kit.Parsers
 			return texture;
 		}
 
+		/// <inheritdoc />
 		public override object Write(object data, string path = null)
 		{
 			Texture2D texture = (Texture2D) data;

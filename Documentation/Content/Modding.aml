@@ -217,9 +217,14 @@
 
 					<definedTerm>Version:</definedTerm>
 					<definition>
+						<para>Mod version.</para>
+					</definition>
+					
+					<definedTerm>Author:</definedTerm>
+					<definition>
 						<para>Mod author.</para>
 					</definition>
-
+					
 					<definedTerm>Description:</definedTerm>
 					<definition>
 						<para>A short description of the mod.</para>
@@ -227,7 +232,7 @@
 
 					<definedTerm>Persistence:</definedTerm>
 					<definition>
-						<para>Defines a mode for executing Lua scripts.</para>
+						<para>A mode for executing Lua scripts.</para>
 
 						<list class="nobullet">
 							<listItem>

@@ -4,6 +4,10 @@ using XLua;
 
 namespace Kit.Modding.Scripting
 {
+	/// <summary>
+	/// A <see cref="SimpleDispatcher"/> with a deeper hooking with the mod.
+	/// </summary>
+	/// <seealso cref="Kit.Modding.Scripting.SimpleDispatcher" />
 	public class FullDispatcher: SimpleDispatcher
 	{
 		protected LuaEnv scriptEnv;
@@ -11,6 +15,10 @@ namespace Kit.Modding.Scripting
 		protected event Action fixedUpdateEvent;
 		protected event Action lateUpdateEvent;
 
+		/// <summary>
+		/// Calls <c>awake</c> on and hooks <c>update</c>, <c>lateUpdate</c> and <c>fixedUpdate</c> methods from the scripting environment.
+		/// </summary>
+		/// <param name="env">The scripting environment.</param>
 		public void Hook(LuaEnv env)
 		{
 			scriptEnv = env;
@@ -54,6 +62,11 @@ namespace Kit.Modding.Scripting
 			fixedUpdateEvent?.Invoke();
 		}
 
+		/// <summary>
+		/// Schedules an action on <c>update</c>, <c>lateUpdate</c> or <c>fixedUpdate</c> methods.
+		/// </summary>
+		/// <param name="type">The method to schedule on. Case-sensitive.</param>
+		/// <param name="action">The piece of code to execute.</param>
 		public void Schedule(string type, Action action)
 		{
 			if (action == null)
@@ -75,6 +88,9 @@ namespace Kit.Modding.Scripting
 			}
 		}
 
+		/// <summary>
+		/// Stop all co-routines and calls <c>onDestroy</c> on mod scripts.
+		/// </summary>
 		public override void Stop()
 		{
 			if (scriptEnv == null)

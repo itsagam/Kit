@@ -54,7 +54,7 @@
 							<para>Tools</para>
 						</entry>
 						<entry>
-							<para>Compile-time XLua tools.</para>
+							<para>Compile-time <link xlink:href="Plugins">XLua</link> tools.</para>
 						</entry>
 					</row>
 				</table>
@@ -573,7 +573,8 @@
 							</para>
 						</entry>
 						<entry>
-							<para>Third-party plugins.</para>
+							<para>
+								<link xlink:href="Plugins">Third-party plugins</link>.</para>
 						</entry>
 					</row>
 				</table>

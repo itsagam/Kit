@@ -6,8 +6,10 @@ using Cysharp.Threading.Tasks;
 
 namespace Kit.Modding.Loaders
 {
+	/// <summary>A <see cref="ModLoader" /> that loads resources directly from folders.</summary>
 	public class DirectModLoader: ModLoader
 	{
+		/// <inheritdoc />
 		public override Mod LoadMod(string path)
 		{
 			FileAttributes attributes = File.GetAttributes(path);
@@ -26,6 +28,7 @@ namespace Kit.Modding.Loaders
 			return mod;
 		}
 
+		/// <inheritdoc />
 		public override async UniTask<Mod> LoadModAsync(string path)
 		{
 			FileAttributes attributes = File.GetAttributes(path);
@@ -45,15 +48,21 @@ namespace Kit.Modding.Loaders
 		}
 	}
 
+	/// <summary>A mod that load files directly.</summary>
+	/// <seealso cref="Kit.Modding.Mod" />
 	public class DirectMod: Mod
 	{
+		/// <summary>Path to the mod.</summary>
 		public string Path { get; }
 
+		/// <summary>Create a new instance with the given path.</summary>
+		/// <param name="path">The path.</param>
 		public DirectMod(string path)
 		{
 			Path = path + "/";
 		}
 
+		/// <inheritdoc />
 		public override string ReadText(string path)
 		{
 			try
@@ -67,6 +76,7 @@ namespace Kit.Modding.Loaders
 			}
 		}
 
+		/// <inheritdoc />
 		public override async UniTask<string> ReadTextAsync(string path)
 		{
 			try
@@ -81,6 +91,7 @@ namespace Kit.Modding.Loaders
 			}
 		}
 
+		/// <inheritdoc />
 		public override byte[] ReadBytes(string path)
 		{
 			try
@@ -94,6 +105,7 @@ namespace Kit.Modding.Loaders
 			}
 		}
 
+		/// <inheritdoc />
 		public override async UniTask<byte[]> ReadBytesAsync(string path)
 		{
 			try
@@ -112,6 +124,7 @@ namespace Kit.Modding.Loaders
 			}
 		}
 
+		/// <inheritdoc />
 		public override IEnumerable<string> FindFiles(string path)
 		{
 			string fullPath = GetFullPath(path);
@@ -140,11 +153,14 @@ namespace Kit.Modding.Loaders
 			}
 		}
 
+		/// <inheritdoc />
 		public override bool Exists(string path)
 		{
 			return File.Exists(GetFullPath(path));
 		}
 
+		/// <summary>Gets the full path to a file.</summary>
+		/// <param name="subPath">Path excluding the mod location.</param>
 		public string GetFullPath(string subPath)
 		{
 			return Path + subPath;

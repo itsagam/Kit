@@ -8,10 +8,16 @@ using Cysharp.Threading.Tasks;
 
 namespace Kit.Modding.Loaders
 {
+	/// <summary>Class ZipModLoader. Implements the <see cref="Kit.Modding.ModLoader" /></summary>
+	/// <seealso cref="Kit.Modding.ModLoader" />
 	public class ZipModLoader: ModLoader
 	{
+		/// <summary>The supported extensions</summary>
 		public readonly List<string> SupportedExtensions = new List<string> { ".zip" };
 
+		/// <summary>Loads the mod.</summary>
+		/// <param name="path">The path.</param>
+		/// <returns>Mod.</returns>
 		public override Mod LoadMod(string path)
 		{
 			FileAttributes attributes = File.GetAttributes(path);
@@ -44,6 +50,9 @@ namespace Kit.Modding.Loaders
 			}
 		}
 
+		/// <summary>load mod as an asynchronous operation.</summary>
+		/// <param name="path">The path.</param>
+		/// <returns>UniTask&lt;Mod&gt;.</returns>
 		public override async UniTask<Mod> LoadModAsync(string path)
 		{
 			FileAttributes attributes = File.GetAttributes(path);
@@ -77,20 +86,27 @@ namespace Kit.Modding.Loaders
 		}
 	}
 
+	/// <summary>A compressed archive loaded as a mod. Loaded with <see cref="ZipModLoader"/>.</summary>
+	/// <seealso cref="Kit.Modding.Mod" />
 	public class ZipMod: Mod
 	{
+		/// <summary>The mod archive.</summary>
 		public ZipArchive Archive { get; }
 
+		/// <summary>Create a new instance with the given archive.</summary>
+		/// <param name="archive">The archive.</param>
 		public ZipMod(ZipArchive archive)
 		{
 			Archive = archive;
 		}
 
+		/// <inheritdoc />
 		public override bool Exists(string path)
 		{
 			return Archive.GetEntry(path) != null;
 		}
 
+		/// <inheritdoc />
 		public override string ReadText(string path)
 		{
 			try
@@ -106,6 +122,7 @@ namespace Kit.Modding.Loaders
 			}
 		}
 
+		/// <inheritdoc />
 		public override async UniTask<string> ReadTextAsync(string path)
 		{
 			try
@@ -121,6 +138,7 @@ namespace Kit.Modding.Loaders
 			}
 		}
 
+		/// <inheritdoc />
 		public override byte[] ReadBytes(string path)
 		{
 			try
@@ -139,6 +157,7 @@ namespace Kit.Modding.Loaders
 			}
 		}
 
+		/// <inheritdoc />
 		public override async UniTask<byte[]> ReadBytesAsync(string path)
 		{
 			try
@@ -157,6 +176,7 @@ namespace Kit.Modding.Loaders
 			}
 		}
 
+		/// <inheritdoc />
 		public override IEnumerable<string> FindFiles(string path)
 		{
 			ZipArchiveEntry result = Archive.GetEntry(path);
@@ -173,6 +193,7 @@ namespace Kit.Modding.Loaders
 						  .Select(entry => entry.FullName);
 		}
 
+		/// <inheritdoc />
 		public override void Unload()
 		{
 			base.Unload();
