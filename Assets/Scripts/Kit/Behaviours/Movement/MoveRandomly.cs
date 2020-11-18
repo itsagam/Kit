@@ -36,7 +36,7 @@ namespace Kit.Behaviours
 		protected Bounds bounds;
 		protected new Transform transform;
 
-		protected void Awake()
+		protected virtual void Awake()
 		{
 			if (Area == null)
 				return;
@@ -46,7 +46,7 @@ namespace Kit.Behaviours
 			Move();
 		}
 
-		protected void Move()
+		protected virtual void Move()
 		{
 			Vector3 destination = bounds.GetRandomPoint();
 			Vector3 position = transform.position;
