@@ -1,4 +1,4 @@
-﻿#if UNITY_EDITOR || DEVELOPMENT_BUILD
+﻿#if CONSOLE && (UNITY_EDITOR || DEVELOPMENT_BUILD)
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -22,9 +22,6 @@ namespace Kit
 	/// <summary>In-game Lua console. Press tilde (~) on PC or flick-down on mobile to show.</summary>
 	public static class Console
 	{
-		/// <summary>Set to <see langword="true" /> to enable the Console.</summary>
-		public const bool Enabled = true;
-
 		/// <summary>Prefab location to the Console UI.</summary>
 		public const string Prefab = "Console/Console";
 
@@ -55,7 +52,7 @@ namespace Kit
 		[RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
 		public static void Initialize()
 		{
-			if (!Enabled || instance != null)
+			if (instance != null)
 				return;
 
 			if (CreateUI())
@@ -282,7 +279,7 @@ namespace Kit
 			var members = type.GetMembers(BindingFlags.Public | BindingFlags.DeclaredOnly | BindingFlags.Static | BindingFlags.Instance);
 			var extensions = from t in type.Assembly.GetTypes().Union(Assembly.GetExecutingAssembly().GetTypes())
 							 //from t in AppDomain.CurrentDomain.GetAssemblies().SelectMany(a => a.GetTypes())
-							 where t.IsSealed() && !t.IsGenericType() && !t.IsNested
+							 where t.IsSealed && !t.IsGenericType && !t.IsNested
 							 from method in t.GetMethods(BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic)
 							 where method.IsDefined(typeof(ExtensionAttribute), false)
 							 where method.GetParameters()[0].ParameterType == type
