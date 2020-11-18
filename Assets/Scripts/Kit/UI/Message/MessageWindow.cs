@@ -62,7 +62,7 @@ namespace Kit.UI.Message
 
 		/// <summary>Show a message window.</summary>
 		/// <remarks>Can be awaited-upon.</remarks>
-		/// <param name="prefab">Path to the prefab to use for displaying the message.</param>
+		/// <param name="prefab">The prefab to use for displaying the message.</param>
 		/// <param name="title">Title of the window.</param>
 		/// <param name="message">The message to show.</param>
 		/// <param name="type">Type of message to show – determines the icon.</param>
@@ -73,7 +73,7 @@ namespace Kit.UI.Message
 		/// <param name="yesAction">>Callback for the Yes button.</param>
 		/// <param name="noAction">>Callback for the No button.</param>
 		/// <returns>Instance of the window created.</returns>
-		public static UniTask<Window> Show(string prefab,
+		public static UniTask<Window> Show(MessageWindow prefab,
 										   string title,
 										   string message,
 										   MessageType type = MessageType.Info,
@@ -96,20 +96,9 @@ namespace Kit.UI.Message
 			return UIManager.Show(prefab, info);
 		}
 
-		/// <summary>Show a message window.</summary>
-		/// <remarks>Can be awaited-upon.</remarks>
-		/// <param name="prefab">The prefab to use for displaying the message.</param>
-		/// <param name="title">Title of the window.</param>
-		/// <param name="message">The message to show.</param>
-		/// <param name="type">Type of message to show – determines the icon.</param>
-		/// <param name="buttons">Buttons to show with the message.</param>
-		/// <param name="subtitle">Sub-title to go along with the title.</param>
-		/// <param name="okayAction">Callback for the Okay button.</param>
-		/// <param name="cancelAction">Callback for the Cancel button.</param>
-		/// <param name="yesAction">>Callback for the Yes button.</param>
-		/// <param name="noAction">>Callback for the No button.</param>
-		/// <returns>Instance of the window created.</returns>
-		public static UniTask<Window> Show(MessageWindow prefab,
+		/// <inheritdoc cref="Show(MessageWindow, string, string, MessageType, MessageButtons, string, Action, Action, Action, Action" />
+		/// <param name="prefab">Path to the prefab to use for displaying the message.</param>
+		public static UniTask<Window> Show(string prefab,
 										   string title,
 										   string message,
 										   MessageType type = MessageType.Info,

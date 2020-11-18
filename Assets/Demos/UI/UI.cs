@@ -9,19 +9,11 @@ namespace Demos
 	public class UI : MonoBehaviour
 	{
 		public Image BGImage;
+		public MessageWindow MsgWindow;
 		public MyWindow PrefabWindow;
 		public MyWindow SceneWindow;
 		public string PrefabPath;
 		public WindowReference SoftReference;
-
-		public void ShowMessage(MessageWindow messageWindow)
-		{
-			MessageWindow.Show(messageWindow,
-							   "Clear background",
-							   "Do you want to clear the background?",
-							   MessageType.Question, MessageButtons.YesNo,
-							   yesAction: () => BGImage.sprite = null);
-		}
 
 		public void ShowWindowWithPrefab()
 		{
@@ -51,6 +43,15 @@ namespace Demos
 		public void ConflictWindow()
 		{
 			UIManager.Show(PrefabWindow, conflictMode: WindowConflictMode.HidePrevious);
+		}
+
+		public void ShowMessage()
+		{
+			MessageWindow.Show(MsgWindow,
+							   "Clear background",
+							   "Do you want to clear the background?",
+							   MessageType.Question, MessageButtons.YesNo,
+							   yesAction: () => BGImage.sprite = null);
 		}
 	}
 }

@@ -96,7 +96,7 @@ namespace Kit.Modding
 		/// <summary>Load a resource.</summary>
 		/// <param name="folder">The folder to load the resource from.</param>
 		/// <param name="file">The path and file-name relative to the <paramref name="folder" />.</param>
-		/// <returns>Reference to the resource.</returns>
+		/// <returns>Reference to the resource, or <see langword="null" /> if it was not found.</returns>
 		public object Load(ResourceFolder folder, string file)
 		{
 			return LoadEx(typeof(object), ModManager.GetModdingPath(folder, file)).reference;

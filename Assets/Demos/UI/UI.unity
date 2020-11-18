@@ -971,7 +971,7 @@ PrefabInstance:
     - target: {fileID: 4014891476405281643, guid: 61de5187bf903e94a8a9751704e93d44,
         type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Mode
-      value: 2
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 4014891476405281643, guid: 61de5187bf903e94a8a9751704e93d44,
         type: 3}
@@ -996,14 +996,13 @@ PrefabInstance:
     - target: {fileID: 4014891476405281643, guid: 61de5187bf903e94a8a9751704e93d44,
         type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_ObjectArgumentAssemblyTypeName
-      value: Engine.UI.Message.MessageWindow, Assembly-CSharp
+      value: UnityEngine.Object, UnityEngine
       objectReference: {fileID: 0}
     - target: {fileID: 4014891476405281643, guid: 61de5187bf903e94a8a9751704e93d44,
         type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_ObjectArgument
       value: 
-      objectReference: {fileID: 7265507603758757806, guid: 269dd88dce84d344a87b68e6a86f1653,
-        type: 3}
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 61de5187bf903e94a8a9751704e93d44, type: 3}
 --- !u!1 &702424201
@@ -1463,6 +1462,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   BGImage: {fileID: 1393822404}
+  MsgWindow: {fileID: 7265507603758757806, guid: 269dd88dce84d344a87b68e6a86f1653,
+    type: 3}
   PrefabWindow: {fileID: -5542622821664111983, guid: cf3746630985c644485c6bb33b9d9125,
     type: 3}
   SceneWindow: {fileID: 906584888}

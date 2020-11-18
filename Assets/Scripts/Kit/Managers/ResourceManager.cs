@@ -151,7 +151,7 @@ namespace Kit
 		///     files. Has no effect if MODDING is not defined or <paramref name="modded" /> is false.
 		/// </param>
 		/// <typeparam name="T">Type of the resource expected.</typeparam>
-		/// <returns>Reference to the resource.</returns>
+		/// <returns>Reference to the resource, or <see langword="null" /> if it was not found.</returns>
 
 		#region Load(folder, file)
 
@@ -271,7 +271,7 @@ namespace Kit
 		/// <param name="folder">The folder to load the resource from.</param>
 		/// <param name="file">The path and file-name relative to the <paramref name="folder" />.</param>
 		/// <typeparam name="T">Type of the resource expected.</typeparam>
-		/// <returns>Reference to the resource.</returns>
+		/// <returns>Reference to the resource, or <see langword="null" /> if it was not found.</returns>
 		public static T LoadUnmodded<T>(ResourceFolder folder, string file)
 		{
 			return (T) LoadUnmodded(typeof(T), folder, file);
@@ -369,7 +369,7 @@ namespace Kit
 		/// <param name="folder">The folder to load the resource from.</param>
 		/// <param name="file">The path and file-name relative to the <paramref name="folder" />.</param>
 		/// <typeparam name="T">Type of the resource expected.</typeparam>
-		/// <returns>Reference to the resource.</returns>
+		/// <returns>Reference to the resource, or <see langword="null" /> if it was not found.</returns>
 		public static T LoadMerged<T>(ResourceFolder folder, string file)
 		{
 			return (T) LoadMerged(typeof(T), folder, file);
@@ -512,7 +512,7 @@ namespace Kit
 		/// <summary>Load a resource from an absolute path with the list of parsers registered. Does not cache.</summary>
 		/// <param name="fullPath">Absolute path to the resource.</param>
 		/// <typeparam name="T">Type of the resource expected.</typeparam>
-		/// <returns>Reference to the resource.</returns>
+		/// <returns>Reference to the resource, or <see langword="null" /> if it was not found.</returns>
 		public static T Load<T>(string fullPath)
 		{
 			return (T) LoadEx(typeof(T), fullPath).reference;
