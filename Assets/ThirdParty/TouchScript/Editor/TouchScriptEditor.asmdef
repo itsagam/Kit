@@ -1,0 +1,19 @@
+{
+    "name": "TouchScript.Editor",
+    "references": [
+        "GUID:65abfa33e73bf1c49867c9f98ec29fe6"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [
+        "TOUCHSCRIPT"
+    ],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

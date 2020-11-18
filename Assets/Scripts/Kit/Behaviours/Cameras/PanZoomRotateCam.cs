@@ -1,4 +1,5 @@
-﻿using System;
+﻿#if TOUCHSCRIPT
+using System;
 using Sirenix.OdinInspector;
 using TouchScript.Gestures;
 using TouchScript.Pointers;
@@ -321,3 +322,4 @@ namespace Kit.Behaviours
 		#endregion
 	}
 }
+#endif

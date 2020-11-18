@@ -1,3 +1,4 @@
+#if TOUCHSCRIPT
 using System;
 using Sirenix.OdinInspector;
 using TouchScript.Gestures.TransformGestures;
@@ -83,3 +84,4 @@ namespace Kit.Behaviours
 		}
 	}
 }
+#endif

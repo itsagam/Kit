@@ -50,13 +50,11 @@ namespace Kit.Containers
 	///         <item>
 	///             <description>
 	///                 <para>
-	///                     The JObject mode is very similar to State-Mono mode, except that you put <see cref="JObject" /> in GameState
-	///                     wherever you want to work with <see cref="MonoBehaviour" />s and call
-	///                     <see
-	///                         cref="JsonPrefab.Instantiate{T}(string, System.Collections.Generic.IEnumerable{Newtonsoft.Json.Linq.JObject}, bool)" />
-	///                     by providing it the prefab path and <see cref="JObject" />s to instantiate directly. This is the faster
-	///                     method and doesn't have problems like having to use <see cref="JsonSubtypes" /> to create the correct
-	///                     State-object type.
+	///                     The JObject mode is very similar to State-Mono mode, except that you put <see cref="JObject" /> in
+	///                     GameState wherever you want to work with <see cref="MonoBehaviour" />s and call
+	///                     <see cref="JsonPrefab.Instantiate{T}(string, IEnumerable{JObject}, bool)" /> by providing it the prefab path
+	///                     and <see cref="JObject" />s to instantiate directly. This is the faster method and doesn't have problems like
+	///                     having to use <see cref="JsonSubtypes" /> to create the correct State-object type.
 	///                 </para>
 	///             </description>
 	///         </item>
@@ -87,7 +85,7 @@ namespace Kit.Containers
 	///   {
 	///  		[JsonProperty]
 	///  		public string Type;
-	/// 
+	///
 	///   		[JsonProperty]
 	///  		public Vector2 Position;
 	///   }
@@ -102,7 +100,7 @@ namespace Kit.Containers
 	///   {
 	///  		[JsonProperty]
 	///  		public string Type;
-	/// 
+	///
 	///   		[JsonProperty]
 	///  		public Vector2 Position;
 	///   }
@@ -124,7 +122,7 @@ namespace Kit.Containers
 	///   {
 	///  		[JsonProperty]
 	///  		public string Type;
-	/// 
+	///
 	///   		[JsonProperty]
 	///  		public Vector2 Position;
 	///   }

@@ -1,19 +1,22 @@
-﻿using System;
+﻿#if UNITY_EDITOR || DEVELOPMENT_BUILD
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Text;
 using Kit.UI.Widgets;
-using TouchScript.Gestures;
-using TouchScript.Layers;
 using UniRx;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using XLua;
 using Object = UnityEngine.Object;
 
-#if UNITY_EDITOR || DEVELOPMENT_BUILD
+#if TOUCHSCRIPT
+using TouchScript.Gestures;
+using TouchScript.Layers;
+#endif
+
 namespace Kit
 {
 	/// <summary>In-game Lua console. Press tilde (~) on PC or flick-down on mobile to show.</summary>
@@ -81,6 +84,7 @@ namespace Kit
 		{
 			if (Application.isMobilePlatform)
 			{
+#if TOUCHSCRIPT
 				GameObject gameObject = instance.gameObject;
 
 				FullscreenLayer layer = gameObject.AddComponent<FullscreenLayer>();
@@ -95,6 +99,7 @@ namespace Kit
 									 else if (flick.ScreenFlickVector.y > 0 && IsVisible)
 										 Hide();
 								 };
+#endif
 			}
 			else
 				Observable
