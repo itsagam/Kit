@@ -21,10 +21,16 @@
 							<codeInline>CS.Game</codeInline> respectively (see <localUri>Resources/Lua/General.lua.txt</localUri>) so
 							<codeInline>UE.GameObject("MyObject")</codeInline> and <codeInline>Game.DataManager.GameData</codeInline> will work just as well.
 						</para>
-						<alert class="note">
+						<alert class="tip">
 							<para>
 								You can, if you so desire, add new functions and commands to the console for easier access by modifying
 								<localUri>Resources/Lua/Console.lua.txt</localUri>.
+							</para>
+						</alert>
+						<alert class="note">
+							<para>
+								...or you can disable the Console entirely by removing the <codeInline>CONSOLE</codeInline> symbol definition in <ui>Project Settings</ui>.
+								It only gets compiled for editor and development builds, either way.
 							</para>
 						</alert>
 					</entry>

@@ -3,6 +3,7 @@ using UnityEngine;
 
 namespace Kit.Behaviours
 {
+	/// <summary>Move the <see cref="Transform"/> in a given direction.</summary>
 	public class MoveInDirection: MonoBehaviour
 	{
 		/// <summary>Direction to move in.</summary>

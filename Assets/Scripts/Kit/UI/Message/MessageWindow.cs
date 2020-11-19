@@ -96,7 +96,7 @@ namespace Kit.UI.Message
 			return UIManager.Show(prefab, info);
 		}
 
-		/// <inheritdoc cref="Show(MessageWindow, string, string, MessageType, MessageButtons, string, Action, Action, Action, Action" />
+		/// <inheritdoc cref="Show(MessageWindow, string, string, MessageType, MessageButtons, string, Action, Action, Action, Action)" />
 		/// <param name="prefab">Path to the prefab to use for displaying the message.</param>
 		public static UniTask<Window> Show(string prefab,
 										   string title,

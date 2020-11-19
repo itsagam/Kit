@@ -78,7 +78,7 @@
 						<para>
 							All of the modding functionality is only compiled if <codeInline>MODDING</codeInline> is defined in
 							<ui>Project Settings</ui> → <ui>Player</ui> → <ui>Scripting Define Symbols</ui>.
-							This not only ensures that modding for a game can be enabled or disabled at the flip of as switch but also that if modding
+							This not only ensures that modding for a game can be enabled or disabled at the flip of a switch but also that if modding
 							support is not needed, the code is not packaged into the game to prevent abuse. Remove the <codeInline>MODDING</codeInline>
 							symbol definition if you don't want modding.
 						</para>

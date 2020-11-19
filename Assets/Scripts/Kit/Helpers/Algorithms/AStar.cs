@@ -91,7 +91,7 @@ namespace Kit.Algorithms
 		}
 	}
 
-	/// <summary>An implementation of the <see href="https://en.wikipedia.org/wiki/Priority_queue" /> data structure.</summary>
+	/// <summary>An implementation of the <see href="https://en.wikipedia.org/wiki/Priority_queue">Priority Queue</see> data structure.</summary>
 	/// <typeparam name="T">Type of the elements to queue.</typeparam>
 	public class PriorityQueue<T>
 	{
