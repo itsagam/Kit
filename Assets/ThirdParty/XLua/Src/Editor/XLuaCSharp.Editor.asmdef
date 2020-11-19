@@ -1,0 +1,19 @@
+{
+    "name": "XLuaCSharp.Editor",
+    "references": [
+        "GUID:025fca6c54a30cb4fbc27d15329c77f1"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [
+        "MODDING || CONSOLE"
+    ],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
