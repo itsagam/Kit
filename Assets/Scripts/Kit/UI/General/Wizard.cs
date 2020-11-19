@@ -71,7 +71,7 @@ namespace Kit.UI
 		protected override void Awake()
 		{
 			base.Awake();
-			Screens.ForEach(s => s.gameObject.SetActive(false));
+			Screens.ForEach(screen => screen.gameObject.SetActive(false));
 		}
 
 		protected override void Start()
