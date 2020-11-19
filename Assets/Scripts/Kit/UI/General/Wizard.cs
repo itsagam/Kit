@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Linq;
+using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using Sirenix.OdinInspector;
 using UnityEngine;
@@ -13,10 +13,18 @@ namespace Kit.UI
 	/// </summary>
 	public class Wizard: Window
 	{
-		/// <summary>The initial window.</summary>
-		[Tooltip("The initial window.")]
-		[PropertyOrder(-99)]
-		public Window Default;
+		/// <summary>List of all <see cref="Window" />s to use as wizard screens. Order is taken into account.</summary>
+		[PropertyOrder(-2)]
+		[Tooltip("List of all Windows to use as wizard screens. Order is taken into account.")]
+		[SceneObjectsOnly]
+		[Required]
+		public List<Window> Screens;
+
+		/// <summary>Index of the initial screen.</summary>
+		[PropertyOrder(-1)]
+		[Tooltip("Index of the initial screen.")]
+		[PropertyRange(0, "@Count - 1")]
+		public int DefaultScreen = 0;
 
 		/// <summary>The animation state to play for showing the next screen.</summary>
 		[Tooltip("The animation state to play for showing the next screen.")]
@@ -60,10 +68,16 @@ namespace Kit.UI
 		/// <summary>Index of the active screen.</summary>
 		public int Index { get; protected set; } = -1;
 
-		protected void Start()
+		protected override void Awake()
 		{
-			if (Default != null)
-				GoTo(Default);
+			base.Awake();
+			Screens.ForEach(screen => screen.gameObject.SetActive(false));
+		}
+
+		protected override void Start()
+		{
+			if (IsValid(DefaultScreen))
+				GoTo(DefaultScreen).Forget();
 		}
 
 		/// <summary>Move the wizard to a specific step.</summary>
@@ -135,19 +149,16 @@ namespace Kit.UI
 		/// <summary>Returns the index of a particular screen.</summary>
 		public virtual int IndexOf(Window window)
 		{
-			Window found = transform.GetComponentsInChildren<Window>(true).FirstOrDefault(p => p == window);
-			if (found != null)
-				return found.transform.GetSiblingIndex();
-			return -1;
+			return Screens.IndexOf(window);
 		}
 
 		/// <summary>Returns the active screen.</summary>
 		public virtual Window Active => this[Index];
 
 		/// <summary>Returns the screen at particular index.</summary>
-		public virtual Window this[int index] => IsValid(index) ? transform.GetChild(index).GetComponent<Window>() : null;
+		public virtual Window this[int index] => IsValid(index) ? Screens[index] : null;
 
 		/// <summary>Returns the total number of screens.</summary>
-		public virtual int Count => transform.childCount;
+		public virtual int Count => Screens.Count;
 	}
 }

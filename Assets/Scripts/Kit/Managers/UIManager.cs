@@ -239,10 +239,10 @@ namespace Kit
 		/// <summary>Register a window in the system. Called automatically.</summary>
 		public static void Register(Window instance)
 		{
-			instance.Hidden.AddListener(() => Showing?.Invoke(instance));
+			instance.Showing.AddListener(() => Showing?.Invoke(instance));
 			instance.Shown.AddListener(() => Shown?.Invoke(instance));
-			instance.Shown.AddListener(() => Hiding?.Invoke(instance));
-			instance.Shown.AddListener(() => Hidden?.Invoke(instance));
+			instance.Hiding.AddListener(() => Hiding?.Invoke(instance));
+			instance.Hidden.AddListener(() => Hidden?.Invoke(instance));
 		}
 
 		private static Canvas CreateCanvas()

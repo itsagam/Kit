@@ -43,6 +43,9 @@ namespace Kit
 		/// <summary>Text to display for <see langword="null" /> objects.</summary>
 		public const string NullString = "nil";
 
+		/// <summary><see cref="StringBuilder" /> for the entire log.</summary>
+		public static readonly StringBuilder LogBuilder = new StringBuilder(Length);
+
 		private static ConsoleUI instance;
 		private static CompositeDisposable disposables = new CompositeDisposable();
 
@@ -177,9 +180,6 @@ namespace Kit
 
 		#region Log
 
-		/// <summary><see cref="StringBuilder" /> for the entire log.</summary>
-		public static readonly StringBuilder LogBuilder = new StringBuilder(Length);
-
 		private static string logEnd = Environment.NewLine;
 
 		private static void RegisterLogging()
@@ -200,7 +200,13 @@ namespace Kit
 		/// <summary>Log an object on the Console.</summary>
 		public static void Log(object obj)
 		{
-			Log(ObjectOrTableToString(obj));
+			if (instance == null)
+				return;
+
+			ObjectOrTableToString(LogBuilder, obj, Depth, new List<object>());
+			TrimLog(LogBuilder.Length);
+			LogBuilder.AppendLine();
+			instance.LogText.text = LogBuilder.ToString();
 		}
 
 		/// <summary>Log a line on the Console.</summary>
@@ -209,24 +215,19 @@ namespace Kit
 			if (instance == null)
 				return;
 
-			StringBuilder log = LogBuilder;
-			int newLength = log.Length + line.Length;
-			if (newLength > Length)
-			{
-				int removeLength = newLength - Length;
-				removeLength = log.IndexOf(logEnd, removeLength) + logEnd.Length;
-				log.Remove(0, removeLength);
-			}
-
-			log.AppendLine(line);
-			instance.LogText.text = log.ToString();
+			TrimLog(LogBuilder.Length  + line.Length);
+			LogBuilder.AppendLine(line);
+			instance.LogText.text = LogBuilder.ToString();
 		}
 
-		private static string ObjectOrTableToString(object obj)
+		private static void TrimLog(int newLength)
 		{
-			StringBuilder output = new StringBuilder();
-			ObjectOrTableToString(output, obj, Depth, new List<object>());
-			return output.ToString();
+			if (newLength <= Length)
+				return;
+
+			int removeLength = newLength - Length;
+			removeLength = LogBuilder.IndexOf(logEnd, removeLength) + logEnd.Length;
+			LogBuilder.Remove(0, removeLength);
 		}
 
 		private static void ObjectOrTableToString(StringBuilder output, object obj, int depth, List<object> traversed)
@@ -249,7 +250,7 @@ namespace Kit
 				output.Append("}");
 			}
 			else
-				Debugger.ObjectToString(output, obj, false, NullString);
+				Debugger.ObjectOrEnumerableToString(output, obj, false, NullString);
 		}
 
 		private static void CyclicObjectOrTableToString(StringBuilder output, object obj, int depth, List<object> traversed)
@@ -270,7 +271,7 @@ namespace Kit
 				}
 			}
 			else
-				Debugger.ObjectToString(output, obj, false, NullString);
+				Debugger.ObjectOrEnumerableToString(output, obj, false, NullString);
 		}
 
 		/// <summary>List all members of a class on the Console.</summary>

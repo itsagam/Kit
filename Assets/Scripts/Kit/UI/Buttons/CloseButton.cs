@@ -5,8 +5,9 @@
 	{
 		protected override void OnClick()
 		{
-			if (UIManager.Last != null)
-				UIManager.Last.Hide();
+			Window window = GetComponentInParent<Window>();
+			if (window != null)
+				window.Hide();
 		}
 	}
 }

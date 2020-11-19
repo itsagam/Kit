@@ -9,6 +9,12 @@ namespace Kit.UI
 	/// <summary>Base class for all screens. Handles animation, sound and events.</summary>
 	public class Window: MonoBehaviour
 	{
+		/// <summary>
+		/// Whether to track the <see cref="Window"/> in <see cref="UIManager"/>.
+		/// </summary>
+		[Tooltip("Whether to track the window in UIManager.")]
+		public bool Track = true;
+
 		/// <summary>The animation state to play when showing the screen.</summary>
 		[FoldoutGroup("Animations")]
 		[Tooltip("The animation state to play when showing the screen.")]
@@ -61,8 +67,20 @@ namespace Kit.UI
 		protected virtual void Awake()
 		{
 			animator = GetComponent<Animator>();
-			gameObject.SetActive(false);
-			UIManager.Register(this);
+			if (Track)
+				UIManager.Register(this);
+		}
+
+		protected virtual void Start()
+		{
+			// Mark the window shown if its in the scene and when not activated through Show.
+			if (!isInstance && IsBusy)
+			{
+				// Start is always called when a game object is activated (no need to check for that)
+				State = WindowState.Shown;
+				if (Track)
+					UIManager.Windows.Add(this);
+			}
 		}
 
 		/// <summary>Show the window.</summary>
@@ -88,9 +106,12 @@ namespace Kit.UI
 				return true;
 
 			State = WindowState.Showing;
+
 			OnShowing();
 			Showing.Invoke();
-			UIManager.Windows.Add(this);
+
+			if (Track)
+				UIManager.Windows.Add(this);
 
 			Data = data;
 			gameObject.SetActive(true);
@@ -171,7 +192,8 @@ namespace Kit.UI
 			else
 			{
 				gameObject.SetActive(false);
-				UIManager.Windows.Remove(this);
+				if (Track)
+					UIManager.Windows.Remove(this);
 			}
 
 			OnHidden();
@@ -187,7 +209,12 @@ namespace Kit.UI
 
 		protected virtual void OnDestroy()
 		{
-			UIManager.Windows.Remove(this);
+			Hidden = null;
+			Hiding = null;
+			Showing = null;
+			Shown = null;
+			if (Track)
+				UIManager.Windows.Remove(this);
 		}
 
 		#endregion

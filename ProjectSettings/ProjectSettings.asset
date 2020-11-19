@@ -745,7 +745,11 @@ PlayerSettings:
   webGLThreadsSupport: 0
   webGLDecompressionFallback: 0
   scriptingDefineSymbols:
+<<<<<<< HEAD
     1: ODIN_INSPECTOR;ODIN_INSPECTOR_3;UNITASK_DOTWEEN_SUPPORT;MODDING;CONSOLE;TOUCHSCRIPT
+=======
+    1: ODIN_INSPECTOR;ODIN_INSPECTOR_3;UNITASK_DOTWEEN_SUPPORT;CONSOLE;MODDING;TOUCHSCRIPT
+>>>>>>> 6bcf3073444342ee20e5304c5477299ae9a30ebe
   platformArchitecture: {}
   scriptingBackend: {}
   il2cppCompilerConfiguration: {}
