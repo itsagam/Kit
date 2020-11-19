@@ -203,7 +203,9 @@ namespace Kit
 		/// <summary>Log an object on the Console.</summary>
 		public static void Log(object obj)
 		{
-			Log(ObjectOrTableToString(obj));
+			StringBuilder output = new StringBuilder();
+			ObjectOrTableToString(output, obj, Depth, new List<object>());
+			Log(output.ToString());
 		}
 
 		/// <summary>Log a line on the Console.</summary>
@@ -225,11 +227,23 @@ namespace Kit
 			instance.LogText.text = log.ToString();
 		}
 
-		private static string ObjectOrTableToString(object obj)
+		/// <summary>Log a line on the Console.</summary>
+		public static void Log(StringBuilder line)
 		{
-			StringBuilder output = new StringBuilder();
-			ObjectOrTableToString(output, obj, Depth, new List<object>());
-			return output.ToString();
+			if (instance == null)
+				return;
+
+			StringBuilder log = LogBuilder;
+			int newLength = log.Length + line.Length;
+			if (newLength > Length)
+			{
+				int removeLength = newLength - Length;
+				removeLength = log.IndexOf(logEnd, removeLength) + logEnd.Length;
+				log.Remove(0, removeLength);
+			}
+
+			log.Append(line);
+			instance.LogText.text = log.ToString();
 		}
 
 		private static void ObjectOrTableToString(StringBuilder output, object obj, int depth, List<object> traversed)
@@ -252,7 +266,7 @@ namespace Kit
 				output.Append("}");
 			}
 			else
-				Debugger.ObjectToString(output, obj, false, NullString);
+				Debugger.ObjectOrEnumerableToString(output, obj, false, NullString);
 		}
 
 		private static void CyclicObjectOrTableToString(StringBuilder output, object obj, int depth, List<object> traversed)
@@ -273,7 +287,7 @@ namespace Kit
 				}
 			}
 			else
-				Debugger.ObjectToString(output, obj, false, NullString);
+				Debugger.ObjectOrEnumerableToString(output, obj, false, NullString);
 		}
 
 		/// <summary>List all members of a class on the Console.</summary>

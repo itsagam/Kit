@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Text;
@@ -10,13 +11,10 @@ using Debug = UnityEngine.Debug;
 
 namespace Kit
 {
-	/// <summary>
-	///     <para>Debugging methods for logging and profiling.</para>
-	///     <para>
-	///         The <see cref="Debugger.Log(object, bool)" /> method is particularly useful for displaying the contents of any object,
-	///         or collection.
-	///     </para>
-	/// </summary>
+	/// <summary>Debugging methods for logging and profiling.</summary>
+	///	<remarks>
+	///     The <see cref="Debugger.Log(object, bool)" /> method is useful for displaying the contents of any object or collection.
+	/// </remarks>
 	public static class Debugger
 	{
 		#region Profiling
@@ -80,6 +78,8 @@ namespace Kit
 		/// <summary>The string to display for <see langword="null" /> objects.</summary>
 		public const string NullString = "Null";
 
+		/// <summary>How deep to go when logging object contents.</summary>
+		public const int Depth = 2;
 
 		// Conditionals make calls to these methods not be compiled in Release builds.
 
@@ -117,7 +117,7 @@ namespace Kit
 		/// <param name="category">Category of the log.</param>
 		/// <param name="line">The line to log.</param>
 		/// <param name="type">Type of log.</param>
-		[Conditional("UNITY_EDITOR")] [Conditional("DEVELOPMENT_BUILD")]
+		[Conditional("UNITY_EDITOR"), Conditional("DEVELOPMENT_BUILD")]
 		public static void Log(string category, string line, LogType type = LogType.Log)
 		{
 			Log("<b>[" + category + "]</b> " + line, type);
@@ -125,28 +125,87 @@ namespace Kit
 
 		/// <summary>Log an object.</summary>
 		/// <param name="obj">The object to log. Can be a collection or a class.</param>
-		/// <param name="serialize">Whether to serialize the object for display if it's a class.</param>
-		[Conditional("UNITY_EDITOR")] [Conditional("DEVELOPMENT_BUILD")]
+		/// <param name="serialize">Whether to serialize objects for display.</param>
+		[Conditional("UNITY_EDITOR"), Conditional("DEVELOPMENT_BUILD")]
 		public static void Log(object obj, bool serialize = false)
 		{
-			Log(ObjectToString(obj, serialize));
+			Log(ObjectOrEnumerableToString(obj, serialize));
 		}
 
-		/// <summary>Log an object.</summary>
+		/// <inheritdoc cref="Log(object, bool)"/>
 		/// <param name="category">Category of the log.</param>
-		/// <param name="obj">The object to log. Can be a collection or a class.</param>
-		/// <param name="serialize">Whether to serialize the object for display if it's a class.</param>
-		[Conditional("UNITY_EDITOR")] [Conditional("DEVELOPMENT_BUILD")]
+		[Conditional("UNITY_EDITOR"), Conditional("DEVELOPMENT_BUILD")]
 		public static void Log(string category, object obj, bool serialize = false)
 		{
-			Log(category, ObjectToString(obj, serialize));
+			Log(category, ObjectOrEnumerableToString(obj, serialize));
 		}
 
-		/// <summary>Convert an object to a string for display.</summary>
+		/// <summary>Log a collection.</summary>
+		/// <param name="enumerable">The collection to log.</param>
+		/// <param name="serialize">Whether to serialize the objects for display.</param>
+		[Conditional("UNITY_EDITOR"), Conditional("DEVELOPMENT_BUILD")]
+		public static void Log(IEnumerable enumerable, bool serialize = false)
+		{
+			Log(EnumerableToString(enumerable, serialize));
+		}
+
+		/// <inheritdoc cref="Log(IEnumerable, bool)"/>
+		/// <param name="category">Category of the log.</param>
+		[Conditional("UNITY_EDITOR"), Conditional("DEVELOPMENT_BUILD")]
+		public static void Log(string category, IEnumerable enumerable, bool serialize = false)
+		{
+			Log(category, EnumerableToString(enumerable, serialize));
+		}
+
+		/// <summary>Convert an object or collection to a string for display.</summary>
 		/// <param name="obj">The object to convert.</param>
 		/// <param name="serialize">Whether to serialize the object if it's a class.</param>
 		/// <param name="nullString">The string to use for <see langword="null" /> objects.</param>
-		public static string ObjectToString(object obj, bool serialize, string nullString = NullString)
+		public static string ObjectOrEnumerableToString(object obj, bool serialize, string nullString = NullString)
+		{
+			StringBuilder output = new StringBuilder();
+			ObjectOrEnumerableToString(output, obj, serialize, nullString);
+			return output.ToString();
+		}
+
+		/// <inheritdoc cref="ObjectOrEnumerableToString(object, bool, string)"/>
+		/// <param name="output"><see cref="StringBuilder"/> to append the result to.</param>
+		public static void ObjectOrEnumerableToString(StringBuilder output, object obj, bool serialize, string nullString)
+		{
+			if (obj is IEnumerable enumerable && !(enumerable is string))
+				EnumerableToString(output, enumerable, serialize, nullString);
+			else
+				ObjectToString(output, obj, serialize, nullString);
+		}
+
+		private static string EnumerableToString(IEnumerable enumerable, bool serialize, string nullString = NullString)
+		{
+			StringBuilder output = new StringBuilder();
+			EnumerableToString(output, enumerable, serialize, nullString);
+			return output.ToString();
+		}
+
+		private static void EnumerableToString(StringBuilder output, IEnumerable enumerable, bool serialize, string nullString = NullString)
+		{
+			if (enumerable == null)
+			{
+				output.Append(nullString);
+				return;
+			}
+			output.Append("{");
+			bool first = true;
+			foreach (object item in enumerable)
+			{
+				if (first)
+					first = false;
+				else
+					output.Append(", ");
+				ObjectOrEnumerableToString(output, item, serialize, nullString);
+			}
+			output.Append("}");
+		}
+
+		private static string ObjectToString(object obj, bool serialize, string nullString = NullString)
 		{
 			if (obj == null)
 				return nullString;
@@ -154,12 +213,7 @@ namespace Kit
 			return serialize ? JsonParser.ToJson(obj) : obj.ToString();
 		}
 
-		/// <summary>Convert an object to a string and append it to a <see cref="StringBuilder" />.</summary>
-		/// <param name="output">The <see cref="StringBuilder" /> to append the result to.</param>
-		/// <param name="obj">The object to convert.</param>
-		/// <param name="serialize">Whether to serialize the object if it's a class.</param>
-		/// <param name="nullString">The string to use for <see langword="null" /> objects.</param>
-		public static void ObjectToString(StringBuilder output, object obj, bool serialize, string nullString)
+		private static void ObjectToString(StringBuilder output, object obj, bool serialize, string nullString = NullString)
 		{
 			output.Append(ObjectToString(obj, serialize, nullString));
 		}
@@ -167,3 +221,4 @@ namespace Kit
 		#endregion
 	}
 }
+

@@ -31,6 +31,7 @@ namespace Kit.UI.Buttons
 		}
 
 		/// <summary>The wizard this button interacts with.</summary>
+		[Required]
 		[Tooltip("The wizard this button interacts with.")]
 		public Wizard Wizard;
 
@@ -40,7 +41,7 @@ namespace Kit.UI.Buttons
 
 		/// <summary>What to do when it is no longer possible to use the button?</summary>
 		[Tooltip("What to do when it is no longer possible to use the button?")]
-		public StepMode Mode = StepMode.Nothing;
+		public StepMode Mode = StepMode.Hide;
 
 		/// <summary>Text-field to use when changing text.</summary>
 		[Tooltip("Text-field to use when changing text.")]
@@ -63,15 +64,17 @@ namespace Kit.UI.Buttons
 			if (Text != null)
 				originalText = Text.text;
 
-			if (Wizard != null)
-				Wizard.Changing.AddListener(OnChanging);
+			Refresh();
+			Wizard.Changing.AddListener(OnChanging);
 		}
 
 		protected void OnChanging(int previousIndex, Window previous, int nextIndex, Window next)
 		{
-			if (Wizard == null)
-				return;
+			Refresh();
+		}
 
+		protected void Refresh()
+		{
 			bool isEdgeCase = IsEdgeCase;
 			switch (Mode)
 			{

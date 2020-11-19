@@ -61,8 +61,21 @@ namespace Kit.UI
 		protected virtual void Awake()
 		{
 			animator = GetComponent<Animator>();
-			gameObject.SetActive(false);
 			UIManager.Register(this);
+		}
+
+		protected virtual void Start()
+		{
+			if (!isInstance)
+			{
+				if (gameObject.activeSelf)
+				{
+					State = WindowState.Shown;
+					UIManager.Windows.Add(this);
+				}
+				else
+					State = WindowState.Hidden;
+			}
 		}
 
 		/// <summary>Show the window.</summary>
