@@ -1,3 +1,6 @@
+using System;
+using System.Threading;
+using Cysharp.Threading.Tasks.Linq;
 using Kit.Pooling;
 using Sirenix.OdinInspector;
 using UnityEngine;
@@ -5,25 +8,34 @@ using UnityEngine;
 namespace Kit.Behaviours
 {
 	/// <summary>Pools the <see cref="GameObject" /> after a specified time.</summary>
-	public class SelfPool: MonoBehaviour
+	public class SelfPool: MonoBehaviour, IPooled
 	{
-		/// <summary>The component to use for pooling.</summary>
-		[Tooltip("The component to use as the key for pooling.")]
-		public Component Component;
-
 		/// <summary>Time to hold out for in seconds before pooling.</summary>
 		[Tooltip("Time to hold out for before pooling.")]
 		[SuffixLabel("seconds", true)]
 		public float Time = 5.0f;
 
-		protected void Start()
+		protected CancellationTokenSource cancelSource;
+
+		public virtual void AwakeFromPool()
 		{
-			Invoke(nameof(Pool), Time);
+			cancelSource = new CancellationTokenSource();
+			UniTaskAsyncEnumerable.Timer(TimeSpan.FromSeconds(Time)).ForEachAsync(_ => Pool(), cancelSource.Token);
 		}
 
-		protected void Pool()
+		public virtual void OnDestroyIntoPool()
 		{
-			Pooler.Destroy(Component);
+			cancelSource.Cancel();
+		}
+
+		protected virtual void OnDestroy()
+		{
+			cancelSource.Cancel();
+		}
+
+		public virtual void Pool()
+		{
+			Pooler.Destroy(this);
 		}
 	}
 }

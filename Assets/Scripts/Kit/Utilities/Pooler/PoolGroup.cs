@@ -35,7 +35,7 @@ namespace Kit.Pooling
 		[PropertySpace]
 		[SceneObjectsOnly]
 		[InlineEditor]
-		[ListDrawerSettings(CustomAddFunction = "AddPool", CustomRemoveElementFunction = "DestroyPool")]
+		[ListDrawerSettings(CustomAddFunction = "AddPool_Editor", CustomRemoveIndexFunction = "DestroyPool_Editor")]
 		[Tooltip("List of pools associated with this group.")]
 		public List<Pool> Pools = new List<Pool>();
 
@@ -72,7 +72,7 @@ namespace Kit.Pooling
 			Pools.Add(pool);
 			pool.transform.parent = transform;
 
-			pool.Group = this;
+			// pool.Group = this;
 			pool.MessageMode = MessageMode;
 			pool.Organize = Organize;
 			pool.Persistent = false;
@@ -91,7 +91,7 @@ namespace Kit.Pooling
 			bool result = Pools.Remove(pool);
 			if (result)
 			{
-				pool.Group = null;
+				// pool.Group = null;
 				pool.transform.parent = null;
 			}
 
@@ -117,15 +117,24 @@ namespace Kit.Pooling
 		#region Editor functionality
 
 #if UNITY_EDITOR
-		private void AddPool()
+		private void AddPool_Editor()
 		{
 			GameObject poolGO = new GameObject("Pool " + (transform.childCount + 1));
 			Pool pool = poolGO.AddComponent<Pool>();
 			AddPool(pool);
+			pool.MessageMode = MessageMode;
+			pool.Organize = Organize;
 		}
 
-		private void DestroyPool(Pool pool)
+		private void DestroyPool_Editor(int index)
 		{
+			Pool pool = Pools[index];
+			if (pool == null)
+			{
+				Pools.RemoveAt(index);
+				return;
+			}
+
 			RemovePool(pool);
 			DestroyImmediate(pool.gameObject);
 		}

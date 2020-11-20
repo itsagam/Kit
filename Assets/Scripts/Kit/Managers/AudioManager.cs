@@ -176,8 +176,7 @@ namespace Kit
 			if (clips == null || clips.Count <= 0)
 				return;
 
-			int randomIndex = Random.Range(0, clips.Count);
-			PlaySound(clips[randomIndex]);
+			PlaySound(clips.GetRandom());
 		}
 
 		/// <summary>Play an audio with the UI sounds group.</summary>
