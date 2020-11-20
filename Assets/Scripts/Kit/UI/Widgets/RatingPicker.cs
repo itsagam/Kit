@@ -1,6 +1,6 @@
-﻿using Sirenix.OdinInspector;
-using UniRx;
-using UniRx.Triggers;
+﻿using Cysharp.Threading.Tasks.Linq;
+using Sirenix.OdinInspector;
+using Cysharp.Threading.Tasks.Triggers;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
@@ -85,9 +85,8 @@ namespace Kit.UI.Widgets
 			colors.pressedColor = pressedColor;
 			button.colors = colors;
 
-			// OnPointerClickAsObservable doesn't register the selection if the press is released somewhere else
-			button.OnPointerUpAsObservable().Subscribe(OnClick);
-
+			// PointerClick doesn't register the selection if the press is released somewhere else
+			button.GetAsyncPointerUpTrigger().ForEachAsync(OnClick);
 			buttons[index] = button;
 		}
 

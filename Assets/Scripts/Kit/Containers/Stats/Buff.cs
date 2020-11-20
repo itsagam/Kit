@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using UniRx;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 
 namespace Kit.Containers
@@ -48,8 +48,7 @@ namespace Kit.Containers
 		public BuffMode Mode = BuffMode.Extend;
 
 		/// <summary>Time remaining in seconds before the buff expires.</summary>
-		public ReactiveProperty<float> TimeLeft { get; } = new ReactiveProperty<float>(-1);
-
+		public float TimeLeft { get; protected set; } = -1;
 
 		/// <summary>Create a new Buff.</summary>
 		public Buff()
@@ -97,21 +96,7 @@ namespace Kit.Containers
 			if (mode == BuffMode.Nothing || previous == null)
 			{
 				upgradeable.GetUpgrades().Add(this);
-				float end = Time.time + Duration;
-				Observable.EveryUpdate()
-						  .Select(l => end - Time.time)
-						  .TakeWhile(t => t > 0)
-						  .Subscribe(time => TimeLeft.Value = time,
-									 () =>
-									 {
-										 try
-										 {
-											 upgradeable.GetUpgrades().Remove(this);
-										 }
-										 catch
-										 {
-										 }
-									 });
+				StartTimer(upgradeable).Forget();
 				return this;
 			}
 
@@ -140,6 +125,20 @@ namespace Kit.Containers
 			}
 
 			return this;
+		}
+
+		protected virtual async UniTaskVoid StartTimer(IUpgradeable upgradeable)
+		{
+			float end = Time.time + Duration;
+			while ( (TimeLeft = end - Time.time) > 0)
+				await UniTask.Yield();
+			try
+			{
+				upgradeable.GetUpgrades().Remove(this);
+			}
+			catch
+			{
+			}
 		}
 
 		/// <summary>Remove the Buff from an IUpgradeable.</summary>

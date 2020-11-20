@@ -5,8 +5,9 @@ using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Text;
+using System.Threading;
+using Cysharp.Threading.Tasks.Linq;
 using Kit.UI.Widgets;
-using UniRx;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using XLua;
@@ -47,7 +48,7 @@ namespace Kit
 		public static readonly StringBuilder LogBuilder = new StringBuilder(Length);
 
 		private static ConsoleUI instance;
-		private static CompositeDisposable disposables = new CompositeDisposable();
+		private static CancellationTokenSource cancelSource = new CancellationTokenSource();
 
 		#region Initialization
 
@@ -102,11 +103,9 @@ namespace Kit
 #endif
 			}
 			else
-				Observable
-				   .EveryUpdate()
-				   .Where(l => Input.GetKeyDown(KeyCode.BackQuote))
-				   .Subscribe(l => Toggle())
-				   .AddTo(disposables);
+				UniTaskAsyncEnumerable.EveryUpdate()
+									  .Where(_ => Input.GetKeyDown(KeyCode.BackQuote))
+									  .ForEachAsync(_ => Toggle(), cancelSource.Token);
 
 			const EventModifiers disregard = EventModifiers.FunctionKey | EventModifiers.Numeric | EventModifiers.CapsLock;
 			InputFieldEx input = instance.CommandInput;
@@ -138,7 +137,7 @@ namespace Kit
 			instance.CommandInput.gameObject.SetActive(true);
 			instance.CommandInput.ActivateInputField();
 			instance.CommandInput.Select();
-			Observable.NextFrame().Subscribe(t => ScrollToBottom());
+			UniTaskAsyncEnumerable.TimerFrame(1).ForEachAsync(_ => ScrollToBottom(), cancelSource.Token);
 		}
 
 		/// <summary>Hide the Console.</summary>
@@ -382,7 +381,8 @@ namespace Kit
 			AddToHistory(command);
 			Execute(command);
 			ClearCommand();
-			Observable.NextFrame().Subscribe(t => ScrollToBottom());
+
+			UniTaskAsyncEnumerable.TimerFrame(1).ForEachAsync(_ => ScrollToBottom(), cancelSource.Token);
 		}
 
 		private static string FormatCommand(string command)
@@ -412,7 +412,8 @@ namespace Kit
 			scriptEnv = new LuaEnv();
 			scriptEnv.DoString("require 'Lua/General'");
 			scriptEnv.DoString("require 'Lua/Console'");
-			Observable.Timer(TimeSpan.FromSeconds(GCInterval)).Subscribe(l => scriptEnv.Tick()).AddTo(disposables);
+
+			UniTaskAsyncEnumerable.Timer(TimeSpan.FromSeconds(GCInterval)).ForEachAsync(_ => scriptEnv.Tick(), cancelSource.Token);
 		}
 
 		/// <summary>Execute a Lua command or expression on the Console.</summary>
@@ -499,7 +500,7 @@ namespace Kit
 		/// <summary>Destroy the Console.</summary>
 		public static void Destroy()
 		{
-			disposables.Dispose();
+			cancelSource.Cancel();
 			scriptEnv.Dispose();
 			UnregisterLogging();
 			instance.gameObject.Destroy();

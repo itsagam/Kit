@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using Cysharp.Threading.Tasks.Linq;
 using Kit.Behaviours;
 using Kit.Pooling;
-using UniRx;
 using UnityEngine;
 using Object = UnityEngine.Object;
 using Random = UnityEngine.Random;
@@ -244,7 +244,8 @@ namespace Kit
 		private static void QueueForDestroy(AudioSource source)
 		{
 			if (!source.loop)
-				Observable.Timer(TimeSpan.FromSeconds(source.clip.length)).Subscribe(l => Pooler.Destroy(source));
+				UniTaskAsyncEnumerable.Timer(TimeSpan.FromSeconds(source.clip.length))
+									  .ForEachAsync(_ => Pooler.Destroy(source));
 		}
 
 		#endregion
@@ -309,12 +310,12 @@ namespace Kit
 			source.Play();
 
 			if (!loop)
-				Observable.Timer(TimeSpan.FromSeconds(clip.length))
-						  .Subscribe(l =>
-									 {
-										 if (gameObject != null)
-											 gameObject.Destroy();
-									 });
+				UniTaskAsyncEnumerable.Timer(TimeSpan.FromSeconds(clip.length))
+									  .ForEachAsync(_ =>
+													{
+														if (gameObject != null)
+															gameObject.Destroy();
+													});
 
 			return source;
 		}

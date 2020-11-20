@@ -43,10 +43,10 @@ namespace Kit.Containers.Editor
 			Buff buff = ValueEntry.SmartValue;
 			SirenixEditorGUI.BeginToolbarBox(label);
 
-			if (Application.isPlaying && buff.TimeLeft.Value > 0)
+			if (Application.isPlaying && buff.TimeLeft > 0)
 			{
 				GUIHelper.PushGUIEnabled(false);
-				EditorGUILayout.LabelField("Time", $"{buff.TimeLeft.Value:0.##}s");
+				EditorGUILayout.LabelField("Time", $"{buff.TimeLeft:0.##}s");
 				GUIHelper.PopGUIEnabled();
 			}
 

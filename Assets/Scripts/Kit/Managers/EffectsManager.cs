@@ -1,4 +1,6 @@
-﻿using Kit.Pooling;
+﻿using Cysharp.Threading.Tasks;
+using Cysharp.Threading.Tasks.Linq;
+using Kit.Pooling;
 using UniRx;
 using UnityEngine;
 
@@ -110,10 +112,16 @@ namespace Kit
 			if (system.main.loop)
 				return;
 
+			UniTaskAsyncEnumerable.EveryUpdate()
+								  .SkipWhile(_ => system.IsAlive(true))
+								  .Subscribe(_ => Pooler.Destroy(system), ex => { });
+
+			/*
 			Observable.EveryUpdate()
 					  .First(l => !system.IsAlive(true))
 					  .CatchIgnore()
 					  .Subscribe(l => Pooler.Destroy(system));
+			*/
 		}
 	}
 }

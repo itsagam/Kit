@@ -121,8 +121,7 @@ namespace Kit
 		public static UniTask FadeIn(Color? color = null, float time = DefaultFadeTime, Action onComplete = null)
 		{
 			FadingIn?.Invoke();
-			return Fade(1,
-						0,
+			return Fade(1, 0,
 						color,
 						time,
 						() =>
@@ -143,8 +142,7 @@ namespace Kit
 		public static UniTask FadeOut(Color? color = null, float time = DefaultFadeTime, Action onComplete = null)
 		{
 			FadingOut?.Invoke();
-			return Fade(0,
-						1,
+			return Fade(0, 1,
 						color,
 						time,
 						() =>
