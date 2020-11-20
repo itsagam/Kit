@@ -103,9 +103,9 @@ namespace Kit.UI
 				int previousIndex = Index;
 				Index = index;
 
-				var previousTask = previous == null ? Show() : previous.Hide(isNext ? NextHideAnimation : PreviousHideAnimation);
-				var nextTask = next.Show(null,
-										 previous == null ? null :
+				var previousTask = previous == null ? Show() : previous.Hide(isNext ? NextHideAnimation : PreviousHideAnimation,
+																			 WindowHideMode.Deactivate);
+				var nextTask = next.Show(previous == null ? null :
 										 isNext           ? NextShowAnimation : PreviousShowAnimation);
 
 				Changing?.Invoke(previousIndex, previous, Index, next);
