@@ -12,11 +12,18 @@ using Debug = UnityEngine.Debug;
 namespace Kit
 {
 	/// <summary>Debugging methods for logging and profiling.</summary>
-	///	<remarks>
-	///     The <see cref="Debugger.Log(object, bool)" /> method is useful for displaying the contents of any object or collection.
-	/// </remarks>
+	/// <remarks>The <see cref="Debugger.Log(object, bool)" /> method is useful for displaying the contents of any object or collection.</remarks>
 	public static class Debugger
 	{
+		private static readonly Dictionary<LogType, string> LogColors = new Dictionary<LogType, string>
+																	   {
+																		   { LogType.Log, "7DE17D" },
+																		   { LogType.Error, "FF746F"},
+																		   { LogType.Exception, "FF746F"},
+																		   { LogType.Warning, "FFB247" },
+																		   { LogType.Assert, "FF7337" }
+																	   };
+
 		#region Profiling
 
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
@@ -80,11 +87,33 @@ namespace Kit
 
 		// Conditionals make calls to these methods not be compiled in Release builds.
 
+		/// <summary>Log an exception.</summary>
+		[Conditional("UNITY_EDITOR")] [Conditional("DEVELOPMENT_BUILD")]
+		public static void Log(Exception ex)
+		{
+			Debug.LogException(ex);
+		}
+
 		/// <summary>Log a line.</summary>
 		/// <param name="line">The line to log.</param>
 		/// <param name="type">Type of log.</param>
 		[Conditional("UNITY_EDITOR")] [Conditional("DEVELOPMENT_BUILD")]
 		public static void Log(string line, LogType type = LogType.Log)
+		{
+			LogInternal($"<color=#{LogColors[type]}>{line}</color>", type);
+		}
+
+		/// <summary>Log a line.</summary>
+		/// <param name="category">Category of the log.</param>
+		/// <param name="line">The line to log.</param>
+		/// <param name="type">Type of log.</param>
+		[Conditional("UNITY_EDITOR")] [Conditional("DEVELOPMENT_BUILD")]
+		public static void Log(string category, string line, LogType type = LogType.Log)
+		{
+			LogInternal($"<color=#{LogColors[type]}><b>{category} ►</b> {line}</color>", type);
+		}
+
+		private static void LogInternal(string line, LogType type)
 		{
 			switch (type)
 			{
@@ -110,28 +139,18 @@ namespace Kit
 			}
 		}
 
-		/// <summary>Log a line.</summary>
-		/// <param name="category">Category of the log.</param>
-		/// <param name="line">The line to log.</param>
-		/// <param name="type">Type of log.</param>
-		[Conditional("UNITY_EDITOR"), Conditional("DEVELOPMENT_BUILD")]
-		public static void Log(string category, string line, LogType type = LogType.Log)
-		{
-			Log("<b>[" + category + "]</b> " + line, type);
-		}
-
 		/// <summary>Log an object.</summary>
 		/// <param name="obj">The object to log. Can be a collection or a class.</param>
 		/// <param name="serialize">Whether to serialize objects for display.</param>
-		[Conditional("UNITY_EDITOR"), Conditional("DEVELOPMENT_BUILD")]
+		[Conditional("UNITY_EDITOR")] [Conditional("DEVELOPMENT_BUILD")]
 		public static void Log(object obj, bool serialize = false)
 		{
 			Log(ObjectOrEnumerableToString(obj, serialize));
 		}
 
-		/// <inheritdoc cref="Log(object, bool)"/>
+		/// <inheritdoc cref="Log(object, bool)" />
 		/// <param name="category">Category of the log.</param>
-		[Conditional("UNITY_EDITOR"), Conditional("DEVELOPMENT_BUILD")]
+		[Conditional("UNITY_EDITOR")] [Conditional("DEVELOPMENT_BUILD")]
 		public static void Log(string category, object obj, bool serialize = false)
 		{
 			Log(category, ObjectOrEnumerableToString(obj, serialize));
@@ -140,15 +159,15 @@ namespace Kit
 		/// <summary>Log a collection.</summary>
 		/// <param name="enumerable">The collection to log.</param>
 		/// <param name="serialize">Whether to serialize the objects for display.</param>
-		[Conditional("UNITY_EDITOR"), Conditional("DEVELOPMENT_BUILD")]
+		[Conditional("UNITY_EDITOR")] [Conditional("DEVELOPMENT_BUILD")]
 		public static void Log(IEnumerable enumerable, bool serialize = false)
 		{
 			Log(EnumerableToString(enumerable, serialize));
 		}
 
-		/// <inheritdoc cref="Log(IEnumerable, bool)"/>
+		/// <inheritdoc cref="Log(IEnumerable, bool)" />
 		/// <param name="category">Category of the log.</param>
-		[Conditional("UNITY_EDITOR"), Conditional("DEVELOPMENT_BUILD")]
+		[Conditional("UNITY_EDITOR")] [Conditional("DEVELOPMENT_BUILD")]
 		public static void Log(string category, IEnumerable enumerable, bool serialize = false)
 		{
 			Log(category, EnumerableToString(enumerable, serialize));
@@ -165,8 +184,8 @@ namespace Kit
 			return output.ToString();
 		}
 
-		/// <inheritdoc cref="ObjectOrEnumerableToString(object, bool, string)"/>
-		/// <param name="output"><see cref="StringBuilder"/> to append the result to.</param>
+		/// <inheritdoc cref="ObjectOrEnumerableToString(object, bool, string)" />
+		/// <param name="output"><see cref="StringBuilder" /> to append the result to.</param>
 		public static void ObjectOrEnumerableToString(StringBuilder output, object obj, bool serialize, string nullString)
 		{
 			if (obj is IEnumerable enumerable && !(enumerable is string))
@@ -189,6 +208,7 @@ namespace Kit
 				output.Append(nullString);
 				return;
 			}
+
 			output.Append("{");
 			bool first = true;
 			foreach (object item in enumerable)
@@ -199,6 +219,7 @@ namespace Kit
 					output.Append(", ");
 				ObjectOrEnumerableToString(output, item, serialize, nullString);
 			}
+
 			output.Append("}");
 		}
 

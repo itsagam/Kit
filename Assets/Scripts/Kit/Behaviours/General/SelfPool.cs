@@ -1,5 +1,6 @@
 using System;
 using System.Threading;
+using Cysharp.Threading.Tasks;
 using Cysharp.Threading.Tasks.Linq;
 using Kit.Pooling;
 using Sirenix.OdinInspector;
@@ -25,12 +26,22 @@ namespace Kit.Behaviours
 
 		public virtual void OnDestroyIntoPool()
 		{
-			cancelSource.Cancel();
+			Cancel();
 		}
 
 		protected virtual void OnDestroy()
 		{
-			cancelSource.Cancel();
+			Cancel();
+		}
+
+		protected virtual void Cancel()
+		{
+			if (cancelSource != null)
+			{
+				cancelSource.Cancel();
+				cancelSource.Dispose();
+				cancelSource = null;
+			}
 		}
 
 		public virtual void Pool()
