@@ -5,6 +5,7 @@ using System.Linq;
 using Cysharp.Threading.Tasks;
 using Sirenix.OdinInspector;
 using UniRx;
+using UnityEditor;
 using UnityEngine;
 
 namespace Kit.Pooling
@@ -66,21 +67,21 @@ namespace Kit.Pooling
 		/// </summary>
 		public const string DestroyMessage = "OnDestroyIntoPool";
 
-		private const int UnlimitedMaxPreloadAmount = 250;
-
-		/// <summary>The pool group this pool belongs to.</summary>
-		[ReadOnly]
-		[HideInInlineEditors]
-		[ShowIf("ShowGroup")]
-		[Tooltip("The pool group this pool belongs to.")]
-		public PoolGroup Group;
+		private const int MaxPreloadLimit = 250;
 
 		/// <summary>The prefab to pool instances of. The particular component is important as that's used as the key.</summary>
 		[Required]
-		[ValueDropdown("GetComponents", AppendNextDrawer = true)]
+		[ValueDropdown("GetPrefabComponents", DropdownTitle = "Component", AppendNextDrawer = true)]
 		[OnValueChanged("ResetName")]
 		[Tooltip("The prefab to pool instances of. The particular component is important as that's used as the key.")]
 		public Component Prefab;
+
+		// /// <summary>The pool group this pool belongs to.</summary>
+		// [HideInInlineEditors]
+		// [SceneObjectsOnly]
+		// [OnValueChanged("OnGroupChanged")]
+		// [Tooltip("The pool group this pool belongs to.")]
+		// public PoolGroup Group;
 
 		/// <summary>How an instance gets informed of pooling events?</summary>
 		[HideInInlineEditors]
@@ -106,7 +107,7 @@ namespace Kit.Pooling
 		[Tooltip("How many seconds to wait before starting to pre-load?")]
 		[SuffixLabel("seconds", true)]
 		[MinValue(0)]
-		public float PreloadDelay = 0.0f;
+		public float PreloadDelay = 1.0f;
 
 		/// <summary>How many seconds to divide the pre-loading over?</summary>
 		[ToggleGroup("Preload")]
@@ -114,7 +115,7 @@ namespace Kit.Pooling
 		[Tooltip("How many seconds to divide the pre-loading over?")]
 		[SuffixLabel("seconds", true)]
 		[MinValue(0)]
-		public float PreloadTime = 1.0f;
+		public float PreloadTime = 3.0f;
 
 		/// <summary>Limit the pool to a certain number of instances.</summary>
 		[ToggleGroup("Limit")]
@@ -180,8 +181,8 @@ namespace Kit.Pooling
 		protected void OnDestroy()
 		{
 			IsDestroying = true;
-			if (Group != null && !Group.IsDestroying)
-				Group.Pools.Remove(this);
+			// if (Group != null && !Group.IsDestroying)
+			// 	Group.Pools.Remove(this);
 			Pooler.UncachePool(this);
 		}
 
@@ -229,7 +230,7 @@ namespace Kit.Pooling
 		protected Component CreateInstance()
 		{
 			Component instance = Instantiate(Prefab);
-			instance.name = name;
+			instance.name = Prefab.name;
 
 			PoolInstance poolInstance = instance.gameObject.AddComponent<PoolInstance>();
 			poolInstance.Pool = this;
@@ -460,7 +461,15 @@ namespace Kit.Pooling
 		#region Editor functionality
 
 #if UNITY_EDITOR
-		private IEnumerable<Component> GetComponents()
+		// private void OnGroupChanged()
+		// {
+		// 	if (Group == null)
+		// 		return;
+		// 	if (!Group.Pools.Contains(this))
+		// 		Group.Pools.Add(this);
+		// }
+
+		private IEnumerable<Component> GetPrefabComponents()
 		{
 			return Prefab != null ? Prefab.gameObject.GetComponents<Component>() : Enumerable.Empty<Component>();
 		}
@@ -468,7 +477,7 @@ namespace Kit.Pooling
 		private void ResetName()
 		{
 			if (Prefab != null)
-				name = Prefab.name;
+				name = $"Pool ({Prefab.name})";
 		}
 
 		private void ClampPreloadAmount()
@@ -477,9 +486,8 @@ namespace Kit.Pooling
 				PreloadAmount = MaxPreloadAmount;
 		}
 
-		private bool ShowGroup => Group                                    != null;
-		private bool ShowPersistent => ((Component) this).transform.parent == null;
-		private int MaxPreloadAmount => Limit ? LimitAmount : UnlimitedMaxPreloadAmount;
+		private bool ShowPersistent => base.transform.parent == null;
+		private int MaxPreloadAmount => Limit ? LimitAmount : MaxPreloadLimit;
 #endif
 
 		#endregion

@@ -5,25 +5,26 @@ using UnityEngine;
 namespace Kit.Behaviours
 {
 	/// <summary>Pools the <see cref="GameObject" /> after a specified time.</summary>
-	public class SelfPool: MonoBehaviour
+	public class SelfPool: MonoBehaviour, IPooled
 	{
-		/// <summary>The component to use for pooling.</summary>
-		[Tooltip("The component to use as the key for pooling.")]
-		public Component Component;
-
 		/// <summary>Time to hold out for in seconds before pooling.</summary>
 		[Tooltip("Time to hold out for before pooling.")]
 		[SuffixLabel("seconds", true)]
 		public float Time = 5.0f;
 
-		protected void Start()
+		public void AwakeFromPool()
 		{
 			Invoke(nameof(Pool), Time);
 		}
 
-		protected void Pool()
+		public void OnDestroyIntoPool()
 		{
-			Pooler.Destroy(Component);
+			CancelInvoke(nameof(Pool));
+		}
+
+		public void Pool()
+		{
+			Pooler.Destroy(this);
 		}
 	}
 }
