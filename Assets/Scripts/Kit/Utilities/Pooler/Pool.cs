@@ -5,29 +5,24 @@ using System.Linq;
 using Cysharp.Threading.Tasks;
 using Sirenix.OdinInspector;
 using UniRx;
-using UnityEditor;
 using UnityEngine;
 
 namespace Kit.Pooling
 {
-	/// <summary>Interface to be implemented by pool components which want to be informed of pooling events directly.</summary>
-	public interface IPooled
-	{
-		/// <summary>Method that gets called when an instance initializes.</summary>
-		void AwakeFromPool();
-
-		/// <summary>Method that gets called when an instance gets pooled.</summary>
-		void OnDestroyIntoPool();
-	}
-
 	/// <summary>How an instance gets informed of pooling events?</summary>
 	public enum PoolMessageMode
 	{
 		/// <summary>Do not inform of pooling events.</summary>
 		None,
 
-		/// <summary>Call <see cref="IPooled" /> methods directly if the instance component implements it.</summary>
-		Interface,
+		/// <summary>Call <see cref="IPooled" /> methods on just the instance component.</summary>
+		IPooledComponent,
+
+		/// <summary>Call <see cref="IPooled" /> methods on the all instance <see cref="GameObject" /> components.</summary>
+		IPooledGameObject,
+
+		/// <summary>Call <see cref="IPooled" /> methods directly on the instance <see cref="GameObject" /> hierarchy.</summary>
+		IPooledHierarchy,
 
 		/// <summary>Call <see cref="Component.SendMessage(string)" /> on instance <see cref="GameObject" />s.</summary>
 		SendMessage,
@@ -69,11 +64,13 @@ namespace Kit.Pooling
 
 		private const int MaxPreloadLimit = 250;
 
-		/// <summary>The prefab to pool instances of. The particular component is important as that's used as the key.</summary>
+		/// <summary>The prefab to pool instances of. The particular component is important as that's the component you will get
+		/// when initializing an instance.</summary>
 		[Required]
 		[ValueDropdown("GetPrefabComponents", DropdownTitle = "Component", AppendNextDrawer = true)]
 		[OnValueChanged("ResetName")]
-		[Tooltip("The prefab to pool instances of. The particular component is important as that's used as the key.")]
+		[Tooltip("The prefab to pool instances of. The particular component is important as that's the component you will get when " +
+				 "initializing an instance.")]
 		public Component Prefab;
 
 		// /// <summary>The pool group this pool belongs to.</summary>
@@ -155,8 +152,19 @@ namespace Kit.Pooling
 		/// <summary>Returns whether the pool is being destroyed.</summary>
 		public bool IsDestroying { get; protected set; }
 
-		protected LinkedList<Component> availableInstances = new LinkedList<Component>();
-		protected LinkedList<Component> usedInstances = new LinkedList<Component>();
+		/// <summary>A list of all instances that can be re-used.</summary>
+		[PropertySpace]
+		[ShowInInspector]
+		[HideInInlineEditors]
+		[ReadOnly]
+		public readonly LinkedList<Component> Available = new LinkedList<Component>();
+
+		/// <summary>A list of all instances that are in use.</summary>
+		[ShowInInspector]
+		[HideInInlineEditors]
+		[ReadOnly]
+		public readonly LinkedList<Component> Used = new LinkedList<Component>();
+
 		protected new Transform transform;
 
 		#endregion
@@ -219,7 +227,8 @@ namespace Kit.Pooling
 			{
 				Component instance = CreateInstance();
 				instance.gameObject.SetActive(false);
-				availableInstances.AddLast(instance);
+				//Pooler.GetInstanceInfo(instance).IsPooled = true;
+				Available.AddLast(instance);
 			}
 		}
 
@@ -232,9 +241,9 @@ namespace Kit.Pooling
 			Component instance = Instantiate(Prefab);
 			instance.name = Prefab.name;
 
-			PoolInstance poolInstance = instance.gameObject.AddComponent<PoolInstance>();
-			poolInstance.Pool = this;
-			poolInstance.Component = instance;
+			GameObject go = instance.gameObject;
+			go.AddComponent<PoolInstance>();
+			Pooler.CacheInstance(go, new PoolInstanceInfo(this, instance));
 
 			if (Organize)
 				instance.transform.SetParent(transform);
@@ -247,11 +256,11 @@ namespace Kit.Pooling
 		public Component Instantiate()
 		{
 			Component instance;
-			if (availableInstances.Count > 0)
+			if (Available.Count > 0)
 			{
-				instance = availableInstances.First.Value;
+				instance = Available.First.Value;
 				instance.gameObject.SetActive(true);
-				availableInstances.RemoveFirst();
+				Available.RemoveFirst();
 			}
 			else
 			{
@@ -262,9 +271,10 @@ namespace Kit.Pooling
 							return null;
 
 						case PoolLimitMode.ReuseFirst:
-							instance = usedInstances.First.Value;
-							usedInstances.RemoveFirst();
-							usedInstances.AddLast(instance);
+							instance = Used.First.Value;
+							Pooler.GetInstanceInfo(instance).IsPooled = false;
+							Used.RemoveFirst();
+							Used.AddLast(instance);
 							SendDestroyMessage(instance);
 							SendInstantiateMessage(instance);
 							return instance;
@@ -273,7 +283,8 @@ namespace Kit.Pooling
 				instance = CreateInstance();
 			}
 
-			usedInstances.AddLast(instance);
+			Pooler.GetInstanceInfo(instance).IsPooled = false;
+			Used.AddLast(instance);
 			SendInstantiateMessage(instance);
 			return instance;
 		}
@@ -383,14 +394,15 @@ namespace Kit.Pooling
 		/// <summary>Pool a particular instance.</summary>
 		public void Destroy(Component instance)
 		{
-			usedInstances.Remove(instance);
+			Used.Remove(instance);
 			if (Limit && Overlimit && LimitMode == PoolLimitMode.DestroyAfterUse)
 			{
 				instance.gameObject.Destroy();
 				return;
 			}
 
-			availableInstances.AddLast(instance);
+			Pooler.GetInstanceInfo(instance).IsPooled = true;
+			Available.AddLast(instance);
 			instance.gameObject.SetActive(false);
 			SendDestroyMessage(instance);
 		}
@@ -398,7 +410,7 @@ namespace Kit.Pooling
 		/// <summary>Pool all instances.</summary>
 		public void DestroyAll()
 		{
-			foreach (Component instance in usedInstances.Reverse())
+			foreach (Component instance in Used.Reverse())
 				Destroy(instance);
 		}
 
@@ -410,9 +422,17 @@ namespace Kit.Pooling
 		{
 			switch (MessageMode)
 			{
-				case PoolMessageMode.Interface:
+				case PoolMessageMode.IPooledComponent:
 					if (instance is IPooled pooled)
 						pooled.AwakeFromPool();
+					break;
+
+				case PoolMessageMode.IPooledGameObject:
+					instance.GetComponents<IPooled>().ForEach(p => p.AwakeFromPool());
+					break;
+
+				case PoolMessageMode.IPooledHierarchy:
+					instance.GetComponentsInChildren<IPooled>().ForEach(p => p.AwakeFromPool());
 					break;
 
 				case PoolMessageMode.SendMessage:
@@ -429,9 +449,17 @@ namespace Kit.Pooling
 		{
 			switch (MessageMode)
 			{
-				case PoolMessageMode.Interface:
+				case PoolMessageMode.IPooledComponent:
 					if (instance is IPooled pooled)
 						pooled.OnDestroyIntoPool();
+					break;
+
+				case PoolMessageMode.IPooledGameObject:
+					instance.GetComponents<IPooled>().ForEach(p => p.OnDestroyIntoPool());
+					break;
+
+				case PoolMessageMode.IPooledHierarchy:
+					instance.GetComponentsInChildren<IPooled>().ForEach(p => p.OnDestroyIntoPool());
 					break;
 
 				case PoolMessageMode.SendMessage:
@@ -446,12 +474,12 @@ namespace Kit.Pooling
 
 		public IEnumerator<Component> GetEnumerator()
 		{
-			return usedInstances.GetEnumerator();
+			return Used.GetEnumerator();
 		}
 
 		IEnumerator IEnumerable.GetEnumerator()
 		{
-			return usedInstances.GetEnumerator();
+			return Used.GetEnumerator();
 		}
 
 		protected bool Overlimit => UsedCount >= LimitAmount;
@@ -494,24 +522,11 @@ namespace Kit.Pooling
 
 		#region Public properties
 
-		/// <summary>A list of all instances that can be re-used.</summary>
-		[PropertySpace]
-		[EnableGUI]
-		[ShowInInspector]
-		[HideInInlineEditors]
-		public LinkedList<Component> Available => availableInstances;
-
 		/// <summary>Number of instances that can be re-used.</summary>
-		public int AvailableCount => availableInstances.Count;
-
-		/// <summary>A list of all instances that are in use.</summary>
-		[EnableGUI]
-		[ShowInInspector]
-		[HideInInlineEditors]
-		public LinkedList<Component> Used => usedInstances;
+		public int AvailableCount => Available.Count;
 
 		/// <summary>Number of instances that are in use.</summary>
-		public int UsedCount => usedInstances.Count;
+		public int UsedCount => Used.Count;
 
 		#endregion
 	}

@@ -19,6 +19,8 @@ namespace Kit.Pooling
 		private static Dictionary<string, Pool> poolsByName = new Dictionary<string, Pool>();
 		private static Dictionary<Component, Pool> poolsByPrefab = new Dictionary<Component, Pool>();
 
+		private static Dictionary<GameObject, PoolInstanceInfo> poolsByGameObject = new Dictionary<GameObject, PoolInstanceInfo>();
+
 		#endregion
 
 		#region PoolGroup management
@@ -211,88 +213,122 @@ namespace Kit.Pooling
 
 		#region Instantiate/Destroy
 
-		/// <summary>Initialize a pool instance.</summary>
-		/// <returns>The instance created.</returns>
-		public static Component Instantiate(string name)
+		/// <summary>
+		/// Register a pool instance. Called automatically.
+		/// </summary>
+		public static void CacheInstance(GameObject gameObject, PoolInstanceInfo info)
 		{
-			return GetPool(name)?.Instantiate();
+			poolsByGameObject.Add(gameObject, info);
+		}
+
+		/// <summary>
+		/// Get information about a pool instance.
+		/// </summary>
+		/// <returns>An instance of the <see cref="PoolInstanceInfo"/> class.</returns>
+		public static PoolInstanceInfo GetInstanceInfo(Component component)
+		{
+			return GetInstanceInfo(component.gameObject);
+		}
+
+		/// <summary>
+		/// Get information about a pool instance.
+		/// </summary>
+		/// <returns>An instance of the <see cref="PoolInstanceInfo"/> class.</returns>
+		public static PoolInstanceInfo GetInstanceInfo(GameObject gameObject)
+		{
+			return poolsByGameObject[gameObject];
+		}
+
+		/// <summary>
+		/// Unregister a pool instance. Called automatically.
+		/// </summary>
+		public static void UncacheInstance(GameObject gameObject)
+		{
+			poolsByGameObject.Remove(gameObject);
 		}
 
 		/// <summary>Initialize a pool instance.</summary>
 		/// <returns>The instance created.</returns>
-		public static Component Instantiate(string name, Transform parent, bool worldSpace = false)
+		public static Component Instantiate(string pool)
 		{
-			return GetPool(name)?.Instantiate(parent, worldSpace);
+			return GetPool(pool)?.Instantiate();
+		}
+
+		/// <summary>Initialize a pool instance.</summary>
+		/// <returns>The instance created.</returns>
+		public static Component Instantiate(string pool, Transform parent, bool worldSpace = false)
+		{
+			return GetPool(pool)?.Instantiate(parent, worldSpace);
 		}
 
 		/// <summary>Initialize a pool instance.</summary>
 		/// <returns>The instance given.</returns>
-		public static Component Instantiate(string name, Vector3 position)
+		public static Component Instantiate(string pool, Vector3 position)
 		{
-			return GetPool(name)?.Instantiate(position);
+			return GetPool(pool)?.Instantiate(position);
 		}
 
 		/// <summary>Initialize a pool instance.</summary>
 		/// <returns>The instance given.</returns>
-		public static Component Instantiate(string name, Vector3 position, Quaternion rotation)
+		public static Component Instantiate(string pool, Vector3 position, Quaternion rotation)
 		{
-			return GetPool(name)?.Instantiate(position, rotation);
+			return GetPool(pool)?.Instantiate(position, rotation);
 		}
 
 		/// <summary>Initialize a pool instance.</summary>
 		/// <returns>The instance given.</returns>
-		public static Component Instantiate(string name, Vector3 position, Transform parent)
+		public static Component Instantiate(string pool, Vector3 position, Transform parent)
 		{
-			return GetPool(name)?.Instantiate(position, parent);
+			return GetPool(pool)?.Instantiate(position, parent);
 		}
 
 		/// <summary>Initialize a pool instance.</summary>
 		/// <returns>The instance given.</returns>
-		public static Component Instantiate(string name, Vector3 position, Quaternion rotation, Transform parent)
+		public static Component Instantiate(string pool, Vector3 position, Quaternion rotation, Transform parent)
 		{
-			return GetPool(name)?.Instantiate(position, rotation, parent);
+			return GetPool(pool)?.Instantiate(position, rotation, parent);
 		}
 
 		/// <summary>Initialize a pool instance.</summary>
 		/// <returns>The instance given.</returns>
-		public static T Instantiate<T>(string name) where T: Component
+		public static T Instantiate<T>(string pool) where T: Component
 		{
-			return GetPool(name)?.Instantiate<T>();
+			return GetPool(pool)?.Instantiate<T>();
 		}
 
 		/// <summary>Initialize a pool instance.</summary>
 		/// <returns>The instance given.</returns>
-		public static T Instantiate<T>(string name, Transform parent, bool worldSpace = false) where T: Component
+		public static T Instantiate<T>(string pool, Transform parent, bool worldSpace = false) where T: Component
 		{
-			return GetPool(name)?.Instantiate<T>(parent, worldSpace);
+			return GetPool(pool)?.Instantiate<T>(parent, worldSpace);
 		}
 
 		/// <summary>Initialize a pool instance.</summary>
 		/// <returns>The instance given.</returns>
-		public static T Instantiate<T>(string name, Vector3 position) where T: Component
+		public static T Instantiate<T>(string pool, Vector3 position) where T: Component
 		{
-			return GetPool(name)?.Instantiate<T>(position);
+			return GetPool(pool)?.Instantiate<T>(position);
 		}
 
 		/// <summary>Initialize a pool instance.</summary>
 		/// <returns>The instance given.</returns>
-		public static T Instantiate<T>(string name, Vector3 position, Quaternion rotation) where T: Component
+		public static T Instantiate<T>(string pool, Vector3 position, Quaternion rotation) where T: Component
 		{
-			return GetPool(name)?.Instantiate<T>(position, rotation);
+			return GetPool(pool)?.Instantiate<T>(position, rotation);
 		}
 
 		/// <summary>Initialize a pool instance.</summary>
 		/// <returns>The instance given.</returns>
-		public static T Instantiate<T>(string name, Vector3 position, Transform parent) where T: Component
+		public static T Instantiate<T>(string pool, Vector3 position, Transform parent) where T: Component
 		{
-			return GetPool(name)?.Instantiate<T>(position, parent);
+			return GetPool(pool)?.Instantiate<T>(position, parent);
 		}
 
 		/// <summary>Initialize a pool instance.</summary>
 		/// <returns>The instance given.</returns>
-		public static T Instantiate<T>(string name, Vector3 position, Quaternion rotation, Transform parent) where T: Component
+		public static T Instantiate<T>(string pool, Vector3 position, Quaternion rotation, Transform parent) where T: Component
 		{
-			return GetPool(name)?.Instantiate<T>(position, rotation, parent);
+			return GetPool(pool)?.Instantiate<T>(position, rotation, parent);
 		}
 
 		/// <summary>Initialize a pool instance.</summary>
@@ -467,14 +503,15 @@ namespace Kit.Pooling
 		/// <summary>Pool an instance.</summary>
 		public static bool Destroy(Component instance)
 		{
-			if (instance == null)
-				return false;
+			return Destroy(instance.gameObject);
+		}
 
-			PoolInstance poolInstance = instance.GetComponent<PoolInstance>();
-			if (poolInstance == null || !poolInstance.IsValid)
-				return false;
+		/// <summary>Pool an instance.</summary>
+		public static bool Destroy(GameObject instance)
+		{
+			if (poolsByGameObject.TryGetValue(instance, out PoolInstanceInfo info))
+				info.Pool.Destroy(info.Component);
 
-			poolInstance.Destroy();
 			return true;
 		}
 

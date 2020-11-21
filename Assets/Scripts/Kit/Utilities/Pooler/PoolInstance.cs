@@ -4,42 +4,40 @@ using UnityEngine;
 namespace Kit.Pooling
 {
 	/// <summary>
-	///     Component added to all instances so we can track the <see cref="Pool" /> they came from. Used in
-	///     <see cref="Pooler.Destroy" /> to de-activate instances without providing pool.
+	///     Component added to all instances so we can handle its destruction gracefully.
 	/// </summary>
 	public class PoolInstance: MonoBehaviour
 	{
-		/// <summary>Pool this instance belong to.</summary>
-		[Tooltip("Pool this instance belong to.")]
-		public Pool Pool;
-
-		/// <summary>The particular component being pooled.</summary>
-		[Tooltip("The particular component being pooled.")]
-		public Component Component;
-
 		// Instances should not destroy under normal circumstances, but are handled gracefully for fault-tolerance
 		protected void OnDestroy()
 		{
-			// Find and remove individual instances from Pool only if the pool/scene itself is not being unloaded
-			if (Pool == null || Pool.IsDestroying)
-				return;
-			if (!Pool.Used.Remove(Component))
-				Pool.Available.Remove(Component);
+			GameObject go = gameObject;
+			PoolInstanceInfo info = Pooler.GetInstanceInfo(go);
+			Pool pool = info.Pool;
+
+			// Remove individual instances from Pool only if the pool/scene itself is not being unloaded
+			if (pool != null && !pool.IsDestroying)
+			{
+				if (info.IsPooled)
+					pool.Available.Remove(info.Component);
+				else
+					pool.Used.Remove(info.Component);
+			}
+			Pooler.UncacheInstance(go);
 		}
 
 		/// <summary>Pool the instance.</summary>
-#if UNITY_EDITOR
 		[PropertySpace]
 		[Button(ButtonSizes.Large)]
-		[ShowIf("IsValid")]
+		[DisableIf("IsPooled")]
 		[LabelText("Move To Pool")]
-#endif
-		public void Destroy()
+		public void Pool()
 		{
-			Pool.Destroy(Component);
+			Pooler.Destroy(this);
 		}
 
-		/// <summary>Is the instance properly configured?</summary>
-		public bool IsValid => Pool != null && Component != null;
+#if UNITY_EDITOR
+		public bool IsPooled => Pooler.GetInstanceInfo(this).IsPooled;
+#endif
 	}
 }
