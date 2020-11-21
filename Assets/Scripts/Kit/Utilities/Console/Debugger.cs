@@ -18,10 +18,10 @@ namespace Kit
 		private static readonly Dictionary<LogType, string> LogColors = new Dictionary<LogType, string>
 																	   {
 																		   { LogType.Log, "7DE17D" },
-																		   { LogType.Error, "FF746F"},
-																		   { LogType.Exception, "FF746F"},
 																		   { LogType.Warning, "FFB247" },
-																		   { LogType.Assert, "FF7337" }
+																		   { LogType.Assert, "60A9FF" },
+																		   { LogType.Error, "FF746F"},
+																		   { LogType.Exception, "FF746F"}
 																	   };
 
 		#region Profiling

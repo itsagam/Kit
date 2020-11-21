@@ -8,8 +8,12 @@
 					<entry>
 						<para>
 							There is a custom in-game <codeEntityReference>T:Kit.Console</codeEntityReference> integrated into the kit that can be brought up by
-							pressing tilde (~) on PC or flicking down on mobile. The console displays all Log messages and supports Lua scripting. This should come
-							in handy in situations where you want to debug or tweak the game.
+							pressing tilde (~) on PC or flicking down on mobile. The console displays all <codeInline>Log</codeInline> messages and supports scripting in 
+							<externalLink>
+								<linkText>Lua</linkText>
+								<linkUri>https://en.wikipedia.org/wiki/Lua_(programming_language</linkUri>
+							</externalLink>.
+							This should come in handy in situations where you want to debug or tweak the game.
 						</para>
 						<para>
 							There is no need to bind commands to the console — it has full access to your game code. XLua does, however, require classes be referred

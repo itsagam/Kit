@@ -2,6 +2,9 @@ using System.Collections.Generic;
 
 namespace Kit
 {
+	/// <summary>
+	/// Extensions for <see cref="List{T}"/>s.
+	/// </summary>
 	public static class ListExtensions
 	{
 		/// <summary>Returns a random element from a list or array.</summary>

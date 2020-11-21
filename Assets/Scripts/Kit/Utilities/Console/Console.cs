@@ -1,4 +1,5 @@
 ﻿#if CONSOLE && (UNITY_EDITOR || DEVELOPMENT_BUILD)
+#if TOUCHSCRIPT
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -6,15 +7,14 @@ using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Text;
 using Kit.UI.Widgets;
+using TouchScript.Gestures;
+using TouchScript.Layers;
 using UniRx;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using XLua;
 using Object = UnityEngine.Object;
 
-#if TOUCHSCRIPT
-using TouchScript.Gestures;
-using TouchScript.Layers;
 #endif
 
 namespace Kit
@@ -30,9 +30,6 @@ namespace Kit
 
 		/// <summary>How deep to go when logging object contents.</summary>
 		public static int Depth = 2;
-
-		/// <summary>Color to use for showing <see cref="Debug.Log(object)" /> messages.</summary>
-		public static string LogColor = "#7EF9FF";
 
 		/// <summary>Garbage collector interval for the Lua environment of the Console.</summary>
 		public const float GCInterval = 1.0f;
@@ -194,7 +191,7 @@ namespace Kit
 
 		private static void OnLog(string message, string stackTrace, LogType type)
 		{
-			Log($"<color={LogColor}>{message}</color>");
+			Log($"<i>{message}</i>");
 		}
 
 		/// <summary>Log an object on the Console.</summary>

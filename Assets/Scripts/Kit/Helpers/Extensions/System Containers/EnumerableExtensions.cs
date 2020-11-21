@@ -23,7 +23,7 @@ namespace Kit
 		/// <summary>Log all the items in enumerable to the Console.</summary>
 		public static void Log<T>(this IEnumerable<T> enumerable, bool serialize = false)
 		{
-			enumerable.ForEach(o => Debugger.Log(o, serialize));
+			Debugger.Log(enumerable, serialize);
 		}
 
 		/// <summary>Return the index of an item, or -1 if not found.</summary>

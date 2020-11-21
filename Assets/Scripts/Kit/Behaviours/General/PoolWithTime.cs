@@ -1,6 +1,5 @@
 using System;
 using System.Threading;
-using Cysharp.Threading.Tasks;
 using Cysharp.Threading.Tasks.Linq;
 using Kit.Pooling;
 using Sirenix.OdinInspector;
@@ -9,7 +8,7 @@ using UnityEngine;
 namespace Kit.Behaviours
 {
 	/// <summary>Pools the <see cref="GameObject" /> after a specified time.</summary>
-	public class SelfPool: MonoBehaviour, IPooled
+	public class PoolWithTime: MonoBehaviour, IPooled
 	{
 		/// <summary>Time to hold out for in seconds before pooling.</summary>
 		[Tooltip("Time to hold out for before pooling.")]

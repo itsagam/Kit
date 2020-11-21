@@ -328,7 +328,7 @@ Camera:
   near clip plane: 0.3
   far clip plane: 1000
   field of view: 60
-  orthographic: 0
+  orthographic: 1
   orthographic size: 5
   m_Depth: -1
   m_CullingMask:
@@ -353,7 +353,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1445151026}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 1, z: -10}
+  m_LocalPosition: {x: 0, y: 0, z: -10}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
@@ -388,7 +388,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 22abe41cefd649240ba819bedaba5bfe, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Prefab: {fileID: -2848439770937075641, guid: 1fa73562a80dd004bba04b0b45af5126, type: 3}
+  Prefab: {fileID: -2848439770937075641, guid: 5d0dc4c349c2308409c2eaafefce888d, type: 3}
   MessageMode: 1
   Preload: 1
   PreloadAmount: 10
@@ -442,7 +442,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 22abe41cefd649240ba819bedaba5bfe, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Prefab: {fileID: -2848439770937075641, guid: aed2cbb08fdd8b34d852240b93b69235, type: 3}
+  Prefab: {fileID: -2848439770937075641, guid: 9b70e95624a933540aee0f158d15206c, type: 3}
   MessageMode: 1
   Preload: 0
   PreloadAmount: 5
@@ -496,7 +496,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 22abe41cefd649240ba819bedaba5bfe, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Prefab: {fileID: -2848439770937075641, guid: b43d5a184d9244b4b9d1fe48518a4e6d, type: 3}
+  Prefab: {fileID: -2848439770937075641, guid: d4fd4bf59756b2f47ba35798c2c9b69b, type: 3}
   MessageMode: 1
   Preload: 0
   PreloadAmount: 5

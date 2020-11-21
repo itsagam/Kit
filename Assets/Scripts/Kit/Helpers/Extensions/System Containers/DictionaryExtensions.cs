@@ -2,7 +2,7 @@ using System.Collections.Generic;
 
 namespace Kit
 {
-	/// <summary>Dictionary extensions.</summary>
+	/// <summary><see cref="Dictionary{TKey,TValue}"/> extensions.</summary>
 	public static class DictionaryExtensions
 	{
 		/// <summary>Allows to iterate over a dictionary using tuples.</summary>
@@ -13,7 +13,7 @@ namespace Kit
 		}
 
 		/// <summary>Return the value of a given key if it exists or the default value (<see langword="null" /> for reference types) if not.</summary>
-		public static TValue GetOrDefault<TKey, TValue>(this Dictionary<TKey, TValue> dictionary, TKey key)
+		public static TValue GetOrDefault<TKey, TValue>(this IDictionary<TKey, TValue> dictionary, TKey key)
 		{
 			return dictionary.TryGetValue(key, out TValue value) ? value : default;
 		}
