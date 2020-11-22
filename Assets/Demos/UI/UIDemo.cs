@@ -4,9 +4,9 @@ using Kit.UI.Message;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace Demos
+namespace Demos.UI
 {
-	public class UI : MonoBehaviour
+	public class UIDemo : MonoBehaviour
 	{
 		public Image BGImage;
 		public MessageWindow MsgWindow;

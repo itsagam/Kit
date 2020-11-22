@@ -12,7 +12,7 @@ using Debug = UnityEngine.Debug;
 namespace Kit
 {
 	/// <summary>Debugging methods for logging and profiling.</summary>
-	/// <remarks>The <see cref="Debugger.Log(object, bool)" /> method is useful for displaying the contents of any object or collection.</remarks>
+	/// <remarks>The <see cref="Debugger.Log(object, bool)" /> method is particularly useful for displaying the contents of any object or collection.</remarks>
 	public static class Debugger
 	{
 		private static readonly Dictionary<LogType, string> LogColors = new Dictionary<LogType, string>

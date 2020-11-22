@@ -3,7 +3,7 @@ using Kit;
 using Kit.UI;
 using UnityEngine.UI;
 
-namespace Demos
+namespace Demos.UI
 {
 	public class MyWindow : Window
 	{
