@@ -11,7 +11,7 @@ namespace Kit.Pooling
 	///     different types and components, or configure them together.
 	/// </summary>
 	[AddComponentMenu("Pooling/PoolGroup")]
-	public class PoolGroup: MonoBehaviour, IEnumerable<Component>
+	public class PoolGroup: MonoBehaviour, IEnumerable<Pool>
 	{
 		#region Fields
 
@@ -47,7 +47,7 @@ namespace Kit.Pooling
 
 		protected void Awake()
 		{
-			Pooler.CacheGroup(this);
+			Pooler.PoolGroupsByName.Add(name, this);
 		}
 
 		protected void Start()
@@ -59,7 +59,7 @@ namespace Kit.Pooling
 		protected void OnDestroy()
 		{
 			IsDestroying = true;
-			Pooler.UncacheGroup(this);
+			Pooler.PoolGroupsByName.Remove(name);
 		}
 
 		#endregion
@@ -104,14 +104,13 @@ namespace Kit.Pooling
 
 		IEnumerator IEnumerable.GetEnumerator()
 		{
-			return Used.GetEnumerator();
+			return Pools.GetEnumerator();
 		}
 
-		public IEnumerator<Component> GetEnumerator()
+		IEnumerator<Pool> IEnumerable<Pool>.GetEnumerator()
 		{
-			return Used.GetEnumerator();
+			return Pools.GetEnumerator();
 		}
-
 		#endregion
 
 		#region Editor functionality

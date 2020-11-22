@@ -173,8 +173,11 @@ namespace Kit.Pooling
 
 		protected void Awake()
 		{
-			Pooler.CachePool(this);
 			transform = base.transform;
+
+			if (Prefab != null)
+				Pooler.PoolsByPrefab.Add(Prefab, this);
+			Pooler.PoolsByName.Add(name, this);
 
 			if (Preload)
 				PreloadInstances().Forget();
@@ -191,7 +194,9 @@ namespace Kit.Pooling
 			IsDestroying = true;
 			// if (Group != null && !Group.IsDestroying)
 			// 	Group.Pools.Remove(this);
-			Pooler.UncachePool(this);
+			if (Prefab != null)
+				Pooler.PoolsByPrefab.Remove(Prefab);
+			Pooler.PoolsByName.Remove(name);
 		}
 
 		/// <summary>Start preloading instances. Automatically gets called if <see cref="Preload" /> is true.</summary>
@@ -227,7 +232,6 @@ namespace Kit.Pooling
 			{
 				Component instance = CreateInstance();
 				instance.gameObject.SetActive(false);
-				//Pooler.GetInstanceInfo(instance).IsPooled = true;
 				Available.AddLast(instance);
 			}
 		}
@@ -243,7 +247,7 @@ namespace Kit.Pooling
 
 			GameObject go = instance.gameObject;
 			go.AddComponent<PoolInstance>();
-			Pooler.CacheInstance(go, new PoolInstanceInfo(this, instance));
+			Pooler.InfoByGameObject.Add(go, new PoolInstanceInfo(this, instance));
 
 			if (Organize)
 				instance.transform.SetParent(transform);
@@ -353,42 +357,55 @@ namespace Kit.Pooling
 		/// <returns>The instance given.</returns>
 		public T Instantiate<T>() where T: Component
 		{
-			return (T) Instantiate();
+			Component instance = Instantiate();
+			return GetInstanceComponent<T>(instance);
 		}
 
 		/// <summary>Initialize a pool instance.</summary>
 		/// <returns>The instance given.</returns>
 		public T Instantiate<T>(Transform parent, bool worldSpace = false) where T: Component
 		{
-			return (T) Instantiate(parent, worldSpace);
+			Component instance = Instantiate(parent, worldSpace);
+			return GetInstanceComponent<T>(instance);
 		}
 
 		/// <summary>Initialize a pool instance.</summary>
 		/// <returns>The instance given.</returns>
 		public T Instantiate<T>(Vector3 position) where T: Component
 		{
-			return (T) Instantiate(position);
+			Component instance = Instantiate(position);
+			return GetInstanceComponent<T>(instance);
 		}
 
 		/// <summary>Initialize a pool instance.</summary>
 		/// <returns>The instance given.</returns>
 		public T Instantiate<T>(Vector3 position, Quaternion rotation) where T: Component
 		{
-			return (T) Instantiate(position, rotation);
+			Component instance = Instantiate(position, rotation);
+			return GetInstanceComponent<T>(instance);
 		}
 
 		/// <summary>Initialize a pool instance.</summary>
 		/// <returns>The instance given.</returns>
 		public T Instantiate<T>(Vector3 position, Transform parent) where T: Component
 		{
-			return (T) Instantiate(position, parent);
+			Component instance = Instantiate(position, parent);
+			return GetInstanceComponent<T>(instance);
 		}
 
 		/// <summary>Initialize a pool instance.</summary>
 		/// <returns>The instance given.</returns>
 		public T Instantiate<T>(Vector3 position, Quaternion rotation, Transform parent) where T: Component
 		{
-			return (T) Instantiate(position, rotation, parent);
+			Component instance = Instantiate(position, rotation, parent);
+			return GetInstanceComponent<T>(instance);
+		}
+
+		private static T GetInstanceComponent<T>(Component instance)
+		{
+			if (instance is T component)
+				return component;
+			return instance.GetComponent<T>();
 		}
 
 		/// <summary>Pool a particular instance.</summary>
@@ -505,7 +522,7 @@ namespace Kit.Pooling
 		private void ResetName()
 		{
 			if (Prefab != null)
-				name = $"Pool ({Prefab.name})";
+				name = Prefab.name;
 		}
 
 		private void ClampPreloadAmount()

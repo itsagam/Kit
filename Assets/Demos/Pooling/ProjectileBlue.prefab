@@ -11,9 +11,9 @@ GameObject:
   - component: {fileID: 4994802364414497229}
   - component: {fileID: 4994802364414497230}
   - component: {fileID: -7310760117908999782}
-  - component: {fileID: -2848439770937075641}
+  - component: {fileID: 4698855329597545572}
   m_Layer: 0
-  m_Name: Projectile1
+  m_Name: ProjectileBlue
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -98,7 +98,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Speed: 10
   direction: {x: 0, y: 1, z: 0}
---- !u!114 &-2848439770937075641
+--- !u!114 &4698855329597545572
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -107,8 +107,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 4994802364414497228}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f9e7e2cf73ce4186a2a046db7339f13f, type: 3}
+  m_Script: {fileID: 11500000, guid: d6f25fe81864a154bb02f3dc2f9e100d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Component: {fileID: 0}
   Time: 3

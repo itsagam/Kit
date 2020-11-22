@@ -1,13 +1,11 @@
-﻿using Kit;
-using Kit.Behaviours;
+﻿using Demos.Pooling;
+using Kit;
 using Kit.Pooling;
 using UnityEngine;
 
 public class Player : MonoBehaviour
 {
-    public PoolGroup Group;
-    public Pool Pool;
-    public MoveInDirection Projectile;
+    public Projectile Prefab;
     public float Speed = 10.0f;
     private new Transform transform;
 
@@ -23,28 +21,23 @@ public class Player : MonoBehaviour
         Vector2 direction = new Vector2(xAxis, yAxis);
 
         if (direction.sqrMagnitude > 0)
-        {
-            //transform.up = -direction;
             transform.Translate(direction * (Speed * Time.deltaTime));
-        }
 
         if (Input.GetButtonDown("Fire1"))
-            Fire();
+            Fire1();
+
+        if (Input.GetButtonDown("Fire2"))
+            Fire2();
     }
 
-    void Fire()
+    void Fire1()
     {
-        Pool pool = null;
+        Pooler.GetGroup("Projectiles").Pools.GetRandom().Instantiate(transform.position);
+    }
 
-        if (Group != null)
-            pool = Group.Pools.GetRandom();
-
-        if (pool == null)
-            pool = Pool;
-
-        if (pool != null)
-            pool.Instantiate(transform.position);
-        else
-            Pooler.Instantiate(Projectile, transform.position);
+    void Fire2()
+    {
+        Projectile instance = Pooler.Instantiate(Prefab, Vector3.zero);
+        instance.transform.up = Random.insideUnitCircle.normalized;
     }
 }

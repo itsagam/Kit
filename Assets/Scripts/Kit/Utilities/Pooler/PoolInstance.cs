@@ -23,7 +23,7 @@ namespace Kit.Pooling
 				else
 					pool.Used.Remove(info.Component);
 			}
-			Pooler.UncacheInstance(go);
+			Pooler.InfoByGameObject.Remove(go);
 		}
 
 		/// <summary>Pool the instance.</summary>
@@ -36,8 +36,6 @@ namespace Kit.Pooling
 			Pooler.Destroy(this);
 		}
 
-#if UNITY_EDITOR
 		public bool IsPooled => Pooler.GetInstanceInfo(this).IsPooled;
-#endif
 	}
 }

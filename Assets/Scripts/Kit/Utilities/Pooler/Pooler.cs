@@ -14,28 +14,30 @@ namespace Kit.Pooling
 	{
 		#region Fields
 
-		private static Dictionary<string, PoolGroup> poolGroupsByName = new Dictionary<string, PoolGroup>();
+		/// <summary>
+		/// A dictionary of all pool groups by name.
+		/// </summary>
+		public static readonly Dictionary<string, PoolGroup> PoolGroupsByName = new Dictionary<string, PoolGroup>();
 
-		private static Dictionary<string, Pool> poolsByName = new Dictionary<string, Pool>();
-		private static Dictionary<Component, Pool> poolsByPrefab = new Dictionary<Component, Pool>();
+		/// <summary>
+		/// A dictionary of all pools by their name.
+		/// </summary>
+		public static readonly Dictionary<string, Pool> PoolsByName = new Dictionary<string, Pool>();
 
-		private static Dictionary<GameObject, PoolInstanceInfo> poolsByGameObject = new Dictionary<GameObject, PoolInstanceInfo>();
+		/// <summary>
+		/// A dictionary of all pools by their prefab.
+		/// </summary>
+		public static readonly Dictionary<Component, Pool> PoolsByPrefab = new Dictionary<Component, Pool>();
+
+		/// <summary>
+		/// A record of information about pool instances by their game object. Required in <see cref="Pooler.Destroy(GameObject)"/>
+		/// to get a <see cref="GameObject"/>'s <see cref="PoolInstanceInfo.Pool"/> without providing the exact component.
+		/// </summary>
+		public static readonly Dictionary<GameObject, PoolInstanceInfo> InfoByGameObject = new Dictionary<GameObject, PoolInstanceInfo>();
 
 		#endregion
 
 		#region PoolGroup management
-
-		/// <summary>Register a group. Called automatically.</summary>
-		public static void CacheGroup(PoolGroup group)
-		{
-			poolGroupsByName.Add(group.name, group);
-		}
-
-		/// <summary>Unregister a group. Called automatically.</summary>
-		public static void UncacheGroup(PoolGroup group)
-		{
-			poolGroupsByName.Remove(group.name);
-		}
 
 		/// <summary>Create a new pool group.</summary>
 		public static PoolGroup CreateGroup(string name)
@@ -54,7 +56,7 @@ namespace Kit.Pooling
 		/// <summary>Get a pool group.</summary>
 		public static PoolGroup GetGroup(string name)
 		{
-			return poolGroupsByName.GetOrDefault(name);
+			return PoolGroupsByName.GetOrDefault(name);
 		}
 
 		/// <summary>Destroy a pool group.</summary>
@@ -99,22 +101,6 @@ namespace Kit.Pooling
 
 		#region Pool management
 
-		/// <summary>Register a pool. Called automatically.</summary>
-		public static void CachePool(Pool pool)
-		{
-			if (pool.Prefab != null)
-				poolsByPrefab.Add(pool.Prefab, pool);
-			poolsByName.Add(pool.name, pool);
-		}
-
-		/// <summary>Unregister a pool. Called automatically.</summary>
-		public static void UncachePool(Pool pool)
-		{
-			if (pool.Prefab != null)
-				poolsByPrefab.Remove(pool.Prefab);
-			poolsByName.Remove(pool.name);
-		}
-
 		/// <summary>Create a new pool for a prefab.</summary>
 		/// <param name="prefab">Prefab to create the pool for.</param>
 		public static Pool CreatePool(Component prefab)
@@ -130,32 +116,32 @@ namespace Kit.Pooling
 			GameObject poolGO = new GameObject(name);
 			Pool pool = poolGO.AddComponent<Pool>();
 			pool.Prefab = prefab;
-			poolsByPrefab.Add(prefab, pool);
+			PoolsByPrefab.Add(prefab, pool);
 			return pool;
 		}
 
 		/// <summary>Returns whether a particular pool exists.</summary>
 		public static bool ContainsPool(string name)
 		{
-			return poolsByName.ContainsKey(name);
+			return PoolsByName.ContainsKey(name);
 		}
 
 		/// <summary>Returns whether a particular pool exists.</summary>
 		public static bool ContainsPool(Component prefab)
 		{
-			return poolsByPrefab.ContainsKey(prefab);
+			return PoolsByPrefab.ContainsKey(prefab);
 		}
 
 		/// <summary>Get a particular pool.</summary>
 		public static Pool GetPool(string name)
 		{
-			return poolsByName.GetOrDefault(name);
+			return PoolsByName.GetOrDefault(name);
 		}
 
 		/// <summary>Get a particular pool.</summary>
 		public static Pool GetPool(Component prefab)
 		{
-			return poolsByPrefab.GetOrDefault(prefab);
+			return PoolsByPrefab.GetOrDefault(prefab);
 		}
 
 		/// <summary>Get a pool or create it if it doesn't exist.</summary>
@@ -214,14 +200,6 @@ namespace Kit.Pooling
 		#region Instantiate/Destroy
 
 		/// <summary>
-		/// Register a pool instance. Called automatically.
-		/// </summary>
-		public static void CacheInstance(GameObject gameObject, PoolInstanceInfo info)
-		{
-			poolsByGameObject.Add(gameObject, info);
-		}
-
-		/// <summary>
 		/// Get information about a pool instance.
 		/// </summary>
 		/// <returns>An instance of the <see cref="PoolInstanceInfo"/> class.</returns>
@@ -236,15 +214,7 @@ namespace Kit.Pooling
 		/// <returns>An instance of the <see cref="PoolInstanceInfo"/> class.</returns>
 		public static PoolInstanceInfo GetInstanceInfo(GameObject gameObject)
 		{
-			return poolsByGameObject[gameObject];
-		}
-
-		/// <summary>
-		/// Unregister a pool instance. Called automatically.
-		/// </summary>
-		public static void UncacheInstance(GameObject gameObject)
-		{
-			poolsByGameObject.Remove(gameObject);
+			return InfoByGameObject[gameObject];
 		}
 
 		/// <summary>Initialize a pool instance.</summary>
@@ -509,7 +479,7 @@ namespace Kit.Pooling
 		/// <summary>Pool an instance.</summary>
 		public static bool Destroy(GameObject instance)
 		{
-			if (poolsByGameObject.TryGetValue(instance, out PoolInstanceInfo info))
+			if (InfoByGameObject.TryGetValue(instance, out PoolInstanceInfo info))
 				info.Pool.Destroy(info.Component);
 
 			return true;
