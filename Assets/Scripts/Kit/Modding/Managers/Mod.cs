@@ -375,7 +375,7 @@ namespace Kit.Modding
 			}
 			catch (Exception e)
 			{
-				Debugger.Log(ModManager.LogCategory, $"{Name} – {e.Message}");
+				Debugger.Log(ModManager.LogCategory, $"{Name} – {e.Message}", LogType.Warning);
 			}
 		}
 

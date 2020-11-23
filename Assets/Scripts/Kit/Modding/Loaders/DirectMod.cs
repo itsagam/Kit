@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Cysharp.Threading.Tasks;
+using UnityEngine;
 
 namespace Kit.Modding.Loaders
 {
@@ -21,7 +22,7 @@ namespace Kit.Modding.Loaders
 			ModMetadata metadata = mod.Load<ModMetadata>(MetadataFile);
 			if (metadata == null)
 			{
-				Debugger.Log(ModManager.LogCategory, $"Could not load metadata for mod \"{path}\"");
+				Debugger.Log(ModManager.LogCategory, $"Could not load metadata for mod \"{path}\"", LogType.Warning);
 				return null;
 			}
 
@@ -40,7 +41,7 @@ namespace Kit.Modding.Loaders
 			ModMetadata metadata = await mod.LoadAsync<ModMetadata>(MetadataFile);
 			if (metadata == null)
 			{
-				Debugger.Log(ModManager.LogCategory, $"Could not load metadata for mod \"{path}\"");
+				Debugger.Log(ModManager.LogCategory, $"Could not load metadata for mod \"{path}\"", LogType.Warning);
 				return null;
 			}
 

@@ -91,7 +91,7 @@ namespace Kit
 
 		/// <summary>Absolute paths to <see cref="ResourceFolder" />s.</summary>
 		// @formatter:off
-		public static readonly Dictionary<ResourceFolder, string> Paths = new Dictionary<ResourceFolder, string> {
+		public static readonly IReadOnlyDictionary<ResourceFolder, string> Paths = new Dictionary<ResourceFolder, string> {
 			{ ResourceFolder.Data, Application.dataPath                       + "/"},
 			{ ResourceFolder.StreamingAssets, Application.streamingAssetsPath + "/"},
 			{ ResourceFolder.PersistentData, Application.persistentDataPath   + "/"},
@@ -442,7 +442,7 @@ namespace Kit
 				}
 				catch (Exception e)
 				{
-					Debugger.Log(LogCategory, e.Message);
+					Debugger.Log(LogCategory, e.Message, LogType.Error);
 				}
 
 			cachedResources[(type, folder, file)] = new WeakReference(merged);
@@ -519,7 +519,7 @@ namespace Kit
 				}
 				catch (Exception e)
 				{
-					Debugger.Log(LogCategory, e.Message);
+					Debugger.Log(LogCategory, e.Message, LogType.Error);
 				}
 
 			cachedResources[(type, folder, file)] = new WeakReference(merged);
@@ -808,7 +808,7 @@ namespace Kit
 			}
 			catch (Exception e)
 			{
-				Debugger.Log(LogCategory, e.Message);
+				Debugger.Log(LogCategory, e.Message, LogType.Error);
 				return null;
 			}
 		}
@@ -833,7 +833,7 @@ namespace Kit
 			}
 			catch (Exception e)
 			{
-				Debugger.Log(LogCategory, e.Message);
+				Debugger.Log(LogCategory, e.Message, LogType.Error);
 				return null;
 			}
 		}
@@ -962,7 +962,7 @@ namespace Kit
 			}
 			catch (Exception e)
 			{
-				Debugger.Log(LogCategory, e.Message);
+				Debugger.Log(LogCategory, e.Message, LogType.Error);
 				return false;
 			}
 		}
@@ -980,7 +980,7 @@ namespace Kit
 			}
 			catch (Exception e)
 			{
-				Debugger.Log(LogCategory, e.Message);
+				Debugger.Log(LogCategory, e.Message, LogType.Error);
 				return false;
 			}
 		}
@@ -997,7 +997,7 @@ namespace Kit
 			}
 			catch (Exception e)
 			{
-				Debugger.Log(LogCategory, e.Message);
+				Debugger.Log(LogCategory, e.Message, LogType.Error);
 				return false;
 			}
 		}
@@ -1015,7 +1015,7 @@ namespace Kit
 			}
 			catch (Exception e)
 			{
-				Debugger.Log(LogCategory, e.Message);
+				Debugger.Log(LogCategory, e.Message, LogType.Error);
 				return false;
 			}
 		}
@@ -1031,6 +1031,7 @@ namespace Kit
 
 		/// <inheritdoc cref="Delete(ResourceFolder, string)" />
 		/// <param name="fullPath">Absolute path to the file.</param>
+		/// <returns><see langword="true"/> if the file didn't exist or was successfully deleted, <see langword="false"/> otherwise.</returns>
 		public static bool Delete(string fullPath)
 		{
 			try
@@ -1040,7 +1041,7 @@ namespace Kit
 			}
 			catch (Exception e)
 			{
-				Debugger.Log(LogCategory, e.Message);
+				Debugger.Log(LogCategory, e.Message, LogType.Error);
 				return false;
 			}
 		}

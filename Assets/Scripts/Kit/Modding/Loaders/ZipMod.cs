@@ -5,6 +5,7 @@ using System.IO;
 using System.IO.Compression;
 using System.Linq;
 using Cysharp.Threading.Tasks;
+using UnityEngine;
 
 namespace Kit.Modding.Loaders
 {
@@ -33,7 +34,7 @@ namespace Kit.Modding.Loaders
 				ModMetadata metadata = mod.Load<ModMetadata>(MetadataFile);
 				if (metadata == null)
 				{
-					Debugger.Log(ModManager.LogCategory, $"Could not load metadata for mod \"{path}\"");
+					Debugger.Log(ModManager.LogCategory, $"Could not load metadata for mod \"{path}\"", LogType.Warning);
 					return null;
 				}
 
@@ -43,7 +44,7 @@ namespace Kit.Modding.Loaders
 			catch (Exception ex)
 			{
 				archive?.Dispose();
-				Debugger.Log(ModManager.LogCategory, $"Error loading mod \"{path}\" – {ex.Message}");
+				Debugger.Log(ModManager.LogCategory, $"Error loading mod \"{path}\" – {ex.Message}", LogType.Warning);
 				return null;
 			}
 		}
@@ -66,7 +67,7 @@ namespace Kit.Modding.Loaders
 				ModMetadata metadata = await mod.LoadAsync<ModMetadata>(MetadataFile);
 				if (metadata == null)
 				{
-					Debugger.Log(ModManager.LogCategory, $"Could not load metadata for mod \"{path}\"");
+					Debugger.Log(ModManager.LogCategory, $"Could not load metadata for mod \"{path}\"", LogType.Warning);
 					return null;
 				}
 
@@ -76,7 +77,7 @@ namespace Kit.Modding.Loaders
 			catch (Exception ex)
 			{
 				archive?.Dispose();
-				Debugger.Log(ModManager.LogCategory, $"Error loading mod \"{path}\" – {ex.Message}");
+				Debugger.Log(ModManager.LogCategory, $"Error loading mod \"{path}\" – {ex.Message}", LogType.Warning);
 				return null;
 			}
 		}
