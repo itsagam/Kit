@@ -33,7 +33,7 @@ namespace Kit
 		///             <term>iOS</term> <description>./Raw</description>
 		///         </item>
 		///         <item>
-		///             <term>Android</term> <description>jar:file://(Game)!/assets</description>
+		///             <term>Android</term> <description>jar:file://{Game APK}!/assets</description>
 		///         </item>
 		///     </list>
 		/// </summary>
@@ -43,16 +43,16 @@ namespace Kit
 		///     <para>The persistent data folder where local data can be stored.</para>
 		///     <list type="bullet">
 		///         <item>
-		///             <term>Windows</term> <description>(User)\AppData\LocalLow\(Company)\(Product)</description>
+		///             <term>Windows</term> <description>{User}\AppData\LocalLow\{Company}\{Product}</description>
 		///         </item>
 		///         <item>
-		///             <term>macOS</term> <description>(User)/Library/Application Support/(Company)/(Product)</description>
+		///             <term>macOS</term> <description>{User}/Library/Application Support/{Company}/{Product}</description>
 		///         </item>
 		///         <item>
-		///             <term>iOS</term> <description>/var/mobile/Containers/Data/Application/(GUID)/Documents</description>
+		///             <term>iOS</term> <description>/var/mobile/Containers/Data/Application/{GUID}/Documents</description>
 		///         </item>
 		///         <item>
-		///             <term>Android</term> <description>/storage/emulated/0/Android/data/(Package)/files</description>
+		///             <term>Android</term> <description>/storage/emulated/0/Android/data/{Package}/files</description>
 		///         </item>
 		///     </list>
 		/// </summary>
@@ -63,12 +63,12 @@ namespace Kit
 	}
 
 	/// <summary>
-	///     A versatile resource management system for loading, unloading, caching, reading, saving and parsing assets with support
-	///     for modding and async methods.
+	///     A versatile resource management system for loading, unloading, caching, reading, saving and parsing assets with support for
+	///     modding and async methods.
 	/// </summary>
 	/// <remarks>
-	///     Can handle file-names without extensions from <see cref="ResourceFolder.Resources" />. Otherwise you have to provide it,
-	///     as you can't enumerate and match files in <see cref="ResourceFolder.StreamingAssets" /> on platforms like Android.
+	///     Can handle file-names without extensions from <see cref="ResourceFolder.Resources" />. Otherwise you have to provide it, as you
+	///     can't enumerate and match files in <see cref="ResourceFolder.StreamingAssets" /> on platforms like Android.
 	/// </remarks>
 	/// <example>
 	///     <code>
@@ -82,7 +82,14 @@ namespace Kit
 	{
 		#region Fields
 
-		/// <summary>Absolute paths to <see cref="ResourceFolder" /> s.</summary>
+		/// <summary>Whether to log load and unload events.</summary>
+		public const bool LogEvents = true;
+
+		/// <summary>Category name to use for logging messages.</summary>
+		public const string LogCategory = "ResourceManager";
+
+
+		/// <summary>Absolute paths to <see cref="ResourceFolder" />s.</summary>
 		// @formatter:off
 		public static readonly Dictionary<ResourceFolder, string> Paths = new Dictionary<ResourceFolder, string> {
 			{ ResourceFolder.Data, Application.dataPath                       + "/"},
@@ -107,8 +114,8 @@ namespace Kit
 		/// <summary>
 		///     <para>Event fired when when any resource is loaded.</para>
 		///     <para>
-		///         Returns the folder, path, reference to the resource and whether the resource was actually loaded (true) or re-used from
-		///         cache (false).
+		///         Returns the folder, path, reference to the resource and whether the resource was actually loaded (true) or re-used from cache
+		///         (false).
 		///     </para>
 		/// </summary>
 		public static event Action<ResourceFolder, string, object, bool> ResourceLoaded;
@@ -131,24 +138,40 @@ namespace Kit
 
 		#endregion
 
+
+		#region Initialization
+
+		static ResourceManager()
+		{
+			if (LogEvents)
+			{
+				ResourceLoaded += (folder, file, obj, loaded) =>
+									  Debugger.Log(LogCategory, $"{(loaded ? "Loaded" : "Reused")} \"{file}\" from {folder}.");
+				ResourceUnloaded += (folder, file) =>
+										Debugger.Log(LogCategory, $"Unloaded \"{file}\" from {folder}.");
+			}
+		}
+
+		#endregion
+
 		#region Loading
 
 		/// <summary>
 		///     <para>Load and cache a resource.</para>
 		///     <para>
-		///         If <paramref name="folder" /> is <see cref="ResourceFolder.Resources" /> the asset is loaded with Resources.Load. If
-		///         it's not, it's parsed manually with the list of parsers registered.
+		///         If <paramref name="folder" /> is <see cref="ResourceFolder.Resources" /> the asset is loaded with Resources.Load. If it's not,
+		///         it's parsed manually with the list of parsers registered.
 		///     </para>
 		/// </summary>
 		/// <param name="folder">The folder to load the resource from.</param>
 		/// <param name="file">The path and file-name relative to the <paramref name="folder" />.</param>
 		/// <param name="modded">
-		///     Whether to allow mods to load their version of the asset instead. Useful if you want to allow some assets to
-		///     be modded, but not others. Has no effect if MODDING is not defined.
+		///     Whether to allow mods to load their version of the asset instead. Useful if you want to allow some assets to be
+		///     modded, but not others. Has no effect if MODDING is not defined.
 		/// </param>
 		/// <param name="merge">
-		///     Whether to merge the game version and all mod versions of the asset. Useful to allow modding of configuration
-		///     files. Has no effect if MODDING is not defined or <paramref name="modded" /> is false.
+		///     Whether to merge the game version and all mod versions of the asset. Useful to allow modding of configuration files.
+		///     Has no effect if MODDING is not defined or <paramref name="modded" /> is false.
 		/// </param>
 		/// <typeparam name="T">Type of the resource expected.</typeparam>
 		/// <returns>Reference to the resource, or <see langword="null" /> if it was not found.</returns>
@@ -194,8 +217,8 @@ namespace Kit
 		/// <summary>
 		///     <para>Load and cache a resource asynchronously.</para>
 		///     <para>
-		///         If <paramref name="folder" /> is <see cref="ResourceFolder.Resources" /> the asset is loaded with Resources.Load. If
-		///         it's not, it's parsed manually with the list of parsers registered.
+		///         If <paramref name="folder" /> is <see cref="ResourceFolder.Resources" /> the asset is loaded with Resources.Load. If it's not,
+		///         it's parsed manually with the list of parsers registered.
 		///     </para>
 		/// </summary>
 		public static async UniTask<T> LoadAsync<T>(ResourceFolder folder, string file, bool modded = DefaultModding, bool merge = false)
@@ -219,8 +242,8 @@ namespace Kit
 		/// <summary>
 		///     <para>Load and cache a resource asynchronously.</para>
 		///     <para>
-		///         If <paramref name="folder" /> is <see cref="ResourceFolder.Resources" /> the asset is loaded with Resources.Load. If
-		///         it's not, it's parsed manually with the list of parsers registered.
+		///         If <paramref name="folder" /> is <see cref="ResourceFolder.Resources" /> the asset is loaded with Resources.Load. If it's not,
+		///         it's parsed manually with the list of parsers registered.
 		///     </para>
 		/// </summary>
 		public static async UniTask<object> LoadAsync(Type type,
@@ -264,8 +287,8 @@ namespace Kit
 		/// <summary>
 		///     <para>Load and cache a resource without regarding mods.</para>
 		///     <para>
-		///         If <paramref name="folder" /> is <see cref="ResourceFolder.Resources" /> the asset is loaded with Resources.Load. If
-		///         it's not, it's parsed manually with the list of parsers registered.
+		///         If <paramref name="folder" /> is <see cref="ResourceFolder.Resources" /> the asset is loaded with Resources.Load. If it's not,
+		///         it's parsed manually with the list of parsers registered.
 		///     </para>
 		/// </summary>
 		/// <param name="folder">The folder to load the resource from.</param>
@@ -309,8 +332,8 @@ namespace Kit
 		/// <summary>
 		///     <para>Load and cache a resource asynchronously without regarding mods.</para>
 		///     <para>
-		///         If <paramref name="folder" /> is <see cref="ResourceFolder.Resources" /> the asset is loaded with  If it's not, it's
-		///         parsed manually with the list of parsers registered.
+		///         If <paramref name="folder" /> is <see cref="ResourceFolder.Resources" /> the asset is loaded with  If it's not, it's parsed
+		///         manually with the list of parsers registered.
 		///     </para>
 		/// </summary>
 		public static async UniTask<T> LoadUnmoddedAsync<T>(ResourceFolder folder, string file)
@@ -322,8 +345,8 @@ namespace Kit
 		/// <summary>
 		///     <para>Load and cache a resource asynchronously without regarding mods.</para>
 		///     <para>
-		///         If <paramref name="folder" /> is <see cref="ResourceFolder.Resources" /> the asset is loaded with  If it's not, it's
-		///         parsed manually with the list of parsers registered.
+		///         If <paramref name="folder" /> is <see cref="ResourceFolder.Resources" /> the asset is loaded with  If it's not, it's parsed
+		///         manually with the list of parsers registered.
 		///     </para>
 		/// </summary>
 		public static async UniTask<object> LoadUnmoddedAsync(Type type, ResourceFolder folder, string file)
@@ -358,12 +381,12 @@ namespace Kit
 #if MODDING
 		/// <summary>
 		///     <para>
-		///         Load a resource merging the game version with all the mod versions and cache it. Useful to allow modding of
-		///         configuration files like Json.
+		///         Load a resource merging the game version with all the mod versions and cache it. Useful to allow modding of configuration files
+		///         like Json.
 		///     </para>
 		///     <para>
-		///         If <paramref name="folder" /> is <see cref="ResourceFolder.Resources" /> the base asset is loaded with  If it's not,
-		///         it's parsed manually with the list of parsers registered.
+		///         If <paramref name="folder" /> is <see cref="ResourceFolder.Resources" /> the base asset is loaded with  If it's not, it's parsed
+		///         manually with the list of parsers registered.
 		///     </para>
 		/// </summary>
 		/// <param name="folder">The folder to load the resource from.</param>
@@ -419,7 +442,7 @@ namespace Kit
 				}
 				catch (Exception e)
 				{
-					Debugger.Log("ResourceManager", e.Message);
+					Debugger.Log(LogCategory, e.Message);
 				}
 
 			cachedResources[(type, folder, file)] = new WeakReference(merged);
@@ -430,12 +453,12 @@ namespace Kit
 		/// <inheritdoc cref="LoadMerged{T}(ResourceFolder, string)" />
 		/// <summary>
 		///     <para>
-		///         Load a resource asynchronously merging the game version with all the mod versions and cache it. Useful to allow modding
-		///         of configuration files like Json.
+		///         Load a resource asynchronously merging the game version with all the mod versions and cache it. Useful to allow modding of
+		///         configuration files like Json.
 		///     </para>
 		///     <para>
-		///         If <paramref name="folder" /> is <see cref="ResourceFolder.Resources" /> the base asset is loaded with Resources.Load.
-		///         If it's not, it's parsed manually with the list of parsers registered.
+		///         If <paramref name="folder" /> is <see cref="ResourceFolder.Resources" /> the base asset is loaded with Resources.Load. If it's
+		///         not, it's parsed manually with the list of parsers registered.
 		///     </para>
 		/// </summary>
 		public static async UniTask<T> LoadMergedAsync<T>(ResourceFolder folder, string file)
@@ -446,12 +469,12 @@ namespace Kit
 		/// <inheritdoc cref="LoadMerged(Type, ResourceFolder, string)" />
 		/// <summary>
 		///     <para>
-		///         Load a resource asynchronously merging the game version with all the mod versions and cache it. Useful to allow modding
-		///         of configuration files like Json.
+		///         Load a resource asynchronously merging the game version with all the mod versions and cache it. Useful to allow modding of
+		///         configuration files like Json.
 		///     </para>
 		///     <para>
-		///         If <paramref name="folder" /> is <see cref="ResourceFolder.Resources" /> the base asset is loaded with Resources.Load.
-		///         If it's not, it's parsed manually with the list of parsers registered.
+		///         If <paramref name="folder" /> is <see cref="ResourceFolder.Resources" /> the base asset is loaded with Resources.Load. If it's
+		///         not, it's parsed manually with the list of parsers registered.
 		///     </para>
 		/// </summary>
 		public static async UniTask<object> LoadMergedAsync(Type type, ResourceFolder folder, string file)
@@ -496,7 +519,7 @@ namespace Kit
 				}
 				catch (Exception e)
 				{
-					Debugger.Log("ResourceManager", e.Message);
+					Debugger.Log(LogCategory, e.Message);
 				}
 
 			cachedResources[(type, folder, file)] = new WeakReference(merged);
@@ -785,7 +808,7 @@ namespace Kit
 			}
 			catch (Exception e)
 			{
-				Debugger.Log("ResourceManager", e.Message);
+				Debugger.Log(LogCategory, e.Message);
 				return null;
 			}
 		}
@@ -810,7 +833,7 @@ namespace Kit
 			}
 			catch (Exception e)
 			{
-				Debugger.Log("ResourceManager", e.Message);
+				Debugger.Log(LogCategory, e.Message);
 				return null;
 			}
 		}
@@ -939,7 +962,7 @@ namespace Kit
 			}
 			catch (Exception e)
 			{
-				Debugger.Log("ResourceManager", e.Message);
+				Debugger.Log(LogCategory, e.Message);
 				return false;
 			}
 		}
@@ -957,7 +980,7 @@ namespace Kit
 			}
 			catch (Exception e)
 			{
-				Debugger.Log("ResourceManager", e.Message);
+				Debugger.Log(LogCategory, e.Message);
 				return false;
 			}
 		}
@@ -974,7 +997,7 @@ namespace Kit
 			}
 			catch (Exception e)
 			{
-				Debugger.Log("ResourceManager", e.Message);
+				Debugger.Log(LogCategory, e.Message);
 				return false;
 			}
 		}
@@ -992,7 +1015,7 @@ namespace Kit
 			}
 			catch (Exception e)
 			{
-				Debugger.Log("ResourceManager", e.Message);
+				Debugger.Log(LogCategory, e.Message);
 				return false;
 			}
 		}
@@ -1017,7 +1040,7 @@ namespace Kit
 			}
 			catch (Exception e)
 			{
-				Debugger.Log("ResourceManager", e.Message);
+				Debugger.Log(LogCategory, e.Message);
 				return false;
 			}
 		}

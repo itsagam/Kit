@@ -17,6 +17,25 @@ namespace Kit.Modding
 	{
 		#region Fields
 
+		/// <summary>
+		/// Category name to use for logging messages.
+		/// </summary>
+		public const string LogCategory = "ModManager";
+
+		/// <summary><see cref="ModGroup" />s by <see cref="ModType" />.</summary>
+		public static readonly Dictionary<ModType, ModGroup> Groups = new Dictionary<ModType, ModGroup>();
+
+		/// <summary>All mod loaders registered with the system.</summary>
+		public static readonly List<ModLoader> Loaders = new List<ModLoader>
+														 {
+															 new DirectModLoader(),
+															 new ZipModLoader(),
+															 new AssetBundleModLoader()
+														 };
+
+		/// <summary>List of all loaded and enabled mods.</summary>
+		public static IReadOnlyList<Mod> ActiveMods { get; private set; } = new List<Mod>();
+
 		/// <summary>Event fired when a mod is loaded.</summary>
 		public static event Action<Mod> ModLoaded;
 
@@ -38,26 +57,13 @@ namespace Kit.Modding
 		/// </summary>
 		public static event Action<ResourceFolder, string, Mod> ResourceUnloaded;
 
-		/// <summary><see cref="ModGroup" />s by <see cref="ModType" />.</summary>
-		public static readonly Dictionary<ModType, ModGroup> Groups = new Dictionary<ModType, ModGroup>();
-
-		/// <summary>All mod loaders registered with the system.</summary>
-		public static readonly List<ModLoader> Loaders = new List<ModLoader>
-														 {
-															 new DirectModLoader(),
-															 new ZipModLoader(),
-															 new AssetBundleModLoader()
-														 };
-
-		/// <summary>List of all loaded and enabled mods.</summary>
-		public static IReadOnlyList<Mod> ActiveMods { get; private set; } = new List<Mod>();
-
 		/// <summary>A cache of all loaded resources.</summary>
 		private static Dictionary<(Type type, ResourceFolder folder, string file), ResourceInfo> cachedResources =
 			new Dictionary<(Type, ResourceFolder, string), ResourceInfo>();
 
 		/// <summary>A cache of folder paths.</summary>
 		private static Dictionary<ResourceFolder, string> folderToString = new Dictionary<ResourceFolder, string>();
+
 
 		#endregion
 
@@ -67,6 +73,14 @@ namespace Kit.Modding
 		{
 			AddDefaultGroups();
 			CacheFolderNames();
+
+			if (ResourceManager.LogEvents)
+			{
+				ResourceLoaded += (folder, file, info, loaded) =>
+									  Debugger.Log(LogCategory, $"{(loaded ? "Loaded" : "Reused")} \"{file}\" from {folder}.");
+				ResourceUnloaded += (folder, file, mod) =>
+										Debugger.Log(LogCategory, $"Unloaded \"{file}\" from {folder}.");
+			}
 			Observable.OnceApplicationQuit().Subscribe(u => UnloadMods());
 		}
 
@@ -155,7 +169,7 @@ namespace Kit.Modding
 			SaveModOrder();
 			RefreshActiveMods();
 
-			Debugger.Log("ModManager", $"{Mods.Count()} mods loaded, {ActiveMods.Count} active.");
+			Debugger.Log(LogCategory, $"{Mods.Count()} mods loaded, {ActiveMods.Count} active.");
 
 			if (executeScripts)
 				ExecuteScripts();
@@ -184,7 +198,7 @@ namespace Kit.Modding
 							mod.Group = group;
 							group.Mods.Add(mod);
 							ModLoaded?.Invoke(mod);
-							Debugger.Log("ModManager", $"Loaded mod \"{mod.Metadata.Name}\".");
+							Debugger.Log(LogCategory, $"Loaded mod \"{mod.Name}\".");
 							break;
 						}
 					}
@@ -193,7 +207,7 @@ namespace Kit.Modding
 			SaveModOrder();
 			RefreshActiveMods();
 
-			Debugger.Log("ModManager", $"{Mods.Count()} mods loaded, {ActiveMods.Count} active.");
+			Debugger.Log(LogCategory, $"{Mods.Count()} mods loaded, {ActiveMods.Count} active.");
 
 			if (executeScripts)
 				await ExecuteScriptsAsync();
@@ -252,7 +266,7 @@ namespace Kit.Modding
 			if (!mod.Group.Deactivatable)
 				return;
 
-			SettingsManager.Set(mod.Group.Name.ToString(), mod.Metadata.Name, "Enabled", value);
+			SettingsManager.Set(mod.Group.Name.ToString(), mod.Name, "Enabled", value);
 			RefreshActiveMods();
 		}
 
@@ -263,7 +277,7 @@ namespace Kit.Modding
 			if (!mod.Group.Deactivatable)
 				return true;
 
-			return SettingsManager.Get(mod.Group.Name.ToString(), mod.Metadata.Name, "Enabled", true);
+			return SettingsManager.Get(mod.Group.Name.ToString(), mod.Name, "Enabled", true);
 		}
 
 		/// <summary>Returns the load order of a mod.</summary>
@@ -335,9 +349,7 @@ namespace Kit.Modding
 					group.Mods = group.Mods.AsEnumerable()
 									  .Reverse()
 									  .OrderBy(mod => SettingsManager.Get(group.Name.ToString(),
-																		  mod.Metadata.Name,
-																		  "Order",
-																		  -1))
+																		  mod.Name, "Order", -1))
 									  .ToList();
 		}
 
@@ -349,7 +361,7 @@ namespace Kit.Modding
 					for (int order = 0; order < group.Mods.Count; order++)
 					{
 						Mod mod = group.Mods[order];
-						SettingsManager.Set(group.Name.ToString(), mod.Metadata.Name, "Order", order);
+						SettingsManager.Set(group.Name.ToString(), mod.Name, "Order", order);
 					}
 		}
 
@@ -668,7 +680,7 @@ namespace Kit.Modding
 			ActiveMods = new List<Mod>();
 
 			if (totalCount > 0)
-				Debugger.Log("ModManager", $"{totalCount} mods unloaded, {activeCount} of them active.");
+				Debugger.Log(LogCategory, $"{totalCount} mods unloaded, {activeCount} of them active.");
 		}
 
 		/// <summary>Unload a mod.</summary>
@@ -687,7 +699,7 @@ namespace Kit.Modding
 			mod.Unload();
 			mod.Group.Mods.Remove(mod);
 			ModUnloaded?.Invoke(mod);
-			Debugger.Log("ModManager", $"Unloaded mod \"{mod.Metadata.Name}\"");
+			Debugger.Log(LogCategory, $"Unloaded mod \"{mod.Name}\".");
 		}
 
 		/// <summary>Unload all resources loaded by a mod.</summary>

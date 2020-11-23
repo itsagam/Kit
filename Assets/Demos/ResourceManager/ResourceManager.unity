@@ -163,7 +163,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 437291348}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 48bd960dba6f920479dcc7dcb112cbd5, type: 3}
+  m_Script: {fileID: 11500000, guid: 43b33739e9465ca4ebde5f92dcf1a221, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!1 &802030425
@@ -369,7 +369,7 @@ PrefabInstance:
         type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
-      objectReference: {fileID: 437291350}
+      objectReference: {fileID: 0}
     - target: {fileID: 4014891476405281643, guid: 61de5187bf903e94a8a9751704e93d44,
         type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_CallState
@@ -378,7 +378,7 @@ PrefabInstance:
     - target: {fileID: 4014891476405281643, guid: 61de5187bf903e94a8a9751704e93d44,
         type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
-      value: LogTypes
+      value: 
       objectReference: {fileID: 0}
     - target: {fileID: 4014891476405281643, guid: 61de5187bf903e94a8a9751704e93d44,
         type: 3}
@@ -534,7 +534,7 @@ PrefabInstance:
         type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
-      objectReference: {fileID: 437291350}
+      objectReference: {fileID: 0}
     - target: {fileID: 4014891476405281643, guid: 61de5187bf903e94a8a9751704e93d44,
         type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_CallState
@@ -699,7 +699,7 @@ PrefabInstance:
         type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
-      objectReference: {fileID: 437291350}
+      objectReference: {fileID: 0}
     - target: {fileID: 4014891476405281643, guid: 61de5187bf903e94a8a9751704e93d44,
         type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_CallState
@@ -864,7 +864,7 @@ PrefabInstance:
         type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
-      objectReference: {fileID: 437291350}
+      objectReference: {fileID: 0}
     - target: {fileID: 4014891476405281643, guid: 61de5187bf903e94a8a9751704e93d44,
         type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_CallState
@@ -1213,7 +1213,7 @@ PrefabInstance:
         type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
-      objectReference: {fileID: 437291350}
+      objectReference: {fileID: 0}
     - target: {fileID: 4014891476405281643, guid: 61de5187bf903e94a8a9751704e93d44,
         type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_CallState

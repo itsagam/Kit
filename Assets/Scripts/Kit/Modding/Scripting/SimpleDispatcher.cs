@@ -35,7 +35,7 @@ namespace Kit.Modding.Scripting
 			}
 			catch (Exception e)
 			{
-				Debugger.Log("ModManager", $"{name} – {e.Message}");
+				Debugger.Log(ModManager.LogCategory, $"{name} – {e.Message}");
 			}
 		}
 
@@ -51,7 +51,7 @@ namespace Kit.Modding.Scripting
 				}
 				catch (Exception e)
 				{
-					Debugger.Log("ModManager", $"{name} – {e.Message}");
+					Debugger.Log(ModManager.LogCategory, $"{name} – {e.Message}");
 					yield break;
 				}
 

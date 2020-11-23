@@ -32,7 +32,7 @@ namespace Kit.Modding.Loaders
 				AssetBundle bundle = AssetBundle.LoadFromFile(path);
 				if (bundle == null)
 				{
-					Debugger.Log("ModManager", $"AssetBundle could not be loaded for mod \"{path}\"");
+					Debugger.Log(ModManager.LogCategory, $"AssetBundle could not be loaded for mod \"{path}\"");
 					return null;
 				}
 
@@ -40,7 +40,7 @@ namespace Kit.Modding.Loaders
 				ModMetadata metadata = mod.Load<ModMetadata>(MetadataFile);
 				if (metadata == null)
 				{
-					Debugger.Log("ModManager", $"Could not load metadata for mod \"{path}\"");
+					Debugger.Log(ModManager.LogCategory, $"Could not load metadata for mod \"{path}\"");
 					return null;
 				}
 
@@ -49,7 +49,7 @@ namespace Kit.Modding.Loaders
 			}
 			catch (Exception ex)
 			{
-				Debugger.Log("ModManager", $"Error loading mod \"{path}\" – {ex.Message}");
+				Debugger.Log(ModManager.LogCategory, $"Error loading mod \"{path}\" – {ex.Message}");
 				return null;
 			}
 		}
@@ -70,7 +70,7 @@ namespace Kit.Modding.Loaders
 				await request;
 				if (request.assetBundle == null)
 				{
-					Debugger.Log("ModManager", $"AssetBundle could not be loaded for mod \"{path}\"");
+					Debugger.Log(ModManager.LogCategory, $"AssetBundle could not be loaded for mod \"{path}\"");
 					return null;
 				}
 
@@ -78,7 +78,7 @@ namespace Kit.Modding.Loaders
 				ModMetadata metadata = await mod.LoadAsync<ModMetadata>(MetadataFile);
 				if (metadata == null)
 				{
-					Debugger.Log("ModManager", $"Could not load metadata for mod \"{path}\"");
+					Debugger.Log(ModManager.LogCategory, $"Could not load metadata for mod \"{path}\"");
 					return null;
 				}
 
@@ -87,7 +87,7 @@ namespace Kit.Modding.Loaders
 			}
 			catch (Exception ex)
 			{
-				Debugger.Log("ModManager", $"Error loading mod \"{path}\" – {ex.Message}");
+				Debugger.Log(ModManager.LogCategory, $"Error loading mod \"{path}\" – {ex.Message}");
 				return null;
 			}
 		}

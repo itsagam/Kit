@@ -21,7 +21,7 @@ namespace Kit.Modding.Loaders
 			ModMetadata metadata = mod.Load<ModMetadata>(MetadataFile);
 			if (metadata == null)
 			{
-				Debugger.Log("ModManager", $"Could not load metadata for mod \"{path}\"");
+				Debugger.Log(ModManager.LogCategory, $"Could not load metadata for mod \"{path}\"");
 				return null;
 			}
 
@@ -40,7 +40,7 @@ namespace Kit.Modding.Loaders
 			ModMetadata metadata = await mod.LoadAsync<ModMetadata>(MetadataFile);
 			if (metadata == null)
 			{
-				Debugger.Log("ModManager", $"Could not load metadata for mod \"{path}\"");
+				Debugger.Log(ModManager.LogCategory, $"Could not load metadata for mod \"{path}\"");
 				return null;
 			}
 

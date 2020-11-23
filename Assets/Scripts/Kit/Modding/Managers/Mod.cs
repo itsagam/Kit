@@ -333,7 +333,7 @@ namespace Kit.Modding
 		{
 			if (Metadata.Persistence != ModPersistence.None)
 			{
-				GameObject gameObject = new GameObject(Metadata.Name);
+				GameObject gameObject = new GameObject(Name);
 				ScriptDispatcher = Metadata.Persistence == ModPersistence.Simple ?
 									   gameObject.AddComponent<SimpleDispatcher>() :
 									   gameObject.AddComponent<FullDispatcher>();
@@ -375,7 +375,7 @@ namespace Kit.Modding
 			}
 			catch (Exception e)
 			{
-				Debugger.Log("ModManager", $"{Metadata.Name} – {e.Message}");
+				Debugger.Log(ModManager.LogCategory, $"{Name} – {e.Message}");
 			}
 		}
 
@@ -404,6 +404,12 @@ namespace Kit.Modding
 		{
 			DisposeScripting();
 		}
+
+		#endregion
+
+		#region Public properties
+
+		public string Name => Metadata?.Name;
 
 		#endregion
 	}
