@@ -22,6 +22,7 @@ namespace Demos.Pooling
 
 		protected void OnTriggerEnter2D(Collider2D other)
 		{
+			// Avoid self-collision checks
 			if (UnityEngine.Time.time - spawnTime < 0.05f)
 				return;
 

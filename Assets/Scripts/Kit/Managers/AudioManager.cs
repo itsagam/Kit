@@ -25,6 +25,11 @@ namespace Kit
 		/// <summary>Handler for music since we're always fading it.</summary>
 		public static AudioFader MusicManager { get; private set; }
 
+		/// <summary>
+		/// Default volume level to use for the background music.
+		/// </summary>
+		public const float DefaultMusicVolume = 0.75f;
+
 		private static GameObject audioGameObject;
 		private static Transform audioTransform;
 		private static Dictionary<string, AudioSource> groupSources = new Dictionary<string, AudioSource>();
@@ -47,7 +52,8 @@ namespace Kit
 			audioGameObject = new GameObject("Audio");
 			audioTransform = audioGameObject.transform;
 
-			AudioSource musicSource = CreateGroup(MusicGroup, LoadGroupVolume(MusicGroup, 0.75f));
+			AudioSource musicSource = CreateGroup(MusicGroup, LoadGroupVolume(MusicGroup, DefaultMusicVolume));
+			musicSource.loop = true;
 			MusicManager = musicSource.gameObject.AddComponent<AudioFader>();
 
 			CreateGroup(SoundGroup, LoadGroupVolume(SoundGroup));
@@ -106,7 +112,7 @@ namespace Kit
 
 		/// <summary>Returns the volume saved in the settings for a group.</summary>
 		/// <param name="name">Name of the group.</param>
-		/// <param name="defaultVolume">Volume to return if it's is not saved yet.</param>
+		/// <param name="defaultVolume">Volume to return if it's not saved yet.</param>
 		public static float LoadGroupVolume(string name, float defaultVolume = 1.0f)
 		{
 			return SettingsManager.Get("Audio", name, "Volume", defaultVolume);
