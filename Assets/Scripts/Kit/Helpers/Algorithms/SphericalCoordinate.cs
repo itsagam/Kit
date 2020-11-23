@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace Kit.Algorithms
 {
-	/// <summary>Represents a point on a sphere, and allows to do calculations with it.</summary>
+	/// <summary>Represents a point on a sphere, and allows to do calculations with it w.r.t to other points on the sphere.</summary>
 	public struct SphericalCoordinate: IEquatable<SphericalCoordinate>
 	{
 		private float radius, polar, elevation;

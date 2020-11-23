@@ -58,7 +58,10 @@ SpriteAtlas:
     - {fileID: 2800000, guid: 372c21488b227a249a0f34ce38c3ec2d, type: 3}
     - {fileID: 2800000, guid: 0e3c3958fdaf3e348b3bb33db898c90a, type: 3}
     - {fileID: 2800000, guid: 39cddfcaf363f1f45a521c8094733758, type: 3}
-    totalSpriteSurfaceArea: 65536
+    - {fileID: 2800000, guid: d7b250b52b757a240aa98bcc24e8ffb4, type: 3}
+    - {fileID: 2800000, guid: 45868e6beb75ad44cb9033c7ff0adafd, type: 3}
+    - {fileID: 2800000, guid: 957b97e8429a36b4db7e99e0da12f8a1, type: 3}
+    totalSpriteSurfaceArea: 77824
     bindAsDefault: 1
     isAtlasV2: 0
     cachedData: {fileID: 0}
@@ -69,14 +72,17 @@ SpriteAtlas:
   - {fileID: 21300000, guid: 9c286e938591b9647bc3c6f20a7cdf94, type: 3}
   - {fileID: 21300000, guid: d47272440a72e774cb69e512c3c87f96, type: 3}
   - {fileID: 21300000, guid: 965b0e8568223e14d8e875927720d73c, type: 3}
+  - {fileID: 21300000, guid: d7b250b52b757a240aa98bcc24e8ffb4, type: 3}
   - {fileID: 21300000, guid: a03defe54c7424b409f9ba5e4f008292, type: 3}
   - {fileID: 21300000, guid: 372c21488b227a249a0f34ce38c3ec2d, type: 3}
   - {fileID: 21300000, guid: 0e3c3958fdaf3e348b3bb33db898c90a, type: 3}
   - {fileID: 21300000, guid: 5ea4dba800df3ca4bbc1c0b58f794060, type: 3}
+  - {fileID: 21300000, guid: 957b97e8429a36b4db7e99e0da12f8a1, type: 3}
   - {fileID: 21300000, guid: 7e00a4f8c8616df4f8f5fcef69be5219, type: 3}
   - {fileID: 21300000, guid: 00b905f897885f14d8a3f3ba605aa0d8, type: 3}
   - {fileID: 21300000, guid: 61907a695706ff141b06e16090e48c56, type: 3}
   - {fileID: 21300000, guid: 39cddfcaf363f1f45a521c8094733758, type: 3}
+  - {fileID: 21300000, guid: 45868e6beb75ad44cb9033c7ff0adafd, type: 3}
   - {fileID: 21300000, guid: 452ebdfc510319d43ab6e8fec9b48ef4, type: 3}
   - {fileID: 21300000, guid: 7a06330d958e90640804963e04889040, type: 3}
   - {fileID: 21300000, guid: 69262d1f170409c4abed0330cedc5293, type: 3}
@@ -86,14 +92,17 @@ SpriteAtlas:
   - Mouser-Left-Button-Dark
   - Arrow-Down-Button-Dark
   - Mouse-None-Button-Dark
+  - A-Button-Dark
   - Enter-Button-Dark
   - Plus-Button-Dark
   - Space-Button-Dark
   - Arrow-Up-Button-Dark
+  - D-Button-Dark
   - Arrow-Right-Button-Dark
   - PC-Icon-Dark
   - Button-Dark
   - W-Button-Dark
+  - S-Button-Dark
   - Command-Button-Dark
   - Mouse-Right-Button-Dark
   - Arrow-Left-Button-Dark

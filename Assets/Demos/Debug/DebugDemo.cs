@@ -54,14 +54,14 @@ namespace Demos.Debug
 			Debugger.StartProfile("Uncached Components");
 			for (int i = 0; i < times; i++)
 			{
-				float distance = (transform.position - Camera.main.transform.position).sqrMagnitude;
+				float distance = (transform.position - Camera.main.transform.position).magnitude;
 			}
 			Debugger.EndProfile();
 
 			Debugger.StartProfile("Cached Components");
 			for (int i = 0; i < times; i++)
 			{
-				float distance = (transform1.position - transform2.position).sqrMagnitude;
+				float distance = (transform1.position - transform2.position).magnitude;
 			}
 			Debugger.EndProfile();
 

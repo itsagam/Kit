@@ -4,11 +4,13 @@ using UnityEngine;
 
 namespace Demos.Pooling
 {
-    public class Player : MonoBehaviour
+    public class Player : Ship
     {
         public Projectile Prefab;
         public float Speed = 10.0f;
-        
+        public AudioClip Fire1Sound;
+        public AudioClip Fire2Sound;
+
         private new Transform transform;
 
         void Awake()
@@ -35,12 +37,14 @@ namespace Demos.Pooling
         void Fire1()
         {
             Pooler.GetGroup("Projectiles").Pools.GetRandom().Instantiate(transform.position);
+            AudioManager.PlaySound(Fire1Sound);
         }
 
         void Fire2()
         {
-            Projectile instance = Pooler.Instantiate(Prefab, Vector3.zero);
-            instance.transform.up = Random.insideUnitCircle.normalized;
+            Projectile projectile = Pooler.Instantiate(Prefab, transform.position);
+            projectile.transform.eulerAngles = new Vector3(0, 0, Random.Range(0, 180) - 90);
+            AudioManager.PlaySound(Fire2Sound);
         }
     }
 }
