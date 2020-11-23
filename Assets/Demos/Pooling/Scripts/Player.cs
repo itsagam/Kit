@@ -6,7 +6,7 @@ namespace Demos.Pooling
 {
     public class Player : Ship
     {
-        public Projectile Prefab;
+        public Projectile Projectile;
         public float Speed = 10.0f;
         public AudioClip Fire1Sound;
         public AudioClip Fire2Sound;
@@ -36,13 +36,13 @@ namespace Demos.Pooling
 
         void Fire1()
         {
-            Pooler.GetGroup("Projectiles").Pools.GetRandom().Instantiate(transform.position);
+            Projectile projectile = Pooler.Instantiate(Projectile, transform.position);
             AudioManager.PlaySound(Fire1Sound);
         }
 
         void Fire2()
         {
-            Projectile projectile = Pooler.Instantiate(Prefab, transform.position);
+            Projectile projectile = Pooler.Instantiate(Projectile, transform.position);
             projectile.transform.eulerAngles = new Vector3(0, 0, Random.Range(0, 180) - 90);
             AudioManager.PlaySound(Fire2Sound);
         }

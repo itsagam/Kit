@@ -1,6 +1,7 @@
 using System;
 using System.Threading;
 using Cysharp.Threading.Tasks.Linq;
+using Kit;
 using Kit.Pooling;
 using UnityEngine;
 using Random = UnityEngine.Random;
@@ -9,7 +10,6 @@ namespace Demos.Pooling
 {
 	public class Enemy: Ship
 	{
-		public Projectile Projectile;
 		public float Delay = 3.0f;
 		public float Interval = 2.0f;
 
@@ -24,12 +24,11 @@ namespace Demos.Pooling
 			UniTaskAsyncEnumerable.Timer(TimeSpan.FromSeconds(Random.Range(0.0f, Delay)))
 								  .Concat(UniTaskAsyncEnumerable.Interval(TimeSpan.FromSeconds(Interval)))
 								  .ForEachAsync(_ => Fire(), cancelSource.Token);
-
 		}
 
 		protected void Fire()
 		{
-			Projectile projectile = Pooler.Instantiate(Projectile, transform.position);
+			Pooler.GetGroup("EnemyProjectiles").Pools.GetRandom().Instantiate(transform.position);
 		}
 
 		protected void OnDestroy()

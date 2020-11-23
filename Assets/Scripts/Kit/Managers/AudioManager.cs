@@ -5,7 +5,6 @@ using Kit.Pooling;
 using UniRx;
 using UnityEngine;
 using Object = UnityEngine.Object;
-using Random = UnityEngine.Random;
 
 namespace Kit
 {
@@ -48,11 +47,11 @@ namespace Kit
 			audioGameObject = new GameObject("Audio");
 			audioTransform = audioGameObject.transform;
 
-			AudioSource musicSource = CreateGroup(MusicGroup, true);
+			AudioSource musicSource = CreateGroup(MusicGroup, LoadGroupVolume(MusicGroup, 0.75f));
 			MusicManager = musicSource.gameObject.AddComponent<AudioFader>();
 
-			CreateGroup(SoundGroup, true);
-			CreateGroup(UIGroup,    true);
+			CreateGroup(SoundGroup, LoadGroupVolume(SoundGroup));
+			CreateGroup(UIGroup,    LoadGroupVolume(UIGroup));
 
 			Object.DontDestroyOnLoad(audioGameObject);
 		}
@@ -63,14 +62,13 @@ namespace Kit
 
 		/// <summary>Create a new <see cref="AudioSource" /> for a sound group.</summary>
 		/// <param name="name">Name of the group.</param>
-		/// <param name="loadVolume">Whether to load the group's volume from settings.</param>
+		/// <param name="volume">Volume level for the group sounds.</param>
 		/// <returns>AudioSource created for the group.</returns>
-		public static AudioSource CreateGroup(string name, bool loadVolume = false)
+		public static AudioSource CreateGroup(string name, float volume = 1.0f)
 		{
 			GameObject gameObject = new GameObject(name);
 			AudioSource source = gameObject.AddComponent<AudioSource>();
-			if (loadVolume)
-				source.volume = LoadGroupVolume(name);
+			source.volume = volume;
 			source.transform.parent = audioTransform;
 			groupSources.Add(name, source);
 			return source;
@@ -107,12 +105,15 @@ namespace Kit
 		}
 
 		/// <summary>Returns the volume saved in the settings for a group.</summary>
-		public static float LoadGroupVolume(string name)
+		/// <param name="name">Name of the group.</param>
+		/// <param name="defaultVolume">Volume to return if it's is not saved yet.</param>
+		public static float LoadGroupVolume(string name, float defaultVolume = 1.0f)
 		{
-			return SettingsManager.Get("Audio", name, "Volume", 1.0f);
+			return SettingsManager.Get("Audio", name, "Volume", defaultVolume);
 		}
 
 		/// <summary>Saves the current volume of a group in settings.</summary>
+		/// <param name="name">Name of the group.</param>
 		public static bool SaveGroupVolume(string name)
 		{
 			AudioSource source = GetGroup(name);
@@ -123,7 +124,9 @@ namespace Kit
 			return true;
 		}
 
-		/// <summary>Saves a volume of a group in settings.</summary>
+		/// <summary>Saves the volume of a group in settings.</summary>
+		/// <param name="name">Name of the group.</param>
+		/// <param name="volume">Volume level to save.</param>
 		public static void SaveGroupVolume(string name, float volume)
 		{
 			SettingsManager.Set("Audio", name, "Volume", volume);
