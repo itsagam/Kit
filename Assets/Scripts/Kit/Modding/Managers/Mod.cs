@@ -1,6 +1,5 @@
 ﻿#if MODDING
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -342,8 +341,7 @@ namespace Kit.Modding
 									   gameObject.AddComponent<SimpleDispatcher>() :
 									   gameObject.AddComponent<FullDispatcher>();
 
-				UniTaskAsyncEnumerable.Interval(GCInterval, PlayerLoopTiming.Update)
-									  .ForEachAsync(_ => ScriptEnv.Tick(), cancelSource.Token);
+				UniTaskAsyncEnumerable.Interval(GCInterval).ForEachAsync(_ => ScriptEnv.Tick(), cancelSource.Token);
 			}
 		}
 
@@ -402,7 +400,14 @@ namespace Kit.Modding
 		/// <summary>Unload the mod.</summary>
 		public virtual void Unload()
 		{
-			DisposeScripting();
+			try
+			{
+				DisposeScripting();
+			}
+			catch (Exception ex)
+			{
+				Debugger.Log(ModManager.LogCategory, $"{Name} – {ex.Message}", LogType.Warning);
+			}
 		}
 
 		#endregion
