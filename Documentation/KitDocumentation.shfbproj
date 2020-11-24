@@ -58,20 +58,16 @@
     <SdkLinkTarget>Blank</SdkLinkTarget>
     <MissingTags>AutoDocumentCtors, AutoDocumentDispose</MissingTags>
     <ApiFilter>
-      <Filter entryType="Namespace" fullName="Demos" isExposed="False" xmlns="" />
-      <Filter entryType="Namespace" fullName="Game" isExposed="False" xmlns="" />
-      <Filter entryType="Namespace" fullName="Game.UI.Menu" isExposed="False" xmlns="" />
-      <Filter entryType="Namespace" fullName="Game.UI.Mods" isExposed="False" xmlns="" />
-      <Filter entryType="Namespace" fullName="Game.UI.Settings" isExposed="False" xmlns="" />
-      <Filter entryType="Namespace" fullName="Game.UI.Splash" isExposed="False" xmlns="" />
-      <Filter entryType="Namespace" fullName="SoftMasking" isExposed="False" xmlns="" />
-      <Filter entryType="Namespace" fullName="SoftMasking.Extensions" isExposed="False" xmlns="" />
-      <Filter entryType="Namespace" fullName="SoftMasking.TextMeshPro" isExposed="False" xmlns="" />
-      <Filter entryType="Namespace" fullName="XLua" isExposed="False" xmlns="" />
-      <Filter entryType="Namespace" fullName="XLua.Cast" isExposed="False" xmlns="" />
-      <Filter entryType="Namespace" fullName="XLua.LuaDLL" isExposed="False" xmlns="" />
-      <Filter entryType="Namespace" fullName="XLua.TemplateEngine" isExposed="False" xmlns="" />
-    </ApiFilter>
+      <Filter entryType="Namespace" fullName="Demos.Debug" isExposed="False" />
+<Filter entryType="Namespace" fullName="Demos.Pooling" isExposed="False" />
+<Filter entryType="Namespace" fullName="Demos.UI" isExposed="False" />
+<Filter entryType="Namespace" fullName="Game" isExposed="False" />
+<Filter entryType="Namespace" fullName="Game.UI.Menu" isExposed="False" />
+<Filter entryType="Namespace" fullName="Game.UI.Settings" isExposed="False" />
+<Filter entryType="Namespace" fullName="Game.UI.Splash" isExposed="False" />
+<Filter entryType="Namespace" fullName="SoftMasking" isExposed="False" />
+<Filter entryType="Namespace" fullName="SoftMasking.Extensions" isExposed="False" />
+<Filter entryType="Namespace" fullName="SoftMasking.TextMeshPro" isExposed="False" /></ApiFilter>
     <PlugInConfigurations />
     <ComponentConfigurations>
     </ComponentConfigurations>

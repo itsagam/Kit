@@ -87,7 +87,7 @@
 						</alert>
 					</definition>
 					<definedTerm>
-						clear()
+						cls() / clear()
 					</definedTerm>
 					<definition>
 						<para>

@@ -72,17 +72,16 @@ namespace Kit.UI.Message
 		/// <param name="cancelAction">Callback for the Cancel button.</param>
 		/// <param name="yesAction">>Callback for the Yes button.</param>
 		/// <param name="noAction">>Callback for the No button.</param>
-		/// <returns>Instance of the window created.</returns>
-		public static UniTask<Window> Show(MessageWindow prefab,
-										   string title,
-										   string message,
-										   MessageType type = MessageType.Info,
-										   MessageButtons buttons = MessageButtons.OK,
-										   string subtitle = "",
-										   Action okayAction = null,
-										   Action cancelAction = null,
-										   Action yesAction = null,
-										   Action noAction = null)
+		public static void Show(MessageWindow prefab,
+								string title,
+								string message,
+								MessageType type = MessageType.Info,
+								MessageButtons buttons = MessageButtons.OK,
+								string subtitle = "",
+								Action okayAction = null,
+								Action cancelAction = null,
+								Action yesAction = null,
+								Action noAction = null)
 		{
 			MessageInfo info = new MessageInfo
 							   {
@@ -93,21 +92,21 @@ namespace Kit.UI.Message
 								   OkayAction = okayAction, CancelAction = cancelAction,
 								   YesAction = yesAction, NoAction = noAction
 							   };
-			return UIManager.Show(prefab, info);
+			UIManager.Show(prefab, info).Forget();
 		}
 
 		/// <inheritdoc cref="Show(MessageWindow, string, string, MessageType, MessageButtons, string, Action, Action, Action, Action)" />
 		/// <param name="prefab">Path to the prefab to use for displaying the message.</param>
-		public static UniTask<Window> Show(string prefab,
-										   string title,
-										   string message,
-										   MessageType type = MessageType.Info,
-										   MessageButtons buttons = MessageButtons.OK,
-										   string subtitle = "",
-										   Action okayAction = null,
-										   Action cancelAction = null,
-										   Action yesAction = null,
-										   Action noAction = null)
+		public static void Show(string prefab,
+								   string title,
+								   string message,
+								   MessageType type = MessageType.Info,
+								   MessageButtons buttons = MessageButtons.OK,
+								   string subtitle = "",
+								   Action okayAction = null,
+								   Action cancelAction = null,
+								   Action yesAction = null,
+								   Action noAction = null)
 		{
 			MessageInfo info = new MessageInfo
 							   {
@@ -118,7 +117,7 @@ namespace Kit.UI.Message
 								   OkayAction = okayAction, CancelAction = cancelAction,
 								   YesAction = yesAction, NoAction = noAction
 							   };
-			return UIManager.Show(prefab, info);
+			UIManager.Show(prefab, info).Forget();
 		}
 
 		protected override void Awake()

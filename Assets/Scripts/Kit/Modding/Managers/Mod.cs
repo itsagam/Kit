@@ -3,7 +3,9 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using Cysharp.Threading.Tasks;
+using Cysharp.Threading.Tasks.Linq;
 using Kit.Modding.Scripting;
 using Kit.Parsers;
 using UnityEngine;
@@ -52,9 +54,7 @@ namespace Kit.Modding
 		#region Fields
 
 		/// <summary>Garbage collector interval for the Lua environment of the mod.</summary>
-		public const float GCInterval = 1.0f;
-
-		private static YieldInstruction gcYield = new WaitForSeconds(GCInterval);
+		public static TimeSpan GCInterval = TimeSpan.FromSeconds(1.0f);
 
 		/// <summary>The <see cref="ModGroup" /> this mod belong to.</summary>
 		public ModGroup Group { get; set; }
@@ -89,6 +89,7 @@ namespace Kit.Modding
 		/// <summary>The <see cref="ScriptDispatcher" /> associated with this mod.</summary>
 		public SimpleDispatcher ScriptDispatcher { get; protected set; }
 
+		protected CancellationTokenSource cancelSource = new CancellationTokenSource();
 		#endregion
 
 		#region Resources
@@ -145,7 +146,7 @@ namespace Kit.Modding
 			var certainties = RankParsers(type, matchingFiles);
 			string text = null;
 			byte[] bytes = null;
-			foreach ((string filePath, ResourceParser parser, var _) in certainties)
+			foreach ((string filePath, ResourceParser parser, _) in certainties)
 				try
 				{
 					if (parser.ParseMode == ParseMode.Binary)
@@ -226,7 +227,7 @@ namespace Kit.Modding
 			var certainties = RankParsers(type, matchingFiles);
 			string text = null;
 			byte[] bytes = null;
-			foreach ((string filePath, ResourceParser parser, var _) in certainties)
+			foreach ((string filePath, ResourceParser parser, _) in certainties)
 				try
 				{
 					if (parser.ParseMode == ParseMode.Binary)
@@ -320,6 +321,9 @@ namespace Kit.Modding
 
 			CreateDispatcher();
 
+			if (Metadata.Persistence == ModPersistence.Full)
+				((FullDispatcher) ScriptDispatcher).Hook(ScriptEnv);
+
 			foreach (string scriptFile in scripts)
 			{
 				var script = await ReadBytesAsync(scriptFile);
@@ -337,7 +341,9 @@ namespace Kit.Modding
 				ScriptDispatcher = Metadata.Persistence == ModPersistence.Simple ?
 									   gameObject.AddComponent<SimpleDispatcher>() :
 									   gameObject.AddComponent<FullDispatcher>();
-				ScriptDispatcher.StartCoroutine(TickCoroutine());
+
+				UniTaskAsyncEnumerable.Interval(GCInterval, PlayerLoopTiming.Update)
+									  .ForEachAsync(_ => ScriptEnv.Tick(), cancelSource.Token);
 			}
 		}
 
@@ -355,15 +361,6 @@ namespace Kit.Modding
 				case ModPersistence.Full:
 					((FullDispatcher) ScriptDispatcher).Hook(ScriptEnv);
 					break;
-			}
-		}
-
-		protected virtual IEnumerator TickCoroutine()
-		{
-			while (true)
-			{
-				yield return gcYield;
-				ScriptEnv.Tick();
 			}
 		}
 
@@ -390,6 +387,9 @@ namespace Kit.Modding
 				ScriptDispatcher.gameObject.Destroy();
 				ScriptDispatcher = null;
 			}
+
+			cancelSource.Cancel();
+			cancelSource.Dispose();
 
 			ScriptEnv.Dispose();
 			ScriptEnv = null;

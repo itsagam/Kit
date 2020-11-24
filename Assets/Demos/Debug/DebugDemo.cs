@@ -32,7 +32,7 @@ namespace Demos.Debug
 			Debugger.Log(array);
 		}
 
-		class User
+		private class User
 		{
 			public string FirstName, LastName;
 			public int Age;
@@ -40,7 +40,7 @@ namespace Demos.Debug
 		}
 		public void LogObject()
 		{
-			User user = new User() { FirstName = "Sultan", LastName = "Rahi", Age = 40, Joined = DateTime.Now};
+			User user = new User { FirstName = "Sultan", LastName = "Rahi", Age = 40, Joined = DateTime.Now};
 			Debugger.Log(user, true);
 		}
 

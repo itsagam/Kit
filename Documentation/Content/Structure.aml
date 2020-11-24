@@ -359,6 +359,16 @@
 					<row>
 						<entry>
 							<para>
+								<token>Tab</token><token>Tab</token>Mods
+							</para>
+						</entry>
+						<entry>
+							<para>Code for a pre-written <codeEntityReference linkText="Window">T:Kit.Modding.UI.ModWindow</codeEntityReference> to manage mods in-game.</para>
+						</entry>
+					</row>
+					<row>
+						<entry>
+							<para>
 								<token>Tab</token>
 								<legacyBold>UI</legacyBold>
 							</para>
@@ -534,16 +544,6 @@
 						</entry>
 						<entry>
 							<para>Main menu code.</para>
-						</entry>
-					</row>
-					<row>
-						<entry>
-							<para>
-								<token>Tab</token><token>Tab</token>Mods
-							</para>
-						</entry>
-						<entry>
-							<para>Mod window code.</para>
 						</entry>
 					</row>
 					<row>

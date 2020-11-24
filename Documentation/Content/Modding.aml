@@ -32,9 +32,9 @@
 					<content>
 						<para>
 							Our modding system achieves the former by hooking into <codeEntityReference>T:Kit.ResourceManager</codeEntityReference>.
-							ResourceManager is the global center where all in-game assets can be loaded and should be the class you use to load everything.
+							ResourceManager is the global center where all in-game assets can be conveniently loaded and should be the class you use to load everything.
 							Before looking for assets in the game <codeEntityReference>T:Kit.ResourceManager</codeEntityReference> asks
-							<codeEntityReference>T:Kit.Modding.ModManager</codeEntityReference> if any of mods has the asset being requested. If that is
+							<codeEntityReference>T:Kit.Modding.ModManager</codeEntityReference> if any of loaded mods has the asset being requested. If that is
 							indeed the case, the mod version is loaded instead.
 						</para>
 						<alert class="note">
@@ -115,7 +115,8 @@
 				</list>
 				<para>
 					However a modder chooses to package a mod, it just needs to be placed inside the <localUri>Mods</localUri> folder. Individual mods can also be enabled
-					or disabled within the game once the system is able to detect them. Their execution order can also be configured in the game.
+					or disabled within the game once the system is able to detect them. Their execution order can also be configured in the game. See 
+					<codeEntityReference>T:Kit.Modding.UI.ModWindow</codeEntityReference>.
 				</para>
 				<para>A mod will typically have the following structure: </para>
 				<table>
@@ -258,7 +259,13 @@
 
 					<definedTerm>Scripts:</definedTerm>
 					<definition>
-						<para>Relative paths to <localUri>.lua</localUri> files to execute, in the order they should be executed.</para>
+						<para>
+							Relative paths to <localUri>.lua</localUri> files to execute, in the order they should be executed.
+						</para>
+						<para>The Lua keyword <codeInline>self</codeInline> in each script will be bound to the
+							<codeEntityReference>T:Kit.Modding.Mod</codeEntityReference>, so you can do stuff like
+							<codeInline>self:Load("Texture.jpg")</codeInline> or <codeInline>print(self.Name)</codeInline> within a script.
+						</para>
 					</definition>
 				</definitionTable>
 				<para>
@@ -286,6 +293,7 @@
 			<codeEntityReference>T:Kit.Modding.ModManager</codeEntityReference>
 			<codeEntityReference>T:Kit.Modding.ModMetadata</codeEntityReference>
 			<codeEntityReference>T:Kit.ResourceManager</codeEntityReference>
+			<codeEntityReference>T:Kit.Modding.UI.ModWindow</codeEntityReference>
 			<externalLink>
 				<linkText>Lua (programming language)</linkText>
 				<linkUri>https://en.wikipedia.org/wiki/Lua_(programming_language)</linkUri>

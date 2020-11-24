@@ -1,1 +1,7 @@
-print("Loaded texture from self Mod 1: " .. self:Load("Resources/Textures/Test.jpg"):ToString())
+print(self.Name)
+
+i = 0
+function update()
+	i = i + 1
+	print(i)
+end
