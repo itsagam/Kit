@@ -24,9 +24,9 @@ function inject(type, method, extend, code)
 	 	extend = true
 	end
 	-- "xlua.hotfix" is faster but doesn't allow calling the original function from injected method,
-	-- "util.hotfix_ex" does – provide a way for doing both using a "extend" toggle, defaulting to true	
+	-- "util.hotfix_ex" does – provide a way for doing both using a "extend" toggle, defaulting to true
 	if extend == true then
-		util.hotfix_ex(type, method, code)	
+		util.hotfix_ex(type, method, code)
 	else
 		xlua.hotfix(type, method, code)
 	end
@@ -44,14 +44,14 @@ function schedule(type, action)
 	self.ScriptDispatcher:Schedule(type, action)
 end
 
-function invoke(time, action)
+function invoke(action, time)
 	startCoroutine(function()
 		yield(UE.WaitForSeconds(time))
 		action()
 	end)
 end
 
-function invokeRepeating(time, interval, action)
+function invokeRepeating(action, time, interval)
 	startCoroutine(function()
 		yield(UE.WaitForSeconds(time))
 		while true do

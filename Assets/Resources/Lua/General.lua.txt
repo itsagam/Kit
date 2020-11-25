@@ -1,3 +1,4 @@
+System = CS.System
 UE = CS.UnityEngine
 Kit = CS.Kit
 Game = CS.Game

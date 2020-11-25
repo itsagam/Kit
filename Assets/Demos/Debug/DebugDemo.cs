@@ -46,11 +46,11 @@ namespace Demos.Debug
 
 		public void Profile()
 		{
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
 			int times = 1000000;
 
 			Transform transform1 = GetComponent<Transform>();
 			Transform transform2 = Camera.main.transform;
-
 			Debugger.StartProfile("Uncached Components");
 			for (int i = 0; i < times; i++)
 			{
@@ -64,7 +64,7 @@ namespace Demos.Debug
 				float distance = (transform1.position - transform2.position).magnitude;
 			}
 			Debugger.EndProfile();
-
+#endif
 		}
 	}
 }
