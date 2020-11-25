@@ -68,12 +68,12 @@ namespace Demos.Modding
 
         public void InjectedReplace()
 		{
-			string message = @"
-Steps to follow before testing injection in Editor:
+			string message = @"Steps to follow before testing injection:
 1. Add HOTFIX_ENABLE in Scripting Define Symbols.
-2. Press XLua -> Generate Code.
-3. Press XLua -> Hotfix Inject in Editor.";
-			MessageWindow.Show(MsgWindow, Title, message);
+2. Move /Plugins/XLua/ to the base folder and delete all asmdefs from it.
+3. Press XLua -> Generate Code.
+4. Press XLua -> Hotfix Inject in Editor.";
+			Debugger.Log(message);
 		}
 
 		public void InjectedExtend()

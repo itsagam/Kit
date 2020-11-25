@@ -49,6 +49,7 @@ Assets/Plugins/Editor/JetBrains.meta
 
 # XLua generated code
 Assets/XLua/Gen/
+Assets/Plugins/XLua/Gen
 
 # Generated documentation
 Documentation/Help/
