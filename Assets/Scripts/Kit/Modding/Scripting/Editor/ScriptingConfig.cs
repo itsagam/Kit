@@ -6,10 +6,13 @@ using XLua;
 
 namespace Kit.Modding.Scripting
 {
-	/// <summary>Configuration file for XLua.</summary>
-	public static class ScriptingConfig
-	{
-		// Recommended that all types to be accessed in Lua have LuaCallCSharp or ReflectionUse.
+    /// <summary>Configuration file for XLua.</summary>
+    public static class ScriptingConfig
+    {
+        // Recommended that all types to be accessed in Lua have LuaCallCSharp or ReflectionUse.
+
+        [CSObjectWrapEditor.GenPath]
+        public static string GenPath => "Assets/Plugins/XLua/Gen";
 
 		// /// <summary>Generate adapter code for these types, otherwise use reflection with lower performance.</summary>
 		// [LuaCallCSharp]

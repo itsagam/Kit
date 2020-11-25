@@ -19,10 +19,11 @@ namespace Demos.Modding
 		public float Speed;
 		public float Damage;
 	}
-
-	[Hotfix]
-	[LuaCallCSharp]
-	public class Demo: MonoBehaviour
+#if HOTFIX_ENABLE
+    [Hotfix]
+    [LuaCallCSharp]
+#endif
+    public class Demo: MonoBehaviour
 	{
 		public RawImage DisplayImage;
 		public MessageWindow MsgWindow;
@@ -61,7 +62,12 @@ namespace Demos.Modding
 			}
 		}
 
-		public void InjectedReplace()
+        public void ClickMe()
+        {
+            MessageWindow.Show(MsgWindow, Title, "Dang it!\nSee the lua scripts for how this is being done.");
+        }
+
+        public void InjectedReplace()
 		{
 			string message = @"
 Steps to follow before testing injection in Editor:
@@ -74,11 +80,6 @@ Steps to follow before testing injection in Editor:
 		public void InjectedExtend()
 		{
 			Debugger.Log("Game code");
-		}
-
-		public void ClickMe()
-		{
-			MessageWindow.Show(MsgWindow, Title, "Dang it!\nSee the lua scripts for how this is being done.");
 		}
 	}
 }
