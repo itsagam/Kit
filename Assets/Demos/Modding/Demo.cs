@@ -21,7 +21,6 @@ namespace Demos.Modding
 	}
 #if HOTFIX_ENABLE
     [Hotfix]
-    [LuaCallCSharp]
 #endif
     public class Demo: MonoBehaviour
 	{
