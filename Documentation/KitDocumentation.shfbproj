@@ -59,15 +59,16 @@
     <MissingTags>AutoDocumentCtors, AutoDocumentDispose</MissingTags>
     <ApiFilter>
       <Filter entryType="Namespace" fullName="Demos.Debug" isExposed="False" />
-<Filter entryType="Namespace" fullName="Demos.Pooling" isExposed="False" />
-<Filter entryType="Namespace" fullName="Demos.UI" isExposed="False" />
-<Filter entryType="Namespace" fullName="Game" isExposed="False" />
-<Filter entryType="Namespace" fullName="Game.UI.Menu" isExposed="False" />
-<Filter entryType="Namespace" fullName="Game.UI.Settings" isExposed="False" />
-<Filter entryType="Namespace" fullName="Game.UI.Splash" isExposed="False" />
-<Filter entryType="Namespace" fullName="SoftMasking" isExposed="False" />
-<Filter entryType="Namespace" fullName="SoftMasking.Extensions" isExposed="False" />
-<Filter entryType="Namespace" fullName="SoftMasking.TextMeshPro" isExposed="False" /></ApiFilter>
+      <Filter entryType="Namespace" fullName="Demos.Pooling" isExposed="False" />
+      <Filter entryType="Namespace" fullName="Demos.UI" isExposed="False" />
+      <Filter entryType="Namespace" fullName="Game" isExposed="False" />
+      <Filter entryType="Namespace" fullName="Game.UI.Menu" isExposed="False" />
+      <Filter entryType="Namespace" fullName="Game.UI.Settings" isExposed="False" />
+      <Filter entryType="Namespace" fullName="Game.UI.Splash" isExposed="False" />
+      <Filter entryType="Namespace" fullName="SoftMasking" isExposed="False" />
+      <Filter entryType="Namespace" fullName="SoftMasking.Extensions" isExposed="False" />
+      <Filter entryType="Namespace" fullName="SoftMasking.TextMeshPro" isExposed="False" />
+    </ApiFilter>
     <PlugInConfigurations />
     <ComponentConfigurations>
     </ComponentConfigurations>
@@ -160,6 +161,10 @@
     <Image Include="media\Console.PNG">
       <ImageId>Console</ImageId>
       <AlternateText>Console</AlternateText>
+    </Image>
+    <Image Include="media\Modding.png">
+      <ImageId>Modding</ImageId>
+      <AlternateText>Modding</AlternateText>
     </Image>
   </ItemGroup>
   <ItemGroup>

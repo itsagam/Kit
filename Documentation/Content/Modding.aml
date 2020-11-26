@@ -24,7 +24,9 @@
 					</listItem>
 				</list>
 				<para>The modding system integrated into the kit supports both.</para>
-
+				<mediaLink>
+					<image xlink:href="Modding" placement="center"/>
+				</mediaLink>
 			</content>
 			<sections>
 				<section>
