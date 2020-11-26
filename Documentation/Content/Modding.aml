@@ -233,7 +233,7 @@
 						<para>A short description of the mod.</para>
 					</definition>
 
-					<definedTerm>Persistence:</definedTerm>
+					<definedTerm address="Persistence">Persistence:</definedTerm>
 					<definition>
 						<para>A mode for executing Lua scripts.</para>
 
@@ -245,15 +245,15 @@
 							</listItem>
 							<listItem>
 								<para>
-									<legacyBold>Simple</legacyBold> – Execute them, create a <codeInline>GameObject</codeInline> for the mod to run co-routines 
-									with, and keep the scripting environment until the mod is unloaded.
+									<legacyBold>Simple</legacyBold> – Execute them, create a <codeEntityReference>T:Kit.Modding.Scripting.SimpleDispatcher</codeEntityReference>
+									for the mod to run co-routines with, and keep the scripting environment until the mod is unloaded.
 								</para>
 							</listItem>
 							<listItem>
 								<para>
-									<legacyBold>Full</legacyBold> – Execute them, create a <codeInline>GameObject</codeInline> for the mod, hook 
-									<codeInline>awake</codeInline>/<codeInline>start</codeInline>/<codeInline>update</codeInline>/... methods from
-									scripts with the <codeInline>GameObject</codeInline>, and keep the scripting environment until the mod is unloaded.
+									<legacyBold>Full</legacyBold> – Execute them, create a <codeEntityReference>T:Kit.Modding.Scripting.FullDispatcher</codeEntityReference>
+									for the mod, hook <codeInline>awake</codeInline>/<codeInline>start</codeInline>/<codeInline>update</codeInline>/... methods from
+									scripts with the dispatcher, and keep the scripting environment until the mod is unloaded.
 								</para>
 							</listItem>
 						</list>
@@ -263,10 +263,6 @@
 					<definition>
 						<para>
 							Relative paths to <localUri>.lua</localUri> files to execute, in the order they should be executed.
-						</para>
-						<para>The Lua keyword <codeInline>self</codeInline> in each script will be bound to the
-							<codeEntityReference>T:Kit.Modding.Mod</codeEntityReference>, so you can do stuff like
-							<codeInline>self:Load("Texture.jpg")</codeInline> or <codeInline>print(self.Name)</codeInline> within a script.
 						</para>
 					</definition>
 				</definitionTable>
@@ -288,7 +284,81 @@
 				</code>
 			</content>
 		</section>
-
+		<section>
+			<title>Scripts</title>
+			<content>
+				<para>The Lua keyword <codeInline>self</codeInline> in each script is bound to the
+					<codeEntityReference>T:Kit.Modding.Mod</codeEntityReference>, so you can do stuff like
+					<codeInline>self:Load("Texture.jpg")</codeInline> or <codeInline>print(self.Name)</codeInline> within a script.
+					There are also built-in methods (see <localUri>Resources/Lua/Modding.lua.txt</localUri>):
+				</para>
+				<definitionTable>
+					<definedTerm>
+						startCoroutine(<replaceable>function</replaceable>)
+					</definedTerm>
+					<definition>
+						<para>
+							Start a co-routine with the <codeEntityReference linkText="dispatcher">T:Kit.Modding.Scripting.SimpleDispatcher</codeEntityReference> created for the mod.
+						</para>
+					</definition>
+					<definedTerm>
+						yield(<replaceable>function</replaceable>)
+					</definedTerm>
+					<definition>
+						<para>
+							Yield a function from a co-routine.
+						</para>
+					</definition>
+					<definedTerm>
+						invoke(<replaceable>function</replaceable>, <replaceable>time</replaceable>)
+					</definedTerm>
+					<definition>
+						<para>
+							Call a function after <replaceable>time</replaceable> seconds.
+						</para>
+					</definition>
+					<definedTerm>
+						invokeRepeating(<replaceable>function</replaceable>, <replaceable>time</replaceable>, <replaceable>interval</replaceable>)
+					</definedTerm>
+					<definition>
+						<para>
+							Call a function after <replaceable>time</replaceable> seconds, and keep calling it after <replaceable>interval</replaceable> seconds.
+						</para>
+					</definition>
+					<definedTerm>
+						schedule(<replaceable>type</replaceable>, <replaceable>function</replaceable>)
+					</definedTerm>
+					<definition>
+						<para>
+							Schedule a function for <codeInline>update</codeInline>, <codeInline>fixedUpdate</codeInline> or <codeInline>lateUpdate</codeInline>.
+						</para>
+					</definition>
+					<definedTerm>
+						inject(<replaceable>type</replaceable>, <replaceable>method</replaceable>, <replaceable>function</replaceable>)
+					</definedTerm>
+					<definition>
+						<para>
+							Inject a <replaceable>function</replaceable>'s code into the <replaceable>method</replaceable> of a <replaceable>type</replaceable>.
+						</para>
+					</definition>
+					<definedTerm>
+						inject(<replaceable>type</replaceable>, <replaceable>method</replaceable>, <replaceable>extend</replaceable>, <replaceable>function</replaceable>)
+					</definedTerm>
+					<definition>
+						<para>
+							Inject a <replaceable>function</replaceable>'s code into the <replaceable>method</replaceable> of a <replaceable>type</replaceable>.
+							If <replaceable>extend</replaceable> is <codeInline>false</codeInline>, it's less overhead but you can't call the base method from the script
+							(Default: <codeInline>true</codeInline>).
+						</para>
+					</definition>				
+				</definitionTable>
+				<alert class="important">
+					<para>
+						Do set the <link xlink:href="#Persistence">persistence</link> to Simple or Full if you call these methods.
+					</para>
+				</alert>
+			</content>
+		</section>
 
 		<relatedTopics>
 			<link xlink:href="Console" />
