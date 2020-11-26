@@ -1,11 +1,12 @@
-﻿#if MODDING
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using Kit;
-using Kit.Modding;
 using Kit.UI.Message;
 using UnityEngine;
 using UnityEngine.UI;
+
+#if MODDING
+using Kit.Modding;
 #endif
 
 namespace Demos.Modding
