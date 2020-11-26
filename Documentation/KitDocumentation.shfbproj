@@ -130,6 +130,7 @@
     <None Include="Content\Modding.aml" />
     <None Include="Content\Plugins.aml" />
     <None Include="Content\Console.aml" />
+    <None Include="Content\Pooler.aml" />
     <None Include="Content\Structure.aml" />
     <None Include="Content\Welcome.aml" />
   </ItemGroup>

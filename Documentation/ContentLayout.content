@@ -1,8 +1,9 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Topics>
   <Topic id="Welcome" visible="True" isDefault="true" />
-  <Topic id="Structure" visible="True" isSelected="true" title="Directory Structure" />
+  <Topic id="Structure" visible="True" title="Directory Structure" />
   <Topic id="Plugins" visible="True" />
   <Topic id="Console" visible="True" />
+  <Topic id="Pooler" visible="True" isSelected="true" />
   <Topic id="Modding" visible="True" />
 </Topics>
