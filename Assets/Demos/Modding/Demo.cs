@@ -3,16 +3,14 @@ using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using Kit;
 using Kit.Modding;
-using Kit.Parsers;
 using Kit.UI.Message;
 using UnityEngine;
 using UnityEngine.UI;
-using XLua;
-using Object = System.Object;
-
+#endif
 
 namespace Demos.Modding
 {
+#if MODDING
 	public class TestData
 	{
 		public string Title;
@@ -22,12 +20,14 @@ namespace Demos.Modding
 #if HOTFIX_ENABLE
     [Hotfix]
 #endif
+#endif
     public class Demo: MonoBehaviour
 	{
 		public RawImage DisplayImage;
 		public MessageWindow MsgWindow;
 		public List<Button> DisabledButtons;
 
+#if MODDING
 		public string Title { get; protected set; } = "Demo";
 
 		protected void Awake()
@@ -80,6 +80,6 @@ namespace Demos.Modding
 		{
 			Debugger.Log("Game code");
 		}
+#endif
 	}
 }
-#endif
