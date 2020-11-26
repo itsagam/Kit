@@ -166,6 +166,14 @@
       <ImageId>Modding</ImageId>
       <AlternateText>Modding</AlternateText>
     </Image>
+    <Image Include="media\Pooler_Diagram.png">
+      <ImageId>Pooler_Diagram</ImageId>
+      <AlternateText>Pooler Diagram</AlternateText>
+    </Image>
+    <Image Include="media\Pooler_Screen.png">
+      <ImageId>Pooler_Screen</ImageId>
+      <AlternateText>Pooler Screen</AlternateText>
+    </Image>
   </ItemGroup>
   <ItemGroup>
     <Tokens Include="Content\Tokens.tokens" />
