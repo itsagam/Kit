@@ -81,17 +81,17 @@
 				<para>
 					The most basic use-case of the <codeEntityReference>T:Kit.Pooling.Pooler</codeEntityReference> and the easiest way to it 
 					is to just replace <codeInline>Object.Instantiate()</codeInline> calls
-					with <codeEntityReference qualifyHint="true">M:Kit.Pooling.Pooler.Instantiate</codeEntityReference> and <codeInline>Object.Destroy()</codeInline>
-					calls with <codeEntityReference qualifyHint="true">M:Kit.Pooling.Pooler.Destroy(Component)</codeEntityReference>. If your instances don't require
+					with <codeEntityReference qualifyHint="true" autoUpgrade="true">M:Kit.Pooling.Pooler.Instantiate(UnityEngine.Component)</codeEntityReference> and <codeInline>Object.Destroy()</codeInline>
+					calls with <codeEntityReference qualifyHint="true" autoUpgrade="true">M:Kit.Pooling.Pooler.Destroy(UnityEngine.Component)</codeEntityReference>. If your instances don't require
 					much tuning, everything would just work by itself. Typically though, that is not the case and you need to move
 					<codeInline>Awake</codeInline> and <codeInline>OnDestroy</codeInline> code that requires re-initializing into 
 					<codeEntityReference linkText="AwakeFromPool">F:Kit.Pooling.Pool.InstantiateMessage</codeEntityReference> and 
 					<codeEntityReference linkText="OnDestroyIntoPool">F:Kit.Pooling.Pool.DestroyMessage</codeEntityReference>. If you need more 
 					control over the configuration of a pool, you can either create one either
-					<codeEntityReference linkText="through code">M:Kit.Pooling.Pooler.GetOrCreatePool</codeEntityReference> or  
+					<codeEntityReference linkText="through code">M:Kit.Pooling.Pooler.GetOrCreatePool(UnityEngine.Component)</codeEntityReference> or  
 					add <codeEntityReference>T:Kit.Pooling.Pool</codeEntityReference> to a 
 					<codeInline>GameObject</codeInline> in the scene. You can likewise group pools
-					<codeEntityReference linkText="through code">M:Kit.Pooling.Pooler.GetOrCreatePoolGroup</codeEntityReference> or by attaching
+					<codeEntityReference linkText="through code">M:Kit.Pooling.Pooler.GetOrCreateGroup(System.String)</codeEntityReference> or by attaching
 					<codeEntityReference>T:Kit.Pooling.PoolGroup</codeEntityReference> in the inspector. All the configuration features are then exposed as properties of a
 					<codeEntityReference>T:Kit.Pooling.Pool</codeEntityReference>.
 				</para>			
