@@ -25,9 +25,7 @@ namespace Kit
 		/// <summary>Handler for music since we're always fading it.</summary>
 		public static AudioFader MusicManager { get; private set; }
 
-		/// <summary>
-		/// Default volume level to use for the background music.
-		/// </summary>
+		/// <summary>Default volume level to use for the background music.</summary>
 		public const float DefaultMusicVolume = 0.75f;
 
 		private static GameObject audioGameObject;

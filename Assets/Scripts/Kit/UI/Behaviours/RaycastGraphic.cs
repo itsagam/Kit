@@ -12,8 +12,8 @@ namespace Kit.UI.Behaviours
 #endif
 
 	/// <summary>
-	///     A sub-class of the Unity UI <see cref="Graphic" /> that just skips drawing. Useful for providing a raycast target
-	///     without actually drawing anything.
+	///     A sub-class of the Unity UI <see cref="Graphic" /> that just skips drawing. Useful for providing a raycast target without actually
+	///     drawing anything.
 	/// </summary>
 	public class RaycastGraphic: Graphic
 	{

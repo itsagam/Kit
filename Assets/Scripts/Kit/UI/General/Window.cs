@@ -9,9 +9,7 @@ namespace Kit.UI
 	/// <summary>Base class for all screens. Handles animation, sound and events.</summary>
 	public class Window: MonoBehaviour
 	{
-		/// <summary>
-		/// Whether to track the <see cref="Window"/> in <see cref="UIManager"/>.
-		/// </summary>
+		/// <summary>Whether to track the <see cref="Window" /> in <see cref="UIManager" />.</summary>
 		[Tooltip("Whether to track the window in UIManager.")]
 		public bool Track = true;
 
@@ -241,10 +239,7 @@ namespace Kit.UI
 		{
 		}
 
-		/// <summary>
-		///     Method that gets called when <see cref="Data" /> is updated. Child classes should override this method and update the UI
-		///     here.
-		/// </summary>
+		/// <summary>Method that gets called when <see cref="Data" /> is updated. Child classes should override this method and update the UI here.</summary>
 		public virtual void Refresh()
 		{
 		}

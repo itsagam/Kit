@@ -10,9 +10,9 @@ using Object = UnityEngine.Object;
 namespace Kit.Containers
 {
 	/// <summary>
-	///     Instantiates a prefab for each object encountered while reading a Json and populates the instances with the states
-	///     provided. You have to provide the path to a prefab and anything enclosed with {} in the prefab path is replaced with the
-	///     value of a property, so you can instantiate different prefabs depending on the state.
+	///     Instantiates a prefab for each object encountered while reading a Json and populates the instances with the states provided. You
+	///     have to provide the path to a prefab and anything enclosed with {} in the prefab path is replaced with the value of a property, so you
+	///     can instantiate different prefabs depending on the state.
 	/// </summary>
 	/// <remarks>
 	///     <para>There are three ways to use this class – Mono-only, State-Mono or JObject-Mono method:</para>
@@ -20,14 +20,13 @@ namespace Kit.Containers
 	///         <item>
 	///             <description>
 	///                 <para>
-	///                     In the Mono-only mode, you put a <see cref="JsonConverter" /> attribute on a <see cref="MonoBehaviour" />
-	///                     with type <see cref="JsonPrefabConverter" /> and the prefab path as its first argument. On the Json side, you
-	///                     use the actual <see cref="MonoBehaviour" /> type in the GameState object. Whenever the Json is loaded, the
-	///                     converter will instantiate objects and assign them in the GameState. This way, the
-	///                     <see cref="MonoBehaviour" />s will be strongly bound to the GameState. The advantage of this is that any
-	///                     changes in the <see cref="MonoBehaviour" />s will be automatically be reflected in the state. The
-	///                     disadvantage being if <see cref="MonoBehaviour" />s are destroyed, they'll become <see langword="null" /> or
-	///                     inaccessible in the GameState.
+	///                     In the Mono-only mode, you put a <see cref="JsonConverter" /> attribute on a <see cref="MonoBehaviour" /> with type
+	///                     <see cref="JsonPrefabConverter" /> and the prefab path as its first argument. On the Json side, you use the actual
+	///                     <see cref="MonoBehaviour" /> type in the GameState object. Whenever the Json is loaded, the converter will instantiate
+	///                     objects and assign them in the GameState. This way, the <see cref="MonoBehaviour" />s will be strongly bound to the
+	///                     GameState. The advantage of this is that any changes in the <see cref="MonoBehaviour" />s will be automatically be
+	///                     reflected in the state. The disadvantage being if <see cref="MonoBehaviour" />s are destroyed, they'll become
+	///                     <see langword="null" /> or inaccessible in the GameState.
 	///                 </para>
 	///             </description>
 	///         </item>
@@ -35,34 +34,34 @@ namespace Kit.Containers
 	///             <description>
 	///                 <para>
 	///                     In the State-Mono mode, you put <see cref="JsonPrefabAttribute" /> on a separate class denoting a
-	///                     <see cref="MonoBehaviour" />'s state and use that in the GameState. The Json will be loaded normally, and
-	///                     nothing will happen by itself. To instantiate objects, you have to call
-	///                     <see cref="JsonPrefab.Instantiate{T}(IEnumerable, bool)" /> on state-objects whenever you want. The advantage
-	///                     of this is that you have more control on the life-cycle of MonoBehaviours and states will not become
-	///                     <see langword="null" /> if <see cref="MonoBehaviour" />s are destroyed. The disadvantage is that you have to
-	///                     save back state manually if/when <see cref="MonoBehaviour" />s are changed. To aid this, there is a method
-	///                     called <see cref="JsonPrefab.Save(MonoBehaviour, object)" /> which can be called manually and is
-	///                     automatically called when a Json-created <see cref="MonoBehaviour" /> is destroyed. This is the slowest
-	///                     method since we have to convert to and from <see cref="JObject" /> each time we have to populate data.
+	///                     <see cref="MonoBehaviour" />'s state and use that in the GameState. The Json will be loaded normally, and nothing will
+	///                     happen by itself. To instantiate objects, you have to call <see cref="JsonPrefab.Instantiate{T}(IEnumerable, bool)" />
+	///                     on state-objects whenever you want. The advantage of this is that you have more control on the life-cycle of
+	///                     MonoBehaviours and states will not become <see langword="null" /> if <see cref="MonoBehaviour" />s are destroyed. The
+	///                     disadvantage is that you have to save back state manually if/when <see cref="MonoBehaviour" />s are changed. To aid
+	///                     this, there is a method called <see cref="JsonPrefab.Save(MonoBehaviour, object)" /> which can be called manually and
+	///                     is automatically called when a Json-created <see cref="MonoBehaviour" /> is destroyed. This is the slowest method since
+	///                     we have to convert to and from <see cref="JObject" /> each time we have to populate data.
 	///                 </para>
 	///             </description>
 	///         </item>
 	///         <item>
 	///             <description>
 	///                 <para>
-	///                     The JObject mode is very similar to State-Mono mode, except that you put <see cref="JObject" /> in
-	///                     GameState wherever you want to work with <see cref="MonoBehaviour" />s and call
-	///                     <see cref="JsonPrefab.Instantiate{T}(string, IEnumerable{JObject}, bool)" /> by providing it the prefab path
-	///                     and <see cref="JObject" />s to instantiate directly. This is the faster method and doesn't have problems like
-	///                     having to use <see cref="JsonSubtypes" /> to create the correct State-object type.
+	///                     The JObject mode is very similar to State-Mono mode, except that you put <see cref="JObject" /> in GameState wherever
+	///                     you want to work with <see cref="MonoBehaviour" />s and call
+	///                     <see
+	///                         cref="JsonPrefab.Instantiate{T}(string, System.Collections.Generic.IEnumerable{Newtonsoft.Json.Linq.JObject}, bool)" />
+	///                     by providing it the prefab path and <see cref="JObject" />s to instantiate directly. This is the faster method and
+	///                     doesn't have problems like having to use <see cref="JsonSubtypes" /> to create the correct State-object type.
 	///                 </para>
 	///             </description>
 	///         </item>
 	///     </list>
 	/// </remarks>
 	/// <example>
-	///     The following will all instantiate two prefabs, "Building/ProducerBuilding" and "Building/BankBuilding", with Position (1, 1)
-	///     and (2, 2) respectively.
+	///     The following will all instantiate two prefabs, "Building/ProducerBuilding" and "Building/BankBuilding", with Position (1, 1) and (2,
+	///     2) respectively.
 	///     <code language="javascript" title="Json">
 	///   {
 	///  		"Buildings":
@@ -85,7 +84,7 @@ namespace Kit.Containers
 	///   {
 	///  		[JsonProperty]
 	///  		public string Type;
-	///
+	/// 
 	///   		[JsonProperty]
 	///  		public Vector2 Position;
 	///   }
@@ -100,7 +99,7 @@ namespace Kit.Containers
 	///   {
 	///  		[JsonProperty]
 	///  		public string Type;
-	///
+	/// 
 	///   		[JsonProperty]
 	///  		public Vector2 Position;
 	///   }
@@ -122,7 +121,7 @@ namespace Kit.Containers
 	///   {
 	///  		[JsonProperty]
 	///  		public string Type;
-	///
+	/// 
 	///   		[JsonProperty]
 	///  		public Vector2 Position;
 	///   }

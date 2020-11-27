@@ -6,10 +6,7 @@ using UnityEngine;
 
 namespace Kit.Containers
 {
-	/// <summary>
-	///     A generic class that holds how much of a particular item you carry. Can be used to create things like Inventories or
-	///     Wallets.
-	/// </summary>
+	/// <summary>A generic class that holds how much of a particular item you carry. Can be used to create things like Inventories or Wallets.</summary>
 	/// <typeparam name="T">Base type of items.</typeparam>
 	/// <example>
 	///     <code>
@@ -32,8 +29,8 @@ namespace Kit.Containers
 		public event Action<T, int> Removed;
 
 		/// <summary>
-		///     A dictionary that tells the maximum amount of items of different types can be there. The amount of those types will not
-		///     go beyond this number if it is specified. Ignored if <see langword="null" />.
+		///     A dictionary that tells the maximum amount of items of different types can be there. The amount of those types will not go beyond
+		///     this number if it is specified. Ignored if <see langword="null" />.
 		/// </summary>
 		public IDictionary<T, int> Max;
 
@@ -231,8 +228,8 @@ namespace Kit.Containers
 	}
 
 	/// <summary>
-	///     <see cref="Bunch{T}" /> is just <c>KeyValuePair&lt;<typeparamref name="T" />, int&gt;</c> with operators for use with
-	///     Bags (would've just derived from <c>KeyValuePair</c> but you can't inherit structs).
+	///     <see cref="Bunch{T}" /> is just <c>KeyValuePair&lt;<typeparamref name="T" />, int&gt;</c> with operators for use with Bags
+	///     (would've just derived from <c>KeyValuePair</c> but you can't inherit structs).
 	/// </summary>
 	/// <example>
 	///     <code>

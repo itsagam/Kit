@@ -6,32 +6,25 @@ namespace Kit.Pooling
 	/// <summary>A robust and easy-to-use <see cref="GameObject" /> pooler. Supports grouping, limiting and pre-loading.</summary>
 	/// <example>
 	///     Replace <see cref="Object.Instantiate(Object)" qualifyHint="true" /> calls with
-	///     <see cref="Pooler.Instantiate(Component)" qualifyHint="true" /> &amp;
-	///     <see cref="Object.Destroy(Object)" qualifyHint="true" /> with <see cref="Pooler.Destroy(Component)" qualifyHint="true" />,
-	///     and you're good to go.
+	///     <see cref="Pooler.Instantiate(Component)" qualifyHint="true" /> &amp; <see cref="Object.Destroy(Object)" qualifyHint="true" /> with
+	///     <see cref="Pooler.Destroy(Component)" qualifyHint="true" />, and you're good to go.
 	/// </example>
 	public static class Pooler
 	{
 		#region Fields
 
-		/// <summary>
-		/// A dictionary of all pool groups by name.
-		/// </summary>
+		/// <summary>A dictionary of all pool groups by name.</summary>
 		public static readonly Dictionary<string, PoolGroup> PoolGroupsByName = new Dictionary<string, PoolGroup>();
 
-		/// <summary>
-		/// A dictionary of all pools by their name.
-		/// </summary>
+		/// <summary>A dictionary of all pools by their name.</summary>
 		public static readonly Dictionary<string, Pool> PoolsByName = new Dictionary<string, Pool>();
 
-		/// <summary>
-		/// A dictionary of all pools by their prefab.
-		/// </summary>
+		/// <summary>A dictionary of all pools by their prefab.</summary>
 		public static readonly Dictionary<Component, Pool> PoolsByPrefab = new Dictionary<Component, Pool>();
 
 		/// <summary>
-		/// A record of information about pool instances by their game object. Required in <see cref="Pooler.Destroy(GameObject)"/>
-		/// to get a <see cref="GameObject"/>'s <see cref="PoolInstanceInfo.Pool"/> without providing the exact component.
+		///     A record of information about pool instances by their game object. Required in <see cref="Pooler.Destroy(GameObject)" /> to get a
+		///     <see cref="GameObject" />'s <see cref="PoolInstanceInfo.Pool" /> without providing the exact component.
 		/// </summary>
 		public static readonly Dictionary<GameObject, PoolInstanceInfo> InfoByGameObject = new Dictionary<GameObject, PoolInstanceInfo>();
 
@@ -199,19 +192,15 @@ namespace Kit.Pooling
 
 		#region Instantiate/Destroy
 
-		/// <summary>
-		/// Get information about a pool instance.
-		/// </summary>
-		/// <returns>An instance of the <see cref="PoolInstanceInfo"/> class.</returns>
+		/// <summary>Get information about a pool instance.</summary>
+		/// <returns>An instance of the <see cref="PoolInstanceInfo" /> class.</returns>
 		public static PoolInstanceInfo GetInstanceInfo(Component component)
 		{
 			return GetInstanceInfo(component.gameObject);
 		}
 
-		/// <summary>
-		/// Get information about a pool instance.
-		/// </summary>
-		/// <returns>An instance of the <see cref="PoolInstanceInfo"/> class.</returns>
+		/// <summary>Get information about a pool instance.</summary>
+		/// <returns>An instance of the <see cref="PoolInstanceInfo" /> class.</returns>
 		public static PoolInstanceInfo GetInstanceInfo(GameObject gameObject)
 		{
 			return InfoByGameObject[gameObject];

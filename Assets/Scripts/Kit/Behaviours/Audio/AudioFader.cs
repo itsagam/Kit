@@ -5,12 +5,12 @@ using UnityEngine;
 namespace Kit.Behaviours
 {
 	/// <summary>
-	///     Attach it to a <see cref="GameObject" /> with an <see cref="AudioSource" /> and this component will allow you to play,
-	///     pause, stop, and change volume or clip with the volume fading in/out.
+	///     Attach it to a <see cref="GameObject" /> with an <see cref="AudioSource" /> and this component will allow you to play, pause,
+	///     stop, and change volume or clip with the volume fading in/out.
 	/// </summary>
 	/// <remarks>
-	///     Just attaching it to an <see cref="AudioSource" /> with <see cref="AudioSource.playOnAwake" /> <see langword="true" />
-	///     will fade the audio in on Awake.
+	///     Just attaching it to an <see cref="AudioSource" /> with <see cref="AudioSource.playOnAwake" /> <see langword="true" /> will fade
+	///     the audio in on Awake.
 	/// </remarks>
 	/// <seealso cref="SceneDirector" />
 	[RequireComponent(typeof(AudioSource))]

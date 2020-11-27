@@ -7,8 +7,8 @@ using UnityEngine;
 namespace Kit.Pooling
 {
 	/// <summary>
-	///     A PoolGroup represents a collection of <see cref="Pool" />s grouped by name. Can be used to group together pools of
-	///     different types and components, or configure them together.
+	///     A PoolGroup represents a collection of <see cref="Pool" />s grouped by name. Can be used to group together pools of different
+	///     types and components, or configure them together.
 	/// </summary>
 	[AddComponentMenu("Pooling/PoolGroup")]
 	public class PoolGroup: MonoBehaviour, IEnumerable<Pool>
@@ -90,10 +90,8 @@ namespace Kit.Pooling
 		{
 			bool result = Pools.Remove(pool);
 			if (result)
-			{
 				// pool.Group = null;
 				pool.transform.parent = null;
-			}
 
 			return result;
 		}
@@ -111,6 +109,7 @@ namespace Kit.Pooling
 		{
 			return Pools.GetEnumerator();
 		}
+
 		#endregion
 
 		#region Editor functionality

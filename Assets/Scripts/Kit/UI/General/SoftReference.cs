@@ -12,8 +12,8 @@ using Sirenix.OdinInspector.Editor;
 namespace Kit.UI
 {
 	/// <summary>
-	///     A <see cref="SoftReference{T}" /> (path-only) to a <see cref="Window" />. Here because Unity can be picky about
-	///     serializing generic variables.
+	///     A <see cref="SoftReference{T}" /> (path-only) to a <see cref="Window" />. Here because Unity can be picky about serializing
+	///     generic variables.
 	/// </summary>
 	[Serializable]
 	public class WindowReference: SoftReference<Window>
@@ -39,8 +39,8 @@ namespace Kit.UI
 	}
 
 	/// <summary>
-	///     A class that allows one to select assets in the inspector without hard-referencing them. Saves their path instead which
-	///     can later be used to load with <see cref="Load" /> or manually with <see cref="ResourceManager" /> or
+	///     A class that allows one to select assets in the inspector without hard-referencing them. Saves their path instead which can later
+	///     be used to load with <see cref="Load" /> or manually with <see cref="ResourceManager" /> or
 	///     <see cref="Resources.Load(string)" qualifyHint="true" />.
 	/// </summary>
 	/// <remarks>Can be used directly as a string without needing to call <see cref="ToString" />.</remarks>

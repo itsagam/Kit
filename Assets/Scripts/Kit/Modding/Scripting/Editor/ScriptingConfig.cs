@@ -2,30 +2,31 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using CSObjectWrapEditor;
 using XLua;
 
 namespace Kit.Modding.Scripting
 {
-    /// <summary>Configuration file for XLua.</summary>
-    public static class ScriptingConfig
-    {
-        // Recommended that all types to be accessed in Lua have LuaCallCSharp or ReflectionUse.
+	/// <summary>Configuration file for XLua.</summary>
+	public static class ScriptingConfig
+	{
+		// Recommended that all types to be accessed in Lua have LuaCallCSharp or ReflectionUse.
 
-        /// <summary>Set the proper path for XLua generated code.</summary>
-        [CSObjectWrapEditor.GenPath]
-        public static string GenPath
-        {
-            get
-            {
-                // If hotfixing/injection is enabled, all XLua code (including generated) needs to be in the main assembly, so
-                // moving the code there as placing it in Plugins compiles it to Assembly-CSharp-firstpass.
+		/// <summary>Set the proper path for XLua generated code.</summary>
+		[GenPath]
+		public static string GenPath
+		{
+			get
+			{
+				// If hotfixing/injection is enabled, all XLua code (including generated) needs to be in the main assembly, so
+				// moving the code there as placing it in Plugins compiles it to Assembly-CSharp-firstpass.
 #if !HOTFIX_ENABLE
-                return "Assets/Plugins/XLua/Gen";
+				return "Assets/Plugins/XLua/Gen";
 #else
                 return "Assets/XLua/Gen";
 #endif
-            }
-        }
+			}
+		}
 
 		// /// <summary>Generate adapter code for these types, otherwise use reflection with lower performance.</summary>
 		// [LuaCallCSharp]

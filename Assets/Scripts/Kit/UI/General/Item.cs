@@ -7,10 +7,7 @@ namespace Kit.UI
 	{
 		protected object data;
 
-		/// <summary>
-		///     Method that gets called when <see cref="Data" /> is updated. Child classes should override this method and update the UI
-		///     here.
-		/// </summary>
+		/// <summary>Method that gets called when <see cref="Data" /> is updated. Child classes should override this method and update the UI here.</summary>
 		public virtual void Refresh()
 		{
 		}

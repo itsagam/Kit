@@ -4,8 +4,8 @@ using Cysharp.Threading.Tasks;
 namespace Kit.Modding
 {
 	/// <summary>
-	///     Template for classes that want to implement mod-loading from different types of packages. Each would need to implement
-	///     its corresponding <see cref="Mod" /> sub-class as well.
+	///     Template for classes that want to implement mod-loading from different types of packages. Each would need to implement its
+	///     corresponding <see cref="Mod" /> sub-class as well.
 	/// </summary>
 	public abstract class ModLoader
 	{

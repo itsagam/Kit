@@ -7,10 +7,7 @@ using UnityEngine;
 
 namespace Kit.Behaviours
 {
-	/// <summary>
-	///     Provides a robust gesture-oriented Pan/Zoom/Rotate functionality for a camera. Supports both orthographic and
-	///     perspective modes.
-	/// </summary>
+	/// <summary>Provides a robust gesture-oriented Pan/Zoom/Rotate functionality for a camera. Supports both orthographic and perspective modes.</summary>
 	[RequireComponent(typeof(Camera))]
 	[RequireComponent(typeof(MetaGesture))]
 	public class PanZoomRotateCam: MonoBehaviour

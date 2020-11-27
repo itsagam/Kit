@@ -6,8 +6,8 @@ using UniRx;
 namespace Kit.Containers
 {
 	/// <summary>
-	///     Any entity (POCO or <see cref="Sirenix.OdinInspector.SerializedMonoBehaviour" />) that wishes to have stats should
-	///     implement this interface and provide a list of <see cref="Upgrade" />s.
+	///     Any entity (POCO or <see cref="Sirenix.OdinInspector.SerializedMonoBehaviour" />) that wishes to have stats should implement this
+	///     interface and provide a list of <see cref="Upgrade" />s.
 	/// </summary>
 	public interface IUpgradeable
 	{

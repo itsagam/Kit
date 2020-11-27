@@ -51,8 +51,8 @@ namespace Kit.Pooling
 		#region Fields
 
 		/// <summary>
-		///     Message to send on instance initialization when <see cref="PoolMessageMode" /> is
-		///     <see cref="PoolMessageMode.SendMessage" /> or <see cref="PoolMessageMode.BroadcastMessage" />.
+		///     Message to send on instance initialization when <see cref="PoolMessageMode" /> is <see cref="PoolMessageMode.SendMessage" /> or
+		///     <see cref="PoolMessageMode.BroadcastMessage" />.
 		/// </summary>
 		public const string InstantiateMessage = "AwakeFromPool";
 
@@ -64,8 +64,10 @@ namespace Kit.Pooling
 
 		private const int MaxPreloadLimit = 250;
 
-		/// <summary>The prefab to pool instances of. The particular component is important as that's the component you will get
-		/// when initializing an instance.</summary>
+		/// <summary>
+		///     The prefab to pool instances of. The particular component is important as that's the component you will get when initializing an
+		///     instance.
+		/// </summary>
 		[Required]
 		[ValueDropdown("GetPrefabComponents", DropdownTitle = "Component", AppendNextDrawer = true)]
 		[OnValueChanged("ResetName")]
@@ -135,8 +137,8 @@ namespace Kit.Pooling
 		public int LimitAmount = 50;
 
 		/// <summary>
-		///     Whether to organize instances for a cleaner scene hierarchy? Disable this if you want to set the parent of your
-		///     instances manually.
+		///     Whether to organize instances for a cleaner scene hierarchy? Disable this if you want to set the parent of your instances
+		///     manually.
 		/// </summary>
 		[Tooltip("Whether to organize instances for a cleaner scene hierarchy? Disable this if you want to set the parent of your " +
 				 "instances manually.")]

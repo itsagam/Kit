@@ -89,6 +89,7 @@ namespace Kit.Modding
 		public SimpleDispatcher ScriptDispatcher { get; protected set; }
 
 		protected CancellationTokenSource cancelSource = new CancellationTokenSource();
+
 		#endregion
 
 		#region Resources

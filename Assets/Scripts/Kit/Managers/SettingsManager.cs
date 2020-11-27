@@ -5,8 +5,8 @@ using UnityEngine;
 namespace Kit
 {
 	/// <summary>
-	///     Allows to save/load device-specific app-wide settings (with <see cref="PlayerPrefs" /> as back-end). Supports
-	///     organization, more types, and is easier-to-use.
+	///     Allows to save/load device-specific app-wide settings (with <see cref="PlayerPrefs" /> as back-end). Supports organization, more
+	///     types, and is easier-to-use.
 	/// </summary>
 	public static class SettingsManager
 	{

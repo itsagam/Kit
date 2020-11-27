@@ -62,8 +62,8 @@ namespace Kit.Containers
 		///     <para>Converts a string to <see cref="EffectType" /> and value.</para>
 		///     <para>
 		///         "x" at the beginning of a string translates to <see cref="EffectType.Multiplier" />, a string ending with "%" means
-		///         <see cref="EffectType.Percentage" />, while neither of those means <see cref="EffectType.Constant" />. Rest of the string
-		///         should be a number denoting the value.
+		///         <see cref="EffectType.Percentage" />, while neither of those means <see cref="EffectType.Constant" />. Rest of the string should be
+		///         a number denoting the value.
 		///     </para>
 		/// </summary>
 		/// <returns>The <see cref="EffectType" /> and value in the form of a tuple.</returns>

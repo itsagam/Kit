@@ -17,9 +17,7 @@ namespace Kit.Modding
 	{
 		#region Fields
 
-		/// <summary>
-		/// Category name to use for logging messages.
-		/// </summary>
+		/// <summary>Category name to use for logging messages.</summary>
 		public const string LogCategory = "ModManager";
 
 		/// <summary><see cref="ModGroup" />s by <see cref="ModType" />.</summary>
@@ -64,7 +62,6 @@ namespace Kit.Modding
 		/// <summary>A cache of folder paths.</summary>
 		private static Dictionary<ResourceFolder, string> folderToString = new Dictionary<ResourceFolder, string>();
 
-
 		#endregion
 
 		#region Initialization
@@ -81,6 +78,7 @@ namespace Kit.Modding
 				ResourceUnloaded += (folder, file, mod) =>
 										Debugger.Log(LogCategory, $"Unloaded \"{file}\" from {folder}.");
 			}
+
 			Observable.OnceApplicationQuit().Subscribe(u => UnloadMods());
 		}
 
@@ -349,7 +347,9 @@ namespace Kit.Modding
 					group.Mods = group.Mods.AsEnumerable()
 									  .Reverse()
 									  .OrderBy(mod => SettingsManager.Get(group.Name.ToString(),
-																		  mod.Name, "Order", -1))
+																		  mod.Name,
+																		  "Order",
+																		  -1))
 									  .ToList();
 		}
 

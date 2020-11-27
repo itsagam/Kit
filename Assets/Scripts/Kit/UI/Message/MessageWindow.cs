@@ -98,15 +98,15 @@ namespace Kit.UI.Message
 		/// <inheritdoc cref="Show(MessageWindow, string, string, MessageType, MessageButtons, string, Action, Action, Action, Action)" />
 		/// <param name="prefab">Path to the prefab to use for displaying the message.</param>
 		public static void Show(string prefab,
-								   string title,
-								   string message,
-								   MessageType type = MessageType.Info,
-								   MessageButtons buttons = MessageButtons.OK,
-								   string subtitle = "",
-								   Action okayAction = null,
-								   Action cancelAction = null,
-								   Action yesAction = null,
-								   Action noAction = null)
+								string title,
+								string message,
+								MessageType type = MessageType.Info,
+								MessageButtons buttons = MessageButtons.OK,
+								string subtitle = "",
+								Action okayAction = null,
+								Action cancelAction = null,
+								Action yesAction = null,
+								Action noAction = null)
 		{
 			MessageInfo info = new MessageInfo
 							   {

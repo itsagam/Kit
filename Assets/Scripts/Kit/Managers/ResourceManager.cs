@@ -1031,7 +1031,7 @@ namespace Kit
 
 		/// <inheritdoc cref="Delete(ResourceFolder, string)" />
 		/// <param name="fullPath">Absolute path to the file.</param>
-		/// <returns><see langword="true"/> if the file didn't exist or was successfully deleted, <see langword="false"/> otherwise.</returns>
+		/// <returns><see langword="true" /> if the file didn't exist or was successfully deleted, <see langword="false" /> otherwise.</returns>
 		public static bool Delete(string fullPath)
 		{
 			try

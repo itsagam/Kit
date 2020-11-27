@@ -56,12 +56,12 @@ namespace Kit
 
 	/// <summary>
 	///     <para>
-	///         Global access to UI and window management. Your screens need to derive from <see cref="Window" /> which you can then
-	///         show by calling <see cref="UIManager.Show(Window, object, Transform, string, WindowConflictMode)" /> on prefabs.
+	///         Global access to UI and window management. Your screens need to derive from <see cref="Window" /> which you can then show by
+	///         calling <see cref="UIManager.Show(Window, object, Transform, string, WindowConflictMode)" /> on prefabs.
 	///     </para>
 	///     <para>
-	///         You can you also call <see cref="Window.Show(object)" />/<see cref="Window.Hide(WindowHideMode)" /> on them directly if
-	///         they are in the scene, for example.
+	///         You can you also call <see cref="Window.Show(object)" />/<see cref="Window.Hide(WindowHideMode)" /> on them directly if they are
+	///         in the scene, for example.
 	///     </para>
 	/// </summary>
 	public static class UIManager

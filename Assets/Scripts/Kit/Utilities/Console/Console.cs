@@ -212,7 +212,7 @@ namespace Kit
 			if (instance == null)
 				return;
 
-			TrimLog(LogBuilder.Length  + line.Length);
+			TrimLog(LogBuilder.Length + line.Length);
 			LogBuilder.AppendLine(line);
 			instance.LogText.text = LogBuilder.ToString();
 		}

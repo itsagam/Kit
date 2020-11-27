@@ -2,7 +2,7 @@ using System.Collections.Generic;
 
 namespace Kit
 {
-	/// <summary><see cref="Dictionary{TKey,TValue}"/> extensions.</summary>
+	/// <summary><see cref="Dictionary{TKey,TValue}" /> extensions.</summary>
 	public static class DictionaryExtensions
 	{
 		/// <summary>Allows to iterate over a dictionary using tuples.</summary>

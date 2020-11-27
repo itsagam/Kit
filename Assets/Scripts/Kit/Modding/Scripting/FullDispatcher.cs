@@ -1,10 +1,7 @@
 ﻿#if MODDING
 using System;
 using Cysharp.Threading.Tasks;
-using Cysharp.Threading.Tasks.Linq;
-using UnityEngine;
 using XLua;
-using Object = System.Object;
 
 namespace Kit.Modding.Scripting
 {
@@ -18,8 +15,8 @@ namespace Kit.Modding.Scripting
 		protected event Action lateUpdateEvent;
 
 		/// <summary>
-		///     Calls <c>awake</c> on and hooks <c>start</c>, <c>update</c>, <c>lateUpdate</c> and <c>fixedUpdate</c> methods
-		/// 	from the scripting environment.
+		///     Calls <c>awake</c> on and hooks <c>start</c>, <c>update</c>, <c>lateUpdate</c> and <c>fixedUpdate</c> methods from the scripting
+		///     environment.
 		/// </summary>
 		/// <param name="env">The scripting environment.</param>
 		public void Hook(LuaEnv env)

@@ -285,7 +285,7 @@
 			</content>
 		</section>
 		<section>
-			<title>Scripts</title>
+			<title>Scripting</title>
 			<content>
 				<para>The Lua keyword <codeInline>self</codeInline> in each script is bound to the
 					<codeEntityReference>T:Kit.Modding.Mod</codeEntityReference>, so you can do stuff like

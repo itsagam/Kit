@@ -3,9 +3,7 @@ using UnityEngine;
 
 namespace Kit.Pooling
 {
-	/// <summary>
-	///     Component added to all instances so we can handle its destruction gracefully.
-	/// </summary>
+	/// <summary>Component added to all instances so we can handle its destruction gracefully.</summary>
 	public class PoolInstance: MonoBehaviour
 	{
 		// Instances should not destroy under normal circumstances, but are handled gracefully for fault-tolerance
@@ -23,6 +21,7 @@ namespace Kit.Pooling
 				else
 					pool.Used.Remove(info.Component);
 			}
+
 			Pooler.InfoByGameObject.Remove(go);
 		}
 

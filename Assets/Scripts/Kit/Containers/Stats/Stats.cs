@@ -10,8 +10,8 @@ namespace Kit.Containers
 	///     <see cref="UnityEngine.MonoBehaviour" />s with Odin's <see cref="Sirenix.OdinInspector.SerializedMonoBehaviour" />.
 	/// </summary>
 	/// <remarks>
-	///     The class is highly optimized as the current values are only updated when the <see cref="IUpgradeable" /> adds or
-	///     removes an <see cref="Upgrade" /> or the base value of a property changes.
+	///     The class is highly optimized as the current values are only updated when the <see cref="IUpgradeable" /> adds or removes an
+	///     <see cref="Upgrade" /> or the base value of a property changes.
 	/// </remarks>
 	public class Stats: Dictionary<string, StatBaseProperty>, IDisposable
 	{
@@ -158,8 +158,8 @@ namespace Kit.Containers
 		/// <summary>Calculate aggregates from a list of effects.</summary>
 		/// <param name="effects">The list of effect to calculate aggregates of.</param>
 		/// <returns>
-		///     A tuple with <see cref="EffectType.Constant" />, <see cref="EffectType.Percentage" /> and
-		///     <see cref="EffectType.Multiplier" /> sums respectively.
+		///     A tuple with <see cref="EffectType.Constant" />, <see cref="EffectType.Percentage" /> and <see cref="EffectType.Multiplier" />
+		///     sums respectively.
 		/// </returns>
 		public static (float, float, float) GetAggregates(IEnumerable<Effect> effects)
 		{

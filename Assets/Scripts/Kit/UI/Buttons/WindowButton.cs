@@ -22,8 +22,8 @@ namespace Kit.UI.Buttons
 
 		/// <summary>Whether to store just the path to the Window and load it at runtime using "Resources.Load".</summary>
 		/// <remarks>
-		///     If on, you cannot reference a Window from the scene and have to provide a prefab within a "Resources" folder. If off,
-		///     the Window will be hard-referenced and be loaded with this button, whether it is opened or not.
+		///     If on, you cannot reference a Window from the scene and have to provide a prefab within a "Resources" folder. If off, the Window
+		///     will be hard-referenced and be loaded with this button, whether it is opened or not.
 		/// </remarks>
 		[LabelText("Soft Reference")]
 		[OnValueChanged("RefreshReference")]
@@ -48,8 +48,8 @@ namespace Kit.UI.Buttons
 
 		/// <summary>Whether to show, hide or toggle.</summary>
 		/// <remarks>
-		///     With a soft-reference, the file-name will be matched with a window to hide or toggle. With a hard-reference to an asset,
-		///     the prefab name.
+		///     With a soft-reference, the file-name will be matched with a window to hide or toggle. With a hard-reference to an asset, the
+		///     prefab name.
 		/// </remarks>
 		[Tooltip("Whether to show, hide or toggle. \n\n"                                                     +
 				 "With a soft-reference, the file-name will be matched with a window to hide or toggle.\n\n" +
