@@ -86,7 +86,7 @@ namespace Kit.Pooling
 		[HideInInlineEditors]
 		[LabelText("Message")]
 		[Tooltip("How an instance gets informed of pooling events?")]
-		public PoolMessageMode MessageMode = PoolMessageMode.IPooledComponent;
+		public PoolMessageMode MessageMode = PoolMessageMode.SendMessage;
 
 		/// <summary>Whether to pre-instantiate a certain of number of instances for future use.</summary>
 		[ToggleGroup("Preload")]

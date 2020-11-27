@@ -59,16 +59,13 @@
     <MissingTags>AutoDocumentCtors, AutoDocumentDispose</MissingTags>
     <ApiFilter>
       <Filter entryType="Namespace" fullName="Demos.Debug" isExposed="False" />
-      <Filter entryType="Namespace" fullName="Demos.Pooling" isExposed="False" />
-      <Filter entryType="Namespace" fullName="Demos.UI" isExposed="False" />
-      <Filter entryType="Namespace" fullName="Game" isExposed="False" />
-      <Filter entryType="Namespace" fullName="Game.UI.Menu" isExposed="False" />
-      <Filter entryType="Namespace" fullName="Game.UI.Settings" isExposed="False" />
-      <Filter entryType="Namespace" fullName="Game.UI.Splash" isExposed="False" />
-      <Filter entryType="Namespace" fullName="SoftMasking" isExposed="False" />
-      <Filter entryType="Namespace" fullName="SoftMasking.Extensions" isExposed="False" />
-      <Filter entryType="Namespace" fullName="SoftMasking.TextMeshPro" isExposed="False" />
-    </ApiFilter>
+<Filter entryType="Namespace" fullName="Demos.Pooling" isExposed="False" />
+<Filter entryType="Namespace" fullName="Demos.Resource" isExposed="False" />
+<Filter entryType="Namespace" fullName="Demos.UI" isExposed="False" />
+<Filter entryType="Namespace" fullName="Game" isExposed="False" />
+<Filter entryType="Namespace" fullName="Game.UI.Menu" isExposed="False" />
+<Filter entryType="Namespace" fullName="Game.UI.Settings" isExposed="False" />
+<Filter entryType="Namespace" fullName="Game.UI.Splash" isExposed="False" /></ApiFilter>
     <PlugInConfigurations />
     <ComponentConfigurations>
     </ComponentConfigurations>

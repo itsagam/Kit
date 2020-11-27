@@ -6,8 +6,54 @@
 				<row>
 					<entry>
 						<para>
-							Content.
+							<legacyBold>Object pooling</legacyBold> or just pooling in game development is the concept of pre-loading 
+							objects... or at-least not destroying them completely after they're used. <codeInline>Instantiate</codeInline> and 
+							<codeInline>Destroy</codeInline> are costly methods in Unity, and have a lot of impact on the CPU and Garbage Collector.
+							By de-activating instead of destroying objects we're going to need more copies of anyway, we avoid the cost
+							of <codeInline>Instantiate</codeInline>/<codeInline>Destroy</codeInline>, prevent stutters, and make the game smoother.
 						</para>
+						<para>
+							The text-book example would be projectiles in a 2D-shooter.
+						</para>
+						<para>
+							A <legacyBold>Pooler</legacyBold> is a system that facilitates this task. Typically it involves calling 
+							<codeInline>SetActive</codeInline> on <codeInline>GameObjects</codeInline> for re-using and destroying pool instances.
+							<codeInline>Instantiate</codeInline> is called only when there are no more objects in the "re-use" list. There also needs
+							to be messaging system so that pool instances are informed of these events and can manage themselves accordingly.
+						</para>
+						<para>
+							The pooling system in the kit provides the functionality in a inspector-friendly manner, and is quite effecient &amp; easy-to-use. It also supports:
+						</para>
+							<list class="ordered">
+							<listItem>
+								<para>
+									<legacyBold>Limiting</legacyBold> – You can limit the number of the instances cached to a certain amount, and decide
+									what to do if more are required.
+								</para>
+							</listItem>
+							<listItem>
+								<para>
+									<legacyBold>Pre-loading</legacyBold> – You can auto-<codeInline>Instantiate</codeInline> instances on
+									scene load so they're ready-to-use immediately when required.
+								</para>
+							</listItem>
+							<listItem>
+								<para>
+									<legacyBold>Persistence</legacyBold> – You can tell a pool to keep and manage instances even after the scene is unloaded.
+								</para>
+							</listItem>								
+							<listItem>
+								<para>
+									<legacyBold>Organizing</legacyBold> – You can make the Pooler organize scene hierarchy so that it's easy to follow
+									with all the instance <codeInline>GameObjects</codeInline>.
+								</para>
+							</listItem>
+							<listItem>
+								<para>
+									<legacyBold>Grouping</legacyBold> – You can organize pools of similar category and configure them together.
+								</para>
+							</listItem>
+						</list>						
 					</entry>
 					<entry>
 						<mediaLink>
@@ -20,16 +66,43 @@
 		</introduction>
 
 		<section>
-			<title>Pooler</title>
-			<content>
-				<para>Pooler</para>
+			<title>System</title>
+			<content>			
+				<para>
+					The class <codeEntityReference>T:Kit.Pooling.Pooler</codeEntityReference> is the central hub to the system. It provides access to 
+					adding, querying, and removing instances, pools and groups. For every different prefab, a separate <codeEntityReference>T:Kit.Pooling.Pool</codeEntityReference> 
+					object is created, which can them can be grouped together into <codeEntityReference>T:Kit.Pooling.PoolGroup</codeEntityReference>s. The pool 
+					keeps track of all instances <codeEntityReference linkText="being used">F:Kit.Pooling.Pool.Used</codeEntityReference> and 
+					those that <codeEntityReference linkText="are available">F:Kit.Pooling.Pool.Available</codeEntityReference>.
+				</para>
 				<mediaLink>
 					<image xlink:href="Pooler_Diagram" placement="center"/>
-				</mediaLink>
+				</mediaLink>				
+				<para>
+					The most basic use-case of the <codeEntityReference>T:Kit.Pooling.Pooler</codeEntityReference> and the easiest way to it 
+					is to just replace <codeInline>Object.Instantiate()</codeInline> calls
+					with <codeEntityReference qualifyHint="true">M:Kit.Pooling.Pooler.Instantiate</codeEntityReference> and <codeInline>Object.Destroy()</codeInline>
+					calls with <codeEntityReference qualifyHint="true">M:Kit.Pooling.Pooler.Destroy(Component)</codeEntityReference>. If your instances don't require
+					much tuning, everything would just work by itself. Typically though, that is not the case and you need to move
+					<codeInline>Awake</codeInline> and <codeInline>OnDestroy</codeInline> code that requires re-initializing into 
+					<codeEntityReference linkText="AwakeFromPool">F:Kit.Pooling.Pool.InstantiateMessage</codeEntityReference> and 
+					<codeEntityReference linkText="OnDestroyIntoPool">F:Kit.Pooling.Pool.DestroyMessage</codeEntityReference>. If you need more 
+					control over the configuration of a pool, you can either create one either
+					<codeEntityReference linkText="through code">M:Kit.Pooling.Pooler.GetOrCreatePool</codeEntityReference> or  
+					add <codeEntityReference>T:Kit.Pooling.Pool</codeEntityReference> to a 
+					<codeInline>GameObject</codeInline> in the scene. You can likewise group pools
+					<codeEntityReference linkText="through code">M:Kit.Pooling.Pooler.GetOrCreatePoolGroup</codeEntityReference> or by attaching
+					<codeEntityReference>T:Kit.Pooling.PoolGroup</codeEntityReference> in the inspector. All the configuration features are then exposed as properties of a
+					<codeEntityReference>T:Kit.Pooling.Pool</codeEntityReference>.
+				</para>			
 			</content>
 		</section>
 
 		<relatedTopics>
+			<codeEntityReference>T:Kit.Pooling.Pooler</codeEntityReference>
+			<codeEntityReference>T:Kit.Pooling.PoolGroup</codeEntityReference>
+			<codeEntityReference>T:Kit.Pooling.Pool</codeEntityReference>
+			<codeEntityReference>T:Kit.Pooling.PoolInstance</codeEntityReference>
 		</relatedTopics>
 	</developerConceptualDocument>
 </topic>

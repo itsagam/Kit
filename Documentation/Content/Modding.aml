@@ -93,8 +93,8 @@
 			<title>Mods</title>
 			<content>
 				<para>
-					Mod-loading is done just by calling <codeEntityReference qualifyHint="true">M:Kit.Modding.ModManager.LoadMods(Boolean)</codeEntityReference>/
-					<codeEntityReference qualifyHint="true">M:Kit.Modding.ModManager.LoadModsAsync(Boolean)</codeEntityReference> methods, whereby the game will look for mods
+					Mod-loading is done just by calling <codeEntityReference qualifyHint="true">M:Kit.Modding.ModManager.LoadMods(bool)</codeEntityReference>/
+					<codeEntityReference qualifyHint="true">M:Kit.Modding.ModManager.LoadModsAsync(bool)</codeEntityReference> methods, whereby the game will look for mods
 					in pre-defined locations (generally inside a <link xlink:href="Structure">Mods folder within the base game folder</link>) and load them.
 				</para>
 				<para>The system supports loading mods from 3 different formats:</para>
