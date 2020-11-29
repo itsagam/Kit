@@ -93,25 +93,6 @@ namespace Kit
 		private static Canvas lastCanvas = null;
 
 		/// <summary>
-		///     <para>Show a window from a path.</para>
-		///     <para>Can be <c>await</c>-ed upon.</para>
-		/// </summary>
-		/// <param name="path">The path to window (should be in a Resources folder).</param>
-		/// <param name="data">The data to pass to the window.</param>
-		/// <param name="parent">The parent transform to attach the window to. Uses a general Canvas and transform by default.</param>
-		/// <param name="animation">The animation state name to play when showing.</param>
-		/// <param name="conflictMode">What to do if the window already exists?</param>
-		/// <returns>An instance of the window.</returns>
-		public static UniTask<Window> Show(string path,
-										   object data = null,
-										   Transform parent = default,
-										   string animation = default,
-										   WindowConflictMode conflictMode = DefaultConflictMode)
-		{
-			return ShowInternal(path, data, parent, animation, conflictMode);
-		}
-
-		/// <summary>
 		///     <para>Show a window using a prefab.</para>
 		///     <para>Can be <c>await</c>-ed upon.</para>
 		/// </summary>
@@ -128,6 +109,21 @@ namespace Kit
 										   WindowConflictMode conflictMode = DefaultConflictMode)
 		{
 			return ShowInternal(prefab, data, parent, animation, conflictMode);
+		}
+
+		/// <inheritdoc cref="Show(Kit.UI.Window,object,UnityEngine.Transform,string,Kit.WindowConflictMode)" />
+		/// <summary>
+		///     <para>Show a window from a path.</para>
+		///     <para>Can be <c>await</c>-ed upon.</para>
+		/// </summary>
+		/// <param name="path">The path to window (should be in a Resources folder).</param>
+		public static UniTask<Window> Show(string path,
+										   object data = null,
+										   Transform parent = default,
+										   string animation = default,
+										   WindowConflictMode conflictMode = DefaultConflictMode)
+		{
+			return ShowInternal(path, data, parent, animation, conflictMode);
 		}
 
 		// Workaround for CS4014: If you call async methods, but not await them, C# warns that you should.

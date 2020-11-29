@@ -70,7 +70,7 @@ namespace Kit
 			}
 		}
 
-		/// <summary>Return the value of a setting, or default value if doesn't exist.</summary>
+		/// <summary>Return the value of a setting, or a default value if doesn't exist.</summary>
 		/// <param name="category">Category/system the setting is for.</param>
 		/// <param name="entity">Object/entity the setting is for.</param>
 		/// <param name="property">Name of the setting.</param>

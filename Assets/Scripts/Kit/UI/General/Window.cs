@@ -90,11 +90,9 @@ namespace Kit.UI
 			return Show(ShowAnimation, data);
 		}
 
-		/// <summary>Show the window.</summary>
+		/// <inheritdoc cref="Show(object)"/>
+		/// <summary>Show the window using a particular animation.</summary>
 		/// <param name="animation">Play this animation state instead of the one set in <see cref="ShowAnimation" />.</param>
-		/// <param name="data">Data to pass to the window.</param>
-		/// <returns>Whether the window was successfully shown.</returns>
-		/// <remarks>Can be <c>await</c>-ed upon.</remarks>
 		public async UniTask<bool> Show(string animation, object data = null)
 		{
 			if (IsBusy)
@@ -140,11 +138,9 @@ namespace Kit.UI
 			return Hide(HideAnimation, mode);
 		}
 
-		/// <summary>Hide the window.</summary>
+		/// <inheritdoc cref="Hide(Kit.WindowHideMode)"/>
+		/// <summary>Hide the window using a particular animation.</summary>
 		/// <param name="animation">Play this animation state instead of the one set in <see cref="HideAnimation" />.</param>
-		/// <param name="mode">How to hide the window?</param>
-		/// <returns>Whether the window was successfully hidden.</returns>
-		/// <remarks>Can be <c>await</c>-ed upon.</remarks>
 		public async UniTask<bool> Hide(string animation, WindowHideMode mode = UIManager.DefaultHideMode)
 		{
 			if (IsBusy)

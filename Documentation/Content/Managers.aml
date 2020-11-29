@@ -3,9 +3,12 @@
 	<developerConceptualDocument xmlns="http://ddue.schemas.microsoft.com/authoring/2003/5" xmlns:xlink="http://www.w3.org/1999/xlink">
 		<introduction>
 			<para>Most video-games require a host of managers to handle things like UI, sounds and effects. The most common of those are included in the
-			Kit. What follows is a cheat-sheet of the most important methods in the included managers. Consult the manager reference documents for an
-			in-depth look at the features and options available.</para>
+			kit. What follows is a cheat-sheet of the most important methods in the included managers. Consult the manager reference documents for a
+			more in-depth look at the features and options available.</para>
 
+			<autoOutline lead="none"/>
+			
+			<!--
 			<list class="bullet">
 				<listItem>
 					<para>
@@ -38,6 +41,7 @@
 					</para>
 				</listItem>
 			</list>
+			-->
 		</introduction>
 
 		<section address="UIManager">
@@ -45,7 +49,7 @@
 				UIManager
 			</title>
 			<content>
-				<para>All of the methods return a <codeInline>UniTask</codeInline> which completes after the respective animations have ended
+				<para>All of the methods return a <codeInline>UniTask</codeInline> which completes after respective animations have ended
 				and can be <codeInline>await</codeInline>-ed upon.
 			</para>
 				<table>
@@ -62,27 +66,17 @@
 					<row>
 						<entry>
 							<para>
-								<codeEntityReference>M:Kit.UIManager.Show(Kit.UI.Window, System.Object, UnityEngine.Transform, System.String, Kit.WindowConflictMode)</codeEntityReference>
+								<codeEntityReference autoUpgrade="true">M:Kit.UIManager.Show(Kit.UI.Window,System.Object,UnityEngine.Transform,System.String,Kit.WindowConflictMode)</codeEntityReference>
 							</para>
 						</entry>
 						<entry>
 							<para>Instantiate and show a window from a prefab.</para>
 						</entry>
-					</row>					
-					<row>
-						<entry>
-							<para>
-								<codeEntityReference>M:Kit.UIManager.Show(System.String, System.Object, UnityEngine.Transform, System.String, Kit.WindowConflictMode)</codeEntityReference>
-							</para>
-						</entry>
-						<entry>
-							<para>Instantiate and show a window from a prefab's path.</para>
-						</entry>
 					</row>
 					<row>
 						<entry>
 							<para>
-								<codeEntityReference>M:Kit.UIManager.Hide(System.String, System.String, Kit.WindowHideMode)</codeEntityReference>
+								<codeEntityReference autoUpgrade="true">M:Kit.UIManager.Hide(System.String,System.String,Kit.WindowHideMode)</codeEntityReference>
 							</para>
 						</entry>
 						<entry>
@@ -123,7 +117,7 @@
 			</title>
 			<content>
 				<para>
-					All of the <codeEntityReference>T:Kit.ResourceManager</codeEntityReference> methods provide <codeInline>Async</codeInline> versions 
+					All of the <codeEntityReference>T:Kit.ResourceManager</codeEntityReference> methods provide <codeInline>async</codeInline> versions 
 					which should the ones you use to perform IO operations for a smoother experience.
 				</para>
 				<table>
@@ -140,21 +134,11 @@
 					<row>
 						<entry>
 							<para>
-								<codeEntityReference autoUpgrade="true">M:Kit.ResourceManager.Load{T}(Kit.ResourceFolder, System.String, System.Boolean, System.Boolean)</codeEntityReference>
+								<codeEntityReference autoUpgrade="true">M:Kit.ResourceManager.Load``1(System.String)</codeEntityReference>
 							</para>
 						</entry>
 						<entry>
-							<para>Load a resource from the most common locations.</para>
-						</entry>
-					</row>
-					<row>
-						<entry>
-							<para>
-								<codeEntityReference autoUpgrade="true">M:Kit.ResourceManager.Load{T}(System.String)</codeEntityReference>
-							</para>
-						</entry>
-						<entry>
-							<para>Load a resource from anywhere.</para>
+							<para>Load a resource.</para>
 						</entry>
 					</row>					
 					<row>
@@ -181,7 +165,7 @@
 					<row>
 						<entry>
 							<para>
-								<codeEntityReference autoUpgrade="true">M:Kit.ResourceManager.Save(System.String, System.Object)</codeEntityReference>
+								<codeEntityReference autoUpgrade="true">M:Kit.ResourceManager.Save(System.String,System.Object)</codeEntityReference>
 							</para>
 						</entry>
 						<entry>
@@ -193,8 +177,8 @@
 					<row>
 						<entry>
 							<para>
-								<codeEntityReference autoUpgrade="true">M:Kit.ResourceManager.SaveText(System.String, String.String)</codeEntityReference> /
-								<codeEntityReference autoUpgrade="true">M:Kit.ResourceManager.SaveBytes(System.String, String.Byte[])</codeEntityReference>
+								<codeEntityReference autoUpgrade="true">M:Kit.ResourceManager.SaveText(System.String,System.String)</codeEntityReference> /
+								<codeEntityReference autoUpgrade="true">M:Kit.ResourceManager.SaveBytes(System.String,System.Byte[])</codeEntityReference>
 							</para>
 						</entry>
 						<entry>
@@ -254,7 +238,7 @@
 					<row>
 						<entry>
 							<para>
-								<codeEntityReference>M:Kit.SceneDirector.FadeIn(UnityEngine.Color?, System.Float, System.Action)</codeEntityReference>
+								<codeEntityReference autoUpgrade="true">M:Kit.SceneDirector.FadeIn(System.Nullable{UnityEngine.Color},System.Single,System.Action)</codeEntityReference>
 							</para>
 						</entry>
 						<entry>
@@ -264,7 +248,7 @@
 					<row>
 						<entry>
 							<para>
-								<codeEntityReference>M:Kit.SceneDirector.FadeOut(UnityEngine.Color?, System.Float, System.Action)</codeEntityReference>
+								<codeEntityReference autoUpgrade="true">M:Kit.SceneDirector.FadeOut(System.Nullable{UnityEngine.Color},System.Single,System.Action)</codeEntityReference>
 							</para>
 						</entry>
 						<entry>
@@ -274,7 +258,7 @@
 					<row>
 						<entry>
 							<para>
-								<codeEntityReference>M:Kit.SceneDirector.LoadScene(System.String, Kit.FadeMode, UnityEngine.Color?, System.Float, System.Boolean, System.Action{System.Float}, System.Action, System.Action)</codeEntityReference>
+								<codeEntityReference autoUpgrade="true">M:Kit.SceneDirector.LoadScene(System.String,Kit.FadeMode,System.Nullable{UnityEngine.Color},System.Single,System.Boolean,System.Action{System.Single},System.Action,System.Action)</codeEntityReference>
 							</para>
 						</entry>
 						<entry>
@@ -284,7 +268,7 @@
 					<row>
 						<entry>
 							<para>
-								<codeEntityReference>M:Kit.SceneDirector.ReloadScene(Kit.FadeMode, UnityEngine.Color, System.Float, System.Boolean, System.Action{System.Float}, System.Action, System.Action)</codeEntityReference>
+								<codeEntityReference autoUpgrade="true">M:Kit.SceneDirector.ReloadScene(Kit.FadeMode,System.Nullable{UnityEngine.Color},System.Single,System.Boolean,System.Action{System.Single},System.Action,System.Action)</codeEntityReference>
 							</para>
 						</entry>
 						<entry>
@@ -314,7 +298,7 @@
 					<row>
 						<entry>
 							<para>
-								<codeEntityReference>M:Kit.AudioManager.PlaySound(UnityEngine.AudioClip)</codeEntityReference>
+								<codeEntityReference autoUpgrade="true">M:Kit.AudioManager.PlaySound(UnityEngine.AudioClip)</codeEntityReference>
 							</para>
 						</entry>
 						<entry>
@@ -324,7 +308,7 @@
 					<row>
 						<entry>
 							<para>
-								<codeEntityReference>M:Kit.AudioManager.PlayUI(UnityEngine.AudioClip)</codeEntityReference>
+								<codeEntityReference autoUpgrade="true">M:Kit.AudioManager.PlayUI(UnityEngine.AudioClip)</codeEntityReference>
 							</para>
 						</entry>
 						<entry>
@@ -334,9 +318,9 @@
 					<row>
 						<entry>
 							<para>
-								<codeEntityReference>M:Kit.AudioManager.PlayMusic(UnityEngine.AudioClip)</codeEntityReference> /
-								<codeEntityReference>M:Kit.AudioManager.PauseMusic</codeEntityReference> /
-								<codeEntityReference>M:Kit.AudioManager.StopMusic</codeEntityReference>
+								<codeEntityReference autoUpgrade="true">M:Kit.AudioManager.PlayMusic(UnityEngine.AudioClip)</codeEntityReference> /
+								<codeEntityReference autoUpgrade="true">M:Kit.AudioManager.PauseMusic</codeEntityReference> /
+								<codeEntityReference autoUpgrade="true">M:Kit.AudioManager.StopMusic</codeEntityReference>
 							</para>
 						</entry>
 						<entry>
@@ -356,7 +340,7 @@
 					<row>
 						<entry>
 							<para>
-								<codeEntityReference>M:Kit.AudioManager.Play(UnityEngine.AudioClip, System.Boolean, System.Boolean)</codeEntityReference>
+								<codeEntityReference>M:Kit.AudioManager.Play(UnityEngine.AudioClip,System.Boolean,System.Boolean)</codeEntityReference>
 							</para>
 						</entry>
 						<entry>
@@ -388,11 +372,11 @@
 					<row>
 						<entry>
 							<para>
-								<codeEntityReference autoUpgrade="true">M:Kit.EffectsManager.Spawn(UnityEngine.ParticleSystem, UnityEngine.Vector3)</codeEntityReference>
+								<codeEntityReference autoUpgrade="true">M:Kit.EffectsManager.Spawn(UnityEngine.ParticleSystem,UnityEngine.Vector3)</codeEntityReference>
 							</para>
 						</entry>
 						<entry>
-							<para>Spawn and pool an particle effect.</para>
+							<para>Spawn and pool a particle effect.</para>
 						</entry>
 					</row>
 					<row>
@@ -438,7 +422,7 @@
 					<row>
 						<entry>
 							<para>
-								<codeEntityReference>M:Kit.SettingsManager.Set(System.String, System.String, System.String, System.Object)</codeEntityReference>
+								<codeEntityReference autoUpgrade="true">M:Kit.SettingsManager.Set(System.String,System.String,System.String,System.Object)</codeEntityReference>
 							</para>
 						</entry>
 						<entry>
@@ -448,7 +432,7 @@
 					<row>
 						<entry>
 							<para>
-								<codeEntityReference>M:Kit.SettingsManager.Get{T}(System.String, System.String, System.String)</codeEntityReference>
+								<codeEntityReference autoUpgrade="true">M:Kit.SettingsManager.Get``1(System.String,System.String,System.String,``0)</codeEntityReference>
 							</para>
 						</entry>
 						<entry>
@@ -458,7 +442,7 @@
 					<row>
 						<entry>
 							<para>
-								<codeEntityReference>M:Kit.SettingsManager.Save</codeEntityReference>
+								<codeEntityReference autoUpgrade="true">M:Kit.SettingsManager.Save</codeEntityReference>
 							</para>
 						</entry>
 						<entry>
@@ -470,6 +454,12 @@
 		</section>
 		
 		<relatedTopics>
+			<codeEntityReference>T:Kit.UIManager</codeEntityReference>
+			<codeEntityReference>T:Kit.ResourceManager</codeEntityReference>
+			<codeEntityReference>T:Kit.SceneDirector</codeEntityReference>
+			<codeEntityReference>T:Kit.AudioManager</codeEntityReference>
+			<codeEntityReference>T:Kit.EffectsManager</codeEntityReference>
+			<codeEntityReference>T:Kit.SettingsManager</codeEntityReference>
 		</relatedTopics>
 	</developerConceptualDocument>
 </topic>
