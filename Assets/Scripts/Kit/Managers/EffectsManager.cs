@@ -1,7 +1,6 @@
 ﻿using Cysharp.Threading.Tasks;
 using Cysharp.Threading.Tasks.Linq;
 using Kit.Pooling;
-using UniRx;
 using UnityEngine;
 
 namespace Kit
@@ -24,7 +23,7 @@ namespace Kit
 			return particleSystem;
 		}
 
-		/// <inheritdoc cref="Spawn(ParticleSystem, Vector3)"/>
+		/// <inheritdoc cref="Spawn(ParticleSystem, Vector3)" />
 		public static ParticleSystem Spawn(ParticleSystem prefab, Vector3 position, Quaternion rotation)
 		{
 			if (prefab == null)
@@ -35,7 +34,7 @@ namespace Kit
 			return particleSystem;
 		}
 
-		/// <inheritdoc cref="Spawn(ParticleSystem, Vector3)"/>
+		/// <inheritdoc cref="Spawn(ParticleSystem, Vector3)" />
 		public static ParticleSystem Spawn(ParticleSystem prefab, Transform parent, bool worldSpace = false)
 		{
 			if (prefab == null)
@@ -46,7 +45,7 @@ namespace Kit
 			return particleSystem;
 		}
 
-		/// <inheritdoc cref="Spawn(ParticleSystem, Vector3)"/>
+		/// <inheritdoc cref="Spawn(ParticleSystem, Vector3)" />
 		public static ParticleSystem Spawn(ParticleSystem prefab, Transform parent, Vector3 position)
 		{
 			if (prefab == null)
@@ -60,7 +59,7 @@ namespace Kit
 			return particleSystem;
 		}
 
-		/// <inheritdoc cref="Spawn(ParticleSystem, Vector3)"/>
+		/// <inheritdoc cref="Spawn(ParticleSystem, Vector3)" />
 		public static ParticleSystem Spawn(ParticleSystem prefab, Transform parent, Vector3 position, Quaternion rotation)
 		{
 			if (prefab == null)
@@ -112,7 +111,6 @@ namespace Kit
 								  .Where(_ => !system.IsAlive(true))
 								  .Take(1)
 								  .ForEachAsync(_ => Pooler.Destroy(system), system.GetCancellationTokenOnDestroy());
-
 		}
 	}
 }

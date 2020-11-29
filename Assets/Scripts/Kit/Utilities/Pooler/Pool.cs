@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.Linq;
 using Cysharp.Threading.Tasks;
 using Sirenix.OdinInspector;
-using UniRx;
 using UnityEngine;
 
 namespace Kit.Pooling
@@ -220,7 +219,6 @@ namespace Kit.Pooling
 				await UniTask.Delay(timeSpan);
 				PreloadInstance();
 			}
-
 		}
 
 		protected void PreloadInstances(int count)
@@ -293,7 +291,7 @@ namespace Kit.Pooling
 			return instance;
 		}
 
-		/// <inheritdoc cref="Instantiate()"/>
+		/// <inheritdoc cref="Instantiate()" />
 		public Component Instantiate(Transform parent, bool worldSpace = false)
 		{
 			Component instance = Instantiate();
@@ -302,7 +300,7 @@ namespace Kit.Pooling
 			return instance;
 		}
 
-		/// <inheritdoc cref="Instantiate()"/>
+		/// <inheritdoc cref="Instantiate()" />
 		public Component Instantiate(Vector3 position)
 		{
 			Component instance = Instantiate();
@@ -311,7 +309,7 @@ namespace Kit.Pooling
 			return instance;
 		}
 
-		/// <inheritdoc cref="Instantiate()"/>
+		/// <inheritdoc cref="Instantiate()" />
 		public Component Instantiate(Vector3 position, Quaternion rotation)
 		{
 			Component instance = Instantiate();
@@ -323,7 +321,7 @@ namespace Kit.Pooling
 			return instance;
 		}
 
-		/// <inheritdoc cref="Instantiate()"/>
+		/// <inheritdoc cref="Instantiate()" />
 		public Component Instantiate(Vector3 position, Transform parent)
 		{
 			Component instance = Instantiate();
@@ -335,7 +333,7 @@ namespace Kit.Pooling
 			return instance;
 		}
 
-		/// <inheritdoc cref="Instantiate()"/>
+		/// <inheritdoc cref="Instantiate()" />
 		public Component Instantiate(Vector3 position, Quaternion rotation, Transform parent)
 		{
 			Component instance = Instantiate();
@@ -348,42 +346,42 @@ namespace Kit.Pooling
 			return instance;
 		}
 
-		/// <inheritdoc cref="Instantiate()"/>
+		/// <inheritdoc cref="Instantiate()" />
 		public T Instantiate<T>() where T: Component
 		{
 			Component instance = Instantiate();
 			return GetInstanceComponent<T>(instance);
 		}
 
-		/// <inheritdoc cref="Instantiate()"/>
+		/// <inheritdoc cref="Instantiate()" />
 		public T Instantiate<T>(Transform parent, bool worldSpace = false) where T: Component
 		{
 			Component instance = Instantiate(parent, worldSpace);
 			return GetInstanceComponent<T>(instance);
 		}
 
-		/// <inheritdoc cref="Instantiate()"/>
+		/// <inheritdoc cref="Instantiate()" />
 		public T Instantiate<T>(Vector3 position) where T: Component
 		{
 			Component instance = Instantiate(position);
 			return GetInstanceComponent<T>(instance);
 		}
 
-		/// <inheritdoc cref="Instantiate()"/>
+		/// <inheritdoc cref="Instantiate()" />
 		public T Instantiate<T>(Vector3 position, Quaternion rotation) where T: Component
 		{
 			Component instance = Instantiate(position, rotation);
 			return GetInstanceComponent<T>(instance);
 		}
 
-		/// <inheritdoc cref="Instantiate()"/>
+		/// <inheritdoc cref="Instantiate()" />
 		public T Instantiate<T>(Vector3 position, Transform parent) where T: Component
 		{
 			Component instance = Instantiate(position, parent);
 			return GetInstanceComponent<T>(instance);
 		}
 
-		/// <inheritdoc cref="Instantiate()"/>
+		/// <inheritdoc cref="Instantiate()" />
 		public T Instantiate<T>(Vector3 position, Quaternion rotation, Transform parent) where T: Component
 		{
 			Component instance = Instantiate(position, rotation, parent);

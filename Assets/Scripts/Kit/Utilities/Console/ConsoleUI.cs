@@ -1,5 +1,4 @@
-﻿using System;
-using Kit.UI.Widgets;
+﻿using Kit.UI.Widgets;
 using UnityEngine;
 using UnityEngine.UI;
 

@@ -209,7 +209,7 @@ namespace Kit
 			return source;
 		}
 
-		/// <inheritdoc cref="Play(AudioSource)"/>
+		/// <inheritdoc cref="Play(AudioSource)" />
 		public static AudioSource Play(AudioSource prefab, Transform parent, bool worldSpace = false)
 		{
 			if (prefab == null)
@@ -220,7 +220,7 @@ namespace Kit
 			return source;
 		}
 
-		/// <inheritdoc cref="Play(AudioSource)"/>
+		/// <inheritdoc cref="Play(AudioSource)" />
 		public static AudioSource Play(AudioSource prefab, Vector3 position)
 		{
 			if (prefab == null)
@@ -231,7 +231,7 @@ namespace Kit
 			return source;
 		}
 
-		/// <inheritdoc cref="Play(AudioSource)"/>
+		/// <inheritdoc cref="Play(AudioSource)" />
 		public static AudioSource Play(AudioSource prefab, Transform parent, Vector3 position)
 		{
 			if (prefab == null)
@@ -263,7 +263,7 @@ namespace Kit
 			return clip == null ? null : PlayDedicated(clip, loop, is3D);
 		}
 
-		/// <inheritdoc cref="Play(AudioClip, bool, bool)"/>
+		/// <inheritdoc cref="Play(AudioClip, bool, bool)" />
 		public static AudioSource Play(AudioClip clip, Vector3 position, bool loop = false, bool is3D = true)
 		{
 			if (clip == null)
@@ -274,7 +274,7 @@ namespace Kit
 			return source;
 		}
 
-		/// <inheritdoc cref="Play(AudioClip, bool, bool)"/>
+		/// <inheritdoc cref="Play(AudioClip, bool, bool)" />
 		public static AudioSource Play(AudioClip clip, Transform parent, bool loop = false, bool is3D = true)
 		{
 			if (clip == null)
@@ -285,7 +285,7 @@ namespace Kit
 			return source;
 		}
 
-		/// <inheritdoc cref="Play(AudioClip, bool, bool)"/>
+		/// <inheritdoc cref="Play(AudioClip, bool, bool)" />
 		public static AudioSource Play(AudioClip clip, Transform parent, Vector3 position, bool loop = false, bool is3D = true)
 		{
 			if (clip == null)

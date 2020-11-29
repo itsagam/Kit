@@ -79,6 +79,7 @@ namespace Kit.Modding
 										Debugger.Log(LogCategory, $"Unloaded \"{file}\" from {folder}.");
 			}
 
+
 			Observable.OnceApplicationQuit().Subscribe(u => UnloadMods());
 		}
 

@@ -130,7 +130,7 @@ namespace Kit.Containers
 		protected virtual async UniTaskVoid StartTimer(IUpgradeable upgradeable)
 		{
 			float end = Time.time + Duration;
-			while ( (TimeLeft = end - Time.time) > 0)
+			while ((TimeLeft = end - Time.time) > 0)
 				await UniTask.Yield();
 			try
 			{

@@ -2,7 +2,6 @@
 using System.Threading;
 using Cysharp.Threading.Tasks.Linq;
 using Sirenix.OdinInspector;
-using UniRx;
 using UnityEngine;
 
 namespace Kit.UI
