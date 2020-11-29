@@ -24,6 +24,11 @@ namespace Kit.UI
 			QueueHide();
 		}
 
+		protected override void OnHidden()
+		{
+			Cancel();
+		}
+
 		protected virtual void QueueHide()
 		{
 			Cancel();
