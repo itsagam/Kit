@@ -213,246 +213,211 @@ namespace Kit.Pooling
 			return GetPool(pool)?.Instantiate();
 		}
 
-		/// <summary>Initialize a pool instance.</summary>
-		/// <returns>The instance created.</returns>
+		/// <inheritdoc cref="Instantiate(string)"/>
 		public static Component Instantiate(string pool, Transform parent, bool worldSpace = false)
 		{
 			return GetPool(pool)?.Instantiate(parent, worldSpace);
 		}
 
-		/// <summary>Initialize a pool instance.</summary>
-		/// <returns>The instance given.</returns>
+		/// <inheritdoc cref="Instantiate(string)"/>
 		public static Component Instantiate(string pool, Vector3 position)
 		{
 			return GetPool(pool)?.Instantiate(position);
 		}
 
-		/// <summary>Initialize a pool instance.</summary>
-		/// <returns>The instance given.</returns>
+		/// <inheritdoc cref="Instantiate(string)"/>
 		public static Component Instantiate(string pool, Vector3 position, Quaternion rotation)
 		{
 			return GetPool(pool)?.Instantiate(position, rotation);
 		}
 
-		/// <summary>Initialize a pool instance.</summary>
-		/// <returns>The instance given.</returns>
+		/// <inheritdoc cref="Instantiate(string)"/>
 		public static Component Instantiate(string pool, Vector3 position, Transform parent)
 		{
 			return GetPool(pool)?.Instantiate(position, parent);
 		}
 
-		/// <summary>Initialize a pool instance.</summary>
-		/// <returns>The instance given.</returns>
+		/// <inheritdoc cref="Instantiate(string)"/>
 		public static Component Instantiate(string pool, Vector3 position, Quaternion rotation, Transform parent)
 		{
 			return GetPool(pool)?.Instantiate(position, rotation, parent);
 		}
 
-		/// <summary>Initialize a pool instance.</summary>
-		/// <returns>The instance given.</returns>
+		/// <inheritdoc cref="Instantiate(string)"/>
 		public static T Instantiate<T>(string pool) where T: Component
 		{
 			return GetPool(pool)?.Instantiate<T>();
 		}
 
-		/// <summary>Initialize a pool instance.</summary>
-		/// <returns>The instance given.</returns>
+		/// <inheritdoc cref="Instantiate(string)"/>
 		public static T Instantiate<T>(string pool, Transform parent, bool worldSpace = false) where T: Component
 		{
 			return GetPool(pool)?.Instantiate<T>(parent, worldSpace);
 		}
 
-		/// <summary>Initialize a pool instance.</summary>
-		/// <returns>The instance given.</returns>
+		/// <inheritdoc cref="Instantiate(string)"/>
 		public static T Instantiate<T>(string pool, Vector3 position) where T: Component
 		{
 			return GetPool(pool)?.Instantiate<T>(position);
 		}
 
-		/// <summary>Initialize a pool instance.</summary>
-		/// <returns>The instance given.</returns>
+		/// <inheritdoc cref="Instantiate(string)"/>
 		public static T Instantiate<T>(string pool, Vector3 position, Quaternion rotation) where T: Component
 		{
 			return GetPool(pool)?.Instantiate<T>(position, rotation);
 		}
 
-		/// <summary>Initialize a pool instance.</summary>
-		/// <returns>The instance given.</returns>
+		/// <inheritdoc cref="Instantiate(string)"/>
 		public static T Instantiate<T>(string pool, Vector3 position, Transform parent) where T: Component
 		{
 			return GetPool(pool)?.Instantiate<T>(position, parent);
 		}
 
-		/// <summary>Initialize a pool instance.</summary>
-		/// <returns>The instance given.</returns>
+		/// <inheritdoc cref="Instantiate(string)"/>
 		public static T Instantiate<T>(string pool, Vector3 position, Quaternion rotation, Transform parent) where T: Component
 		{
 			return GetPool(pool)?.Instantiate<T>(position, rotation, parent);
 		}
 
-		/// <summary>Initialize a pool instance.</summary>
-		/// <returns>The instance given.</returns>
+		/// <inheritdoc cref="Instantiate(string)"/>
 		public static Component Instantiate(Component prefab)
 		{
 			return GetOrCreatePool(prefab).Instantiate();
 		}
 
-		/// <summary>Initialize a pool instance.</summary>
-		/// <returns>The instance given.</returns>
+		/// <inheritdoc cref="Instantiate(string)"/>
 		public static Component Instantiate(Component prefab, Transform parent, bool worldSpace = false)
 		{
 			return GetOrCreatePool(prefab).Instantiate(parent, worldSpace);
 		}
 
-		/// <summary>Initialize a pool instance.</summary>
-		/// <returns>The instance given.</returns>
+		/// <inheritdoc cref="Instantiate(string)"/>
 		public static Component Instantiate(Component prefab, Vector3 position)
 		{
 			return GetOrCreatePool(prefab).Instantiate(position);
 		}
 
-		/// <summary>Initialize a pool instance.</summary>
-		/// <returns>The instance given.</returns>
+		/// <inheritdoc cref="Instantiate(string)"/>
 		public static Component Instantiate(Component prefab, Vector3 position, Quaternion rotation)
 		{
 			return GetOrCreatePool(prefab).Instantiate(position, rotation);
 		}
 
-		/// <summary>Initialize a pool instance.</summary>
-		/// <returns>The instance given.</returns>
+		/// <inheritdoc cref="Instantiate(string)"/>
 		public static Component Instantiate(Component prefab, Vector3 position, Transform parent)
 		{
 			return GetOrCreatePool(prefab).Instantiate(position, parent);
 		}
 
-		/// <summary>Initialize a pool instance.</summary>
-		/// <returns>The instance given.</returns>
+		/// <inheritdoc cref="Instantiate(string)"/>
 		public static Component Instantiate(Component prefab, Vector3 position, Quaternion rotation, Transform parent)
 		{
 			return GetOrCreatePool(prefab).Instantiate(position, rotation, parent);
 		}
 
-		/// <summary>Initialize a pool instance.</summary>
-		/// <returns>The instance given.</returns>
+		/// <inheritdoc cref="Instantiate(string)"/>
 		public static T Instantiate<T>(T prefab) where T: Component
 		{
 			return GetOrCreatePool(prefab).Instantiate<T>();
 		}
 
-		/// <summary>Initialize a pool instance.</summary>
-		/// <returns>The instance given.</returns>
+		/// <inheritdoc cref="Instantiate(string)"/>
 		public static T Instantiate<T>(T prefab, Transform parent, bool worldSpace = false) where T: Component
 		{
 			return GetOrCreatePool(prefab).Instantiate<T>(parent, worldSpace);
 		}
 
-		/// <summary>Initialize a pool instance.</summary>
-		/// <returns>The instance given.</returns>
+		/// <inheritdoc cref="Instantiate(string)"/>
 		public static T Instantiate<T>(T prefab, Vector3 position) where T: Component
 		{
 			return GetOrCreatePool(prefab).Instantiate<T>(position);
 		}
 
-		/// <summary>Initialize a pool instance.</summary>
-		/// <returns>The instance given.</returns>
+		/// <inheritdoc cref="Instantiate(string)"/>
 		public static T Instantiate<T>(T prefab, Vector3 position, Quaternion rotation) where T: Component
 		{
 			return GetOrCreatePool(prefab).Instantiate<T>(position, rotation);
 		}
 
-		/// <summary>Initialize a pool instance.</summary>
-		/// <returns>The instance given.</returns>
+		/// <inheritdoc cref="Instantiate(string)"/>
 		public static T Instantiate<T>(T prefab, Vector3 position, Transform parent) where T: Component
 		{
 			return GetOrCreatePool(prefab).Instantiate<T>(position, parent);
 		}
 
-		/// <summary>Initialize a pool instance.</summary>
-		/// <returns>The instance given.</returns>
+		/// <inheritdoc cref="Instantiate(string)"/>
 		public static T Instantiate<T>(T prefab, Vector3 position, Quaternion rotation, Transform parent) where T: Component
 		{
 			return GetOrCreatePool(prefab).Instantiate<T>(position, rotation, parent);
 		}
 
-		/// <summary>Initialize a pool instance.</summary>
-		/// <returns>The instance given.</returns>
+		/// <inheritdoc cref="Instantiate(string)"/>
 		public static T Instantiate<T>(string group, T prefab) where T: Component
 		{
 			return GetOrCreatePool(group, prefab).Instantiate<T>();
 		}
 
-		/// <summary>Initialize a pool instance.</summary>
-		/// <returns>The instance given.</returns>
+		/// <inheritdoc cref="Instantiate(string)"/>
 		public static T Instantiate<T>(string group, T prefab, Transform parent, bool worldSpace = false) where T: Component
 		{
 			return GetOrCreatePool(group, prefab).Instantiate<T>(parent, worldSpace);
 		}
 
-		/// <summary>Initialize a pool instance.</summary>
-		/// <returns>The instance given.</returns>
+		/// <inheritdoc cref="Instantiate(string)"/>
 		public static T Instantiate<T>(string group, T prefab, Vector3 position) where T: Component
 		{
 			return GetOrCreatePool(group, prefab).Instantiate<T>(position);
 		}
 
-		/// <summary>Initialize a pool instance.</summary>
-		/// <returns>The instance given.</returns>
+		/// <inheritdoc cref="Instantiate(string)"/>
 		public static T Instantiate<T>(string group, T prefab, Vector3 position, Quaternion rotation) where T: Component
 		{
 			return GetOrCreatePool(group, prefab).Instantiate<T>(position, rotation);
 		}
 
-		/// <summary>Initialize a pool instance.</summary>
-		/// <returns>The instance given.</returns>
+		/// <inheritdoc cref="Instantiate(string)"/>
 		public static T Instantiate<T>(string group, T prefab, Vector3 position, Transform parent) where T: Component
 		{
 			return GetOrCreatePool(group, prefab).Instantiate<T>(position, parent);
 		}
 
-		/// <summary>Initialize a pool instance.</summary>
-		/// <returns>The instance given.</returns>
+		/// <inheritdoc cref="Instantiate(string)"/>
 		public static T Instantiate<T>(string group, T prefab, Vector3 position, Quaternion rotation, Transform parent) where T: Component
 		{
 			return GetOrCreatePool(group, prefab).Instantiate<T>(position, rotation, parent);
 		}
 
-		/// <summary>Initialize a pool instance.</summary>
-		/// <returns>The instance given.</returns>
+		/// <inheritdoc cref="Instantiate(string)"/>
 		public static T Instantiate<T>(PoolGroup group, T prefab) where T: Component
 		{
 			return GetOrCreatePool(group, prefab).Instantiate<T>();
 		}
 
-		/// <summary>Initialize a pool instance.</summary>
-		/// <returns>The instance given.</returns>
+		/// <inheritdoc cref="Instantiate(string)"/>
 		public static T Instantiate<T>(PoolGroup group, T prefab, Transform parent, bool worldSpace = false) where T: Component
 		{
 			return GetOrCreatePool(group, prefab).Instantiate<T>(parent, worldSpace);
 		}
 
-		/// <summary>Initialize a pool instance.</summary>
-		/// <returns>The instance given.</returns>
+		/// <inheritdoc cref="Instantiate(string)"/>
 		public static T Instantiate<T>(PoolGroup group, T prefab, Vector3 position) where T: Component
 		{
 			return GetOrCreatePool(group, prefab).Instantiate<T>(position);
 		}
 
-		/// <summary>Initialize a pool instance.</summary>
-		/// <returns>The instance given.</returns>
+		/// <inheritdoc cref="Instantiate(string)"/>
 		public static T Instantiate<T>(PoolGroup group, T prefab, Vector3 position, Quaternion rotation) where T: Component
 		{
 			return GetOrCreatePool(group, prefab).Instantiate<T>(position, rotation);
 		}
 
-		/// <summary>Initialize a pool instance.</summary>
-		/// <returns>The instance given.</returns>
+		/// <inheritdoc cref="Instantiate(string)"/>
 		public static T Instantiate<T>(PoolGroup group, T prefab, Vector3 position, Transform parent) where T: Component
 		{
 			return GetOrCreatePool(group, prefab).Instantiate<T>(position, parent);
 		}
 
-		/// <summary>Initialize a pool instance.</summary>
-		/// <returns>The instance given.</returns>
+		/// <inheritdoc cref="Instantiate(string)"/>
 		public static T Instantiate<T>(PoolGroup group, T prefab, Vector3 position, Quaternion rotation, Transform parent)
 			where T: Component
 		{

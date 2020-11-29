@@ -138,7 +138,7 @@ namespace Kit.UI
 			return Hide(HideAnimation, mode);
 		}
 
-		/// <inheritdoc cref="Hide(Kit.WindowHideMode)"/>
+		/// <inheritdoc cref="Hide(WindowHideMode)"/>
 		/// <summary>Hide the window using a particular animation.</summary>
 		/// <param name="animation">Play this animation state instead of the one set in <see cref="HideAnimation" />.</param>
 		public async UniTask<bool> Hide(string animation, WindowHideMode mode = UIManager.DefaultHideMode)

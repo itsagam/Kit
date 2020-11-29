@@ -295,8 +295,7 @@ namespace Kit.Pooling
 			return instance;
 		}
 
-		/// <summary>Initialize a pool instance.</summary>
-		/// <returns>The instance given.</returns>
+		/// <inheritdoc cref="Instantiate()"/>
 		public Component Instantiate(Transform parent, bool worldSpace = false)
 		{
 			Component instance = Instantiate();
@@ -305,8 +304,7 @@ namespace Kit.Pooling
 			return instance;
 		}
 
-		/// <summary>Initialize a pool instance.</summary>
-		/// <returns>The instance given.</returns>
+		/// <inheritdoc cref="Instantiate()"/>
 		public Component Instantiate(Vector3 position)
 		{
 			Component instance = Instantiate();
@@ -315,8 +313,7 @@ namespace Kit.Pooling
 			return instance;
 		}
 
-		/// <summary>Initialize a pool instance.</summary>
-		/// <returns>The instance given.</returns>
+		/// <inheritdoc cref="Instantiate()"/>
 		public Component Instantiate(Vector3 position, Quaternion rotation)
 		{
 			Component instance = Instantiate();
@@ -328,8 +325,7 @@ namespace Kit.Pooling
 			return instance;
 		}
 
-		/// <summary>Initialize a pool instance.</summary>
-		/// <returns>The instance given.</returns>
+		/// <inheritdoc cref="Instantiate()"/>
 		public Component Instantiate(Vector3 position, Transform parent)
 		{
 			Component instance = Instantiate();
@@ -341,8 +337,7 @@ namespace Kit.Pooling
 			return instance;
 		}
 
-		/// <summary>Initialize a pool instance.</summary>
-		/// <returns>The instance given.</returns>
+		/// <inheritdoc cref="Instantiate()"/>
 		public Component Instantiate(Vector3 position, Quaternion rotation, Transform parent)
 		{
 			Component instance = Instantiate();
@@ -355,48 +350,42 @@ namespace Kit.Pooling
 			return instance;
 		}
 
-		/// <summary>Initialize a pool instance.</summary>
-		/// <returns>The instance given.</returns>
+		/// <inheritdoc cref="Instantiate()"/>
 		public T Instantiate<T>() where T: Component
 		{
 			Component instance = Instantiate();
 			return GetInstanceComponent<T>(instance);
 		}
 
-		/// <summary>Initialize a pool instance.</summary>
-		/// <returns>The instance given.</returns>
+		/// <inheritdoc cref="Instantiate()"/>
 		public T Instantiate<T>(Transform parent, bool worldSpace = false) where T: Component
 		{
 			Component instance = Instantiate(parent, worldSpace);
 			return GetInstanceComponent<T>(instance);
 		}
 
-		/// <summary>Initialize a pool instance.</summary>
-		/// <returns>The instance given.</returns>
+		/// <inheritdoc cref="Instantiate()"/>
 		public T Instantiate<T>(Vector3 position) where T: Component
 		{
 			Component instance = Instantiate(position);
 			return GetInstanceComponent<T>(instance);
 		}
 
-		/// <summary>Initialize a pool instance.</summary>
-		/// <returns>The instance given.</returns>
+		/// <inheritdoc cref="Instantiate()"/>
 		public T Instantiate<T>(Vector3 position, Quaternion rotation) where T: Component
 		{
 			Component instance = Instantiate(position, rotation);
 			return GetInstanceComponent<T>(instance);
 		}
 
-		/// <summary>Initialize a pool instance.</summary>
-		/// <returns>The instance given.</returns>
+		/// <inheritdoc cref="Instantiate()"/>
 		public T Instantiate<T>(Vector3 position, Transform parent) where T: Component
 		{
 			Component instance = Instantiate(position, parent);
 			return GetInstanceComponent<T>(instance);
 		}
 
-		/// <summary>Initialize a pool instance.</summary>
-		/// <returns>The instance given.</returns>
+		/// <inheritdoc cref="Instantiate()"/>
 		public T Instantiate<T>(Vector3 position, Quaternion rotation, Transform parent) where T: Component
 		{
 			Component instance = Instantiate(position, rotation, parent);

@@ -1,4 +1,6 @@
-﻿using Kit.Pooling;
+﻿using Cysharp.Threading.Tasks;
+using Cysharp.Threading.Tasks.Linq;
+using Kit.Pooling;
 using UniRx;
 using UnityEngine;
 
@@ -22,8 +24,7 @@ namespace Kit
 			return particleSystem;
 		}
 
-		/// <summary>Spawn a <see cref="ParticleSystem" /> and pool it after it finishes.</summary>
-		/// <returns>The pool instance.</returns>
+		/// <inheritdoc cref="Spawn(ParticleSystem, Vector3)"/>
 		public static ParticleSystem Spawn(ParticleSystem prefab, Vector3 position, Quaternion rotation)
 		{
 			if (prefab == null)
@@ -34,8 +35,7 @@ namespace Kit
 			return particleSystem;
 		}
 
-		/// <summary>Spawn a <see cref="ParticleSystem" /> and pool it after it finishes.</summary>
-		/// <returns>The pool instance.</returns>
+		/// <inheritdoc cref="Spawn(ParticleSystem, Vector3)"/>
 		public static ParticleSystem Spawn(ParticleSystem prefab, Transform parent, bool worldSpace = false)
 		{
 			if (prefab == null)
@@ -46,8 +46,7 @@ namespace Kit
 			return particleSystem;
 		}
 
-		/// <summary>Spawn a <see cref="ParticleSystem" /> and pool it after it finishes.</summary>
-		/// <returns>The pool instance.</returns>
+		/// <inheritdoc cref="Spawn(ParticleSystem, Vector3)"/>
 		public static ParticleSystem Spawn(ParticleSystem prefab, Transform parent, Vector3 position)
 		{
 			if (prefab == null)
@@ -61,8 +60,7 @@ namespace Kit
 			return particleSystem;
 		}
 
-		/// <summary>Spawn a <see cref="ParticleSystem" /> and pool it after it finishes.</summary>
-		/// <returns>The pool instance.</returns>
+		/// <inheritdoc cref="Spawn(ParticleSystem, Vector3)"/>
 		public static ParticleSystem Spawn(ParticleSystem prefab, Transform parent, Vector3 position, Quaternion rotation)
 		{
 			if (prefab == null)
@@ -110,10 +108,9 @@ namespace Kit
 			if (system.main.loop)
 				return;
 
-			Observable.EveryUpdate()
-					  .First(l => !system.IsAlive(true))
-					  .CatchIgnore()
-					  .Subscribe(l => Pooler.Destroy(system));
+			UniTaskAsyncEnumerable.EveryUpdate()
+								  .SkipWhile(_ => system.IsAlive(true))
+								  .ForEachAsync(_ => Pooler.Destroy(system));
 		}
 	}
 }

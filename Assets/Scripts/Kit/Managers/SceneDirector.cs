@@ -110,19 +110,15 @@ namespace Kit
 				  .ToUniTask();
 		}
 
+		/// <inheritdoc cref="Fade"/>
 		/// <summary>
 		///     <para>Fade in the screen.</para>
 		///     <para>Can be <c>await</c>-ed upon.</para>
 		/// </summary>
-		/// <param name="color">Fade color. Default if not specified.</param>
-		/// <param name="time">Time to take.</param>
-		/// <param name="onComplete">Method to call when done.</param>
-		/// <returns>A UniTask that emits when fading's done.</returns>
 		public static UniTask FadeIn(Color? color = null, float time = DefaultFadeTime, Action onComplete = null)
 		{
 			FadingIn?.Invoke();
-			return Fade(1,
-						0,
+			return Fade(1, 0,
 						color,
 						time,
 						() =>
@@ -132,19 +128,15 @@ namespace Kit
 						});
 		}
 
+		/// <inheritdoc cref="Fade"/>
 		/// <summary>
 		///     <para>Fade out the screen.</para>
 		///     <para>Can be <c>await</c>-ed upon.</para>
 		/// </summary>
-		/// <param name="color">Fade color. Default if not specified.</param>
-		/// <param name="time">Time to take.</param>
-		/// <param name="onComplete">Method to call when done.</param>
-		/// <returns>A UniTask that emits when fading's done.</returns>
 		public static UniTask FadeOut(Color? color = null, float time = DefaultFadeTime, Action onComplete = null)
 		{
 			FadingOut?.Invoke();
-			return Fade(0,
-						1,
+			return Fade(0, 1,
 						color,
 						time,
 						() =>
@@ -152,29 +144,6 @@ namespace Kit
 							onComplete?.Invoke();
 							FadedOut?.Invoke();
 						});
-		}
-
-		/// <summary>
-		///     <para>Reload the active scene.</para>
-		///     <para>Can be <c>await</c>-ed upon.</para>
-		/// </summary>
-		/// <param name="fadeMode">How to fade?</param>
-		/// <param name="fadeColor">Fade color. Default if not specified.</param>
-		/// <param name="fadeTime">Time to take for fading.</param>
-		/// <param name="additive">Whether to load the scene additively.</param>
-		/// <param name="onLoadProgress">Method to call when loading progresses.</param>
-		/// <param name="onLoadComplete">Method to call when loading completes.</param>
-		/// <param name="onComplete">Method to call when loading and fading (if applicable) completes.</param>
-		/// <returns>A UniTask that emits when fading's done.</returns>
-		public static UniTask ReloadScene(FadeMode fadeMode = DefaultFadeMode,
-										  Color? fadeColor = null,
-										  float fadeTime = DefaultFadeTime,
-										  bool additive = false,
-										  Action<float> onLoadProgress = null,
-										  Action onLoadComplete = null,
-										  Action onComplete = null)
-		{
-			return LoadScene(ActiveScene.path, fadeMode, fadeColor, fadeTime, additive, onLoadProgress, onLoadComplete, onComplete);
 		}
 
 		/// <summary>
@@ -208,6 +177,22 @@ namespace Kit
 				await FadeIn(fadeColor, fadeTime);
 
 			onComplete?.Invoke();
+		}
+
+		/// <inheritdoc cref="LoadScene"/>
+		/// <summary>
+		///     <para>Reload the active scene.</para>
+		///     <para>Can be <c>await</c>-ed upon.</para>
+		/// </summary>
+		public static UniTask ReloadScene(FadeMode fadeMode = DefaultFadeMode,
+										  Color? fadeColor = null,
+										  float fadeTime = DefaultFadeTime,
+										  bool additive = false,
+										  Action<float> onLoadProgress = null,
+										  Action onLoadComplete = null,
+										  Action onComplete = null)
+		{
+			return LoadScene(ActiveScene.path, fadeMode, fadeColor, fadeTime, additive, onLoadProgress, onLoadComplete, onComplete);
 		}
 
 		private static async UniTask LoadScene(string nameOrPath,

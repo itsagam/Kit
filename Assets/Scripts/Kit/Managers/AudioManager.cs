@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using Cysharp.Threading.Tasks.Linq;
 using Kit.Behaviours;
 using Kit.Pooling;
-using UniRx;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
@@ -208,8 +208,7 @@ namespace Kit
 			return source;
 		}
 
-		/// <summary>Spawn an <see cref="AudioSource" /> and pool it after the sound ends.</summary>
-		/// <returns>The pool instance.</returns>
+		/// <inheritdoc cref="Play(AudioSource)"/>
 		public static AudioSource Play(AudioSource prefab, Transform parent, bool worldSpace = false)
 		{
 			if (prefab == null)
@@ -220,8 +219,7 @@ namespace Kit
 			return source;
 		}
 
-		/// <summary>Spawn an <see cref="AudioSource" /> and pool it after the sound ends.</summary>
-		/// <returns>The pool instance.</returns>
+		/// <inheritdoc cref="Play(AudioSource)"/>
 		public static AudioSource Play(AudioSource prefab, Vector3 position)
 		{
 			if (prefab == null)
@@ -232,8 +230,7 @@ namespace Kit
 			return source;
 		}
 
-		/// <summary>Spawn an <see cref="AudioSource" /> and pool it after the sound ends.</summary>
-		/// <returns>The pool instance.</returns>
+		/// <inheritdoc cref="Play(AudioSource)"/>
 		public static AudioSource Play(AudioSource prefab, Transform parent, Vector3 position)
 		{
 			if (prefab == null)
@@ -250,7 +247,8 @@ namespace Kit
 		private static void QueueForDestroy(AudioSource source)
 		{
 			if (!source.loop)
-				Observable.Timer(TimeSpan.FromSeconds(source.clip.length)).Subscribe(l => Pooler.Destroy(source));
+				UniTaskAsyncEnumerable.Timer(TimeSpan.FromSeconds(source.clip.length))
+									  .ForEachAsync(_ => Pooler.Destroy(source));
 		}
 
 		#endregion
@@ -264,8 +262,7 @@ namespace Kit
 			return clip == null ? null : PlayDedicated(clip, loop, is3D);
 		}
 
-		/// <summary>Play an audio with a dedicated <see cref="AudioSource" /> and destroy it after it ends (if it's not looping).</summary>
-		/// <returns>The <see cref="AudioSource" /> instantiated.</returns>
+		/// <inheritdoc cref="Play(AudioClip, bool, bool)"/>
 		public static AudioSource Play(AudioClip clip, Vector3 position, bool loop = false, bool is3D = true)
 		{
 			if (clip == null)
@@ -276,8 +273,7 @@ namespace Kit
 			return source;
 		}
 
-		/// <summary>Play an audio with a dedicated <see cref="AudioSource" /> and destroy it after it ends (if it's not looping).</summary>
-		/// <returns>The <see cref="AudioSource" /> instantiated.</returns>
+		/// <inheritdoc cref="Play(AudioClip, bool, bool)"/>
 		public static AudioSource Play(AudioClip clip, Transform parent, bool loop = false, bool is3D = true)
 		{
 			if (clip == null)
@@ -288,8 +284,7 @@ namespace Kit
 			return source;
 		}
 
-		/// <summary>Play an audio with a dedicated <see cref="AudioSource" /> and destroy it after it ends (if it's not looping).</summary>
-		/// <returns>The <see cref="AudioSource" /> instantiated.</returns>
+		/// <inheritdoc cref="Play(AudioClip, bool, bool)"/>
 		public static AudioSource Play(AudioClip clip, Transform parent, Vector3 position, bool loop = false, bool is3D = true)
 		{
 			if (clip == null)
@@ -315,12 +310,12 @@ namespace Kit
 			source.Play();
 
 			if (!loop)
-				Observable.Timer(TimeSpan.FromSeconds(clip.length))
-						  .Subscribe(l =>
-									 {
-										 if (gameObject != null)
-											 gameObject.Destroy();
-									 });
+				UniTaskAsyncEnumerable.Timer(TimeSpan.FromSeconds(clip.length))
+									  .ForEachAsync(_ =>
+													{
+														if (gameObject != null)
+															gameObject.Destroy();
+													});
 
 			return source;
 		}

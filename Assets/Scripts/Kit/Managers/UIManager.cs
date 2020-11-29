@@ -111,7 +111,7 @@ namespace Kit
 			return ShowInternal(prefab, data, parent, animation, conflictMode);
 		}
 
-		/// <inheritdoc cref="Show(Kit.UI.Window,object,UnityEngine.Transform,string,Kit.WindowConflictMode)" />
+		/// <inheritdoc cref="Show(Window,object,Transform,string,WindowConflictMode)" />
 		/// <summary>
 		///     <para>Show a window from a path.</para>
 		///     <para>Can be <c>await</c>-ed upon.</para>
