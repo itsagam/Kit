@@ -86,7 +86,7 @@ namespace Kit.Pooling
 		[HideInInlineEditors]
 		[LabelText("Message")]
 		[Tooltip("How an instance gets informed of pooling events?")]
-		public PoolMessageMode MessageMode = PoolMessageMode.SendMessage;
+		public PoolMessageMode MessageMode = PoolMessageMode.IPooledComponent;
 
 		/// <summary>Whether to pre-instantiate a certain of number of instances for future use.</summary>
 		[ToggleGroup("Preload")]
@@ -411,8 +411,8 @@ namespace Kit.Pooling
 
 			Pooler.GetInstanceInfo(instance).IsPooled = true;
 			Available.AddLast(instance);
-			instance.gameObject.SetActive(false);
 			SendDestroyMessage(instance);
+			instance.gameObject.SetActive(false);
 		}
 
 		/// <summary>Pool all instances.</summary>

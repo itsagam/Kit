@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Threading;
+using Cysharp.Threading.Tasks.Linq;
 using Sirenix.OdinInspector;
 using UniRx;
 using UnityEngine;
@@ -15,7 +17,7 @@ namespace Kit.UI
 		[Tooltip("Duration to display the window for.")]
 		public float Time = 3.0f;
 
-		protected IDisposable observable;
+		protected CancellationTokenSource cancelSource;
 
 		protected override void OnShown()
 		{
@@ -24,19 +26,29 @@ namespace Kit.UI
 
 		protected virtual void QueueHide()
 		{
-			observable?.Dispose();
-			observable = Observable.Timer(TimeSpan.FromSeconds(Time))
-								   .Subscribe(t =>
-											  {
-												  observable = null;
-												  Hide();
-											  });
+			Cancel();
+			cancelSource = new CancellationTokenSource();
+			UniTaskAsyncEnumerable.Timer(TimeSpan.FromSeconds(Time))
+								  .ForEachAsync(_ =>
+												{
+													Hide();
+												}, cancelSource.Token);
 		}
 
 		protected override void OnDestroy()
 		{
 			base.OnDestroy();
-			observable?.Dispose();
+			Cancel();
+		}
+
+		protected virtual void Cancel()
+		{
+			if (cancelSource != null)
+			{
+				cancelSource.Cancel();
+				cancelSource.Dispose();
+				cancelSource = null;
+			}
 		}
 	}
 }

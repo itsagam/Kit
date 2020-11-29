@@ -109,8 +109,8 @@ namespace Kit
 				return;
 
 			UniTaskAsyncEnumerable.EveryUpdate()
-								  .SkipWhile(_ => system.IsAlive(true))
-								  .ForEachAsync(_ => Pooler.Destroy(system));
+								  .Where(_ => !system.IsAlive(true))
+								  .FirstAsync(_ => Pooler.Destroy(system));
 		}
 	}
 }
