@@ -6,7 +6,6 @@ using System.Linq;
 using Cysharp.Threading.Tasks;
 using Kit.Modding.Loaders;
 using Kit.Parsers;
-using UniRx;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
@@ -79,8 +78,7 @@ namespace Kit.Modding
 										Debugger.Log(LogCategory, $"Unloaded \"{file}\" from {folder}.");
 			}
 
-
-			Observable.OnceApplicationQuit().Subscribe(u => UnloadMods());
+			ControlHelper.ApplicationQuit += () => UnloadMods();
 		}
 
 		/// <summary>Adds default mod groups.</summary>
