@@ -425,7 +425,7 @@
 						</entry>
 						<entry>
 							<para>
-								A premade <codeEntityReference>T:Kit.UI.Window</codeEntityReference> for showing general game messages.
+								A pre-made <codeEntityReference>T:Kit.UI.Window</codeEntityReference> for showing general game messages.
 							</para>
 						</entry>
 					</row>
@@ -471,7 +471,7 @@
 							</para>
 						</entry>
 						<entry>
-							<para>GameObject pooling and grouping.</para>
+							<para><codeInline>GameObject</codeInline> pooling and grouping.</para>
 						</entry>
 					</row>
 					<row>
@@ -569,7 +569,7 @@
 					<row>
 						<entry>
 							<para>
-								<legacyBold>ThirdParty</legacyBold>
+								<legacyBold>Plugins</legacyBold>
 							</para>
 						</entry>
 						<entry>

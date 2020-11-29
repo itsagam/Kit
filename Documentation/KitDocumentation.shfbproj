@@ -43,8 +43,7 @@
     <WarnOnMissingSourceContext>False</WarnOnMissingSourceContext>
     <VisibleItems>ProtectedInternalAsProtected, NonBrowsable</VisibleItems>
     <DocumentationSources>
-      <DocumentationSource sourceFile="..\Temp\bin\Debug\Assembly-CSharp.dll" />
-      <DocumentationSource sourceFile="..\Temp\bin\Debug\Assembly-CSharp.xml" />
+      <DocumentationSource sourceFile="..\Assembly-CSharp.csproj" />
     </DocumentationSources>
     <HelpTitle>Kit Documentation</HelpTitle>
     <HelpFileVersion>v1.0</HelpFileVersion>
@@ -59,6 +58,7 @@
     <MissingTags>AutoDocumentCtors, AutoDocumentDispose</MissingTags>
     <ApiFilter>
       <Filter entryType="Namespace" fullName="Demos.Debug" isExposed="False" />
+<Filter entryType="Namespace" fullName="Demos.Modding" isExposed="False" />
 <Filter entryType="Namespace" fullName="Demos.Pooling" isExposed="False" />
 <Filter entryType="Namespace" fullName="Demos.Resource" isExposed="False" />
 <Filter entryType="Namespace" fullName="Demos.UI" isExposed="False" />
@@ -71,23 +71,23 @@
     </ComponentConfigurations>
     <NamespaceSummaries>
       <NamespaceSummaryItem name="Kit" isDocumented="True">Base namespace with managers, helpers and extensions.</NamespaceSummaryItem>
-      <NamespaceSummaryItem name="Kit.Algorithms" isDocumented="True">Implementations of common algorithms.</NamespaceSummaryItem>
-      <NamespaceSummaryItem name="Kit.Behaviours" isDocumented="True">&lt;b&gt;MonoBehaviours&lt;/b&gt; for all occasions.</NamespaceSummaryItem>
-      <NamespaceSummaryItem name="Kit.Containers" isDocumented="True">Collections and data containers.</NamespaceSummaryItem>
-      <NamespaceSummaryItem name="Kit.Modding (Group)" isGroup="True" isDocumented="True">The modding system.</NamespaceSummaryItem>
-      <NamespaceSummaryItem name="Kit.Modding" isDocumented="True">The modding system.</NamespaceSummaryItem>
-      <NamespaceSummaryItem name="Kit.Modding.Loaders" isDocumented="True">Handlers for loading mods of different file types.</NamespaceSummaryItem>
-      <NamespaceSummaryItem name="Kit.Modding.Scripting" isDocumented="True">Support for executing Lua scripts from mods.</NamespaceSummaryItem>
-      <NamespaceSummaryItem name="Kit.Parsers" isDocumented="True">Handlers for parsing different types of files from &lt;b&gt;ResourceManager&lt;/b&gt; and mods.</NamespaceSummaryItem>
-      <NamespaceSummaryItem name="Kit.Pooling" isDocumented="True">&lt;b&gt;GameObject&lt;/b&gt; pooler.</NamespaceSummaryItem>
-      <NamespaceSummaryItem name="Kit.UI" isDocumented="True">Most common UI elements.</NamespaceSummaryItem>
-      <NamespaceSummaryItem name="Kit.UI.Behaviours" isDocumented="True">Common &lt;b&gt;MonoBehaviours&lt;/b&gt; for UI elements.</NamespaceSummaryItem>
-      <NamespaceSummaryItem name="Kit.UI.Buttons" isDocumented="True">Common functionalities for buttons.</NamespaceSummaryItem>
-      <NamespaceSummaryItem name="Kit.UI.Layout" isDocumented="True">Scripts for UI layouts.</NamespaceSummaryItem>
-      <NamespaceSummaryItem name="Kit.UI.Message" isDocumented="True">A pre-made &lt;b&gt;Window&lt;/b&gt; for showing general game messages.</NamespaceSummaryItem>
-      <NamespaceSummaryItem name="Kit.UI.Widgets" isDocumented="True">UI widgets.</NamespaceSummaryItem>
-      <NamespaceSummaryItem name="Kit.UI (Group)" isGroup="True" isDocumented="True">Most common UI elements.</NamespaceSummaryItem>
-    </NamespaceSummaries>
+<NamespaceSummaryItem name="Kit.Algorithms" isDocumented="True">Implementations of common algorithms.</NamespaceSummaryItem>
+<NamespaceSummaryItem name="Kit.Behaviours" isDocumented="True">&lt;b&gt;MonoBehaviours&lt;/b&gt; for all occasions.</NamespaceSummaryItem>
+<NamespaceSummaryItem name="Kit.Containers" isDocumented="True">Collections and data containers.</NamespaceSummaryItem>
+<NamespaceSummaryItem name="Kit.Modding (Group)" isGroup="True" isDocumented="True">The modding system.</NamespaceSummaryItem>
+<NamespaceSummaryItem name="Kit.Modding" isDocumented="True">The modding system.</NamespaceSummaryItem>
+<NamespaceSummaryItem name="Kit.Modding.Loaders" isDocumented="True">Handlers for loading mods of different file types.</NamespaceSummaryItem>
+<NamespaceSummaryItem name="Kit.Modding.Scripting" isDocumented="True">Support for executing Lua scripts from mods.</NamespaceSummaryItem>
+<NamespaceSummaryItem name="Kit.Parsers" isDocumented="True">Handlers for parsing different types of files from &lt;b&gt;ResourceManager&lt;/b&gt; and mods.</NamespaceSummaryItem>
+<NamespaceSummaryItem name="Kit.Pooling" isDocumented="True">&lt;b&gt;GameObject&lt;/b&gt; pooler.</NamespaceSummaryItem>
+<NamespaceSummaryItem name="Kit.UI" isDocumented="True">Most common UI elements.</NamespaceSummaryItem>
+<NamespaceSummaryItem name="Kit.UI.Behaviours" isDocumented="True">Common &lt;b&gt;MonoBehaviours&lt;/b&gt; for UI elements.</NamespaceSummaryItem>
+<NamespaceSummaryItem name="Kit.UI.Buttons" isDocumented="True">Common functionalities for buttons.</NamespaceSummaryItem>
+<NamespaceSummaryItem name="Kit.UI.Layout" isDocumented="True">Scripts for UI layouts.</NamespaceSummaryItem>
+<NamespaceSummaryItem name="Kit.UI.Message" isDocumented="True">A pre-made &lt;b&gt;Window&lt;/b&gt; for showing general game messages.</NamespaceSummaryItem>
+<NamespaceSummaryItem name="Kit.UI.Widgets" isDocumented="True">UI widgets.</NamespaceSummaryItem>
+<NamespaceSummaryItem name="Kit.UI (Group)" isGroup="True" isDocumented="True">Most common UI elements.</NamespaceSummaryItem>
+<NamespaceSummaryItem name="Kit.Modding.UI" isDocumented="True">UI code for managing mods in-game.</NamespaceSummaryItem></NamespaceSummaries>
     <FeedbackEMailAddress>agam%40frag-games.com</FeedbackEMailAddress>
     <HeaderText>
     </HeaderText>
@@ -124,6 +124,7 @@
     <Folder Include="media" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Content\Managers.aml" />
     <None Include="Content\Modding.aml" />
     <None Include="Content\Plugins.aml" />
     <None Include="Content\Console.aml" />

@@ -3,7 +3,8 @@
   <Topic id="Welcome" visible="True" isDefault="true" />
   <Topic id="Structure" visible="True" title="Directory Structure" />
   <Topic id="Plugins" visible="True" />
+  <Topic id="Managers" visible="True" isSelected="true" />
+  <Topic id="Pooler" visible="True" />
   <Topic id="Console" visible="True" />
-  <Topic id="Pooler" visible="True" isSelected="true" />
   <Topic id="Modding" visible="True" />
 </Topics>

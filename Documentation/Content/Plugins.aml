@@ -37,7 +37,7 @@
 						</entry>
 						<entry>
 							<para>
-								<localUri>Assets/ThirdParty/DOTween/</localUri>
+								<localUri>/Assets/Plugins/DOTween/</localUri>
 							</para>
 						</entry>
 					</row>
@@ -55,7 +55,7 @@
 						</entry>
 						<entry>
 							<para>
-								<localUri>Assets/ThirdParty/Sirenix/</localUri>
+								<localUri>/Assets/Plugins/Sirenix/</localUri>
 							</para>
 						</entry>
 					</row>
@@ -74,13 +74,12 @@
 									<linkText>Lua</linkText>
 									<linkUri>https://en.wikipedia.org/wiki/Lua_(programming_language)</linkUri>
 								</externalLink>
-								interpreter for <codeEntityReference linkText="modding">T:Kit.Modding.Mod</codeEntityReference> and 
-								<codeEntityReference>T:Kit.Console</codeEntityReference>.
+								interpreter for <link xlink:href="Modding">modding</link> and <link xlink:href="Console" />.
 							</para>
 						</entry>
 						<entry>
 							<para>
-								<localUri>Assets/ThirdParty/XLua/</localUri>, <localUri>Assets/Plugins/XLua/</localUri>, <localUri>Assets/Tools</localUri>
+								<localUri>/Assets/Plugins/XLua/</localUri>, <localUri>/Assets/Plugins/XLuaNative/</localUri>, <localUri>/Tools</localUri>
 							</para>
 						</entry>
 					</row>
@@ -98,7 +97,7 @@
 						</entry>
 						<entry>
 							<para>
-								<localUri>Assets/ThirdParty/TouchScript/</localUri>
+								<localUri>/Assets/Plugins/TouchScript/</localUri>
 							</para>
 						</entry>						
 					</row>
@@ -116,7 +115,7 @@
 						</entry>
 						<entry>
 							<para>
-								<localUri>Assets/ThirdParty/CleanUI/</localUri>
+								<localUri>/Assets/Plugins/CleanUI/</localUri>
 							</para>
 						</entry>
 					</row>
@@ -134,7 +133,7 @@
 						</entry>
 						<entry>
 							<para>
-								<localUri>Assets/ThirdParty/SoftMask/</localUri>
+								<localUri>/Assets/Plugins/SoftMask/</localUri>
 							</para>
 						</entry>						
 					</row>

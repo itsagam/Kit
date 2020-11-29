@@ -1,0 +1,475 @@
+<?xml version="1.0" encoding="utf-8"?>
+<topic id="Managers" revisionNumber="1">
+	<developerConceptualDocument xmlns="http://ddue.schemas.microsoft.com/authoring/2003/5" xmlns:xlink="http://www.w3.org/1999/xlink">
+		<introduction>
+			<para>Most video-games require a host of managers to handle things like UI, sounds and effects. The most common of those are included in the
+			Kit. What follows is a cheat-sheet of the most important methods in the included managers. Consult the manager reference documents for an
+			in-depth look at the features and options available.</para>
+
+			<list class="bullet">
+				<listItem>
+					<para>
+						<codeEntityReference>T:Kit.UIManager</codeEntityReference>
+					</para>
+				</listItem>
+				<listItem>
+					<para>
+						<codeEntityReference>T:Kit.ResourceManager</codeEntityReference>
+					</para>
+				</listItem>
+				<listItem>
+					<para>
+						<codeEntityReference>T:Kit.SceneDirector</codeEntityReference>
+					</para>
+				</listItem>
+				<listItem>
+					<para>
+						<codeEntityReference>T:Kit.AudioManager</codeEntityReference>
+					</para>
+				</listItem>
+				<listItem>
+					<para>
+						<codeEntityReference>T:Kit.EffectsManager</codeEntityReference>
+					</para>
+				</listItem>
+				<listItem>
+					<para>
+						<codeEntityReference>T:Kit.SettingsManager</codeEntityReference>
+					</para>
+				</listItem>
+			</list>
+		</introduction>
+
+		<section address="UIManager">
+			<title>
+				UIManager
+			</title>
+			<content>
+				<para>All of the methods return a <codeInline>UniTask</codeInline> which completes after the respective animations have ended
+				and can be <codeInline>await</codeInline>-ed upon.
+			</para>
+				<table>
+					<tableHeader>
+						<row>
+							<entry>
+								<para>Method(s)</para>
+							</entry>
+							<entry>
+								<para>Description</para>
+							</entry>
+						</row>
+					</tableHeader>
+					<row>
+						<entry>
+							<para>
+								<codeEntityReference>M:Kit.UIManager.Show(Kit.UI.Window, System.Object, UnityEngine.Transform, System.String, Kit.WindowConflictMode)</codeEntityReference>
+							</para>
+						</entry>
+						<entry>
+							<para>Instantiate and show a window from a prefab.</para>
+						</entry>
+					</row>					
+					<row>
+						<entry>
+							<para>
+								<codeEntityReference>M:Kit.UIManager.Show(System.String, System.Object, UnityEngine.Transform, System.String, Kit.WindowConflictMode)</codeEntityReference>
+							</para>
+						</entry>
+						<entry>
+							<para>Instantiate and show a window from a prefab's path.</para>
+						</entry>
+					</row>
+					<row>
+						<entry>
+							<para>
+								<codeEntityReference>M:Kit.UIManager.Hide(System.String, System.String, Kit.WindowHideMode)</codeEntityReference>
+							</para>
+						</entry>
+						<entry>
+							<para>Hide a window with a name.</para>
+						</entry>
+					</row>
+					<row>
+						<entry>
+							<para>
+								<codeEntityReference autoUpgrade="true" qualifyHint="true">M:Kit.UI.Window.Show(System.Object)</codeEntityReference>
+							</para>
+						</entry>
+						<entry>
+							<para>
+								Show a given window.
+							</para>
+						</entry>
+					</row>
+					<row>
+						<entry>
+							<para>
+								<codeEntityReference autoUpgrade="true" qualifyHint="true">M:Kit.UI.Window.Hide(Kit.WindowHideMode)</codeEntityReference>
+							</para>
+						</entry>
+						<entry>
+							<para>
+								Hide a given window.
+							</para>
+						</entry>
+					</row>
+				</table>
+			</content>
+		</section>
+
+		<section address="ResourceManager">
+			<title>
+				ResourceManager
+			</title>
+			<content>
+				<para>
+					All of the <codeEntityReference>T:Kit.ResourceManager</codeEntityReference> methods provide <codeInline>Async</codeInline> versions 
+					which should the ones you use to perform IO operations for a smoother experience.
+				</para>
+				<table>
+					<tableHeader>
+						<row>
+							<entry>
+								<para>Method(s)</para>
+							</entry>
+							<entry>
+								<para>Description</para>
+							</entry>
+						</row>
+					</tableHeader>
+					<row>
+						<entry>
+							<para>
+								<codeEntityReference autoUpgrade="true">M:Kit.ResourceManager.Load{T}(Kit.ResourceFolder, System.String, System.Boolean, System.Boolean)</codeEntityReference>
+							</para>
+						</entry>
+						<entry>
+							<para>Load a resource from the most common locations.</para>
+						</entry>
+					</row>
+					<row>
+						<entry>
+							<para>
+								<codeEntityReference autoUpgrade="true">M:Kit.ResourceManager.Load{T}(System.String)</codeEntityReference>
+							</para>
+						</entry>
+						<entry>
+							<para>Load a resource from anywhere.</para>
+						</entry>
+					</row>					
+					<row>
+						<entry>
+							<para>
+								<codeEntityReference autoUpgrade="true">M:Kit.ResourceManager.Unload(System.Object)</codeEntityReference>
+							</para>
+						</entry>
+						<entry>
+							<para>Unload a resource.</para>
+						</entry>
+					</row>
+					<row>
+						<entry>
+							<para>
+								<codeEntityReference autoUpgrade="true">M:Kit.ResourceManager.ReadText(System.String)</codeEntityReference> /
+								<codeEntityReference autoUpgrade="true">M:Kit.ResourceManager.ReadBytes(System.String)</codeEntityReference>
+							</para>
+						</entry>
+						<entry>
+							<para>Read the contents of a file in text/binary mode.</para>
+						</entry>
+					</row>
+					<row>
+						<entry>
+							<para>
+								<codeEntityReference autoUpgrade="true">M:Kit.ResourceManager.Save(System.String, System.Object)</codeEntityReference>
+							</para>
+						</entry>
+						<entry>
+							<para>
+								Save the contents of an object to a file.
+							</para>
+						</entry>
+					</row>
+					<row>
+						<entry>
+							<para>
+								<codeEntityReference autoUpgrade="true">M:Kit.ResourceManager.SaveText(System.String, String.String)</codeEntityReference> /
+								<codeEntityReference autoUpgrade="true">M:Kit.ResourceManager.SaveBytes(System.String, String.Byte[])</codeEntityReference>
+							</para>
+						</entry>
+						<entry>
+							<para>
+								Save a string or byte-array to a file.
+							</para>
+						</entry>
+					</row>
+					<row>
+						<entry>
+							<para>
+								<codeEntityReference autoUpgrade="true">M:Kit.ResourceManager.Delete(System.String)</codeEntityReference>
+							</para>
+						</entry>
+						<entry>
+							<para>
+								Delete a file.
+							</para>
+						</entry>
+					</row>
+					<row>
+						<entry>
+							<para>
+								<codeEntityReference autoUpgrade="true">M:Kit.ResourceManager.Exists(System.String)</codeEntityReference>
+							</para>
+						</entry>
+						<entry>
+							<para>
+								Check whether a file exists.
+							</para>
+						</entry>
+					</row>					
+				</table>
+			</content>
+		</section>
+		
+		<section address="SceneDirector">
+			<title>
+				SceneDirector
+			</title>
+			<content>
+				<para>
+					All of the methods return a <codeInline>UniTask</codeInline> which completes after fading is done and can be 
+					<codeInline>await</codeInline>-ed upon as well.
+				</para>
+				<table>
+					<tableHeader>
+						<row>
+							<entry>
+								<para>Method(s)</para>
+							</entry>
+							<entry>
+								<para>Description</para>
+							</entry>
+						</row>
+					</tableHeader>
+					<row>
+						<entry>
+							<para>
+								<codeEntityReference>M:Kit.SceneDirector.FadeIn(UnityEngine.Color?, System.Float, System.Action)</codeEntityReference>
+							</para>
+						</entry>
+						<entry>
+							<para>Fade in the screen.</para>
+						</entry>
+					</row>
+					<row>
+						<entry>
+							<para>
+								<codeEntityReference>M:Kit.SceneDirector.FadeOut(UnityEngine.Color?, System.Float, System.Action)</codeEntityReference>
+							</para>
+						</entry>
+						<entry>
+							<para>Fade out the screen.</para>
+						</entry>
+					</row>
+					<row>
+						<entry>
+							<para>
+								<codeEntityReference>M:Kit.SceneDirector.LoadScene(System.String, Kit.FadeMode, UnityEngine.Color?, System.Float, System.Boolean, System.Action{System.Float}, System.Action, System.Action)</codeEntityReference>
+							</para>
+						</entry>
+						<entry>
+							<para>Load a scene with fading.</para>
+						</entry>
+					</row>
+					<row>
+						<entry>
+							<para>
+								<codeEntityReference>M:Kit.SceneDirector.ReloadScene(Kit.FadeMode, UnityEngine.Color, System.Float, System.Boolean, System.Action{System.Float}, System.Action, System.Action)</codeEntityReference>
+							</para>
+						</entry>
+						<entry>
+							<para>Reload the scene with fading.</para>
+						</entry>
+					</row>
+				</table>
+			</content>
+		</section>
+		
+		<section address="AudioManager">
+			<title>
+				AudioManager
+			</title>
+			<content>
+				<table>
+					<tableHeader>
+						<row>
+							<entry>
+								<para>Method(s)</para>
+							</entry>
+							<entry>
+								<para>Description</para>
+							</entry>
+						</row>
+					</tableHeader>
+					<row>
+						<entry>
+							<para>
+								<codeEntityReference>M:Kit.AudioManager.PlaySound(UnityEngine.AudioClip)</codeEntityReference>
+							</para>
+						</entry>
+						<entry>
+							<para>Play general sounds.</para>
+						</entry>
+					</row>
+					<row>
+						<entry>
+							<para>
+								<codeEntityReference>M:Kit.AudioManager.PlayUI(UnityEngine.AudioClip)</codeEntityReference>
+							</para>
+						</entry>
+						<entry>
+							<para>Play UI sounds.</para>
+						</entry>
+					</row>
+					<row>
+						<entry>
+							<para>
+								<codeEntityReference>M:Kit.AudioManager.PlayMusic(UnityEngine.AudioClip)</codeEntityReference> /
+								<codeEntityReference>M:Kit.AudioManager.PauseMusic</codeEntityReference> /
+								<codeEntityReference>M:Kit.AudioManager.StopMusic</codeEntityReference>
+							</para>
+						</entry>
+						<entry>
+							<para>Handle background music.</para>
+						</entry>
+					</row>
+					<row>
+					<entry>
+						<para>
+							<codeEntityReference>M:Kit.AudioManager.Play(UnityEngine.AudioSource)</codeEntityReference>
+						</para>
+					</entry>
+					<entry>
+						<para>Spawn an <codeInline>AudioSource</codeInline> in the world and pool it.</para>
+					</entry>
+					</row>
+					<row>
+						<entry>
+							<para>
+								<codeEntityReference>M:Kit.AudioManager.Play(UnityEngine.AudioClip, System.Boolean, System.Boolean)</codeEntityReference>
+							</para>
+						</entry>
+						<entry>
+							<para>
+								Play an <codeInline>AudioClip</codeInline> with a dedicated <codeInline>AudioSource</codeInline>.
+							</para>
+						</entry>
+					</row>
+				</table>
+			</content>
+		</section>
+
+		<section address="EffectsManager">
+			<title>
+				EffectsManager
+			</title>
+			<content>
+				<table>
+					<tableHeader>
+						<row>
+							<entry>
+								<para>Method(s)</para>
+							</entry>
+							<entry>
+								<para>Description</para>
+							</entry>
+						</row>
+					</tableHeader>
+					<row>
+						<entry>
+							<para>
+								<codeEntityReference autoUpgrade="true">M:Kit.EffectsManager.Spawn(UnityEngine.ParticleSystem, UnityEngine.Vector3)</codeEntityReference>
+							</para>
+						</entry>
+						<entry>
+							<para>Spawn and pool an particle effect.</para>
+						</entry>
+					</row>
+					<row>
+						<entry>
+							<para>
+								<codeEntityReference autoUpgrade="true">M:Kit.EffectsManager.Despawn(UnityEngine.Component)</codeEntityReference>
+							</para>
+						</entry>
+						<entry>
+							<para>Despawn a particle effect.</para>
+						</entry>
+					</row>
+					<row>
+						<entry>
+							<para>
+								<codeEntityReference autoUpgrade="true">M:Kit.EffectsManager.DespawnAll</codeEntityReference>
+							</para>
+						</entry>
+						<entry>
+							<para>Despawn all particle effects.</para>
+						</entry>
+					</row>
+				</table>
+			</content>
+		</section>
+
+		<section address="SettingsManager">
+			<title>
+				SettingsManager
+			</title>
+			<content>
+				<table>
+					<tableHeader>
+						<row>
+							<entry>
+								<para>Method(s)</para>
+							</entry>
+							<entry>
+								<para>Description</para>
+							</entry>
+						</row>
+					</tableHeader>
+					<row>
+						<entry>
+							<para>
+								<codeEntityReference>M:Kit.SettingsManager.Set(System.String, System.String, System.String, System.Object)</codeEntityReference>
+							</para>
+						</entry>
+						<entry>
+							<para>Set a setting.</para>
+						</entry>
+					</row>
+					<row>
+						<entry>
+							<para>
+								<codeEntityReference>M:Kit.SettingsManager.Get{T}(System.String, System.String, System.String)</codeEntityReference>
+							</para>
+						</entry>
+						<entry>
+							<para>Get a setting.</para>
+						</entry>
+					</row>
+					<row>
+						<entry>
+							<para>
+								<codeEntityReference>M:Kit.SettingsManager.Save</codeEntityReference>
+							</para>
+						</entry>
+						<entry>
+							<para>Save settings.</para>
+						</entry>
+					</row>
+				</table>
+			</content>
+		</section>
+		
+		<relatedTopics>
+		</relatedTopics>
+	</developerConceptualDocument>
+</topic>
