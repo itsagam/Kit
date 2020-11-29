@@ -110,7 +110,9 @@ namespace Kit
 
 			UniTaskAsyncEnumerable.EveryUpdate()
 								  .Where(_ => !system.IsAlive(true))
-								  .FirstAsync(_ => Pooler.Destroy(system));
+								  .Take(1)
+								  .ForEachAsync(_ => Pooler.Destroy(system), system.GetCancellationTokenOnDestroy());
+
 		}
 	}
 }

@@ -1,4 +1,5 @@
-﻿using Kit.UI.Widgets;
+﻿using System;
+using Kit.UI.Widgets;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -18,5 +19,12 @@ namespace Kit
 
 		/// <summary>The command input-field.</summary>
 		public InputFieldEx CommandInput;
+
+#if CONSOLE
+		private void OnDestroy()
+		{
+			Console.Destroy();
+		}
+#endif
 	}
 }

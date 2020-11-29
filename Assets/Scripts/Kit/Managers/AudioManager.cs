@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Cysharp.Threading.Tasks;
 using Cysharp.Threading.Tasks.Linq;
 using Kit.Behaviours;
 using Kit.Pooling;
@@ -248,7 +249,7 @@ namespace Kit
 		{
 			if (!source.loop)
 				UniTaskAsyncEnumerable.Timer(TimeSpan.FromSeconds(source.clip.length))
-									  .ForEachAsync(_ => Pooler.Destroy(source));
+									  .ForEachAsync(_ => Pooler.Destroy(source), source.GetCancellationTokenOnDestroy());
 		}
 
 		#endregion
