@@ -1,6 +1,7 @@
 ﻿using System;
 using Kit;
 using UnityEngine;
+using Object = System.Object;
 
 namespace Demos.Debug
 {
@@ -49,13 +50,15 @@ namespace Demos.Debug
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
 			int times = 1000000;
 
+			Canvas canvas = FindObjectOfType<Canvas>();
+
 			Transform transform1 = GetComponent<Transform>();
-			Transform transform2 = Camera.main.transform;
+			Transform transform2 = canvas.transform;
 
 			Debugger.StartProfile("Uncached Components");
 			for (int i = 0; i < times; i++)
 			{
-				float distance = (transform.position - Camera.main.transform.position).magnitude;
+				float distance = (transform.position - canvas.transform.position).magnitude;
 			}
 			Debugger.EndProfile();
 

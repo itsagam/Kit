@@ -75,7 +75,7 @@ namespace Kit.Pooling
 				 "initializing an instance.")]
 		public Component Prefab;
 
-		// /// <summary>The pool group this pool belongs to.</summary>
+		// /// <summary>The group this pool belongs to.</summary>
 		// [HideInInlineEditors]
 		// [SceneObjectsOnly]
 		// [OnValueChanged("OnGroupChanged")]
@@ -213,29 +213,27 @@ namespace Kit.Pooling
 				return;
 			}
 
-			int amount = PreloadAmount;
-			float preloadFrames = PreloadTime    / Time.fixedUnscaledDeltaTime;
-			float amountPerFrame = PreloadAmount / preloadFrames;
-
-			while (amount > 0)
+			float timePerInstance = PreloadTime / PreloadAmount;
+			TimeSpan timeSpan = TimeSpan.FromSeconds(timePerInstance);
+			for (int i = 0; i < PreloadAmount; i++)
 			{
-				float runningAmount = 0;
-				await Observable.EveryUpdate().TakeWhile(l => runningAmount < 1).Do(l => runningAmount += amountPerFrame);
-
-				int runningCount = (int) runningAmount;
-				PreloadInstances(runningCount);
-				amount -= runningCount;
+				await UniTask.Delay(timeSpan);
+				PreloadInstance();
 			}
+
 		}
 
 		protected void PreloadInstances(int count)
 		{
 			for (int i = 0; i < count; i++)
-			{
-				Component instance = CreateInstance();
-				instance.gameObject.SetActive(false);
-				Available.AddLast(instance);
-			}
+				PreloadInstance();
+		}
+
+		protected void PreloadInstance()
+		{
+			Component instance = CreateInstance();
+			instance.gameObject.SetActive(false);
+			Available.AddLast(instance);
 		}
 
 		#endregion

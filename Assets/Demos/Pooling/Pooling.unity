@@ -5751,9 +5751,9 @@ MonoBehaviour:
   Prefab: {fileID: 4698855329597545572, guid: fc813905c9fbe564d87976deb47cd149, type: 3}
   MessageMode: 1
   Preload: 1
-  PreloadAmount: 5
+  PreloadAmount: 10
   PreloadDelay: 1
-  PreloadTime: 3
+  PreloadTime: 2
   Limit: 1
   LimitMode: 2
   LimitAmount: 50

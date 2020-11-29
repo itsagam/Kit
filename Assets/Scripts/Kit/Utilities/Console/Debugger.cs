@@ -3,6 +3,8 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Text;
+using Cysharp.Threading.Tasks;
+using Cysharp.Threading.Tasks.Linq;
 using Kit.Parsers;
 using UniRx;
 using UnityEngine;
@@ -65,12 +67,13 @@ namespace Kit
 		{
 			Recorder recorder = sample.GetRecorder();
 			recorder.enabled = true;
-			Observable.EveryEndOfFrame()
-					  .Subscribe(l =>
-								 {
-									 if (recorder.sampleBlockCount > 0)
-										 Log(sample.name + ": " + ConvertTime(recorder.elapsedNanoseconds));
-								 });
+
+			UniTaskAsyncEnumerable.EveryUpdate(PlayerLoopTiming.LastPostLateUpdate)
+								  .ForEachAsync(_ =>
+												{
+													if (recorder.sampleBlockCount > 0)
+														Log(sample.name + ": " + ConvertTime(recorder.elapsedNanoseconds));
+												});
 		}
 
 		private static string ConvertTime(long time)
