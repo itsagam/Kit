@@ -2,8 +2,8 @@
 <topic id="Managers" revisionNumber="1">
 	<developerConceptualDocument xmlns="http://ddue.schemas.microsoft.com/authoring/2003/5" xmlns:xlink="http://www.w3.org/1999/xlink">
 		<introduction>
-			<para>Most video-games require a host of managers to handle things like UI, sounds and effects. The most common of those are included in the
-			kit. What follows is a cheat-sheet of the most important methods in the included managers. Consult the manager reference documents for a
+			<para>Most video-games require a host of managers to handle things like UI, sounds, and effects. The most common of these are included in the
+			kit. What follows is a cheat-sheet of the most useful methods in the included managers. Consult the manager reference documents for a
 			more in-depth look at the features and options available.</para>
 
 			<autoOutline lead="none"/>
@@ -118,7 +118,7 @@
 			<content>
 				<para>
 					All of the <codeEntityReference>T:Kit.ResourceManager</codeEntityReference> methods provide <codeInline>async</codeInline> versions 
-					which should the ones you use to perform IO operations for a smoother experience.
+					which should be the ones you use to perform IO operations for a smoother experience.
 				</para>
 				<table>
 					<tableHeader>
@@ -222,7 +222,7 @@
 			<content>
 				<para>
 					All of the methods return a <codeInline>UniTask</codeInline> which completes after fading is done and can be 
-					<codeInline>await</codeInline>-ed upon as well.
+					<codeInline>await</codeInline>-ed as well.
 				</para>
 				<table>
 					<tableHeader>

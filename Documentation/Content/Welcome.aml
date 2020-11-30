@@ -2,17 +2,119 @@
 <topic id="Welcome" revisionNumber="1">
 	<developerConceptualDocument xmlns="http://ddue.schemas.microsoft.com/authoring/2003/5" xmlns:xlink="http://www.w3.org/1999/xlink">
 		<introduction>
-			<para>Stub description.</para>
+			<para>
+				Most game development projects start with a host of systems that need to be integrated before tasks related to the game can be tackled. This
+				kit is developed to bridge that gap.
+			</para>
 		</introduction>
 
 		<section>
-			<title>Stub title.</title>
+			<title>Benefits</title>
 			<content>
-				<para>Stub content.</para>
+				<para>Having a shared repository of commonly-used managers, classes, &amp; utilities has quite a few other benefits as well over the alternative:</para>
+				<list class="bullet">
+					<listItem>
+						<para>
+							Time spent on re-implementing stuff can instead be allocated to making it better, or documenting it.
+						</para>
+					</listItem>
+					<listItem>
+						<para>
+							Any improvements can be quickly shared with everybody without having them split over multiple projects and people.
+						</para>
+					</listItem>
+					<listItem>
+						<para>
+							Bugs can be quickly identified and ironed-out, paving way for a battle-tested set of tools.
+						</para>
+					</listItem>
+				</list>
 			</content>
 		</section>
 
+		<section>
+			<title>What's Here</title>
+			<content>
+				<para>A non-exhaustive list of what's included:</para>
+				<list class="bullet">
+					<listItem>
+						<para>
+							<link xlink:href="Managers">Managers for handling things</link> like UI and sound.
+						</para>
+					</listItem>
+					<listItem>
+						<para>
+							Commonly-used <codeEntityReference linkText="behaviours">N:Kit.Behaviours</codeEntityReference>.
+						</para>
+					</listItem>
+					<listItem>
+						<para>
+							<codeEntityReference linkText="Data containers">N:Kit.Containers</codeEntityReference>.
+						</para>
+					</listItem>					
+					<listItem>
+						<para>
+							A <codeEntityReference linkText="stat system">T:Kit.Containers.Stats</codeEntityReference>.
+						</para>
+					</listItem>		
+					<listItem>
+						<para>
+							Helper <codeEntityReference linkText="function library">N:Kit</codeEntityReference>.
+						</para>
+					</listItem>
+					<listItem>
+						<para>
+							<codeEntityReference linkText="Extension methods">N:Kit</codeEntityReference> for standard types.
+						</para>
+					</listItem>
+					<listItem>
+						<para>
+							Implementations of <codeEntityReference linkText="common algorithms">N:Kit.Algorithms</codeEntityReference>.
+						</para>
+					</listItem>
+					<listItem>
+						<para>
+							A <link xlink:href="Pooler">pooling system</link>.
+						</para>
+					</listItem>
+					<listItem>
+						<para>
+							<codeEntityReference linkText="Debugging tools">T:Kit.Debugger</codeEntityReference> and an <link xlink:href="Console">in-game Console</link>.
+						</para>
+					</listItem>
+					<listItem>
+						<para>
+							A <link xlink:href="Modding"> modding system</link>.
+						</para>
+					</listItem>				
+					<listItem>
+						<para>
+							A library of UI sprites and built-in prefabs.
+						</para>
+					</listItem>
+					<listItem>
+						<para>
+							Code for the most frequent <codeEntityReference linkText="UI elements">G:Kit.UI</codeEntityReference>.
+						</para>
+					</listItem>						
+					<listItem>
+						<para>
+							Pre-built Splash, Menu, Settings, and <codeEntityReference linkText="Message">T:Kit.UI.Message.MessageWindow</codeEntityReference>
+							screens.
+						</para>
+					</listItem>
+					<listItem>
+						<para>
+							<link xlink:href="Plugins">Plugin integrations</link>.
+						</para>
+					</listItem>							
+				</list>
+			</content>
+		</section>
+		
 		<relatedTopics>
+			<link xlink:href="Structure" />
+			<link xlink:href="Plugins" />
 		</relatedTopics>
 	</developerConceptualDocument>
 </topic>

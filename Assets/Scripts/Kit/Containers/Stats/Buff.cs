@@ -29,7 +29,7 @@ namespace Kit.Containers
 
 	/// <summary>
 	///     <para>Represents an <see cref="Upgrade" /> that is only applicable for a specified duration, and gets removed afterwards.</para>
-	///     <para>Needs to be added through <see cref="AddTo(IUpgradeable)" /> to an <see cref="IUpgradeable" /> for the timer to start.</para>
+	///     <para>Needs to be added through <see cref="Apply(IUpgradeable)" /> to an <see cref="IUpgradeable" /> for the timer to start.</para>
 	/// </summary>
 	/// <example>
 	///     <code>
@@ -58,7 +58,7 @@ namespace Kit.Containers
 		/// <summary>Create a new Buff.</summary>
 		/// <param name="id">Upgrade ID.</param>
 		/// <param name="duration">Duration of the buff in seconds.</param>
-		/// <param name="mode">The BuffMode to use.</param>
+		/// <param name="mode">The <see cref="BuffMode" /> to use.</param>
 		public Buff(string id, float duration, BuffMode mode = BuffMode.Extend)
 		{
 			ID = id;
@@ -70,24 +70,23 @@ namespace Kit.Containers
 		/// <param name="id">Upgrade ID.</param>
 		/// <param name="effects">List of Upgrade effects.</param>
 		/// <param name="duration">Duration of the Buff in seconds.</param>
-		/// <param name="mode">The BuffMode to use.</param>
+		/// <param name="mode">The <see cref="BuffMode" /> to use.</param>
 		public Buff(string id, IEnumerable<Effect> effects, float duration, BuffMode mode = BuffMode.Extend)
 			: this(id, duration, mode)
 		{
 			AddEffects(effects);
 		}
 
-		/// <summary>Add the Buff to an IUpgradeable and start the timer.</summary>
-		/// <param name="upgradeable">The IUpgradeable to add the buff to.</param>
-		public virtual Buff AddTo(IUpgradeable upgradeable)
+		/// <summary>Add the buff to an <see cref="IUpgradeable" /> and start the timer.</summary>
+		/// <param name="upgradeable">The <see cref="IUpgradeable" /> to apply the buff on.</param>
+		public virtual Buff Apply(IUpgradeable upgradeable)
 		{
-			return AddTo(upgradeable, Mode);
+			return Apply(upgradeable, Mode);
 		}
 
-		/// <summary>Add the Buff to an IUpgradeable and start the timer.</summary>
-		/// <param name="upgradeable">The IUpgradeable to add the buff to.</param>
-		/// <param name="mode">BuffMode override.</param>
-		public virtual Buff AddTo(IUpgradeable upgradeable, BuffMode mode)
+		/// <inheritdoc cref="Apply(IUpgradeable)"/>
+		/// <param name="mode"><see cref="BuffMode" /> override.</param>
+		public virtual Buff Apply(IUpgradeable upgradeable, BuffMode mode)
 		{
 			Buff previous = null;
 			if (mode != BuffMode.Nothing)
@@ -141,9 +140,9 @@ namespace Kit.Containers
 			}
 		}
 
-		/// <summary>Remove the Buff from an IUpgradeable.</summary>
-		/// <param name="upgradeable">The IUpgradeable to remove the buff from.</param>
-		/// <returns>Whether the item was successfully removed.</returns>
+		/// <summary>Remove the buff from an <see cref="IUpgradeable" />.</summary>
+		/// <param name="upgradeable">The <see cref="IUpgradeable" /> which contains the buff.</param>
+		/// <returns>Whether the buff was successfully removed.</returns>
 		public virtual bool RemoveFrom(IUpgradeable upgradeable)
 		{
 			return upgradeable.GetUpgrades().Remove(this);

@@ -19,10 +19,11 @@
 							A <legacyBold>Pooler</legacyBold> is a system that facilitates this task. Typically it involves calling 
 							<codeInline>SetActive</codeInline> on <codeInline>GameObjects</codeInline> for re-using and destroying pool instances.
 							<codeInline>Instantiate</codeInline> is called only when there are no more objects in the "re-use" list. There also needs
-							to be messaging system so that pool instances are informed of these events and can manage themselves accordingly.
+							to be a messaging system so that pool instances are informed of these events and can manage themselves accordingly.
 						</para>
 						<para>
-							The pooling system in the kit provides the functionality in a inspector-friendly manner, and is quite effecient &amp; easy-to-use. It also supports:
+							The pooling system in the kit provides the functionality in an inspector-friendly manner, and is quite efficient &amp; easy-to-use.
+							It also supports:
 						</para>
 							<list class="ordered">
 							<listItem>
@@ -50,7 +51,7 @@
 							</listItem>
 							<listItem>
 								<para>
-									<legacyBold>Grouping</legacyBold> – You can organize pools of similar category and configure them together.
+									<legacyBold>Grouping</legacyBold> – You can organize pools of similar categories and configure them together.
 								</para>
 							</listItem>
 						</list>						
@@ -69,9 +70,9 @@
 			<title>System</title>
 			<content>			
 				<para>
-					The class <codeEntityReference>T:Kit.Pooling.Pooler</codeEntityReference> is the central hub to the system. It provides access to 
-					adding, querying, and removing instances, pools and groups. For every different prefab, a separate <codeEntityReference>T:Kit.Pooling.Pool</codeEntityReference> 
-					object is created, which can them can be grouped together into <codeEntityReference>T:Kit.Pooling.PoolGroup</codeEntityReference>s. The pool 
+					The class <codeEntityReference>T:Kit.Pooling.Pooler</codeEntityReference> is the central hub of the system. It provides access to 
+					adding, querying, and removing instances, pools, and groups. For every different prefab, a separate <codeEntityReference>T:Kit.Pooling.Pool</codeEntityReference> 
+					object is created, which can be grouped together into <codeEntityReference>T:Kit.Pooling.PoolGroup</codeEntityReference>s. The pool 
 					keeps track of all instances <codeEntityReference linkText="being used">F:Kit.Pooling.Pool.Used</codeEntityReference> and 
 					those that <codeEntityReference linkText="are available">F:Kit.Pooling.Pool.Available</codeEntityReference>.
 				</para>

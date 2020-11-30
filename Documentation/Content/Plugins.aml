@@ -21,6 +21,9 @@
 							<entry>
 								<para>Location(s)</para>
 							</entry>
+							<entry>
+								<para>Requirement</para>
+							</entry>							
 						</row>
 					</tableHeader>
 					<row>
@@ -40,6 +43,11 @@
 								<localUri>/Assets/Plugins/DOTween/</localUri>
 							</para>
 						</entry>
+						<entry>
+							<para>
+								Mandatory.
+							</para>
+						</entry>						
 					</row>
 					<row>
 						<entry>
@@ -56,6 +64,11 @@
 						<entry>
 							<para>
 								<localUri>/Assets/Plugins/Sirenix/</localUri>
+							</para>
+						</entry>
+						<entry>
+							<para>
+								Mandatory.
 							</para>
 						</entry>
 					</row>
@@ -82,6 +95,11 @@
 								<localUri>/Assets/Plugins/XLua/</localUri>, <localUri>/Assets/Plugins/XLuaNative/</localUri>, <localUri>/Tools</localUri>
 							</para>
 						</entry>
+						<entry>
+							<para>
+								 Optional — not compiled if <codeInline>MODDING</codeInline> and <codeInline>CONSOLE</codeInline> are not defined.
+							</para>
+						</entry>						
 					</row>
 					<row>
 						<entry>
@@ -93,13 +111,20 @@
 							</para>
 						</entry>
 						<entry>
-							<para>Gestures and touch library.</para>
+							<para>
+								Gestures and touch library.
+							</para>
 						</entry>
 						<entry>
 							<para>
 								<localUri>/Assets/Plugins/TouchScript/</localUri>
 							</para>
-						</entry>						
+						</entry>	
+						<entry>
+							<para>
+								 Optional — not compiled if <codeInline>TOUCHSCRIPT</codeInline> is not defined.
+							</para>
+						</entry>							
 					</row>
 					<row>
 						<entry>
@@ -118,6 +143,11 @@
 								<localUri>/Assets/Plugins/CleanUI/</localUri>
 							</para>
 						</entry>
+						<entry>
+							<para>
+								Optional — Can just delete the folder and your own sprites.
+							</para>
+						</entry>						
 					</row>
 					<row>
 						<entry>
@@ -135,7 +165,12 @@
 							<para>
 								<localUri>/Assets/Plugins/SoftMask/</localUri>
 							</para>
-						</entry>						
+						</entry>
+						<entry>
+							<para>
+								Optional — Can just delete the folder.
+							</para>
+						</entry>				
 					</row>
 				</table>
 			</content>
@@ -154,6 +189,9 @@
 							<entry>
 								<para>Description</para>
 							</entry>
+							<entry>
+								<para>Requirement</para>
+							</entry>							
 						</row>
 					</tableHeader>
 					<row>
@@ -169,19 +207,11 @@
 							<para>
 								Json <codeEntityReference linkText="serialization and deserialization">T:Kit.Parsers.JsonParser</codeEntityReference>.</para>
 						</entry>
-					</row>
-					<row>
 						<entry>
 							<para>
-								<externalLink>
-									<linkText>UniRx</linkText>
-									<linkUri>https://github.com/neuecc/UniRx</linkUri>
-								</externalLink>
+								Mandatory.
 							</para>
-						</entry>
-						<entry>
-							<para>Reactive programming implementation.</para>
-						</entry>
+						</entry>						
 					</row>
 					<row>
 						<entry>
@@ -197,7 +227,31 @@
 								<codeInline>async</codeInline>-<codeInline>await</codeInline> support.
 							</para>
 						</entry>
-					</row>					
+						<entry>
+							<para>
+								Mandatory.
+							</para>
+						</entry>						
+					</row>						
+					<row>
+						<entry>
+							<para>
+								<externalLink>
+									<linkText>UniRx</linkText>
+									<linkUri>https://github.com/neuecc/UniRx</linkUri>
+								</externalLink>
+							</para>
+						</entry>
+						<entry>
+							<para>Reactive programming implementation.</para>
+						</entry>
+						<entry>
+							<para>
+								Optional - Only used in the <codeEntityReference linkText="stat system">T:Kit.Containers.Stats</codeEntityReference> and
+								can be removed together with it.
+							</para>
+						</entry>							
+					</row>
 				</table>
 			</content>
 		</section>

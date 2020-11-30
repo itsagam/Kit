@@ -2,7 +2,7 @@
 <topic id="Structure" revisionNumber="1">
 	<developerConceptualDocument xmlns="http://ddue.schemas.microsoft.com/authoring/2003/5" xmlns:xlink="http://www.w3.org/1999/xlink">
 		<introduction>
-			<para>The kit files are structured as below:</para>
+			<para>The kit directory hierarchy is structured as below:</para>
 		</introduction>
 
 		<section>
@@ -135,7 +135,7 @@
 							</para>
 						</entry>
 						<entry>
-							<para>MonoBehaviours for all occasions.</para>
+							<para><codeInline>MonoBehaviours</codeInline> for all occasions.</para>
 						</entry>
 					</row>
 					<row>
@@ -166,7 +166,7 @@
 							</para>
 						</entry>
 						<entry>
-							<para>Json utitilies.</para>
+							<para>Json utilities.</para>
 						</entry>
 					</row>
 					<row>
@@ -240,7 +240,7 @@
 							</para>
 						</entry>
 						<entry>
-							<para>Resource loading, unloading, caching, reading, saving and parsing.</para>
+							<para>Resource loading, unloading, caching, reading, saving, and parsing.</para>
 						</entry>
 					</row>
 					<row>
@@ -276,7 +276,7 @@
 							</para>
 						</entry>
 						<entry>
-							<para>Play &amp; pool sounds and group them into AudioSources. Handle music.</para>
+							<para>Play &amp; pool sounds and group them into <codeInline>AudioSources</codeInline>. Handle music.</para>
 						</entry>
 					</row>
 					<row>
@@ -384,7 +384,7 @@
 							</para>
 						</entry>
 						<entry>
-							<para>Common MonoBehaviours for UI elements.</para>
+							<para>Common <codeInline>MonoBehaviours</codeInline> for UI elements.</para>
 						</entry>
 					</row>
 					<row>
@@ -394,7 +394,7 @@
 							</para>
 						</entry>
 						<entry>
-							<para>Common functionalities for buttons.</para>
+							<para>General functionalities for buttons.</para>
 						</entry>
 					</row>
 					<row>
@@ -404,7 +404,7 @@
 							</para>
 						</entry>
 						<entry>
-							<para>Most common UI elements.</para>
+							<para>Most frequent UI elements.</para>
 						</entry>
 					</row>
 					<row>

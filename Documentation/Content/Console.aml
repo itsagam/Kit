@@ -16,7 +16,7 @@
 							This should come in handy in situations where you want to debug or tweak the game.
 						</para>
 						<para>
-							There is no need to bind commands to the console — it has full access to your game code. XLua does, however, require classes be referred
+							There is no need to bind commands to the console — it has full access to your game code. XLua does, however, require classes to be referred
 							to by their fully-qualified name, starting with <codeInline>CS</codeInline>. So <codeInline>GameObject("MyObject")</codeInline> or
 							<codeInline>DataManager.GameData</codeInline> will not work but
 							<codeInline>CS.UnityEngine.GameObject("MyObject")</codeInline> and <codeInline>CS.Game.DataManager.GameData</codeInline> will. To ease the
@@ -108,7 +108,7 @@
 					</definedTerm>
 					<definition>
 						<para>
-							Get the specified component of the <codeInline>GameObject</codeInline> at given scene <replaceable>path</replaceable>.
+							Get the specified component of the <codeInline>GameObject</codeInline> at the given scene <replaceable>path</replaceable>.
 							Uses <codeInline>GameObject.Find</codeInline>.
 						</para>
 					</definition>
@@ -117,7 +117,7 @@
 					</definedTerm>
 					<definition>
 						<para>
-							Get the first component of given <replaceable>type</replaceable>.
+							Get the first component of the given <replaceable>type</replaceable>.
 						</para>
 					</definition>
 					<definedTerm>
@@ -189,7 +189,7 @@
 					</definedTerm>
 					<definition>
 						<para>
-							Destroy the first component of given <replaceable>type</replaceable>.
+							Destroy the first component of the given <replaceable>type</replaceable>.
 						</para>
 					</definition>
 				</definitionTable>

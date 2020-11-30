@@ -9,15 +9,16 @@
 				with it to be able to create a mod. Which is one of the reasons most Unity games with good modding support don’t go this route and implement
 				custom modding tools &amp; systems.
 			</para>
+			<autoOutline />
 		</introduction>
 
-		<section>
+		<section address="System">
 			<title>System</title>
 			<content>
 				<para>Any modding system has to contend with two types of resources:</para>
 				<list class="ordered">
 					<listItem>
-						<para>Assets such as textures, sounds and configuration files to allow modding of in-game look-and-feel.</para>
+						<para>Assets such as textures, sounds, and configuration files to allow modding of in-game look-and-feel.</para>
 					</listItem>
 					<listItem>
 						<para>Scripts to add new features or modify existing functionality.</para>
@@ -36,7 +37,7 @@
 							Our modding system achieves the former by hooking into <codeEntityReference>T:Kit.ResourceManager</codeEntityReference>.
 							ResourceManager is the global center where all in-game assets can be conveniently loaded and should be the class you use to load everything.
 							Before looking for assets in the game <codeEntityReference>T:Kit.ResourceManager</codeEntityReference> asks
-							<codeEntityReference>T:Kit.Modding.ModManager</codeEntityReference> if any of loaded mods has the asset being requested. If that is
+							<codeEntityReference>T:Kit.Modding.ModManager</codeEntityReference> if any of the loaded mods have the asset being requested. If that is
 							indeed the case, the mod version is loaded instead.
 						</para>
 						<alert class="note">
@@ -63,7 +64,7 @@
 								<linkText>XLua</linkText>
 								<linkUri>https://github.com/Tencent/xLua</linkUri>
 							</externalLink>.
-							A mod just has to provide a list of <localUri>.lua</localUri> scripts it wants to executes. The scripts have full access to your game (with the
+							A mod just has to provide a list of <localUri>.lua</localUri> scripts it wants to execute. The scripts have full access to your game (with the
 							<codeInline>CS</codeInline> namespace) and Unity (with the <codeInline>UnityEngine</codeInline> or <codeInline>UE</codeInline>
 							namespace) and can do pretty much everything. They also support code injection whereby they can modify the functionality of
 							existing methods.
@@ -89,7 +90,7 @@
 			</sections>
 		</section>
 
-		<section>
+		<section address="Mods">
 			<title>Mods</title>
 			<content>
 				<para>
@@ -187,7 +188,7 @@
 							<para>Optional</para>
 						</entry>
 						<entry>
-							<para>Game assets to replace in the base game folder folder.</para>
+							<para>Game assets to replace in the base game folder.</para>
 						</entry>
 					</row>
 					<row>
@@ -203,7 +204,7 @@
 					</row>
 				</table>
 				<para>
-					Any paths/files placed inside <localUri>Resources</localUri>, <localUri>StreamingAssets</localUri>, <localUri>PersistentData</localUri>
+					Any paths/files placed inside <localUri>Resources</localUri>, <localUri>StreamingAssets</localUri>, <localUri>PersistentData</localUri>,
 					and <localUri>Data</localUri> folders inside a mod directly override the version base game provides. So, for example, if you have a
 					<localUri>Mod1/Resources/Backgrounds/Background1.jpg</localUri>, and the game calls
 					<codeInline>ResourceManager.Load&lt;Texture&gt;(ResourceFolder.Resources, "Backgrounds/Background1")</codeInline> the mod version will be 
@@ -284,7 +285,8 @@
 				</code>
 			</content>
 		</section>
-		<section>
+		
+		<section address="Scripting">
 			<title>Scripting</title>
 			<content>
 				<para>The Lua keyword <codeInline>self</codeInline> in each script is bound to the
@@ -330,7 +332,7 @@
 					</definedTerm>
 					<definition>
 						<para>
-							Schedule a function for <codeInline>update</codeInline>, <codeInline>fixedUpdate</codeInline> or <codeInline>lateUpdate</codeInline>.
+							Schedule a function for <codeInline>update</codeInline>, <codeInline>fixedUpdate</codeInline>, or <codeInline>lateUpdate</codeInline>.
 						</para>
 					</definition>
 					<definedTerm>
